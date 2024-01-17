@@ -1,0 +1,21 @@
+{
+  "extends": [
+    "plugin:storybook/recommended",
+    "next",
+    "next/core-web-vitals",
+    "eslint:recommended"
+  ],
+  "globals": {
+    "React": "readonly"
+  },
+  "overrides": [
+    {
+      "files": [
+        "*.stories.@(ts|tsx|js|jsx|mjs|cjs)"
+      ]
+    }
+  ],
+  "rules": {
+    "no-unused-vars": "warn"
+  }
+}

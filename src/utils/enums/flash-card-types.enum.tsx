@@ -1,0 +1,5 @@
+export enum FlashCardTypesEnum {
+  GUESS_DEFINITION = 'GUESS_DEFINITION',
+  GUESS_NAME = 'GUESS_NAME',
+  SHOW_ALL = 'SHOW_ALL'
+}
