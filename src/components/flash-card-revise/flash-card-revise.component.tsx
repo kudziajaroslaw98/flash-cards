@@ -9,6 +9,7 @@ import ButtonComponent from '#/components/ui/button/button.component';
 import DropdownComponent from '#/components/ui/dropdown/dropdown.component';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
+import { DEFAULT_STATS } from '#/utils/defaults/stats.default';
 import { FlashCardTypesEnum } from '#/utils/enums/flash-card-types.enum';
 import getRandomRangedNumber from '#/utils/functions/get-random-ranged-number.util';
 import { FlashCardModel } from '#/utils/models/flash-card.model';
@@ -26,8 +27,11 @@ export default function FlashCardReviseComponent() {
   const {
     arrayOfValues: flashCardsArray,
     value: flashCards,
-    setToLocalStorage,
+    setToLocalStorage: setFlashCards,
   } = useLocalStorage<FlashCardModel, FlashCards>('words', {});
+
+  const { value: statistics, setToLocalStorage: setStatistics } =
+    useLocalStorage('stats', DEFAULT_STATS);
 
   const { pickedItems: randomCards, reshuffle } =
     useRandomArrayItems<FlashCardModel>(
@@ -47,16 +51,26 @@ export default function FlashCardReviseComponent() {
 
     const correct = isCorrect(flashCard);
     const clonedFlashCards = cloneDeep(flashCards);
+    const clonedStats = cloneDeep(statistics);
+
+    clonedStats.answers += 1;
 
     if (correct) {
+      clonedStats.correctAnswers += 1;
       if (revisedCard && revisedCard?.weight > 0.01) {
-        clonedFlashCards[flashCard.uuid].weight -= 0.01;
+        (clonedFlashCards[flashCard.uuid].weight -= 0.01).toFixed(2);
       }
     } else {
-      clonedFlashCards[flashCard.uuid].weight += 0.01;
+      clonedStats.incorrectAnswers += 1;
+      (clonedFlashCards[flashCard.uuid].weight += 0.01).toFixed(2);
     }
 
-    setToLocalStorage(clonedFlashCards);
+    clonedStats.accuracy = parseFloat(
+      (clonedStats.correctAnswers / clonedStats.answers).toFixed(2),
+    );
+
+    setFlashCards(clonedFlashCards);
+    setStatistics(clonedStats);
     setClickedCard(flashCard);
     setClicked(true);
   };
@@ -79,36 +93,38 @@ export default function FlashCardReviseComponent() {
 
   return (
     flashCardsArray.length > 0 && (
-      <div className='flex flex-col items-center justify-center gap-2 md:gap-8'>
-        <div
-          className={`mb-2 flex h-auto min-h-16 w-full max-w-80 flex-col items-center justify-center gap-4 px-4 text-center text-lg font-semibold md:max-w-xl dark:text-slate-200`}
-        >
-          {reviseType === FlashCardTypesEnum.GUESS_DEFINITION &&
-            revisedCard && <p>{revisedCard.word}</p>}
+      <div className='flex h-full flex-col justify-stretch pb-36'>
+        <div className='flex h-full flex-col items-center gap-2 md:gap-8'>
+          <div
+            className={`mb-2 flex h-auto min-h-16 w-full max-w-80 flex-col items-center justify-center gap-4 px-4 text-center text-lg font-semibold md:max-w-xl dark:text-slate-200`}
+          >
+            {reviseType === FlashCardTypesEnum.GUESS_DEFINITION &&
+              revisedCard && <p>{revisedCard.word}</p>}
 
-          {reviseType === FlashCardTypesEnum.GUESS_NAME && revisedCard && (
-            <p>{revisedCard.definition}</p>
-          )}
+            {reviseType === FlashCardTypesEnum.GUESS_NAME && revisedCard && (
+              <p>{revisedCard.definition}</p>
+            )}
+          </div>
+
+          <div className='grid w-full auto-rows-fr grid-cols-1 flex-col items-center justify-center gap-3 sm:grid-cols-2-auto'>
+            {randomCards.map((flashCard) => (
+              <FlashCardComponent
+                key={flashCard.uuid}
+                flashCard={flashCard}
+                reviseType={reviseType}
+                correct={isCorrect(flashCard)}
+                clickedOnFlashCard={flashCard === clickedCard}
+                clickedOverall={clicked}
+                onClick={(flashCard) => changeClicked(flashCard)}
+              />
+            ))}
+          </div>
         </div>
 
-        <div className='grid h-full w-full grid-cols-1 items-center justify-center gap-4 sm:grid-cols-2-auto'>
-          {randomCards.map((flashCard) => (
-            <FlashCardComponent
-              key={flashCard.uuid}
-              flashCard={flashCard}
-              reviseType={reviseType}
-              correct={isCorrect(flashCard)}
-              clickedOnFlashCard={flashCard === clickedCard}
-              clickedOverall={clicked}
-              onClick={(flashCard) => changeClicked(flashCard)}
-            />
-          ))}
-        </div>
-
-        <div className='flex w-full flex-col items-center gap-4'>
+        <div className='fixed bottom-0 left-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md sm:bottom-32 dark:bg-slate-950/10'>
           <ButtonComponent
             class={
-              'mt-8 min-w-52 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 dark:bg-green-500 dark:hover:bg-green-400'
+              'max-w-80 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 md:w-52 dark:bg-green-500 dark:hover:bg-green-400'
             }
             onClick={reshuffleFlashCards}
           >

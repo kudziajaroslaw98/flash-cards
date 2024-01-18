@@ -62,12 +62,12 @@ export default function DropdownComponent<T>(
   };
 
   return (
-    <div className='relative w-full sm:w-52'>
+    <div className='relative w-full max-w-80 sm:w-52 '>
       <div
         className={`group z-30 flex h-12 cursor-pointer items-center justify-center rounded-md border border-green-400 px-4 transition-colors md:h-10 ${
           visible
             ? 'bg-green-400 text-gray-50 dark:bg-slate-600 dark:text-green-400'
-            : 'text-green-400'
+            : 'bg-gray-200 text-green-400 dark:bg-slate-950'
         }`}
         onClick={() => toggleDropdownVisibility()}
       >

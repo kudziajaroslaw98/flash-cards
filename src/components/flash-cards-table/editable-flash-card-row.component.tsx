@@ -42,7 +42,7 @@ export default function EditableFlashCardRowComponent(
       }
       className={`flex rounded-md border shadow-table-row transition-all ${
         props.isSelected(props.flashCard)
-          ? 'border-green-400/50 bg-green-100 dark:border-green-600/40 dark:bg-green-600'
+          ? 'border-green-400/50 bg-green-100 dark:border-green-600/40 dark:bg-green-500/20'
           : 'border-transparent bg-gray-100 dark:border-slate-700 dark:bg-slate-800'
       }`}
       transition={{
@@ -76,10 +76,10 @@ export default function EditableFlashCardRowComponent(
       <motion.td className='z-20 flex w-full min-w-44 flex-col items-start gap-2 p-2 py-4 text-sm text-gray-800 md:w-auto md:flex-row md:items-center md:border-r md:border-r-slate-400/20 md:py-2 dark:text-slate-200'>
         <input
           type='text'
-          className={`w-full rounded-md p-2 text-base font-semibold outline-none ring-blue-400 transition-all focus:ring-1 md:text-sm ${
+          className={`w-full rounded-md bg-transparent p-2 text-base font-semibold outline-none ring-blue-400 transition-all focus:ring-1 md:text-sm ${
             props.isSelected(props.flashCard)
-              ? 'border-green-400/50 bg-green-100 dark:bg-green-600'
-              : 'border-transparent bg-gray-100 dark:border-slate-700 dark:bg-slate-800'
+              ? 'border-green-400/50'
+              : 'border-transparent dark:border-slate-700'
           }`}
           id={`word-${props.flashCard.uuid}`}
           onInput={(value) =>
@@ -88,10 +88,10 @@ export default function EditableFlashCardRowComponent(
           value={props.flashCard.word}
         />
         <TextAreaComponent
-          class={`flex md:hidden  ${
+          class={`flex bg-transparent md:hidden ${
             props.isSelected(props.flashCard)
-              ? 'border-green-400/50 bg-green-100 dark:bg-green-600'
-              : 'border-transparent bg-gray-100 dark:border-slate-700 dark:bg-slate-800'
+              ? 'border-green-400/50 '
+              : 'border-transparent dark:border-slate-700'
           }`}
           onInput={(value) => props.definitionChange(props.flashCard, value)}
           value={props.flashCard.definition}
@@ -101,10 +101,10 @@ export default function EditableFlashCardRowComponent(
 
       <motion.td className='line-clamp-2 hidden w-full items-center p-2 px-4 text-sm text-gray-700 md:flex dark:text-slate-200'>
         <TextAreaComponent
-          class={`hidden md:flex  ${
+          class={`hidden bg-transparent md:flex ${
             props.isSelected(props.flashCard)
-              ? 'border-green-400/50 bg-green-100 dark:bg-green-600'
-              : 'border-transparent bg-gray-100 dark:border-slate-700 dark:bg-slate-800'
+              ? 'border-green-400/50 '
+              : 'border-transparent dark:border-slate-700'
           }`}
           onInput={(value) => props.definitionChange(props.flashCard, value)}
           value={props.flashCard.definition}

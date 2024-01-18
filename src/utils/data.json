@@ -3,280 +3,280 @@
     "word": "Enigmatic",
     "definition": "Difficult to interpret or understand; mysterious.",
     "uuid": "765876db-18e1-43c3-98ea-0cdb2950c1ef",
-    "weight": 1,
+    "weight": 0.5,
     "order": 0
   },
   "94a80f1d-e7d5-4d2f-93f4-f8f05c79e95f": {
     "word": "Mellifluous",
     "definition": "Smooth and sweet-sounding, often used to describe a voice or music.",
     "uuid": "94a80f1d-e7d5-4d2f-93f4-f8f05c79e95f",
-    "weight": 1,
+    "weight": 0.5,
     "order": 1
   },
   "a4d0177d-cecd-48da-ba7b-71a9c9c4541b": {
     "word": "Quixotic",
     "definition": "Extremely idealistic, unrealistic, and impractical, often to the point of being foolish.",
     "uuid": "a4d0177d-cecd-48da-ba7b-71a9c9c4541b",
-    "weight": 1,
+    "weight": 0.5,
     "order": 2
   },
   "d1a6863a-145e-41e3-8ba3-f2b6df2d5bed": {
     "word": "Reticent",
     "definition": "Not revealing one's thoughts or feelings readily; reserved.",
     "uuid": "d1a6863a-145e-41e3-8ba3-f2b6df2d5bed",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 3
   },
   "0401142c-9671-4b8f-a81f-e2d98f515cc8": {
     "word": "Disparate",
     "definition": "Essentially different in kind; not allowing comparison.",
     "uuid": "0401142c-9671-4b8f-a81f-e2d98f515cc8",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 4
   },
   "0f51d272-a84d-43c3-b41c-f3d240c48de0": {
     "word": "Ardent",
     "definition": "Enthusiastic or passionate.",
     "uuid": "0f51d272-a84d-43c3-b41c-f3d240c48de0",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 5
   },
   "d0fda697-a8ba-4b96-8b7b-5851ebc89c51": {
     "word": "Ephemeral",
     "definition": "Lasting for a very short time; fleeting, transitory, or brief.",
     "uuid": "d0fda697-a8ba-4b96-8b7b-5851ebc89c51",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 6
   },
   "e1b6065b-6413-4587-ae53-32df54309728": {
     "word": "Pernicious",
     "definition": "Having a harmful effect, especially in a gradual or subtle way.",
     "uuid": "e1b6065b-6413-4587-ae53-32df54309728",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 7
   },
   "97e1ba6d-c00a-4a64-97b0-606595585503": {
     "word": "Ubiquitous",
     "definition": "Present, appearing, or found everywhere; widespread.",
     "uuid": "97e1ba6d-c00a-4a64-97b0-606595585503",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 8
   },
   "2fd1ec42-27d8-40c0-9449-0f963384e808": {
     "word": "Esoteric",
     "definition": "Intended for or likely to be understood by only a small number of people with special knowledge.",
     "uuid": "2fd1ec42-27d8-40c0-9449-0f963384e808",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 9
   },
   "af57f44e-661d-4afe-baca-bd7ff269b9b3": {
     "word": "Harangue",
     "definition": "A lengthy and aggressive speech; a tirade.",
     "uuid": "af57f44e-661d-4afe-baca-bd7ff269b9b3",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 10
   },
   "fd47d5a4-7b8e-45d0-babd-62061bd23d82": {
     "word": "Sycophant",
     "definition": "A person who acts obsequiously towards someone important in order to gain advantage; a flatterer or yes-man.",
     "uuid": "fd47d5a4-7b8e-45d0-babd-62061bd23d82",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 11
   },
   "5e98d9f6-6d68-4889-bd96-647cef206d43": {
     "word": "Benevolent",
     "definition": "Well-meaning and kindly.",
     "uuid": "5e98d9f6-6d68-4889-bd96-647cef206d43",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 12
   },
   "f0a1df62-d46f-43a9-974f-521dbf7258f5": {
     "word": "Cacophony",
     "definition": "A harsh, discordant mixture of sounds.",
     "uuid": "f0a1df62-d46f-43a9-974f-521dbf7258f5",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 13
   },
   "de3d9a46-a874-44c0-93db-75bfe3b6806b": {
     "word": "Munificent",
     "definition": "More generous than is usual or necessary.",
     "uuid": "de3d9a46-a874-44c0-93db-75bfe3b6806b",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 14
   },
   "06b664f2-d897-4b6e-b1ff-7d01e68eb1ee": {
     "word": "Ineffable",
     "definition": "Too great or extreme to be expressed or described in words.",
     "uuid": "06b664f2-d897-4b6e-b1ff-7d01e68eb1ee",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 15
   },
   "16b4627d-3047-49df-86e9-81dfe51be84f": {
     "word": "Quagmire",
     "definition": "A soft, boggy area of land that gives way underfoot; a complex, difficult, or precarious situation.",
     "uuid": "16b4627d-3047-49df-86e9-81dfe51be84f",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 16
   },
   "f58c3b7c-61c1-4dba-9649-67a6fe5eafe4": {
     "word": "Nebulous",
     "definition": "In the form of a cloud or haze; hazy.",
     "uuid": "f58c3b7c-61c1-4dba-9649-67a6fe5eafe4",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 17
   },
   "0ac37956-a8db-4b1e-8033-44d257a049fb": {
     "word": "Incandescent",
     "definition": "Emitting light as a result of being heated; passionate or brilliant.",
     "uuid": "0ac37956-a8db-4b1e-8033-44d257a049fb",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 18
   },
   "6fe1c94a-e014-46b8-bb3d-c54b962b32ad": {
     "word": "Lethargic",
     "definition": "Affected by lethargy; sluggish and apathetic.",
     "uuid": "6fe1c94a-e014-46b8-bb3d-c54b962b32ad",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 19
   },
   "d7b72283-c6d4-4adc-a690-980b0874aa8b": {
     "word": "Obfuscate",
     "definition": "To deliberately make something unclear or difficult to understand; to obscure or confuse.",
     "uuid": "d7b72283-c6d4-4adc-a690-980b0874aa8b",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 20
   },
   "2be8d4a8-e28d-41b1-9eef-dff981b54252": {
     "word": "Nocturnal",
     "definition": "Active or occurring during the night.",
     "uuid": "2be8d4a8-e28d-41b1-9eef-dff981b54252",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 21
   },
   "b092df31-6209-4732-83ed-9cbfc18bd8bd": {
     "word": "Voracious",
     "definition": "Wanting or devouring great quantities of food; having a very eager approach to a particular activity.",
     "uuid": "b092df31-6209-4732-83ed-9cbfc18bd8bd",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 22
   },
   "e4b4e690-2aa3-49bd-b93c-f6397b3ef77c": {
     "word": "Panacea",
     "definition": "A solution or remedy for all difficulties or diseases.",
     "uuid": "e4b4e690-2aa3-49bd-b93c-f6397b3ef77c",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 23
   },
   "5715b80e-e81b-41c7-9a6c-be50ebc84c6a": {
     "word": "Serendipity",
     "definition": "The occurrence and development of events by chance in a happy or beneficial way.",
     "uuid": "5715b80e-e81b-41c7-9a6c-be50ebc84c6a",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 24
   },
   "a4ecc77e-499e-4e24-8c9d-485c9c286aee": {
     "word": "Aplomb",
     "definition": "Self-confidence or assurance, especially when in a demanding situation; poise or assurance.",
     "uuid": "a4ecc77e-499e-4e24-8c9d-485c9c286aee",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 25
   },
   "cc4f2d32-3c36-4967-b3bf-61f527f29aa1": {
     "word": "Quell",
     "definition": "Suppress (a feeling, especially an unpleasant one); put an end to.",
     "uuid": "cc4f2d32-3c36-4967-b3bf-61f527f29aa1",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 26
   },
   "01fd3201-f608-42a8-b178-fd7195d14ce4": {
     "word": "Zephyr",
     "definition": "A soft, gentle breeze.",
     "uuid": "01fd3201-f608-42a8-b178-fd7195d14ce4",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 27
   },
   "cc0d712f-963a-4126-a321-a9d05379ab7a": {
     "word": "Pervasive",
     "definition": "Spreading widely throughout an area or a group of people.",
     "uuid": "cc0d712f-963a-4126-a321-a9d05379ab7a",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 28
   },
   "08a50bb3-a696-435c-bb3e-5d3e2e404f1b": {
     "word": "Exacerbate",
     "definition": "Make (a problem, bad situation, or negative feeling) worse.",
     "uuid": "08a50bb3-a696-435c-bb3e-5d3e2e404f1b",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 29
   },
   "f70a20e6-20e9-4d59-9c89-911128f4455c": {
     "word": "Myriad",
     "definition": "A countless or extremely great number.",
     "uuid": "f70a20e6-20e9-4d59-9c89-911128f4455c",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 30
   },
   "4a1bdb6f-ccb0-45a9-bba7-b14807933ebe": {
     "word": "Nefarious",
     "definition": "Wicked, villainous, or heinously infamous.",
     "uuid": "4a1bdb6f-ccb0-45a9-bba7-b14807933ebe",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 31
   },
   "a79deb52-3bbb-4c69-addb-38dd42600f4d": {
     "word": "Halcyon",
     "definition": "Denoting a period of time in the past that was idyllically happy and peaceful.",
     "uuid": "a79deb52-3bbb-4c69-addb-38dd42600f4d",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 32
   },
   "8300eedb-7952-4a03-872e-3924f6ebade5": {
     "word": "Languid",
     "definition": "Lacking in vigor or vitality; slow and relaxed.",
     "uuid": "8300eedb-7952-4a03-872e-3924f6ebade5",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 33
   },
   "0d15b731-aec5-4a86-8d20-207742242a07": {
     "word": "Ztest",
     "definition": "Ztest",
     "uuid": "0d15b731-aec5-4a86-8d20-207742242a07",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 34
   },
   "0fd25512-2422-4c3b-b4e4-ff46b9458bf3": {
     "word": "Ztest2",
     "definition": "Ztest",
     "uuid": "0fd25512-2422-4c3b-b4e4-ff46b9458bf3",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 35
   },
   "cd49e69e-19dc-491d-8533-6dc0bfacd44b": {
     "word": "Ztest3",
     "definition": "Ztest",
     "uuid": "cd49e69e-19dc-491d-8533-6dc0bfacd44b",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 36
   },
   "1e254e0d-ea9c-41c0-a8a9-e7d789687e6c": {
     "word": "Ztest4",
     "definition": "Ztest",
     "uuid": "1e254e0d-ea9c-41c0-a8a9-e7d789687e6c",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 37
   },
   "69afdda4-9d31-493d-b445-23f4dca6fb65": {
     "word": "Ztest5",
     "definition": "Ztest",
     "uuid": "69afdda4-9d31-493d-b445-23f4dca6fb65",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 38
   },
   "5f243c50-c565-411f-9cec-fd5cf58cee76": {
     "word": "Ztest6",
     "definition": "Ztest",
     "uuid": "5f243c50-c565-411f-9cec-fd5cf58cee76",
-    "weight": 0.01,
+    "weight": 0.5,
     "order": 39
   }
 }

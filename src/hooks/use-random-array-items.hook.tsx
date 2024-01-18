@@ -21,8 +21,6 @@ export default function useRandomArrayItems<T>(
     const pickedItemsTmp: T[] = [];
     const summedWeights = addUpNumberArray(weightsArray);
 
-    console.log(array.length <= itemsCount);
-
     if (array.length <= itemsCount) {
       pickedItemsTmp.push(...array);
     } else {

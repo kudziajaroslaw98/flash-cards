@@ -57,7 +57,7 @@ export default function FlashCardComponent(params: Readonly<FlashCardParams>) {
       onMouseMove={(e) =>
         handleMouseMove(e.clientX, e.clientY, e.currentTarget)
       }
-      className={`group relative z-10 flex h-full min-h-32 w-full max-w-80 cursor-pointer flex-col justify-center overflow-hidden rounded-md border border-gray-50 bg-gray-100 p-4 transition-all active:scale-95 sm:justify-start sm:gap-3  dark:border-slate-800 dark:bg-slate-900 ${getClickedCardStyles()}`}
+      className={`group relative z-10 flex h-full min-h-32 w-full max-w-80 cursor-pointer flex-col justify-center gap-2 rounded-md border border-gray-50 bg-gray-100 p-4 transition-all active:scale-95 sm:justify-start sm:gap-3  dark:border-slate-800 dark:bg-slate-900 ${getClickedCardStyles()}`}
     >
       <motion.div
         className='pointer-events-none absolute inset-0 z-10 flex opacity-0 transition-all group-hover:opacity-100 dark:hidden'
@@ -84,6 +84,7 @@ export default function FlashCardComponent(params: Readonly<FlashCardParams>) {
           ? ''
           : params.flashCard?.word}
       </h2>
+
       <h4
         className={`z-20 flex w-full min-w-72 items-center rounded-md text-sm font-normal text-gray-600 sm:min-h-16 sm:items-start dark:text-slate-300 ${
           params.reviseType === FlashCardTypesEnum.GUESS_NAME

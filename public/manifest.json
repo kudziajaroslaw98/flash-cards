@@ -1,0 +1,12 @@
+{
+  "id": "any_id",
+  "name": "FlashCards",
+  "short_name": "flash-cards",
+  "description": "Learning words made easy",
+  "icons": [],
+  "theme_color": "#020617",
+  "background_color": "#020617",
+  "start_url": "/learn",
+  "scope": ".",
+  "display": "standalone"
+}

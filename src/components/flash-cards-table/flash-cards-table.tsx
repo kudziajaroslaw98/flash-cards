@@ -22,6 +22,7 @@ import EditableFlashCardRowComponent from '#/components/flash-cards-table/editab
 import { FlashCardRowComponent } from '#/components/flash-cards-table/flash-card-row.component';
 import ButtonComponent from '#/components/ui/button/button.component';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
+import { DEFAULT_STATS } from '#/utils/defaults/stats.default';
 import typedInstanceFactory from '#/utils/functions/typed-instance-factory.util';
 import { FlashCardModel } from '#/utils/models/flash-card.model';
 import { FlashCards } from '#/utils/types/local-storage-flash-card.type';
@@ -30,11 +31,15 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 export default function FlashCardsTable() {
   const flashCardSort = (head: FlashCardModel, tail: FlashCardModel) =>
     head.order - tail.order;
+
   const {
     value: flashCards,
     arrayOfValues: flashCardsArray,
-    setToLocalStorage,
+    setToLocalStorage: setFlashCards,
   } = useLocalStorage<FlashCardModel, FlashCards>('words', {}, flashCardSort);
+  const { value: statistics, setToLocalStorage: setStatistics } =
+    useLocalStorage('stats', DEFAULT_STATS);
+
   const [selected, setSelected] = useState<UUID[]>([]);
   const [draggedData, setDraggedData] = useState<FlashCardModel | undefined>(
     undefined,
@@ -80,11 +85,12 @@ export default function FlashCardsTable() {
     });
 
     setSelected([]);
-    setToLocalStorage(flashCardsClone);
+    setFlashCards(flashCardsClone);
   };
 
   const addNewRecord = () => {
     const flashCardsClone = cloneDeep(flashCards);
+    const clonedStats = cloneDeep(statistics);
     const newUuid = uuid() as UUID;
     const newFlashCards = typedInstanceFactory(flashCardsClone, {
       [newUuid]: {
@@ -96,7 +102,10 @@ export default function FlashCardsTable() {
       },
     });
 
-    setToLocalStorage(newFlashCards);
+    clonedStats.createdFlashCards += 1;
+
+    setFlashCards(newFlashCards);
+    setStatistics(clonedStats);
     setTimeout(() => {
       window.document.body.scrollIntoView({
         block: 'end',
@@ -110,16 +119,15 @@ export default function FlashCardsTable() {
 
     flashCardsClone[flashCard.uuid] = { ...flashCard, word: value };
 
-    setToLocalStorage(flashCardsClone);
+    setFlashCards(flashCardsClone);
   };
 
   const definitionChange = (flashCard: FlashCardModel, value: string) => {
-    console.log(value);
     const flashCardsClone = cloneDeep(flashCards);
 
     flashCardsClone[flashCard.uuid] = { ...flashCard, definition: value };
 
-    setToLocalStorage(flashCardsClone);
+    setFlashCards(flashCardsClone);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -136,7 +144,7 @@ export default function FlashCardsTable() {
     draggedItem.order = tmpDroppedOrder;
     droppedItem.order = tmpDraggedOrder;
 
-    setToLocalStorage(flashCardsClone);
+    setFlashCards(flashCardsClone);
     setDraggedData(undefined);
   };
 
@@ -200,7 +208,7 @@ export default function FlashCardsTable() {
 
       <div className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'>
         <ButtonComponent
-          class='w-full bg-green-400 py-2 hover:bg-green-500 active:focus:bg-green-600 md:h-12 dark:bg-green-600 dark:hover:bg-green-500 dark:active:focus:bg-green-700'
+          class='w-full bg-green-400 py-2 hover:bg-green-500 active:focus:bg-green-600 md:h-12 dark:bg-green-500 dark:hover:bg-green-500 dark:active:focus:bg-green-700'
           onClick={addNewRecord}
         >
           <PlusIcon className='h-4 w-4' />

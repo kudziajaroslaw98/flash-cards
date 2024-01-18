@@ -14,6 +14,7 @@ export default function TextAreaComponent(props: Readonly<TextAreaProps>) {
 
   const adjustHeight = useDebounce(() => {
     if (textAreaRef.current) {
+      textAreaRef.current.style.height = '36px';
       textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
     }
   }, 75);
@@ -22,26 +23,24 @@ export default function TextAreaComponent(props: Readonly<TextAreaProps>) {
     adjustHeight();
 
     window.addEventListener('resize', () => {
-      if (textAreaRef.current) {
-        textAreaRef.current.style.height = 'auto';
-        adjustHeight();
-      }
+      adjustHeight();
     });
 
     return () => {
       window.removeEventListener('resize', () => {
-        if (textAreaRef.current) {
-          textAreaRef.current.style.height = 'auto';
-          adjustHeight();
-        }
+        adjustHeight();
       });
     };
   }, []);
 
+  useEffect(() => {
+    adjustHeight();
+  }, [value]);
+
   return (
     <textarea
       ref={textAreaRef}
-      className={`w-full resize-none rounded-md p-2 outline-none ring-blue-400 transition-all focus:ring-1 ${props.class}`}
+      className={`h-8 w-full resize-none rounded-md p-2 outline-none ring-blue-400 transition-all focus:ring-1 ${props.class}`}
       id={props.id}
       value={value}
       onInput={(e) => {

@@ -16,6 +16,25 @@
     }
 }
 
+body {
+    min-height: 100vh;
+    min-height: fill-available;
+    min-height: -webkit-fill-available;
+}
+
+html {
+    min-height: fill-available;
+    min-height: -webkit-fill-available;
+}
+
+main {
+    @apply h-full;
+}
+
+div#__next {
+    @apply h-full;
+}
+
 *::-webkit-scrollbar {
     display: none;
 }
