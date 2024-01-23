@@ -1,22 +1,49 @@
 'use client';
 
+import HamburgerMenuComponent from '#/components/hamburger-menu/hamburger-menu.component';
 import LinkComponent from '#/components/ui/link/link.component';
 import SwitchComponent from '#/components/ui/switch/switch.component';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
+import { NavigationItem } from '#/utils/interfaces/navigation-item.interface';
 import {
   AcademicCapIcon,
+  ChartBarIcon,
   HashtagIcon,
+  LanguageIcon,
   MoonIcon,
   SunIcon,
 } from '@heroicons/react/24/solid';
-import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function HeaderComponent() {
-  const navigationItems = [
-    { label: 'Learn', href: '/learn' },
-    { label: 'Revise', href: '/revise' },
-    { label: 'Stats', href: '/stats' },
-  ];
+  const pathname = usePathname();
+  const [navigationItems, setNavigationItems] = useState<NavigationItem[]>([
+    {
+      label: 'Learn',
+      href: '/learn',
+      icon: <AcademicCapIcon className='h-4 w-4' />,
+    },
+    {
+      label: 'Revise',
+      href: '/revise',
+      icon: <LanguageIcon className='h-4 w-4' />,
+    },
+    {
+      label: 'Stats',
+      href: '/stats',
+      icon: <ChartBarIcon className='h-4 w-4' />,
+    },
+  ]);
+
+  useEffect(() => {
+    setNavigationItems(
+      navigationItems.map((item) => {
+        item.active = pathname === item.href;
+        return item;
+      }),
+    );
+  }, [pathname]);
 
   const { value, setToLocalStorage } = useLocalStorage('theme', {
     theme: 'dark',
@@ -54,7 +81,7 @@ export default function HeaderComponent() {
             <span>FLASHCARDS</span>
           </h4>
 
-          <span className='hidden items-center gap-1 text-gray-500 sm:flex dark:text-slate-300'>
+          <span className='hidden items-center gap-1 text-gray-500 lg:flex dark:text-slate-300'>
             <span>
               <HashtagIcon className='h-4 w-4' />
             </span>
@@ -62,27 +89,37 @@ export default function HeaderComponent() {
           </span>
         </div>
 
-        <div className='flex gap-4 md:gap-8'>
-          {navigationItems.map((item) => (
-            <LinkComponent
-              key={item.href}
-              href={item.href}
-              label={item.label}
-            />
-          ))}
+        <div className='flex items-center justify-center gap-4 md:gap-8'>
+          <div className='hidden items-center justify-center gap-4 md:flex md:gap-8'>
+            {navigationItems.map((item) => (
+              <LinkComponent
+                key={item.href}
+                href={item.href}
+                label={item.label}
+                icon={item.icon}
+                active={item.active}
+              />
+            ))}
 
-          <SwitchComponent
-            checkedLabel={'Dark mode'}
-            uncheckedLabel={'Light mode'}
-            onClick={changeTheme}
-            value={isDarkMode()}
-          >
-            {isDarkMode() ? (
-              <MoonIcon className='h-4 w-4' />
-            ) : (
-              <SunIcon className='h-4 w-4' />
-            )}
-          </SwitchComponent>
+            <SwitchComponent
+              checkedLabel={'Dark mode'}
+              uncheckedLabel={'Light mode'}
+              onClick={changeTheme}
+              value={isDarkMode()}
+            >
+              {isDarkMode() ? (
+                <MoonIcon className='h-4 w-4' />
+              ) : (
+                <SunIcon className='h-4 w-4' />
+              )}
+            </SwitchComponent>
+          </div>
+
+          <HamburgerMenuComponent
+            changeTheme={changeTheme}
+            isDarkMode={isDarkMode}
+            navigationItems={navigationItems}
+          />
         </div>
       </div>
     </header>

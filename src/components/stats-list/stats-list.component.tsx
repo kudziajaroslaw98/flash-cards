@@ -14,10 +14,11 @@ export default function StatsListComponent() {
 
   return (
     <div className='flex h-full w-full items-start justify-center pt-24'>
-      <div className='grid max-w-2xl auto-rows-fr grid-cols-3 gap-4'>
+      {/*<div className='grid max-w-2xl auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-3'>*/}
+      <div className='flex max-w-2xl flex-wrap justify-center gap-4'>
         <CardComponent
           backgroundGradientWidth={100}
-          class=' w-full max-w-44 flex-col items-center justify-center gap-4'
+          class='min-h-44 w-full max-w-44 flex-col items-center justify-center gap-4'
         >
           <h2 className='text-5xl font-bold text-green-400 dark:text-green-500'>
             {statistics.answers}
@@ -30,7 +31,7 @@ export default function StatsListComponent() {
 
         <CardComponent
           backgroundGradientWidth={100}
-          class=' w-full  max-w-44 flex-col items-center justify-center gap-4'
+          class='min-h-44 w-full  max-w-44 flex-col items-center justify-center gap-4'
         >
           <h2 className='text-5xl font-bold text-green-400 dark:text-green-500'>
             {statistics.correctAnswers}
@@ -43,7 +44,7 @@ export default function StatsListComponent() {
 
         <CardComponent
           backgroundGradientWidth={100}
-          class=' w-full max-w-44 flex-col items-center justify-center gap-4'
+          class='min-h-44 w-full max-w-44 flex-col items-center justify-center gap-4'
         >
           <h2 className='text-5xl font-bold text-green-400 dark:text-green-500'>
             {statistics.incorrectAnswers}
@@ -56,7 +57,7 @@ export default function StatsListComponent() {
 
         <CardComponent
           backgroundGradientWidth={100}
-          class=' w-full max-w-44 flex-col items-center justify-center gap-4'
+          class='min-h-44 w-full max-w-44 flex-col items-center justify-center gap-4'
         >
           <h2 className='text-5xl font-bold text-green-400 dark:text-green-500'>
             {statistics.createdFlashCards}
@@ -70,7 +71,7 @@ export default function StatsListComponent() {
 
         <CardComponent
           backgroundGradientWidth={100}
-          class=' w-full max-w-44 flex-col items-center justify-center gap-4'
+          class='min-h-44 w-full max-w-44 flex-col items-center justify-center gap-4'
         >
           <h2 className='text-5xl font-bold text-green-400 dark:text-green-500'>
             {statistics.accuracy * 100}%

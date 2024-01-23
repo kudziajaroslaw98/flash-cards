@@ -38,6 +38,18 @@ const config: Config = {
           '0%': { opacity: '0', transform: 'translateY(-95%)' },
           '100%': { opacity: '1', transform: 'translateY(-100%)' },
         },
+        'fade-out-to-top': {
+          '0%': {
+            opacity: '1',
+            transform: 'translateY(100%)',
+            display: 'flex',
+          },
+          '100%': {
+            opacity: '0',
+            transform: 'translateY(95%)',
+            display: 'none',
+          },
+        },
         'background-gradient': {
           '0%, 100%': {
             backgroundPosition: '0% 25%',
@@ -71,6 +83,7 @@ const config: Config = {
         'background-gradient': 'background-gradient 12s ease infinite',
         'fade-in-to-bottom': 'fade-in-to-bottom .3s ease-in-out forwards',
         'fade-in-to-top': 'fade-in-to-top .3s ease-in-out forwards',
+        'fade-out-to-top': 'fade-out-to-top .3s ease-in-out forwards',
         'shake-infinite': 'shake 1s ease-in-out infinite',
         shake: 'shake 1s ease-in-out forwards',
       },
