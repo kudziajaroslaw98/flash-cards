@@ -110,7 +110,7 @@ export default function LoginFormComponent() {
 
       <div className='flex flex-col items-center justify-center gap-1'>
         <span className='text-gray-600 dark:text-slate-400'>
-          You don't have an account?
+          You don&apost have an account?
         </span>
 
         <LinkComponent
