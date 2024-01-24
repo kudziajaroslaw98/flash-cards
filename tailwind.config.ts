@@ -98,6 +98,8 @@ const config: Config = {
           '0 2.8px 2.2px rgb(0 0 0 / 0.010), 0 1.7px 2.3px rgb(0 0 0 / 0.010), 0 1.5px 1px rgb(0 0 0 / 0.010), 0 43px 55.9px rgb(0 0 0 / 0.010), 0 55.8px 60.4px rgb(0 0 0 / 0.010), 0 40px 80px rgb(0 0 0 / 0.010)',
         'card-hovered':
           '0 2.8px 2.2px rgb(0 0 0 / 0.02), 0 1.7px 2.3px rgb(0 0 0 / 0.03), 0 1.5px 1px rgb(0 0 0 / 0.03), 0 23px 35.9px rgb(0 0 0 / 0.03), 0 25.8px 30.4px rgb(0 0 0 / 0.03), 0 40px 60px rgb(0 0 0 / 0.03)',
+        'dark-card-hovered':
+          '0 2.8px 2.2px rgb(0 0 0 / 0.08), 0 1.7px 2.3px rgb(0 0 0 / 0.08), 0 1.5px 1px rgb(0 0 0 / 0.08), 0 23px 35.9px rgb(0 0 0 / 0.08), 0 25.8px 30.4px rgb(0 0 0 / 0.08), 0 40px 60px rgb(0 0 0 / 0.08)',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

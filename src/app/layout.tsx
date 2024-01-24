@@ -24,7 +24,7 @@ export default function RootLayout({
       <body
         className={
           inter.className +
-          'min-w-screen flex w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 dark:from-slate-900 dark:to-slate-950'
+          'min-w-screen flex w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950'
         }
       >
         <HeaderComponent />
