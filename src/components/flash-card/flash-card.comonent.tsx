@@ -1,6 +1,7 @@
 import { FlashCardTypesEnum } from '#/utils/enums/flash-card-types.enum';
 import { FlashCardModel } from '#/utils/models/flash-card.model';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { React } from 'react';
 
 interface FlashCardParams {
   flashCard: FlashCardModel;
@@ -51,7 +52,7 @@ export default function FlashCardComponent(params: Readonly<FlashCardParams>) {
     }
   };
 
-  const handleKeyDown = (event: KeyboardEvent) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     switch (event.key) {
       case ' ':
       case 'Enter':
@@ -65,7 +66,7 @@ export default function FlashCardComponent(params: Readonly<FlashCardParams>) {
   return (
     <div
       onClick={() => params.onClick(params.flashCard)}
-      onMouseMove={(e) =>
+      onMouseMove={(e: { clientX: number; clientY: number; currentTarget: EventTarget & HTMLElement; }) =>
         handleMouseMove(e.clientX, e.clientY, e.currentTarget)
       }
       onKeyDown={(event) => handleKeyDown(event)}
