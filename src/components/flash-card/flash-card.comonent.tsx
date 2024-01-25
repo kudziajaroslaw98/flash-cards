@@ -51,12 +51,25 @@ export default function FlashCardComponent(params: Readonly<FlashCardParams>) {
     }
   };
 
+  const handleKeyDown = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case ' ':
+      case 'Enter':
+        params.onClick(params.flashCard);
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <div
       onClick={() => params.onClick(params.flashCard)}
       onMouseMove={(e) =>
         handleMouseMove(e.clientX, e.clientY, e.currentTarget)
       }
+      onKeyDown={(event) => handleKeyDown(event)}
+      tabIndex={0}
       className={`group relative z-10 flex h-full min-h-32 w-full max-w-80 cursor-pointer flex-col justify-center gap-2 rounded-md border border-gray-50 bg-gray-100 p-4 transition-all active:scale-95 sm:justify-start sm:gap-3  dark:border-slate-800 dark:bg-slate-900 ${getClickedCardStyles()}`}
     >
       <motion.div

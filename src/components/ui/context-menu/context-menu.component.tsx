@@ -1,6 +1,6 @@
 'use client';
 
-import { PropsWithChildren, ReactNode, useState } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
 
 interface ContextMenuItem {
   label?: string;
@@ -17,6 +17,7 @@ interface ContextMenuProps {
   afterMenuClass?: string;
   menuItems: ContextMenuItem[];
   name: string;
+  open: boolean;
 }
 
 interface MenuItemProps {
@@ -27,14 +28,11 @@ interface MenuItemProps {
 }
 
 export default function ContextMenuComponent(props: ContextMenuProps) {
-  const [open, setOpen] = useState(false);
-
   const MenuItem = (menuItemProps: PropsWithChildren<MenuItemProps>) => {
     return (
       <li
         onClick={() => {
           if (menuItemProps?.onClick) {
-            setOpen(false);
             menuItemProps.onClick();
           }
         }}
@@ -56,11 +54,11 @@ export default function ContextMenuComponent(props: ContextMenuProps) {
 
   return (
     <div className='relative'>
-      <div onClick={() => setOpen(!open)}>{props.triggerComponent}</div>
+      <div>{props.triggerComponent}</div>
 
       <div
         className={`${
-          open ? 'animate-fade-in-to-bottom ' : 'animate-fade-out-to-top'
+          props.open ? 'animate-fade-in-to-bottom ' : 'animate-fade-out-to-top'
         } absolute -bottom-2 right-0 z-20 w-64 overflow-clip rounded border border-gray-200 md:w-52 dark:border-slate-700 `}
       >
         <ul className='flex h-auto w-full flex-col items-center'>
@@ -77,7 +75,6 @@ export default function ContextMenuComponent(props: ContextMenuProps) {
               active={item.active}
               visible={true}
               onClick={() => {
-                setOpen(false);
                 item.onClick();
               }}
             >

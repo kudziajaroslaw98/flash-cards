@@ -10,12 +10,14 @@ export interface LinkProps {
   icon?: ReactNode;
   active?: boolean;
   class?: string;
+  onClick?: () => void;
 }
 
 export default function LinkComponent(props: LinkProps) {
   return (
     <Link
       href={props.href}
+      onClick={props.onClick}
       className={`group relative flex items-center justify-center text-green-500 underline-offset-2 transition-all hover:text-green-400 ${props.class}`}
     >
       <span className='flex items-center gap-2'>

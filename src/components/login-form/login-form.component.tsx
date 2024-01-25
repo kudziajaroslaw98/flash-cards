@@ -1,7 +1,9 @@
 'use client';
 
 import ButtonComponent from '#/components/ui/button/button.component';
-import InputComponent from '#/components/ui/input/input.component';
+import InputComponent, {
+  InputValidation,
+} from '#/components/ui/input/input.component';
 import LinkComponent from '#/components/ui/link/link.component';
 import { FingerPrintIcon } from '@heroicons/react/24/solid';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -18,8 +20,12 @@ export default function LoginFormComponent() {
   const router = useRouter();
   const supabase = createClientComponentClient();
 
-  const emailValidation = z.string().email();
-  const passwordValidation = z.string().min(8);
+  const emailValidation = z
+    .string()
+    .email({ message: 'Email format is incorrect.' });
+  const passwordValidation = z
+    .string()
+    .min(1, { message: 'Password is required.' });
 
   const handleSignUp = async () => {
     await supabase.auth.signUp({
@@ -56,11 +62,20 @@ export default function LoginFormComponent() {
     value: string,
     scheme: z.ZodString,
     setter: Dispatch<SetStateAction<boolean>>,
-  ): boolean => {
-    const isValid = scheme.safeParse(value).success;
-    setter(isValid);
+  ): InputValidation => {
+    const output = scheme.safeParse(value);
+    let valid = false;
+    let error: string | undefined = undefined;
 
-    return isValid;
+    if (output.success) {
+      valid = true;
+    } else {
+      error = output.error.errors?.[0]?.message;
+    }
+
+    setter(valid);
+
+    return { valid, error };
   };
 
   return (
@@ -110,7 +125,7 @@ export default function LoginFormComponent() {
 
       <div className='flex flex-col items-center justify-center gap-1'>
         <span className='text-gray-600 dark:text-slate-400'>
-          You don&apost have an account?
+          You don&apos;t have an account?
         </span>
 
         <LinkComponent

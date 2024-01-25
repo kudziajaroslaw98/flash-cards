@@ -1,6 +1,8 @@
 'use client';
 
+import ButtonComponent from '#/components/ui/button/button.component';
 import ContextMenuComponent from '#/components/ui/context-menu/context-menu.component';
+import LinkComponent from '#/components/ui/link/link.component';
 import SwitchComponent from '#/components/ui/switch/switch.component';
 import { ToggleButtonComponent } from '#/components/ui/toggle-button/toggle-button.component';
 import { NavigationItem } from '#/utils/interfaces/navigation-item.interface';
@@ -8,21 +10,42 @@ import {
   Bars3Icon,
   MoonIcon,
   SunIcon,
+  UserCircleIcon,
   XMarkIcon,
 } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface HamburgerMenuProps {
   changeTheme: () => void;
   isDarkMode: () => boolean;
   navigationItems: NavigationItem[];
+  logOut: () => void;
+  loggedIn: boolean;
 }
 
 export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
   const router = useRouter();
   const [toggled, toggle] = useState(false);
+  const [isOpen, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handler = (event: MouseEvent) => {
+      if (!menuRef.current) {
+        return;
+      }
+      if (!menuRef.current.contains(event.target as Node)) {
+        setOpen(false);
+        toggle(false);
+      }
+    };
+    document.addEventListener('click', handler, true);
+    return () => {
+      document.removeEventListener('click', handler);
+    };
+  }, []);
 
   const activeIcon = (
     <motion.span
@@ -45,8 +68,12 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
   );
 
   return (
-    <div className='flex md:hidden'>
+    <div
+      className='flex md:hidden'
+      ref={menuRef}
+    >
       <ContextMenuComponent
+        open={isOpen}
         name={'hamburger-menu'}
         afterMenuClass='py-4 justify-center'
         triggerComponent={
@@ -55,7 +82,10 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
             class='z-30 !px-2 !text-green-400 transition hover:bg-green-400 hover:!text-gray-50 active:focus:bg-green-500'
             activeIcon={activeIcon}
             inactiveIcon={inactiveIcon}
-            toggle={() => toggle(!toggled)}
+            toggle={() => {
+              setOpen(!isOpen);
+              toggle(!toggled);
+            }}
             toggled={toggled}
           ></ToggleButtonComponent>
         }
@@ -73,12 +103,53 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
             )}
           </SwitchComponent>
         }
+        beforeMenuItems={
+          <div className='w-full'>
+            {props.loggedIn && (
+              <div className='flex flex-col gap-3'>
+                <div className='flex w-full flex-col items-center justify-center'>
+                  <UserCircleIcon className='h-8 w-8' />
+                  <span>John Doe</span>
+                </div>
+                <ButtonComponent
+                  onClick={() => {
+                    props.logOut();
+                    setOpen(false);
+                    toggle(!toggled);
+                  }}
+                  class='h-8 bg-red-300'
+                >
+                  Log out
+                </ButtonComponent>
+              </div>
+            )}
+
+            {!props.loggedIn && (
+              <div className='flex flex-col gap-3'>
+                <div className='flex w-full flex-col items-center justify-center'>
+                  <span>You are not logged in.</span>
+                </div>
+
+                <LinkComponent
+                  label={'You can do it here'}
+                  onClick={() => {
+                    toggle(!toggled);
+                    setOpen(false);
+                  }}
+                  href={'/login'}
+                  class={'underline'}
+                ></LinkComponent>
+              </div>
+            )}
+          </div>
+        }
         menuItems={props.navigationItems.map((item) => ({
           label: item.label,
           icon: item.icon,
           active: item.active,
           onClick: () => {
             router.push(item.href);
+            setOpen(false);
             toggle(!toggled);
           },
         }))}
