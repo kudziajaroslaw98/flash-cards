@@ -63,7 +63,7 @@ export default function SignUpFormComponent() {
       })
       .refine(({ password, confirmPassword }) => password === confirmPassword, {
         path: ['confirmPassword'],
-        message: 'Passwords doesnt match',
+        message: `Passwords don't match`,
       }),
   };
 

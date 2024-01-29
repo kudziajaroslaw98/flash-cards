@@ -58,8 +58,10 @@ export default function ContextMenuComponent(props: ContextMenuProps) {
 
       <div
         className={`${
-          props.open ? 'animate-fade-in-to-bottom ' : 'animate-fade-out-to-top'
-        } absolute -bottom-2 right-0 z-20 w-64 overflow-clip rounded border border-gray-200 md:w-52 dark:border-slate-700 `}
+          props.open
+            ? 'z-20 animate-fade-in-to-bottom'
+            : '-z-10 animate-fade-out-to-top'
+        } absolute -bottom-2 right-0 w-64 overflow-clip rounded border border-gray-200 md:w-52 dark:border-slate-700 `}
       >
         <ul className='flex h-auto w-full flex-col items-center'>
           <MenuItem

@@ -78,37 +78,37 @@ export default function FormComponent<
 
       initialRender.current = false;
     }
-  }, [props.scheme]);
+  }, [props.initialValues, props.scheme]);
 
   useEffect(() => {
     if (props.debug && props.debug.inputs) {
       console.log('form - inputs - ', formInputs);
     }
-  }, [formInputs]);
+  }, [props.debug, formInputs]);
 
   useEffect(() => {
     if (props.debug && props.debug.validity) {
       console.log('form - valids - ', formValids);
     }
-  }, [formValids]);
+  }, [props.debug, formValids]);
 
   useEffect(() => {
     if (props.debug && props.debug.errors) {
       console.log('form - errors - ', formErrors);
     }
-  }, [formErrors]);
+  }, [props.debug, formErrors]);
 
   useEffect(() => {
     if (props.debug && props.debug.values) {
       console.log('form - values - ', formValues);
     }
-  }, [formValues]);
+  }, [props.debug, formValues]);
 
   useEffect(() => {
     if (props.debug && props.debug.touch) {
       console.log('form - touched - ', touchedInputs);
     }
-  }, [touchedInputs]);
+  }, [props.debug, touchedInputs]);
 
   const checkFormValidity = () => {
     const output: SafeParseSuccess<unknown> | SafeParseError<unknown> =
