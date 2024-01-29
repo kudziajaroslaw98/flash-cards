@@ -1,35 +1,34 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { omit } from 'lodash';
-import { DetailedHTMLProps, InputHTMLAttributes, useState } from 'react';
-
-interface InputProps<T>
-  extends DetailedHTMLProps<
-    InputHTMLAttributes<HTMLInputElement>,
-    HTMLInputElement
-  > {
-  label?: string;
-  for?: string;
-  validate?: (value: T) => InputValidation;
-}
+import { DetailedHTMLProps, InputHTMLAttributes, useEffect } from 'react';
 
 export interface InputValidation {
   valid: boolean;
   error?: string;
 }
 
-function InputComponent<T>(props: InputProps<T>) {
-  const [isValid, setIsValid] = useState(true);
-  const [error, setError] = useState<string>();
+interface NarrowedInputHTMLAttributes<T> extends InputHTMLAttributes<T> {
+  value: string;
+}
 
-  const validate = (value: T) => {
-    if (props.validate) {
-      const { valid, error } = props.validate(value);
+export interface InputProps
+  extends DetailedHTMLProps<
+    NarrowedInputHTMLAttributes<HTMLInputElement>,
+    HTMLInputElement
+  > {
+  label?: string;
+  for?: string;
+  valid: boolean;
+  error: string | null;
+  value: string;
+}
 
-      setIsValid(valid);
-      setError(error);
-    }
-  };
+function InputComponent(props: InputProps) {
+  useEffect(() => {
+    console.log(props.error);
+  }, [props.error]);
 
   return (
     <label
@@ -37,9 +36,9 @@ function InputComponent<T>(props: InputProps<T>) {
       htmlFor={props.for}
     >
       <input
-        {...omit(props, ['for', 'label', 'validate'])}
-        onBlur={(e) => validate(e.currentTarget.value as T)}
-        className={`${!isValid ? '!border-red-400' : ''} 
+        {...omit(props, ['for', 'label', 'valid', 'error'])}
+        value={props.value ?? ''}
+        className={`${!props.valid ? '!border-red-400' : ''} 
         peer w-full rounded-md border border-green-400 bg-gray-100 p-2 px-6 text-base text-gray-800 outline-none transition-all placeholder:text-gray-100
         focus:placeholder:text-gray-600 dark:bg-slate-900 dark:text-slate-200 dark:placeholder:text-slate-900 dark:focus:placeholder:text-slate-400
         `}
@@ -52,23 +51,32 @@ function InputComponent<T>(props: InputProps<T>) {
               ? '-translate-y-8'
               : '-translate-y-0'
           } 
-          ${!isValid ? '!text-red-400' : ''}
+          ${!props.valid ? '!text-red-400' : ''}
           absolute left-2 top-8 z-20 w-auto px-4 text-green-400 
           transition after:absolute after:left-0 after:-z-10 after:h-1 after:w-full after:translate-y-6 after:bg-gray-100
           group-hover:-translate-y-8 group-active:-translate-y-8 peer-focus:-translate-y-8
           dark:after:bg-slate-900`}
         >
-          {props.label}
+          {`${props.label}${props.required ? '*' : ''}`}
         </span>
       )}
 
-      <span
-        className={`${
-          error ? 'h-4 opacity-100' : 'h-0 opacity-0'
-        } px-6 text-red-400 transition-all`}
-      >
-        {error}
-      </span>
+      {props.error && (
+        <motion.span
+          initial={{
+            height: 0,
+            opacity: 0,
+          }}
+          animate={{
+            height: 'auto',
+            opacity: 1,
+          }}
+          transition={{ ease: 'easeInOut', duration: 0.2 }}
+          className={`px-6 text-sm text-red-400`}
+        >
+          {props.error}
+        </motion.span>
+      )}
     </label>
   );
 }

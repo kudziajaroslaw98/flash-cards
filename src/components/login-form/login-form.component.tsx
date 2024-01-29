@@ -1,49 +1,55 @@
 'use client';
 
+import FormComponent from '#/app/playground/form.component';
 import ButtonComponent from '#/components/ui/button/button.component';
-import InputComponent, {
-  InputValidation,
-} from '#/components/ui/input/input.component';
 import LinkComponent from '#/components/ui/link/link.component';
 import { FingerPrintIcon } from '@heroicons/react/24/solid';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 
 export default function LoginFormComponent() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [emailValid, setEmailValid] = useState(false);
-  const [passwordValid, setPasswordValid] = useState(false);
+  const formScheme = {
+    inputs: {
+      email: {
+        type: 'email',
+        name: 'email',
+        label: 'Email',
+        placeholder: 'example@email.com',
+      },
+      password: {
+        type: 'password',
+        name: 'password',
+        label: 'Password',
+      },
+    },
+    validation: z.object({
+      email: z.string().email('Email is incorrect.'),
+      password: z
+        .string()
+        .min(8, 'Password must be at least 8 characters long'),
+    }),
+  };
+
+  const [formValid, setFormValid] = useState(true);
+  const [formValue, setFormValue] = useState<
+    Partial<Record<keyof typeof formScheme.inputs, string>>
+  >({});
 
   const router = useRouter();
   const supabase = createClientComponentClient();
 
-  const emailValidation = z
-    .string()
-    .email({ message: 'Email format is incorrect.' });
-  const passwordValidation = z
-    .string()
-    .min(1, { message: 'Password is required.' });
-
-  const handleSignUp = async () => {
-    await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
-      },
-    });
-
-    router.refresh();
-  };
-
   const handleSignIn = async () => {
+    if (!formValue?.['email'] || !formValue?.['password'] || !formValid) {
+      return;
+    }
+
+    // todo: change to API call
     await supabase.auth
       .signInWithPassword({
-        email,
-        password,
+        email: formValue?.['email'],
+        password: formValue?.['password'],
       })
       .then(async (res) => {
         if (res.data.session) {
@@ -58,26 +64,6 @@ export default function LoginFormComponent() {
     router.refresh();
   };
 
-  const checkValidity = (
-    value: string,
-    scheme: z.ZodString,
-    setter: Dispatch<SetStateAction<boolean>>,
-  ): InputValidation => {
-    const output = scheme.safeParse(value);
-    let valid = false;
-    let error: string | undefined = undefined;
-
-    if (output.success) {
-      valid = true;
-    } else {
-      error = output.error.errors?.[0]?.message;
-    }
-
-    setter(valid);
-
-    return { valid, error };
-  };
-
   return (
     <div className='relative flex w-full max-w-sm flex-col items-center justify-center gap-12 overflow-clip rounded border border-gray-50 bg-gray-100 p-8 shadow-card-hovered dark:border-slate-800 dark:bg-slate-900'>
       <h4 className='flex items-center justify-center gap-2 text-3xl font-semibold text-green-400'>
@@ -89,27 +75,15 @@ export default function LoginFormComponent() {
       </h4>
 
       <div className='flex w-full flex-col gap-2 py-4'>
-        <InputComponent<string>
-          type={'email'}
-          name={'email'}
-          label={'Email'}
-          placeholder={'example@email.com'}
-          value={email}
-          validate={(value) =>
-            checkValidity(value, emailValidation, setEmailValid)
-          }
-          onInput={(e) => setEmail(e.currentTarget.value)}
-        />
-
-        <InputComponent<string>
-          type={'password'}
-          name={'password'}
-          label={'Password'}
-          value={password}
-          validate={(value) =>
-            checkValidity(value, passwordValidation, setPasswordValid)
-          }
-          onInput={(e) => setPassword(e.currentTarget.value)}
+        <FormComponent
+          debug={{
+            inputs: true,
+            validity: true,
+            errors: true,
+          }}
+          scheme={formScheme}
+          emitFormValid={setFormValid}
+          emitFormValue={setFormValue}
         />
       </div>
 
@@ -118,7 +92,7 @@ export default function LoginFormComponent() {
           'max-w-80 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 md:w-full dark:bg-green-500 dark:hover:bg-green-400'
         }
         onClick={handleSignIn}
-        disabled={!emailValid || !passwordValid}
+        disabled={!formValid}
       >
         Sign in
       </ButtonComponent>
