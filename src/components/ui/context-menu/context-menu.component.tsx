@@ -1,8 +1,9 @@
 'use client';
 
-import { PropsWithChildren, ReactNode } from 'react';
+import MenuItem from '#/components/ui/context-menu/menu-item.component';
+import { ReactNode } from 'react';
 
-interface ContextMenuItem {
+export interface ContextMenuItem {
   label?: string;
   icon?: ReactNode;
   onClick: () => void;
@@ -20,38 +21,7 @@ interface ContextMenuProps {
   open: boolean;
 }
 
-interface MenuItemProps {
-  visible: boolean;
-  class?: string;
-  onClick?: ContextMenuItem['onClick'];
-  active?: ContextMenuItem['active'];
-}
-
 export default function ContextMenuComponent(props: ContextMenuProps) {
-  const MenuItem = (menuItemProps: PropsWithChildren<MenuItemProps>) => {
-    return (
-      <li
-        onClick={() => {
-          if (menuItemProps?.onClick) {
-            menuItemProps.onClick();
-          }
-        }}
-        className={`
-        ${menuItemProps.visible ? 'flex' : 'hidden'}
-        ${menuItemProps.active ? 'border-l-2 border-l-green-400' : ''}
-        ${
-          menuItemProps.onClick
-            ? 'cursor-pointer hover:bg-green-400 hover:text-green-50'
-            : ''
-        }
-         w-full items-center gap-2 border-b border-b-slate-200 bg-gray-50 px-4 py-3 text-green-400 last:border-none dark:border-b-slate-700 dark:bg-slate-800 dark:text-green-400
-         ${menuItemProps.class ?? ''}`}
-      >
-        {menuItemProps.children}
-      </li>
-    );
-  };
-
   return (
     <div className='relative'>
       <div>{props.triggerComponent}</div>

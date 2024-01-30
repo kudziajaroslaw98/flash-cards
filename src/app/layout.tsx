@@ -1,9 +1,19 @@
 import HeaderComponent from '#/components/header/header.component';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Roboto_Mono } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const roboto_mono = Roboto_Mono({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-roboto-mono',
+});
 
 export const metadata: Metadata = {
   title: 'Flash cards',
@@ -19,14 +29,9 @@ export default function RootLayout({
   return (
     <html
       lang='en'
-      className='dark flex'
+      className={`${inter.variable} ${roboto_mono.variable} dark flex font-sans`}
     >
-      <body
-        className={
-          inter.className +
-          'min-w-screen flex w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950'
-        }
-      >
+      <body className='min-w-screen flex w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950'>
         <HeaderComponent />
 
         <main className='mx-auto flex w-full max-w-6xl flex-col p-4'>

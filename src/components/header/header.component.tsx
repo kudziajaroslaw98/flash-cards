@@ -2,7 +2,6 @@
 
 import HamburgerMenuComponent from '#/components/hamburger-menu/hamburger-menu.component';
 import LinkComponent from '#/components/ui/link/link.component';
-import SwitchComponent from '#/components/ui/switch/switch.component';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
 import { NavigationItem } from '#/utils/interfaces/navigation-item.interface';
 import {
@@ -10,11 +9,10 @@ import {
   ChartBarIcon,
   HashtagIcon,
   LanguageIcon,
-  MoonIcon,
-  SunIcon,
 } from '@heroicons/react/24/solid';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { isNil } from 'lodash';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -95,14 +93,19 @@ export default function HeaderComponent() {
 
   return (
     <header className='fixed left-0 top-0 z-30 h-20 w-full bg-gray-50/20 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/20'>
-      <div className='mx-auto flex max-w-5xl items-center justify-between'>
+      <div className='mx-auto flex h-full max-w-5xl items-center justify-between'>
         <div className='flex items-center justify-center gap-4'>
           <h4 className='flex items-center justify-center gap-2 text-xl font-thin tracking-wider text-green-400 dark:text-green-500'>
             <span>
-              <AcademicCapIcon className='h-6 w-6' />
+              <Image
+                width={24}
+                height={24}
+                src={'/images/flash-cards-logo.svg'}
+                alt={'Flash Cards Logo'}
+              />
             </span>
 
-            <span>FLASHCARDS</span>
+            <span className='font-black tracking-tighter'>FLASHCARDS</span>
           </h4>
 
           <span className='hidden items-center gap-1 text-gray-500 lg:flex dark:text-slate-300'>
@@ -124,19 +127,6 @@ export default function HeaderComponent() {
                 active={item.active}
               />
             ))}
-
-            <SwitchComponent
-              checkedLabel={'Dark mode'}
-              uncheckedLabel={'Light mode'}
-              onClick={changeTheme}
-              value={isDarkMode()}
-            >
-              {isDarkMode() ? (
-                <MoonIcon className='h-4 w-4' />
-              ) : (
-                <SunIcon className='h-4 w-4' />
-              )}
-            </SwitchComponent>
           </div>
 
           <HamburgerMenuComponent

@@ -141,7 +141,7 @@ export default function FlashCardReviseComponent() {
     </div>
   ) : (
     <div className='flex h-full w-full flex-col items-center justify-center gap-4 text-xl'>
-      <h3 className='text-gray-600 dark:text-slate-200'>
+      <h3 className='text-gray-500 dark:text-slate-200'>
         You dont have any flashcards yet.
       </h3>
       <LinkComponent

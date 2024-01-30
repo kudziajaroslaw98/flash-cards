@@ -81,31 +81,31 @@ export default function FormComponent<
   }, [props.initialValues, props.scheme]);
 
   useEffect(() => {
-    if (props.debug && props.debug.inputs) {
+    if (props?.debug?.inputs) {
       console.log('form - inputs - ', formInputs);
     }
   }, [props.debug, formInputs]);
 
   useEffect(() => {
-    if (props.debug && props.debug.validity) {
+    if (props?.debug?.validity) {
       console.log('form - valids - ', formValids);
     }
   }, [props.debug, formValids]);
 
   useEffect(() => {
-    if (props.debug && props.debug.errors) {
+    if (props?.debug?.errors) {
       console.log('form - errors - ', formErrors);
     }
   }, [props.debug, formErrors]);
 
   useEffect(() => {
-    if (props.debug && props.debug.values) {
+    if (props?.debug?.values) {
       console.log('form - values - ', formValues);
     }
   }, [props.debug, formValues]);
 
   useEffect(() => {
-    if (props.debug && props.debug.touch) {
+    if (props?.debug?.touch) {
       console.log('form - touched - ', touchedInputs);
     }
   }, [props.debug, touchedInputs]);
@@ -166,9 +166,10 @@ export default function FormComponent<
                 inputProps.onInput(e);
               }
 
-              props.emitFormValue(
-                formValues as Partial<Record<keyof T, string>>,
-              );
+              props.emitFormValue({
+                ...formValues,
+                [inputName]: e.currentTarget.value,
+              } as Partial<Record<keyof T, string>>);
               setFormValues({
                 ...formValues,
                 [inputName]: e.currentTarget.value,

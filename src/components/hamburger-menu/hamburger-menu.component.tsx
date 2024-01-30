@@ -69,7 +69,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
 
   return (
     <div
-      className='flex md:hidden'
+      className='flex'
       ref={menuRef}
     >
       <ContextMenuComponent
