@@ -11,18 +11,17 @@ interface ToastModel {
   timeInMs: number;
 }
 
-interface InternalToastModel
-  extends ToastModel {
+interface InternalToastModel extends ToastModel {
   dueTo: Date;
   timeout: () => void;
 }
 
 export default function useToast() {
-  const [ toasts, setToast ] = useState<ToastModel[]>([]);
-  const [ internalToasts, setInternalToasts ] = useState<
+  const [toasts, setToast] = useState<ToastModel[]>([]);
+  const [internalToasts, setInternalToasts] = useState<
     Record<UUID, InternalToastModel>
   >({});
-  const intervalTimer = useRef<NodeJS.Timeout | null>(null);
+  const intervalTimer = useRef<any | null>(null);
 
   const show = useCallback((toast: Omit<ToastModel, 'uuid'>) => {
     const uuid = v4() as UUID;
@@ -42,12 +41,15 @@ export default function useToast() {
     setInternalToasts({});
   }, []);
 
-  const close = useCallback((toastUuid: UUID) => {
-    const clonedToasts = cloneDeep(internalToasts);
-    delete clonedToasts[toastUuid];
+  const close = useCallback(
+    (toastUuid: UUID) => {
+      const clonedToasts = cloneDeep(internalToasts);
+      delete clonedToasts[toastUuid];
 
-    setInternalToasts(clonedToasts);
-  }, [ internalToasts ]);
+      setInternalToasts(clonedToasts);
+    },
+    [internalToasts],
+  );
 
   const checkTimeouts = useCallback(() => {
     const now = new Date();
@@ -57,7 +59,7 @@ export default function useToast() {
         toast.timeout();
       }
     });
-  }, [ toasts ]);
+  }, [toasts]);
 
   useEffect(() => {
     if (Object.values(internalToasts).length === 0) {
@@ -70,14 +72,14 @@ export default function useToast() {
 
     setToast(
       Object.values(internalToasts).map((toast) =>
-        omit(toast, [ 'dueTo', 'timeout' ]),
+        omit(toast, ['dueTo', 'timeout']),
       ),
     );
 
     return () => {
       intervalTimer;
     };
-  }, [ internalToasts ]);
+  }, [internalToasts]);
 
   return { toasts, show, clear, close };
 }
