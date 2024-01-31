@@ -1,7 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { omit } from 'lodash';
 import { DetailedHTMLProps, InputHTMLAttributes, useEffect } from 'react';
 
 export interface InputValidation {
@@ -36,7 +34,13 @@ function InputComponent(props: InputProps) {
       htmlFor={props.for}
     >
       <input
-        {...omit(props, ['for', 'label', 'valid', 'error'])}
+        {...{
+          ...props,
+          label: undefined,
+          valid: undefined,
+          error: undefined,
+          for: undefined,
+        }}
         value={props.value ?? ''}
         className={`${!props.valid ? '!border-red-400' : ''} 
         peer w-full rounded-md border border-green-400 bg-gray-100 p-2 px-6 text-base text-gray-800 outline-none transition-all placeholder:text-gray-100
@@ -61,22 +65,13 @@ function InputComponent(props: InputProps) {
         </span>
       )}
 
-      {props.error && (
-        <motion.span
-          initial={{
-            height: 0,
-            opacity: 0,
-          }}
-          animate={{
-            height: 'auto',
-            opacity: 1,
-          }}
-          transition={{ ease: 'easeInOut', duration: 0.2 }}
-          className={`px-6 text-sm text-red-400`}
-        >
-          {props.error}
-        </motion.span>
-      )}
+      <span
+        className={`${
+          props.error ? 'max-h-12 opacity-100' : 'max-h-0 opacity-0'
+        } px-6 text-sm text-red-400 transition-all duration-700 ease-in-out`}
+      >
+        {props.error}
+      </span>
     </label>
   );
 }
