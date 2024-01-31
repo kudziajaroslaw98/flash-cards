@@ -1,6 +1,11 @@
 'use client';
 
-import { DetailedHTMLProps, InputHTMLAttributes, useEffect } from 'react';
+import {
+  DetailedHTMLProps,
+  InputHTMLAttributes,
+  useEffect,
+  useState,
+} from 'react';
 
 export interface InputValidation {
   valid: boolean;
@@ -11,7 +16,7 @@ interface NarrowedInputHTMLAttributes<T> extends InputHTMLAttributes<T> {
   value: string;
 }
 
-export interface InputProps
+export interface InputComponentProps
   extends DetailedHTMLProps<
     NarrowedInputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
@@ -23,10 +28,21 @@ export interface InputProps
   value: string;
 }
 
-function InputComponent(props: InputProps) {
+function InputComponent(props: InputComponentProps) {
+  const [inputProps, setInputProps] = useState<Partial<InputComponentProps>>(
+    {},
+  );
+
   useEffect(() => {
-    console.log(props.error);
-  }, [props.error]);
+    const copiedProps: Partial<InputComponentProps> = { ...props };
+
+    delete copiedProps.label;
+    delete copiedProps.valid;
+    delete copiedProps.for;
+    delete copiedProps.error;
+
+    setInputProps(copiedProps);
+  }, [props]);
 
   return (
     <label
@@ -34,14 +50,7 @@ function InputComponent(props: InputProps) {
       htmlFor={props.for}
     >
       <input
-        {...{
-          ...props,
-          label: undefined,
-          valid: undefined,
-          error: undefined,
-          for: undefined,
-        }}
-        value={props.value ?? ''}
+        {...inputProps}
         className={`${!props.valid ? '!border-red-400' : ''} 
         peer w-full rounded-md border border-green-400 bg-gray-100 p-2 px-6 text-base text-gray-800 outline-none transition-all placeholder:text-gray-100
         focus:placeholder:text-gray-600 dark:bg-slate-900 dark:text-slate-200 dark:placeholder:text-slate-900 dark:focus:placeholder:text-slate-400

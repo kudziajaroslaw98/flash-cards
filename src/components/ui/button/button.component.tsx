@@ -1,9 +1,12 @@
-import { PropsWithChildren } from 'react';
+import { ArrowPathIcon } from '@heroicons/react/24/solid';
+import type { PropsWithChildren } from 'react';
 
 export interface ButtonProps {
   class?: string;
   disabled?: boolean;
   onClick?: () => void;
+  icon?: React.ReactNode;
+  loading?: boolean;
 }
 
 export default function ButtonComponent(props: PropsWithChildren<ButtonProps>) {
@@ -18,6 +21,8 @@ export default function ButtonComponent(props: PropsWithChildren<ButtonProps>) {
       dark:disabled:bg-transparent ${props.class}`}
       onClick={() => (props?.onClick ? props.onClick() : null)}
     >
+      {props.loading && <ArrowPathIcon className={'h-4 w-4 animate-spin'} />}
+      {!props.loading && props.icon}
       {props.children}
     </button>
   );
