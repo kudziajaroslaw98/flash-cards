@@ -1,8 +1,7 @@
 'use client';
 
-import FormComponent from '#/app/playground/form.component';
+import FormComponent from '#/components/form-component/form.component';
 import { RocketLaunchIcon } from '@heroicons/react/24/solid';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { z } from 'zod';
@@ -11,7 +10,6 @@ import LinkComponent from '../ui/link/link.component';
 
 export default function SignUpFormComponent() {
   const router = useRouter();
-  const supabase = createClientComponentClient();
 
   const formScheme = {
     inputs: {
@@ -71,6 +69,7 @@ export default function SignUpFormComponent() {
     Partial<Record<keyof typeof formScheme.inputs, string>>
   >({});
   const [formValid, setFormValid] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
     const { email, password, confirmPassword, firstName, lastName } = formValue;
@@ -86,6 +85,13 @@ export default function SignUpFormComponent() {
       return;
     }
 
+    setLoading(true);
+
+    const { createClientComponentClient } = await import(
+      '@supabase/auth-helpers-nextjs'
+    );
+    const supabase = createClientComponentClient();
+
     // todo: change to API call
     await supabase.auth.signUp({
       email,
@@ -99,6 +105,7 @@ export default function SignUpFormComponent() {
       },
     });
 
+    setLoading(false);
     router.refresh();
   };
 
@@ -122,12 +129,13 @@ export default function SignUpFormComponent() {
 
       <ButtonComponent
         class={
-          'max-w-80 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 md:w-full dark:bg-green-500 dark:hover:bg-green-400'
+          'flex max-w-80 gap-2 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 md:w-full dark:bg-green-500 dark:hover:bg-green-400'
         }
         onClick={handleSignUp}
-        disabled={!formValid}
+        disabled={!formValid || loading}
+        loading={loading}
       >
-        Sign up
+        <span>Sign up</span>
       </ButtonComponent>
 
       <div className='flex flex-col items-center justify-center gap-1'>
@@ -137,7 +145,7 @@ export default function SignUpFormComponent() {
 
         <LinkComponent
           label={'Click here'}
-          href={'login'}
+          href={'sign-in'}
           class={'underline'}
         ></LinkComponent>
       </div>

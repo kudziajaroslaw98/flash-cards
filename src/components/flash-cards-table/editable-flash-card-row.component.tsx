@@ -6,10 +6,10 @@ import { motion } from 'framer-motion';
 interface EditableFlashCardRowProps {
   index: number;
   flashCard: FlashCardModel;
-  toggleSelected: (flashCard: FlashCardModel) => void;
-  isSelected: (flashCard: FlashCardModel) => boolean;
-  definitionChange: (flashCard: FlashCardModel, value: string) => void;
-  wordChange: (flashCard: FlashCardModel, value: string) => void;
+  toggleSelected: (_flashCard: FlashCardModel) => void;
+  isSelected: (_flashCard: FlashCardModel) => boolean;
+  definitionChange: (_flashCard: FlashCardModel, _value: string) => void;
+  wordChange: (_flashCard: FlashCardModel, _value: string) => void;
 }
 
 export default function EditableFlashCardRowComponent(
@@ -19,13 +19,12 @@ export default function EditableFlashCardRowComponent(
     attributes,
     listeners,
     setNodeRef: setDraggableRef,
-    transform,
   } = useDraggable({
     id: `${props.flashCard.uuid}`,
     data: props.flashCard,
   });
 
-  const { isOver, setNodeRef: setDroppableRef } = useDroppable({
+  const { setNodeRef: setDroppableRef } = useDroppable({
     id: `${props.flashCard.uuid}`,
     data: props.flashCard,
   });

@@ -14,7 +14,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { isNil } from 'lodash';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function HeaderComponent() {
   const pathname = usePathname();
@@ -65,15 +65,15 @@ export default function HeaderComponent() {
     setLoggedIn(false);
   };
 
-  const isLoggedIn = async () => {
-    const { data, error } = await supabase.auth.getSession();
+  const isLoggedIn = useCallback(async () => {
+    const { data } = await supabase.auth.getSession();
 
     if (!isNil(data.session)) {
       setLoggedIn(true);
     } else {
       setLoggedIn(false);
     }
-  };
+  }, [supabase.auth]);
 
   useEffect(() => {
     if (
@@ -89,7 +89,7 @@ export default function HeaderComponent() {
 
   useEffect(() => {
     isLoggedIn();
-  }, [pathname]);
+  }, [pathname, isLoggedIn]);
 
   return (
     <header className='fixed left-0 top-0 z-30 h-20 w-full bg-gray-50/20 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/20'>

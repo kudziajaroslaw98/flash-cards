@@ -1,15 +1,14 @@
 'use client';
 
-import FormComponent from '#/app/playground/form.component';
+import FormComponent from '#/components/form-component/form.component';
 import ButtonComponent from '#/components/ui/button/button.component';
 import LinkComponent from '#/components/ui/link/link.component';
 import { FingerPrintIcon } from '@heroicons/react/24/solid';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { z } from 'zod';
 
-export default function LoginFormComponent() {
+export default function SignInComponent() {
   const formScheme = {
     inputs: {
       email: {
@@ -33,17 +32,24 @@ export default function LoginFormComponent() {
   };
 
   const [formValid, setFormValid] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [formValue, setFormValue] = useState<
     Partial<Record<keyof typeof formScheme.inputs, string>>
   >({});
 
   const router = useRouter();
-  const supabase = createClientComponentClient();
 
   const handleSignIn = async () => {
     if (!formValue?.['email'] || !formValue?.['password'] || !formValid) {
       return;
     }
+
+    setLoading(true);
+
+    const { createClientComponentClient } = await import(
+      '@supabase/auth-helpers-nextjs'
+    );
+    const supabase = createClientComponentClient();
 
     // todo: change to API call
     await supabase.auth
@@ -61,13 +67,14 @@ export default function LoginFormComponent() {
         }
       });
 
+    setLoading(false);
     router.refresh();
   };
 
   return (
     <div className='relative flex w-full max-w-sm flex-col items-center justify-center gap-12 overflow-clip rounded border border-gray-50 bg-gray-100 p-8 shadow-card-hovered dark:border-slate-800 dark:bg-slate-900'>
       <h4 className='flex items-center justify-center gap-2 text-3xl font-semibold text-green-400'>
-        <span>Login</span>
+        <span>Sign in</span>
 
         <span className='absolute left-0 top-0 flex -translate-x-1/4 -translate-y-1/4 items-center justify-center opacity-10 dark:opacity-5'>
           <FingerPrintIcon className={'h-80 w-80'} />
@@ -89,12 +96,13 @@ export default function LoginFormComponent() {
 
       <ButtonComponent
         class={
-          'max-w-80 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 md:w-full dark:bg-green-500 dark:hover:bg-green-400'
+          'flex max-w-80 gap-2 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 md:w-full dark:bg-green-500 dark:hover:bg-green-400'
         }
         onClick={handleSignIn}
-        disabled={!formValid}
+        disabled={!formValid || loading}
+        loading={loading}
       >
-        Sign in
+        <span>Sign in</span>
       </ButtonComponent>
 
       <div className='flex flex-col items-center justify-center gap-1'>

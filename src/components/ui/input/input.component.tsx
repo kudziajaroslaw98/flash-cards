@@ -1,8 +1,11 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { omit } from 'lodash';
-import { DetailedHTMLProps, InputHTMLAttributes, useEffect } from 'react';
+import {
+  DetailedHTMLProps,
+  InputHTMLAttributes,
+  useEffect,
+  useState,
+} from 'react';
 
 export interface InputValidation {
   valid: boolean;
@@ -13,7 +16,7 @@ interface NarrowedInputHTMLAttributes<T> extends InputHTMLAttributes<T> {
   value: string;
 }
 
-export interface InputProps
+export interface InputComponentProps
   extends DetailedHTMLProps<
     NarrowedInputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
@@ -25,10 +28,21 @@ export interface InputProps
   value: string;
 }
 
-function InputComponent(props: InputProps) {
+function InputComponent(props: InputComponentProps) {
+  const [inputProps, setInputProps] = useState<Partial<InputComponentProps>>(
+    {},
+  );
+
   useEffect(() => {
-    console.log(props.error);
-  }, [props.error]);
+    const copiedProps: Partial<InputComponentProps> = { ...props };
+
+    delete copiedProps.label;
+    delete copiedProps.valid;
+    delete copiedProps.for;
+    delete copiedProps.error;
+
+    setInputProps(copiedProps);
+  }, [props]);
 
   return (
     <label
@@ -36,8 +50,7 @@ function InputComponent(props: InputProps) {
       htmlFor={props.for}
     >
       <input
-        {...omit(props, ['for', 'label', 'valid', 'error'])}
-        value={props.value ?? ''}
+        {...inputProps}
         className={`${!props.valid ? '!border-red-400' : ''} 
         peer w-full rounded-md border border-green-400 bg-gray-100 p-2 px-6 text-base text-gray-800 outline-none transition-all placeholder:text-gray-100
         focus:placeholder:text-gray-600 dark:bg-slate-900 dark:text-slate-200 dark:placeholder:text-slate-900 dark:focus:placeholder:text-slate-400
@@ -61,22 +74,13 @@ function InputComponent(props: InputProps) {
         </span>
       )}
 
-      {props.error && (
-        <motion.span
-          initial={{
-            height: 0,
-            opacity: 0,
-          }}
-          animate={{
-            height: 'auto',
-            opacity: 1,
-          }}
-          transition={{ ease: 'easeInOut', duration: 0.2 }}
-          className={`px-6 text-sm text-red-400`}
-        >
-          {props.error}
-        </motion.span>
-      )}
+      <span
+        className={`${
+          props.error ? 'max-h-12 opacity-100' : 'max-h-0 opacity-0'
+        } px-6 text-sm text-red-400 transition-all duration-700 ease-in-out`}
+      >
+        {props.error}
+      </span>
     </label>
   );
 }

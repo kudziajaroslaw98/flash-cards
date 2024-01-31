@@ -21,25 +21,7 @@ export default function useToast() {
   const [internalToasts, setInternalToasts] = useState<
     Record<UUID, InternalToastModel>
   >({});
-  const intervalTimer = useRef<any | null>(null);
-
-  const show = useCallback((toast: Omit<ToastModel, 'uuid'>) => {
-    const uuid = v4() as UUID;
-
-    setInternalToasts({
-      ...toasts,
-      [uuid]: {
-        ...toast,
-        uuid,
-        dueTo: new Date(new Date().getTime() + toast.timeInMs),
-        timeout: () => close(uuid),
-      },
-    });
-  }, []);
-
-  const clear = useCallback(() => {
-    setInternalToasts({});
-  }, []);
+  const intervalTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const close = useCallback(
     (toastUuid: UUID) => {
@@ -51,6 +33,27 @@ export default function useToast() {
     [internalToasts],
   );
 
+  const show = useCallback(
+    (toast: Omit<ToastModel, 'uuid'>) => {
+      const uuid = v4() as UUID;
+
+      setInternalToasts({
+        ...toasts,
+        [uuid]: {
+          ...toast,
+          uuid,
+          dueTo: new Date(new Date().getTime() + toast.timeInMs),
+          timeout: () => close(uuid),
+        },
+      });
+    },
+    [close, toasts],
+  );
+
+  const clear = useCallback(() => {
+    setInternalToasts({});
+  }, []);
+
   const checkTimeouts = useCallback(() => {
     const now = new Date();
 
@@ -59,7 +62,7 @@ export default function useToast() {
         toast.timeout();
       }
     });
-  }, [toasts]);
+  }, [internalToasts]);
 
   useEffect(() => {
     if (Object.values(internalToasts).length === 0) {
@@ -79,7 +82,7 @@ export default function useToast() {
     return () => {
       intervalTimer;
     };
-  }, [internalToasts]);
+  }, [internalToasts, checkTimeouts]);
 
   return { toasts, show, clear, close };
 }

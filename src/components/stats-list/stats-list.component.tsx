@@ -14,7 +14,6 @@ export default function StatsListComponent() {
 
   return (
     <div className='flex h-full w-full items-start justify-center pt-24'>
-      {/*<div className='grid max-w-2xl auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-3'>*/}
       <div className='flex max-w-2xl flex-wrap justify-center gap-4'>
         <CardComponent
           backgroundGradientWidth={100}

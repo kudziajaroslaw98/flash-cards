@@ -1,10 +1,10 @@
 'use client';
 
 import InputComponent, {
-  InputProps,
+  InputComponentProps,
 } from '#/components/ui/input/input.component';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
-import {
+import type {
   SafeParseError,
   SafeParseSuccess,
   ZodEffects,
@@ -23,7 +23,10 @@ interface FormScheme<T> {
 }
 
 export default function FormComponent<
-  T extends Record<string, Omit<InputProps, 'value' | 'error' | 'valid'>>,
+  T extends Record<
+    string,
+    Omit<InputComponentProps, 'value' | 'error' | 'valid'>
+  >,
 >(props: {
   scheme: FormScheme<T>;
   initialValues?: Partial<Record<keyof T, string>>;
@@ -58,7 +61,7 @@ export default function FormComponent<
       let initialErrors = {};
       let initialValues = {};
 
-      Object.entries(props.scheme.inputs).forEach(([inputName, _]) => {
+      Object.entries(props.scheme.inputs).forEach(([inputName]) => {
         initialInputs = [...initialInputs, inputName];
         initialValids = { ...initialValids, [inputName]: true };
         initialErrors = { ...initialErrors, [inputName]: null };
@@ -146,7 +149,7 @@ export default function FormComponent<
             key={inputName}
             valid={touchedInputs[inputName] ? formValids[inputName] : true}
             error={touchedInputs[inputName] ? formErrors[inputName] : null}
-            value={formValues[inputName]}
+            value={formValues[inputName] ?? ''}
             onFocus={(e) => {
               if (inputProps.onFocus) {
                 inputProps.onFocus(e);
@@ -170,6 +173,7 @@ export default function FormComponent<
                 ...formValues,
                 [inputName]: e.currentTarget.value,
               } as Partial<Record<keyof T, string>>);
+
               setFormValues({
                 ...formValues,
                 [inputName]: e.currentTarget.value,

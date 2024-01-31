@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 export default function checkValidity(
   value: string | Record<string, unknown> | undefined,
-  scheme: z.ZodType<any>,
+  scheme: z.ZodType<unknown>,
   setter?: Dispatch<SetStateAction<boolean>>,
 ): InputValidation {
   const output = scheme.safeParse(value);

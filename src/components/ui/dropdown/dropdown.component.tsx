@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 export interface DropdownParams<T> {
   items: T[];
   defaultValue: T;
-  onChange: (value: T) => void;
+  onChange: (_value: T) => void;
   labelByKey?: keyof T;
 }
 
@@ -44,13 +44,13 @@ export default function DropdownComponent<T>(
 
     setItems(dropdownItems);
     setPicked(pickedItem);
-  }, [params.items]);
+  }, [params.items, params.defaultValue, params.labelByKey]);
 
   useEffect(() => {
     if (picked) {
       params.onChange(picked?.item);
     }
-  }, [picked]);
+  }, [picked, params]);
 
   const changePickedItem = (pickedItem: DropdownItem<T>) => {
     setPicked(pickedItem);

@@ -12,7 +12,6 @@ import {
 } from '@dnd-kit/core';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { AnimatePresence } from 'framer-motion';
-import { cloneDeep, isEqual } from 'lodash';
 import { UUID } from 'node:crypto';
 import { useState } from 'react';
 import { v4 as uuid } from 'uuid';
@@ -67,14 +66,14 @@ export default function FlashCardsTable() {
     const isFlashCardSelected = selected.includes(flashCard.uuid);
 
     if (isFlashCardSelected) {
-      setSelected(selected.filter((item) => !isEqual(flashCard.uuid, item)));
+      setSelected(selected.filter((item) => flashCard.uuid !== item));
     } else {
       setSelected([...selected, flashCard.uuid]);
     }
   };
 
   const removeSelected = () => {
-    const flashCardsClone = cloneDeep(flashCards);
+    const flashCardsClone = { ...flashCards };
 
     selected.forEach((flashCardUuid) => {
       delete flashCardsClone?.[flashCardUuid];
@@ -89,8 +88,8 @@ export default function FlashCardsTable() {
   };
 
   const addNewRecord = () => {
-    const flashCardsClone = cloneDeep(flashCards);
-    const clonedStats = cloneDeep(statistics);
+    const flashCardsClone = { ...flashCards };
+    const clonedStats = { ...statistics };
     const newUuid = uuid() as UUID;
     const newFlashCards = typedInstanceFactory(flashCardsClone, {
       [newUuid]: {
@@ -115,7 +114,7 @@ export default function FlashCardsTable() {
   };
 
   const wordChange = (flashCard: FlashCardModel, value: string) => {
-    const flashCardsClone = cloneDeep(flashCards);
+    const flashCardsClone = { ...flashCards };
 
     flashCardsClone[flashCard.uuid] = { ...flashCard, word: value };
 
@@ -123,7 +122,7 @@ export default function FlashCardsTable() {
   };
 
   const definitionChange = (flashCard: FlashCardModel, value: string) => {
-    const flashCardsClone = cloneDeep(flashCards);
+    const flashCardsClone = { ...flashCards };
 
     flashCardsClone[flashCard.uuid] = { ...flashCard, definition: value };
 
@@ -135,7 +134,7 @@ export default function FlashCardsTable() {
       return;
     }
 
-    const flashCardsClone = cloneDeep(flashCards);
+    const flashCardsClone = { ...flashCards };
     const draggedItem = flashCardsClone[event.active.id as UUID];
     const droppedItem = flashCardsClone[event.over?.id as UUID];
     const tmpDraggedOrder = draggedItem.order;

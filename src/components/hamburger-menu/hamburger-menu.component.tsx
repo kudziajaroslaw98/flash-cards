@@ -136,7 +136,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
                     toggle(!toggled);
                     setOpen(false);
                   }}
-                  href={'/login'}
+                  href={'/sign-in'}
                   class={'underline'}
                 ></LinkComponent>
               </div>
