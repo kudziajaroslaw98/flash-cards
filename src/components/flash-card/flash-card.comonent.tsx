@@ -1,27 +1,27 @@
 import { FlashCardTypesEnum } from '#/utils/enums/flash-card-types.enum';
 import { FlashCardModel } from '#/utils/models/flash-card.model';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
-import  React  from 'react';
+import React from 'react';
 
 interface FlashCardParams {
   flashCard: FlashCardModel;
   reviseType: FlashCardTypesEnum;
-  onClick: (value: FlashCardModel) => void;
+  onClick: (_value: FlashCardModel) => void;
   correct?: boolean;
   clickedOnFlashCard?: boolean;
   clickedOverall?: boolean;
 }
 
 export default function FlashCardComponent(params: Readonly<FlashCardParams>) {
-  let mouseX = useMotionValue(0);
-  let mouseY = useMotionValue(0);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
 
   const handleMouseMove = (
     clientX: number,
     clientY: number,
     currentTarget: EventTarget & HTMLElement,
   ) => {
-    let { left, top } = currentTarget.getBoundingClientRect();
+    const { left, top } = currentTarget.getBoundingClientRect();
 
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);
@@ -66,9 +66,11 @@ export default function FlashCardComponent(params: Readonly<FlashCardParams>) {
   return (
     <div
       onClick={() => params.onClick(params.flashCard)}
-      onMouseMove={(e: { clientX: number; clientY: number; currentTarget: EventTarget & HTMLElement; }) =>
-        handleMouseMove(e.clientX, e.clientY, e.currentTarget)
-      }
+      onMouseMove={(e: {
+        clientX: number;
+        clientY: number;
+        currentTarget: EventTarget & HTMLElement;
+      }) => handleMouseMove(e.clientX, e.clientY, e.currentTarget)}
       onKeyDown={(event) => handleKeyDown(event)}
       tabIndex={0}
       className={`group relative z-10 flex h-full min-h-32 w-full max-w-80 cursor-pointer flex-col justify-center gap-2 rounded-md border border-gray-50 bg-gray-100 p-4 transition-all active:scale-95 sm:justify-start sm:gap-3  dark:border-slate-800 dark:bg-slate-900 ${getClickedCardStyles()}`}

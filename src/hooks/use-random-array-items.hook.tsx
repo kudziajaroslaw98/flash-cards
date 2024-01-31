@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import addUpNumberArray from '#/utils/functions/add-up-number-array.util';
 import binarySearch from '#/utils/functions/binary-search-weights.util';
@@ -17,7 +17,7 @@ export default function useRandomArrayItems<T>(
   const [pickedItems, setPickedItems] = useState<T[]>([]);
   const currentArrayLength = useRef(0);
 
-  const reshuffle = () => {
+  const reshuffle = useCallback(() => {
     const pickedItemsTmp: T[] = [];
     const summedWeights = addUpNumberArray(weightsArray);
 
@@ -44,7 +44,7 @@ export default function useRandomArrayItems<T>(
 
     currentArrayLength.current = array.length;
     setPickedItems(pickedItemsTmp);
-  };
+  }, [array, itemsCount, weightsArray]);
 
   useEffect(() => {
     if (
@@ -56,7 +56,7 @@ export default function useRandomArrayItems<T>(
     }
 
     reshuffle();
-  }, [array]);
+  }, [array, itemsCount, pickedItems, reshuffle]);
 
   return { pickedItems, reshuffle };
 }

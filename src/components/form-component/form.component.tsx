@@ -61,7 +61,7 @@ export default function FormComponent<
       let initialErrors = {};
       let initialValues = {};
 
-      Object.entries(props.scheme.inputs).forEach(([inputName, _]) => {
+      Object.entries(props.scheme.inputs).forEach(([inputName]) => {
         initialInputs = [...initialInputs, inputName];
         initialValids = { ...initialValids, [inputName]: true };
         initialErrors = { ...initialErrors, [inputName]: null };

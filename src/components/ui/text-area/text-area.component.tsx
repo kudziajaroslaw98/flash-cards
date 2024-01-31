@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 
 export interface TextAreaProps {
   class: string;
-  onInput: (event: string) => void;
+  onInput: (_event: string) => void;
   value: string;
   id: string;
 }
@@ -31,11 +31,11 @@ export default function TextAreaComponent(props: Readonly<TextAreaProps>) {
         adjustHeight();
       });
     };
-  }, []);
+  }, [adjustHeight]);
 
   useEffect(() => {
     adjustHeight();
-  }, [value]);
+  }, [value, adjustHeight]);
 
   return (
     <textarea

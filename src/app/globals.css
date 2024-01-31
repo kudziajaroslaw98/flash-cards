@@ -3,40 +3,40 @@
 @tailwind utilities;
 
 :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 240, 240, 240;
-    --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 240, 240, 240;
+  --background-end-rgb: 255, 255, 255;
 }
 
 @media (prefers-color-scheme: dark) {
-    :root {
-        --foreground-rgb: 255, 255, 255;
-        --background-start-rgb: 0, 0, 0;
-        --background-end-rgb: 0, 0, 0;
-    }
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
 }
 
 body {
-    min-height: 100vh;
-    min-height: fill-available;
-    min-height: -webkit-fill-available;
+  min-height: 100vh;
+  min-height: stretch;
+  min-height: -webkit-fill-available;
 }
 
 html {
-    min-height: fill-available;
-    min-height: -webkit-fill-available;
+  min-height: stretch;
+  min-height: -webkit-fill-available;
 }
 
 main {
-    @apply h-full;
+  @apply h-full;
 }
 
 div#__next {
-    @apply h-full;
+  @apply h-full;
 }
 
 *::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 /* autofill override light mode */
@@ -52,12 +52,12 @@ select:-webkit-autofill,
 select:-webkit-autofill:enabled,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
-    -webkit-text-fill-color: rgb(31, 41, 55);
-    -webkit-box-shadow: 0 0 0 1000px rgb(243, 244, 246) inset;
-    box-shadow: 0 0 0 1000px rgb(243, 244, 246) inset;
-    background-color: rgb(243, 244, 246);
-    font-size: 1rem;
-    line-height: 1.5rem;
+  -webkit-text-fill-color: rgb(31, 41, 55);
+  -webkit-box-shadow: 0 0 0 1000px rgb(243, 244, 246) inset;
+  box-shadow: 0 0 0 1000px rgb(243, 244, 246) inset;
+  background-color: rgb(243, 244, 246);
+  font-size: 1rem;
+  line-height: 1.5rem;
 }
 
 :is(:where(.dark) input:-webkit-autofill),
@@ -72,10 +72,10 @@ select:-webkit-autofill:focus {
 :is(:where(.dark) select:-webkit-autofill:enabled),
 :is(:where(.dark) select:-webkit-autofill:hover),
 :is(:where(.dark) select:-webkit-autofill:focus) {
-    -webkit-text-fill-color: rgb(226, 232, 240);
-    -webkit-box-shadow: 0 0 0 1000px rgb(15, 23, 42) inset;
-    box-shadow: 0 0 0 1000px rgb(15, 23, 42) inset;
-    background-color: rgb(15, 23, 42);
-    font-size: 1rem;
-    line-height: 1.5rem;
+  -webkit-text-fill-color: rgb(226, 232, 240);
+  -webkit-box-shadow: 0 0 0 1000px rgb(15, 23, 42) inset;
+  box-shadow: 0 0 0 1000px rgb(15, 23, 42) inset;
+  background-color: rgb(15, 23, 42);
+  font-size: 1rem;
+  line-height: 1.5rem;
 }

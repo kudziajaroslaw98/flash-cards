@@ -1,6 +1,6 @@
 'use client';
 
-import FormComponent from '#/app/playground/form.component';
+import FormComponent from '#/components/form-component/form.component';
 import ButtonComponent from '#/components/ui/button/button.component';
 import LinkComponent from '#/components/ui/link/link.component';
 import { FingerPrintIcon } from '@heroicons/react/24/solid';

@@ -1,6 +1,6 @@
 'use client';
 
-import FormComponent from '#/app/playground/form.component';
+import FormComponent from '#/components/form-component/form.component';
 import { RocketLaunchIcon } from '@heroicons/react/24/solid';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -145,7 +145,7 @@ export default function SignUpFormComponent() {
 
         <LinkComponent
           label={'Click here'}
-          href={'login'}
+          href={'sign-in'}
           class={'underline'}
         ></LinkComponent>
       </div>

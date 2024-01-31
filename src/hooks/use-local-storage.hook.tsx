@@ -5,13 +5,13 @@ import { useEffect, useState } from 'react';
 export interface UseLocalStorageOutput<T, K extends Record<string, T>> {
   value: K;
   arrayOfValues: T[];
-  setToLocalStorage: (value: K) => void;
+  setToLocalStorage: (_value: K) => void;
 }
 
 export default function useLocalStorage<T, K extends Record<string, T>>(
   key: string,
   defaultValue: K,
-  sortStrategy?: (head: T, tail: T) => number,
+  sortStrategy?: (_head: T, _tail: T) => number,
 ): UseLocalStorageOutput<T, K> {
   const [json, setJSON] = useState<K>(defaultValue);
   const [array, setArray] = useState<T[]>([]);

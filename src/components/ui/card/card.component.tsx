@@ -9,15 +9,15 @@ export interface CardComponentProps {
 export default function CardComponent(
   props: PropsWithChildren<CardComponentProps>,
 ) {
-  let mouseX = useMotionValue(0);
-  let mouseY = useMotionValue(0);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
 
   const handleMouseMove = (
     clientX: number,
     clientY: number,
     currentTarget: EventTarget & HTMLElement,
   ) => {
-    let { left, top } = currentTarget.getBoundingClientRect();
+    const { left, top } = currentTarget.getBoundingClientRect();
 
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);

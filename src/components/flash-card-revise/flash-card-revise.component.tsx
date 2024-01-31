@@ -1,7 +1,6 @@
 'use client';
 
 import { ArrowPathIcon } from '@heroicons/react/24/solid';
-import { cloneDeep, isEqual } from 'lodash';
 import { useEffect, useState } from 'react';
 
 import FlashCardComponent from '#/components/flash-card/flash-card.comonent';
@@ -42,7 +41,9 @@ export default function FlashCardReviseComponent() {
     );
 
   const isCorrect = (flashCard?: FlashCardModel) => {
-    return isEqual(revisedCard, flashCard ?? clickedCard);
+    const comparisonItem = flashCard ?? clickedCard;
+
+    return revisedCard === comparisonItem;
   };
 
   const changeClicked = (flashCard: FlashCardModel) => {
@@ -51,8 +52,8 @@ export default function FlashCardReviseComponent() {
     }
 
     const correct = isCorrect(flashCard);
-    const clonedFlashCards = cloneDeep(flashCards);
-    const clonedStats = cloneDeep(statistics);
+    const clonedFlashCards = { ...flashCards };
+    const clonedStats = { ...statistics };
 
     clonedStats.answers += 1;
 
@@ -89,7 +90,10 @@ export default function FlashCardReviseComponent() {
   };
 
   useEffect(() => {
-    setRevisedCard(randomCards[getRandomRangedNumber(0, 3)]);
+    const isFullRevise = randomCards.length === 4;
+    const randomMax = isFullRevise ? 3 : randomCards.length - 1;
+
+    setRevisedCard(randomCards[getRandomRangedNumber(0, randomMax)]);
   }, [randomCards]);
 
   return flashCardsArray.length > 0 ? (

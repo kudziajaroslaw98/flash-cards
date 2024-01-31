@@ -17,6 +17,8 @@
     "@heroicons/react": "^2.1.1",
     "@supabase/auth-helpers-nextjs": "^0.8.7",
     "@supabase/supabase-js": "^2.39.3",
+    "@typescript-eslint/eslint-plugin": "^6.20.0",
+    "@typescript-eslint/parser": "^6.20.0",
     "en-dictionary": "^1.2.4",
     "en-wordnet": "^2.0.6",
     "framer-motion": "^10.18.0",
