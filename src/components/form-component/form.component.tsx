@@ -118,11 +118,11 @@ export default function FormComponent<
       props.scheme.validation.safeParse(formValues);
 
     let valids = defaultValids;
+    let errors = {};
 
     if (!output.success) {
       const issues = output?.error?.issues;
       const haveErrors = issues?.length > 0;
-      let errors = {};
 
       if (haveErrors) {
         issues.forEach((issue: ZodIssueBase) => {
@@ -132,10 +132,9 @@ export default function FormComponent<
           }
         });
       }
-
-      setFormErrors(errors);
     }
 
+    setFormErrors(errors);
     setFormValids(valids);
     props.emitFormValid(Object.values(valids).every((item) => item));
   };

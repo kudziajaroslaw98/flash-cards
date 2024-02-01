@@ -1,7 +1,14 @@
-import HeaderComponent from '#/components/header/header.component';
 import type { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 import { Inter, Roboto_Mono } from 'next/font/google';
+
+import HeaderComponent from '#/components/header/header.component';
+import ToastProvider from '#/providers/toast-provider.component';
 import './globals.css';
+
+const ToastsComponent = dynamic(
+  () => import('#/components/toasts/toasts.component'),
+);
 
 const inter = Inter({
   subsets: ['latin'],
@@ -31,12 +38,15 @@ export default function RootLayout({
       lang='en'
       className={`${inter.variable} ${roboto_mono.variable} dark flex font-sans`}
     >
-      <body className='min-w-screen flex w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950'>
-        <HeaderComponent />
+      <body className='min-w-screen relative flex w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950'>
+        <ToastProvider>
+          <ToastsComponent />
+          <HeaderComponent />
 
-        <main className='mx-auto flex w-full max-w-6xl flex-col p-4'>
-          {children}
-        </main>
+          <main className='mx-auto flex w-full max-w-6xl flex-col p-4'>
+            {children}
+          </main>
+        </ToastProvider>
       </body>
     </html>
   );

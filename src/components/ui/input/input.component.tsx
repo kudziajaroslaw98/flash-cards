@@ -29,9 +29,10 @@ export interface InputComponentProps
 }
 
 function InputComponent(props: InputComponentProps) {
-  const [inputProps, setInputProps] = useState<Partial<InputComponentProps>>(
-    {},
-  );
+  const [inputProps, setInputProps] = useState<Partial<InputComponentProps>>({
+    value: '',
+    onChange: () => {},
+  });
 
   useEffect(() => {
     const copiedProps: Partial<InputComponentProps> = { ...props };
