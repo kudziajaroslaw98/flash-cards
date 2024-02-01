@@ -1,19 +1,17 @@
-import { cloneDeep, omit } from 'lodash';
+import { omit } from 'lodash';
 import { UUID } from 'node:crypto';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { v4 } from 'uuid';
 
-interface ToastModel {
+export interface ToastModel {
   uuid: UUID;
   title: string;
-  description: string;
   type: 'success' | 'error' | 'warning' | 'info';
   timeInMs: number;
 }
 
 interface InternalToastModel extends ToastModel {
   dueTo: Date;
-  timeout: () => void;
 }
 
 export default function useToast() {
@@ -25,7 +23,8 @@ export default function useToast() {
 
   const close = useCallback(
     (toastUuid: UUID) => {
-      const clonedToasts = cloneDeep(internalToasts);
+      const clonedToasts = { ...internalToasts };
+
       delete clonedToasts[toastUuid];
 
       setInternalToasts(clonedToasts);
@@ -33,22 +32,19 @@ export default function useToast() {
     [internalToasts],
   );
 
-  const show = useCallback(
-    (toast: Omit<ToastModel, 'uuid'>) => {
-      const uuid = v4() as UUID;
+  const show = (toast: Omit<ToastModel, 'uuid'>) => {
+    const uuid = v4() as UUID;
+    const newToastSet = {
+      ...internalToasts,
+      [uuid]: {
+        ...toast,
+        uuid,
+        dueTo: new Date(new Date().getTime() + toast.timeInMs),
+      },
+    };
 
-      setInternalToasts({
-        ...toasts,
-        [uuid]: {
-          ...toast,
-          uuid,
-          dueTo: new Date(new Date().getTime() + toast.timeInMs),
-          timeout: () => close(uuid),
-        },
-      });
-    },
-    [close, toasts],
-  );
+    setInternalToasts(newToastSet);
+  };
 
   const clear = useCallback(() => {
     setInternalToasts({});
@@ -59,28 +55,34 @@ export default function useToast() {
 
     Object.values(internalToasts).forEach((toast) => {
       if (now > toast.dueTo) {
-        toast.timeout();
+        close(toast.uuid);
       }
     });
-  }, [internalToasts]);
+  }, [internalToasts, close]);
 
   useEffect(() => {
-    if (Object.values(internalToasts).length === 0) {
+    if (
+      Object.values(internalToasts).length === 0 &&
+      intervalTimer.current !== null
+    ) {
+      clearInterval(intervalTimer.current!);
       intervalTimer.current = null;
+    } else if (
+      Object.values(internalToasts).length > 0 &&
+      intervalTimer.current === null
+    ) {
+      intervalTimer.current = setInterval(() => {
+        checkTimeouts();
+      }, 100);
     }
 
-    intervalTimer.current = setInterval(() => {
-      checkTimeouts();
-    }, 100);
-
     setToast(
-      Object.values(internalToasts).map((toast) =>
-        omit(toast, ['dueTo', 'timeout']),
-      ),
+      Object.values(internalToasts).map((toast) => omit(toast, ['dueTo'])),
     );
 
     return () => {
-      intervalTimer;
+      clearInterval(intervalTimer.current!);
+      intervalTimer.current = null;
     };
   }, [internalToasts, checkTimeouts]);
 

@@ -3,6 +3,7 @@
 import FormComponent from '#/components/form-component/form.component';
 import ButtonComponent from '#/components/ui/button/button.component';
 import LinkComponent from '#/components/ui/link/link.component';
+import { useToastContext } from '#/providers/toast-provider.component';
 import { FingerPrintIcon } from '@heroicons/react/24/solid';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -38,6 +39,7 @@ export default function SignInComponent() {
   >({});
 
   const router = useRouter();
+  const { show } = useToastContext();
 
   const handleSignIn = async () => {
     if (!formValue?.['email'] || !formValue?.['password'] || !formValid) {
@@ -64,6 +66,12 @@ export default function SignInComponent() {
             access_token: res.data.session.access_token,
           });
           router.push(`${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/revise`);
+        } else {
+          show({
+            title: res.error?.message ?? 'Unknown error',
+            timeInMs: 3000,
+            type: 'error',
+          });
         }
       });
 
@@ -83,11 +91,6 @@ export default function SignInComponent() {
 
       <div className='flex w-full flex-col gap-2 py-4'>
         <FormComponent
-          debug={{
-            inputs: true,
-            validity: true,
-            errors: true,
-          }}
           scheme={formScheme}
           emitFormValid={setFormValid}
           emitFormValue={setFormValue}
