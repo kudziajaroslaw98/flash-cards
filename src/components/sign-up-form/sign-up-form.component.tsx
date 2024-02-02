@@ -93,27 +93,6 @@ export default function SignUpFormComponent() {
       router.push(`${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/learn`);
     }
 
-    // setLoading(true);
-
-    // const { createClientComponentClient } = await import(
-    //   '@supabase/auth-helpers-nextjs'
-    // );
-    // const supabase = createClientComponentClient();
-
-    // // todo: change to API call
-    // await supabase.auth.signUp({
-    //   email,
-    //   password,
-    //   options: {
-    //     emailRedirectTo: `${location.origin}/auth/callback`,
-    //     data: {
-    //       firstName,
-    //       lastName,
-    //     },
-    //   },
-    // });
-
-    // setLoading(false);
     router.refresh();
   };
 
