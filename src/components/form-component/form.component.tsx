@@ -17,10 +17,10 @@ type ZodSchemaFromBaseObject<T> =
   | ZodObject<Record<keyof T, ZodTypeAny>>
   | ZodEffects<ZodObject<Record<keyof T, ZodTypeAny>>>;
 
-interface FormScheme<T> {
+type FormScheme<T> = {
   validation: ZodSchemaFromBaseObject<T>;
   inputs: T;
-}
+};
 
 export default function FormComponent<
   T extends Record<
@@ -32,6 +32,8 @@ export default function FormComponent<
   initialValues?: Partial<Record<keyof T, string>>;
   emitFormValid: Dispatch<SetStateAction<boolean>>;
   emitFormValue: Dispatch<SetStateAction<Partial<Record<keyof T, string>>>>;
+  formValid?: boolean;
+  formError?: string;
   debug?: {
     inputs?: boolean;
     validity?: boolean;
@@ -40,14 +42,17 @@ export default function FormComponent<
     touch?: boolean;
   };
 }) {
-  const [formValues, setFormValues] = useState<Record<string, string>>({});
-  const [formValids, setFormValids] = useState<Record<string, boolean>>({});
+  const [inputsValidity, setInputsValidity] = useState<Record<string, boolean>>(
+    {},
+  );
+  const [inputsErrors, setInputsErrors] = useState<
+    Record<string, string | null>
+  >({});
+
   const [defaultValids, setDefaultValids] = useState<Record<string, boolean>>(
     {},
   );
-  const [formErrors, setFormErrors] = useState<Record<string, string | null>>(
-    {},
-  );
+  const [formValues, setFormValues] = useState<Record<string, string>>({});
   const [formInputs, setFormInputs] = useState<string[]>([]);
   const [touchedInputs, setTouchedInputs] = useState<Record<string, boolean>>(
     {},
@@ -74,14 +79,32 @@ export default function FormComponent<
       });
 
       setFormInputs(initialInputs);
-      setFormValids(initialValids);
-      setFormErrors(initialErrors);
+      setInputsValidity(initialValids);
+      setInputsErrors(initialErrors);
       setFormValues(initialValues);
       setDefaultValids(initialValids);
 
       initialRender.current = false;
     }
   }, [props.initialValues, props.scheme]);
+
+  useEffect(() => {
+    if (props?.formValid !== undefined && props?.formValid === false) {
+      let initialValids = { ...inputsValidity };
+      let initialErrors = { ...inputsErrors };
+
+      Object.entries(props.scheme.inputs).forEach(([inputName]) => {
+        initialValids = {
+          ...initialValids,
+          [inputName]: props.formValid as boolean,
+        };
+        initialErrors = { ...initialErrors, [inputName]: '' };
+      });
+
+      setInputsValidity(initialValids);
+      setInputsErrors(initialErrors);
+    }
+  }, [props.formValid]);
 
   useEffect(() => {
     if (props?.debug?.inputs) {
@@ -91,15 +114,15 @@ export default function FormComponent<
 
   useEffect(() => {
     if (props?.debug?.validity) {
-      console.log('form - valids - ', formValids);
+      console.log('form - valids - ', inputsValidity);
     }
-  }, [props.debug, formValids]);
+  }, [props.debug, inputsValidity]);
 
   useEffect(() => {
     if (props?.debug?.errors) {
-      console.log('form - errors - ', formErrors);
+      console.log('form - errors - ', inputsErrors);
     }
-  }, [props.debug, formErrors]);
+  }, [props.debug, inputsErrors]);
 
   useEffect(() => {
     if (props?.debug?.values) {
@@ -134,8 +157,8 @@ export default function FormComponent<
       }
     }
 
-    setFormErrors(errors);
-    setFormValids(valids);
+    setInputsErrors(errors);
+    setInputsValidity(valids);
     props.emitFormValid(Object.values(valids).every((item) => item));
   };
 
@@ -146,8 +169,8 @@ export default function FormComponent<
           <InputComponent
             {...inputProps}
             key={inputName}
-            valid={touchedInputs[inputName] ? formValids[inputName] : true}
-            error={touchedInputs[inputName] ? formErrors[inputName] : null}
+            valid={touchedInputs[inputName] ? inputsValidity[inputName] : true}
+            error={touchedInputs[inputName] ? inputsErrors[inputName] : null}
             value={formValues[inputName] ?? ''}
             onFocus={(e) => {
               if (inputProps.onFocus) {
@@ -181,6 +204,16 @@ export default function FormComponent<
           />
         );
       })}
+
+      {props.formError && (
+        <span
+          className={`${
+            props.formError ? 'mt-6 max-h-12 opacity-100' : ' max-h-0 opacity-0'
+          } flex w-full items-center justify-center px-6 text-sm text-red-400 transition-all duration-700 ease-in-out`}
+        >
+          {props.formError}
+        </span>
+      )}
     </form>
   );
 }
