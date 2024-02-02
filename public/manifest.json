@@ -28,5 +28,29 @@
       "sizes": "512x512",
       "type": "image/png"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "New flashcard",
+      "url": "/learn",
+      "icons": [
+        {
+          "src": "/new-flashcard.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Revise flashcards",
+      "url": "/revise",
+      "icons": [
+        {
+          "src": "/revise-flashcards.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }

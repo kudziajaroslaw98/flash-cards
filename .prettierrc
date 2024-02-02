@@ -2,6 +2,7 @@
   "singleQuote": true,
   "jsxSingleQuote": true,
   "singleAttributePerLine": true,
+  "bracketSpacing": true,
   "tailwindConfig": "./tailwind.config.ts",
   "plugins": [
     "prettier-plugin-sort-imports",

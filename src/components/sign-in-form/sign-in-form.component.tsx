@@ -3,11 +3,14 @@
 import FormComponent from '#/components/form-component/form.component';
 import ButtonComponent from '#/components/ui/button/button.component';
 import LinkComponent from '#/components/ui/link/link.component';
-import { useToastContext } from '#/providers/toast-provider.component';
+import useFetch from '#/hooks/use-fetch.hook';
+import { ApiRoutes } from '#/utils/enums/api-routes.enum';
+import { ApiResponse } from '#/utils/models/api-response.model';
+import { SignInResponse } from '#/utils/types/sign-in-response.type';
+import { signInValidationScheme } from '#/utils/validation-schemes/sign-in-validation.scheme';
 import { FingerPrintIcon } from '@heroicons/react/24/solid';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { z } from 'zod';
 
 export default function SignInComponent() {
   const formScheme = {
@@ -24,58 +27,44 @@ export default function SignInComponent() {
         label: 'Password',
       },
     },
-    validation: z.object({
-      email: z.string().email('Email is incorrect.'),
-      password: z
-        .string()
-        .min(8, 'Password must be at least 8 characters long'),
-    }),
+    validation: signInValidationScheme,
   };
 
   const [formValid, setFormValid] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [requestSuccess, setRequestSuccess] = useState<boolean | undefined>();
+  const [requestErrorMsg, setRequestErrorMsg] = useState<string | undefined>();
   const [formValue, setFormValue] = useState<
     Partial<Record<keyof typeof formScheme.inputs, string>>
   >({});
+  const { fetch, isLoading } = useFetch();
 
   const router = useRouter();
-  const { show } = useToastContext();
 
   const handleSignIn = async () => {
-    if (!formValue?.['email'] || !formValue?.['password'] || !formValid) {
+    if (!formValue.email || !formValue.password || !formValid) {
       return;
     }
 
-    setLoading(true);
+    setRequestErrorMsg(undefined);
+    setRequestSuccess(undefined);
 
-    const { createClientComponentClient } = await import(
-      '@supabase/auth-helpers-nextjs'
+    const response = await fetch<ApiResponse<SignInResponse>>(
+      ApiRoutes.SIGN_IN,
+      {
+        body: JSON.stringify(formValue),
+        method: 'POST',
+      },
     );
-    const supabase = createClientComponentClient();
 
-    // todo: change to API call
-    await supabase.auth
-      .signInWithPassword({
-        email: formValue?.['email'],
-        password: formValue?.['password'],
-      })
-      .then(async (res) => {
-        if (res.data.session) {
-          await supabase.auth.setSession({
-            refresh_token: res.data.session.refresh_token,
-            access_token: res.data.session.access_token,
-          });
-          router.push(`${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/revise`);
-        } else {
-          show({
-            title: res.error?.message ?? 'Unknown error',
-            timeInMs: 3000,
-            type: 'error',
-          });
-        }
-      });
+    if (!response?.success) {
+      setRequestErrorMsg(response.error);
+      setRequestSuccess(false);
+    } else {
+      setRequestSuccess(true);
 
-    setLoading(false);
+      router.push(`${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/learn`);
+    }
+
     router.refresh();
   };
 
@@ -89,9 +78,11 @@ export default function SignInComponent() {
         </span>
       </h4>
 
-      <div className='flex w-full flex-col gap-2 py-4'>
+      <div className='flex w-full flex-col gap-2 pt-4'>
         <FormComponent
           scheme={formScheme}
+          formValid={requestSuccess}
+          formError={requestErrorMsg}
           emitFormValid={setFormValid}
           emitFormValue={setFormValue}
         />
@@ -102,8 +93,8 @@ export default function SignInComponent() {
           'flex max-w-80 gap-2 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 md:w-full dark:bg-green-500 dark:hover:bg-green-400'
         }
         onClick={handleSignIn}
-        disabled={!formValid || loading}
-        loading={loading}
+        disabled={!formValid || isLoading}
+        loading={isLoading}
       >
         <span>Sign in</span>
       </ButtonComponent>

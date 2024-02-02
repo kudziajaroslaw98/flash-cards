@@ -42,7 +42,7 @@ export default function ToastsComponent() {
   };
 
   return (
-    <div className='absolute right-0 top-16 z-40 mx-auto flex h-auto w-full max-w-96 flex-col gap-2 overflow-x-clip px-4 sm:right-4 sm:px-0 md:max-w-80'>
+    <div className='absolute right-0 top-16 z-40 flex h-auto w-full flex-col gap-2 overflow-x-clip px-4 sm:right-4 sm:px-0 md:max-w-80'>
       <AnimatePresence>
         {toasts?.map((toast) => (
           <motion.div

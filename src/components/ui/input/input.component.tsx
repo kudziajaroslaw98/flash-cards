@@ -7,10 +7,14 @@ import {
   useState,
 } from 'react';
 
-export interface InputValidation {
-  valid: boolean;
-  error?: string;
-}
+export type InputValidation =
+  | {
+      valid: false;
+      error: string;
+    }
+  | {
+      valid: true;
+    };
 
 interface NarrowedInputHTMLAttributes<T> extends InputHTMLAttributes<T> {
   value: string;
