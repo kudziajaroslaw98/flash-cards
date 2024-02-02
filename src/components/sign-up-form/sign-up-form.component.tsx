@@ -1,10 +1,14 @@
 'use client';
 
 import FormComponent from '#/components/form-component/form.component';
+import useFetch from '#/hooks/use-fetch.hook';
+import { ApiRoutes } from '#/utils/enums/api-routes.enum';
+import { ApiResponse } from '#/utils/models/api-response.model';
+import { SignUpResponse } from '#/utils/types/sign-up-response.type';
+import { signUpValidationScheme } from '#/utils/validation-schemes/sign-up-validation.scheme';
 import { RocketLaunchIcon } from '@heroicons/react/24/solid';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { z } from 'zod';
 import ButtonComponent from '../ui/button/button.component';
 import LinkComponent from '../ui/link/link.component';
 
@@ -47,29 +51,16 @@ export default function SignUpFormComponent() {
         required: true,
       },
     },
-    validation: z
-      .object({
-        firstName: z.string().min(1, 'First name is required'),
-        lastName: z.string().min(1, 'Last name is required'),
-        email: z.string().email('Email is incorrect'),
-        password: z
-          .string()
-          .min(8, 'Password must be at least 8 characters long'),
-        confirmPassword: z
-          .string()
-          .min(8, 'Password must be at least 8 characters long'),
-      })
-      .refine(({ password, confirmPassword }) => password === confirmPassword, {
-        path: ['confirmPassword'],
-        message: `Passwords don't match`,
-      }),
+    validation: signUpValidationScheme,
   };
 
   const [formValue, setFormValue] = useState<
     Partial<Record<keyof typeof formScheme.inputs, string>>
   >({});
   const [formValid, setFormValid] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [requestSuccess, setRequestSuccess] = useState<boolean | undefined>();
+  const [requestErrorMsg, setRequestErrorMsg] = useState<string | undefined>();
+  const { fetch, isLoading } = useFetch();
 
   const handleSignUp = async () => {
     const { email, password, confirmPassword, firstName, lastName } = formValue;
@@ -85,27 +76,44 @@ export default function SignUpFormComponent() {
       return;
     }
 
-    setLoading(true);
-
-    const { createClientComponentClient } = await import(
-      '@supabase/auth-helpers-nextjs'
-    );
-    const supabase = createClientComponentClient();
-
-    // todo: change to API call
-    await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
-        data: {
-          firstName,
-          lastName,
-        },
+    const response = await fetch<ApiResponse<SignUpResponse>>(
+      ApiRoutes.SIGN_UP,
+      {
+        body: JSON.stringify(formValue),
+        method: 'POST',
       },
-    });
+    );
 
-    setLoading(false);
+    if (!response?.success) {
+      setRequestErrorMsg(response.error);
+      setRequestSuccess(false);
+    } else {
+      setRequestSuccess(true);
+
+      router.push(`${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/learn`);
+    }
+
+    // setLoading(true);
+
+    // const { createClientComponentClient } = await import(
+    //   '@supabase/auth-helpers-nextjs'
+    // );
+    // const supabase = createClientComponentClient();
+
+    // // todo: change to API call
+    // await supabase.auth.signUp({
+    //   email,
+    //   password,
+    //   options: {
+    //     emailRedirectTo: `${location.origin}/auth/callback`,
+    //     data: {
+    //       firstName,
+    //       lastName,
+    //     },
+    //   },
+    // });
+
+    // setLoading(false);
     router.refresh();
   };
 
@@ -122,6 +130,8 @@ export default function SignUpFormComponent() {
       <div className='flex w-full flex-col gap-2 py-4'>
         <FormComponent
           scheme={formScheme}
+          formValid={requestSuccess}
+          formError={requestErrorMsg}
           emitFormValid={setFormValid}
           emitFormValue={setFormValue}
         />
@@ -132,8 +142,8 @@ export default function SignUpFormComponent() {
           'flex max-w-80 gap-2 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 md:w-full dark:bg-green-500 dark:hover:bg-green-400'
         }
         onClick={handleSignUp}
-        disabled={!formValid || loading}
-        loading={loading}
+        disabled={!formValid || isLoading}
+        loading={isLoading}
       >
         <span>Sign up</span>
       </ButtonComponent>
