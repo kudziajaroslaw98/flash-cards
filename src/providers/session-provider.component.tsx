@@ -33,20 +33,17 @@ export default function SessionProvider(props: Readonly<PropsWithChildren>) {
 
   const logOut = async () => {
     await supabase.auth.signOut();
+
     setSession(null);
   };
 
   const checkSession = useCallback(async () => {
     const { data } = await supabase.auth.getSession();
 
-    console.log(data);
-
     setSession(data?.session ?? null);
   }, [supabase.auth]);
 
   useEffect(() => {
-    console.log('checkSession');
-
     checkSession();
   }, [pathname, checkSession]);
 
