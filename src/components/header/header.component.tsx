@@ -10,16 +10,12 @@ import {
   HashtagIcon,
   LanguageIcon,
 } from '@heroicons/react/24/solid';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { isNil } from 'lodash';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function HeaderComponent() {
   const pathname = usePathname();
-  const supabase = createClientComponentClient();
-  const [loggedIn, setLoggedIn] = useState(false);
 
   const [navigationItems, setNavigationItems] = useState<NavigationItem[]>([
     {
@@ -60,21 +56,6 @@ export default function HeaderComponent() {
     return value.theme === 'dark';
   };
 
-  const logOut = async () => {
-    await supabase.auth.signOut();
-    setLoggedIn(false);
-  };
-
-  const isLoggedIn = useCallback(async () => {
-    const { data } = await supabase.auth.getSession();
-
-    if (!isNil(data.session)) {
-      setLoggedIn(true);
-    } else {
-      setLoggedIn(false);
-    }
-  }, [supabase.auth]);
-
   useEffect(() => {
     if (
       value.theme === 'dark' ||
@@ -86,10 +67,6 @@ export default function HeaderComponent() {
       document.querySelector('html')?.classList.remove('dark');
     }
   }, [value.theme]);
-
-  useEffect(() => {
-    isLoggedIn();
-  }, [pathname, isLoggedIn]);
 
   return (
     <header className='fixed left-0 top-0 z-30 h-20 w-full bg-gray-50/20 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/20'>
@@ -130,8 +107,6 @@ export default function HeaderComponent() {
           </div>
 
           <HamburgerMenuComponent
-            loggedIn={loggedIn}
-            logOut={logOut}
             changeTheme={changeTheme}
             isDarkMode={isDarkMode}
             navigationItems={navigationItems}

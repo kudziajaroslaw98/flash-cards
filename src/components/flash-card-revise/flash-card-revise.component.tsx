@@ -128,7 +128,7 @@ export default function FlashCardReviseComponent() {
       <div className='fixed bottom-0 left-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md sm:bottom-32 dark:bg-slate-950/10'>
         <ButtonComponent
           class={
-            'max-w-80 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 md:w-52 dark:bg-green-500 dark:hover:bg-green-400'
+            'max-w-80 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 md:!w-52 dark:bg-green-500 dark:hover:bg-green-400'
           }
           onClick={reshuffleFlashCards}
         >
@@ -148,6 +148,7 @@ export default function FlashCardReviseComponent() {
       <h3 className='text-gray-500 dark:text-slate-200'>
         You dont have any flashcards yet.
       </h3>
+
       <LinkComponent
         href='/learn'
         label=' You can add them here'
