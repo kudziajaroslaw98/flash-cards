@@ -5,6 +5,7 @@ import ContextMenuComponent from '#/components/ui/context-menu/context-menu.comp
 import LinkComponent from '#/components/ui/link/link.component';
 import SwitchComponent from '#/components/ui/switch/switch.component';
 import { ToggleButtonComponent } from '#/components/ui/toggle-button/toggle-button.component';
+import { useSessionContext } from '#/providers/session-provider.component';
 import { NavigationItem } from '#/utils/interfaces/navigation-item.interface';
 import {
   Bars3Icon,
@@ -21,8 +22,6 @@ interface HamburgerMenuProps {
   changeTheme: () => void;
   isDarkMode: () => boolean;
   navigationItems: NavigationItem[];
-  logOut: () => void;
-  loggedIn: boolean;
 }
 
 export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
@@ -30,6 +29,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
   const [toggled, toggle] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const { isLoggedIn, session, logOut } = useSessionContext();
 
   useEffect(() => {
     const handler = (event: MouseEvent) => {
@@ -105,15 +105,20 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
         }
         beforeMenuItems={
           <div className='w-full'>
-            {props.loggedIn && (
+            {isLoggedIn && (
               <div className='flex flex-col gap-3'>
                 <div className='flex w-full flex-col items-center justify-center'>
                   <UserCircleIcon className='h-8 w-8' />
-                  <span>John Doe</span>
+
+                  <span>
+                    {session?.user?.user_metadata?.firstName}{' '}
+                    {session?.user?.user_metadata?.lastName}
+                  </span>
                 </div>
+
                 <ButtonComponent
                   onClick={() => {
-                    props.logOut();
+                    logOut();
                     setOpen(false);
                     toggle(!toggled);
                   }}
@@ -124,7 +129,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
               </div>
             )}
 
-            {!props.loggedIn && (
+            {!isLoggedIn && (
               <div className='flex flex-col gap-3'>
                 <div className='flex w-full flex-col items-center justify-center'>
                   <span>You are not logged in.</span>

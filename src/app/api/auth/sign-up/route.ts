@@ -6,12 +6,12 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  const cookieStore = cookies();
-
   let response: ApiResponse<SignUpResponse>;
+
+  const cookieStore = cookies();
+  const body = await request.json();
+
   const validityCheck = checkValidity(body, signUpValidationScheme);
-  const url = new URL(request.url);
 
   if (!validityCheck.valid) {
     response = {
@@ -22,6 +22,11 @@ export async function POST(request: Request) {
     return Response.json(response);
   }
 
+  const capitalisedFirstName =
+    body.firstName.charAt(0).toUpperCase() + body.firstName.slice(1);
+  const capitalisedLastName =
+    body.lastName.charAt(0).toUpperCase() + body.lastName.slice(1);
+
   const supabase = createRouteHandlerClient({
     cookies: () => cookieStore,
   });
@@ -29,12 +34,10 @@ export async function POST(request: Request) {
     email: body.email,
     password: body.password,
     options: {
-      emailRedirectTo: `${url.origin}/learn`,
-      // todo: change the emailRedirectTo to the URL of your confirmation page
-      //   emailRedirectTo: `${url.origin}/sign-up/confirmation`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/api/auth/sign-up/confirmation`,
       data: {
-        firstName: body.firstName,
-        lastName: body.lastName,
+        firstName: capitalisedFirstName,
+        lastName: capitalisedLastName,
       },
     },
   });
