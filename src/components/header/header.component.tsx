@@ -70,7 +70,7 @@ export default function HeaderComponent() {
   }, [value.theme]);
 
   return (
-    <header className='fixed left-0 top-0 z-30 h-20 w-full bg-gray-50/20 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/20'>
+    <header className='fixed left-0 top-0 z-30 h-20 w-full bg-gray-50/5 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/5'>
       <div className='mx-auto flex h-full max-w-5xl items-center justify-between'>
         <div className='flex items-center justify-center gap-4'>
           <Link
