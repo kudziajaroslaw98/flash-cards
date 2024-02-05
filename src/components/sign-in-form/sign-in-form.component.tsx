@@ -69,7 +69,7 @@ export default function SignInComponent() {
   };
 
   return (
-    <div className='relative flex w-full max-w-sm flex-col items-center justify-center gap-12 overflow-clip rounded border border-gray-50 bg-gray-100 p-8 shadow-card-hovered dark:border-slate-800 dark:bg-slate-900'>
+    <div className='relative flex w-full max-w-sm flex-col items-center justify-center gap-12 rounded p-8 sm:overflow-clip sm:border sm:border-gray-50 sm:bg-gray-100 sm:shadow-card-hovered dark:border-slate-800 dark:bg-slate-900'>
       <h4 className='flex items-center justify-center gap-2 text-3xl font-semibold text-green-400'>
         <span>Sign in</span>
 
@@ -95,9 +95,8 @@ export default function SignInComponent() {
         onClick={handleSignIn}
         disabled={!formValid || isLoading}
         loading={isLoading}
-      >
-        <span>Sign in</span>
-      </ButtonComponent>
+        label='Sign in'
+      ></ButtonComponent>
 
       <div className='flex flex-col items-center justify-center gap-1'>
         <span className='text-gray-600 dark:text-slate-400'>

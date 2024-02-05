@@ -6,11 +6,12 @@ import useLocalStorage from '#/hooks/use-local-storage.hook';
 import { NavigationItem } from '#/utils/interfaces/navigation-item.interface';
 import {
   AcademicCapIcon,
-  ChartBarIcon,
   HashtagIcon,
+  HomeIcon,
   LanguageIcon,
 } from '@heroicons/react/24/solid';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -18,6 +19,11 @@ export default function HeaderComponent() {
   const pathname = usePathname();
 
   const [navigationItems, setNavigationItems] = useState<NavigationItem[]>([
+    {
+      label: 'Dashboard',
+      href: '/dashboard',
+      icon: <HomeIcon className='h-4 w-4' />,
+    },
     {
       label: 'Learn',
       href: '/learn',
@@ -27,11 +33,6 @@ export default function HeaderComponent() {
       label: 'Revise',
       href: '/revise',
       icon: <LanguageIcon className='h-4 w-4' />,
-    },
-    {
-      label: 'Stats',
-      href: '/stats',
-      icon: <ChartBarIcon className='h-4 w-4' />,
     },
   ]);
 
@@ -69,10 +70,13 @@ export default function HeaderComponent() {
   }, [value.theme]);
 
   return (
-    <header className='fixed left-0 top-0 z-30 h-20 w-full bg-gray-50/20 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/20'>
+    <header className='fixed left-0 top-0 z-30 h-20 w-full bg-gray-50/5 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/5'>
       <div className='mx-auto flex h-full max-w-5xl items-center justify-between'>
         <div className='flex items-center justify-center gap-4'>
-          <h4 className='flex items-center justify-center gap-2 text-xl font-thin tracking-wider text-green-400 dark:text-green-500'>
+          <Link
+            href={'/dashboard'}
+            className='flex items-center justify-center gap-2 text-xl font-thin tracking-wider'
+          >
             <span>
               <Image
                 width={24}
@@ -82,14 +86,17 @@ export default function HeaderComponent() {
               />
             </span>
 
-            <span className='font-black tracking-tighter'>FLASHCARDS</span>
-          </h4>
+            <h5 className='font-black tracking-tighter text-green-400 dark:text-green-500'>
+              FLASHCARDS
+            </h5>
+          </Link>
 
           <span className='hidden items-center gap-1 text-gray-500 lg:flex dark:text-slate-300'>
             <span>
               <HashtagIcon className='h-4 w-4' />
             </span>
-            <span>Learning words made easy</span>
+
+            <p>Learning words made easy</p>
           </span>
         </div>
 

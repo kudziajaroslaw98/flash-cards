@@ -15,6 +15,11 @@ interface BaseToggleButtonProps {
 }
 
 export function ToggleButtonComponent(props: ToggleButtonProps) {
+  const icon = (
+    <>
+      {props.toggled && props.activeIcon} {!props.toggled && props.inactiveIcon}
+    </>
+  );
   return (
     <ButtonComponent
       onClick={() => {
@@ -22,8 +27,7 @@ export function ToggleButtonComponent(props: ToggleButtonProps) {
         props?.onClick && props.onClick();
       }}
       class={props.class}
-    >
-      {props.toggled && props.activeIcon} {!props.toggled && props.inactiveIcon}
-    </ButtonComponent>
+      icon={icon}
+    ></ButtonComponent>
   );
 }

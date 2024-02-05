@@ -211,18 +211,16 @@ export default function FlashCardsTable() {
         <ButtonComponent
           class='w-full bg-green-400 py-2 hover:bg-green-500 active:focus:bg-green-600 md:h-12 dark:bg-green-500 dark:hover:bg-green-500 dark:active:focus:bg-green-700'
           onClick={addNewRecord}
-        >
-          <PlusIcon className='h-4 w-4' />
-        </ButtonComponent>
+          icon={<PlusIcon className='h-4 w-4' />}
+        />
 
         {flashCardsArray.length > 0 && (
           <ButtonComponent
             class='w-full bg-red-400 py-2 hover:bg-red-500 active:focus:bg-red-600 md:h-12 dark:bg-red-500 dark:hover:bg-red-600 dark:active:focus:bg-red-700'
             disabled={selected.length === 0}
             onClick={removeSelected}
-          >
-            <TrashIcon className='h-4 w-4' />
-          </ButtonComponent>
+            icon={<TrashIcon className='h-4 w-4' />}
+          />
         )}
       </div>
     </div>

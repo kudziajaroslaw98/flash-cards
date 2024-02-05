@@ -52,6 +52,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
       animate={{ rotate: '180deg' }}
       initial={{ rotate: '0deg' }}
       exit={{ rotate: '0deg', opacity: 0 }}
+      className='text-inherit'
     >
       <XMarkIcon className='h-8 w-8' />
     </motion.span>
@@ -62,6 +63,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
       animate={{ rotate: '180deg' }}
       initial={{ rotate: '0deg' }}
       exit={{ rotate: '0deg', opacity: 0 }}
+      className='text-inherit'
     >
       <Bars3Icon className='h-8 w-8' />
     </motion.span>
@@ -87,7 +89,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
               toggle(!toggled);
             }}
             toggled={toggled}
-          ></ToggleButtonComponent>
+          />
         }
         afterMenuItems={
           <SwitchComponent
@@ -110,7 +112,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
                 <div className='flex w-full flex-col items-center justify-center'>
                   <UserCircleIcon className='h-8 w-8' />
 
-                  <span>
+                  <span className='text-inherit'>
                     {session?.user?.user_metadata?.firstName}{' '}
                     {session?.user?.user_metadata?.lastName}
                   </span>
@@ -122,17 +124,16 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
                     setOpen(false);
                     toggle(!toggled);
                   }}
-                  class='h-8 bg-red-300'
-                >
-                  Log out
-                </ButtonComponent>
+                  class='h-8 bg-red-300 hover:bg-red-400'
+                  label='Log out'
+                />
               </div>
             )}
 
             {!isLoggedIn && (
               <div className='flex flex-col gap-3'>
                 <div className='flex w-full flex-col items-center justify-center'>
-                  <span>You are not logged in.</span>
+                  <span className='text-inherit'>You are not logged in.</span>
                 </div>
 
                 <LinkComponent
@@ -142,7 +143,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
                     setOpen(false);
                   }}
                   href={'/sign-in'}
-                  class={'underline'}
+                  class={'text-inherit underline'}
                 ></LinkComponent>
               </div>
             )}
