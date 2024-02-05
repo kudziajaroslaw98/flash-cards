@@ -100,13 +100,13 @@ export default function FlashCardReviseComponent() {
     <div className='flex h-full flex-col justify-stretch pb-36'>
       <div className='flex h-full flex-col items-center gap-2 md:gap-8'>
         <div
-          className={`mb-2 flex h-auto min-h-16 w-full max-w-80 flex-col items-center justify-center gap-4 px-4 text-center text-lg font-semibold md:max-w-xl dark:text-slate-200`}
+          className={`text-default mb-2 flex h-auto min-h-16 w-full max-w-80 flex-col items-center justify-center gap-4 px-4 text-center md:max-w-xl`}
         >
           {reviseType === FlashCardTypesEnum.GUESS_DEFINITION &&
-            revisedCard && <p>{revisedCard.word}</p>}
+            revisedCard && <h5 className='text-default'>{revisedCard.word}</h5>}
 
           {reviseType === FlashCardTypesEnum.GUESS_NAME && revisedCard && (
-            <p>{revisedCard.definition}</p>
+            <h5 className='text-default'>{revisedCard.definition}</h5>
           )}
         </div>
 
@@ -127,14 +127,14 @@ export default function FlashCardReviseComponent() {
 
       <div className='fixed bottom-0 left-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md sm:bottom-32 dark:bg-slate-950/10'>
         <ButtonComponent
+          label={'Reshuffle'}
+          icon={<ArrowPathIcon className='h-4 w-4' />}
+          iconPosition={'right'}
           class={
             'max-w-80 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 md:!w-52 dark:bg-green-500 dark:hover:bg-green-400'
           }
           onClick={reshuffleFlashCards}
-        >
-          <span>Reshuffle</span>
-          <ArrowPathIcon className='h-4 w-4' />
-        </ButtonComponent>
+        />
 
         <DropdownComponent
           items={dropdownItems}

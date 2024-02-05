@@ -28,7 +28,7 @@ export default function CardComponent(
       onMouseMove={(e) =>
         handleMouseMove(e.clientX, e.clientY, e.currentTarget)
       }
-      className={`group relative -z-0 flex cursor-pointer rounded-md border border-gray-50 bg-gray-100 p-4 transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-900 ${
+      className={`group relative -z-0 flex cursor-pointer rounded-md border border-gray-50 bg-gray-100 p-8 transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-900 ${
         props.class ?? ''
       }`}
     >

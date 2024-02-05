@@ -6,7 +6,7 @@ import React from 'react';
 interface FlashCardParams {
   flashCard: FlashCardModel;
   reviseType: FlashCardTypesEnum;
-  onClick: (_value: FlashCardModel) => void;
+  onClick?: (_value: FlashCardModel) => void;
   correct?: boolean;
   clickedOnFlashCard?: boolean;
   clickedOverall?: boolean;
@@ -56,7 +56,7 @@ export default function FlashCardComponent(params: Readonly<FlashCardParams>) {
     switch (event.key) {
       case ' ':
       case 'Enter':
-        params.onClick(params.flashCard);
+        params?.onClick?.(params.flashCard);
         break;
       default:
         break;
@@ -65,7 +65,7 @@ export default function FlashCardComponent(params: Readonly<FlashCardParams>) {
 
   return (
     <div
-      onClick={() => params.onClick(params.flashCard)}
+      onClick={() => params?.onClick?.(params.flashCard)}
       onMouseMove={(e: {
         clientX: number;
         clientY: number;
@@ -89,8 +89,8 @@ export default function FlashCardComponent(params: Readonly<FlashCardParams>) {
         }}
       />
 
-      <h2
-        className={`text z-20 flex w-full items-center rounded-md text-xl text-gray-800 sm:min-h-10 sm:items-start sm:font-semibold dark:text-slate-300 ${
+      <h5
+        className={`text-default z-20 flex w-full items-center rounded-md sm:min-h-10 sm:items-start ${
           params.reviseType === FlashCardTypesEnum.GUESS_DEFINITION
             ? 'bg-green-200 dark:bg-slate-600'
             : 'bg-transparent'
@@ -99,10 +99,10 @@ export default function FlashCardComponent(params: Readonly<FlashCardParams>) {
         {params.reviseType === FlashCardTypesEnum.GUESS_DEFINITION
           ? ''
           : params.flashCard?.word}
-      </h2>
+      </h5>
 
-      <h4
-        className={`z-20 flex w-full min-w-72 items-center rounded-md text-sm font-normal text-gray-600 sm:min-h-16 sm:items-start dark:text-slate-300 ${
+      <p
+        className={`text-default z-20 flex w-full min-w-72 items-center rounded-md text-sm sm:min-h-16 sm:items-start ${
           params.reviseType === FlashCardTypesEnum.GUESS_NAME
             ? 'bg-green-200 dark:bg-slate-600'
             : 'bg-transparent'
@@ -111,7 +111,7 @@ export default function FlashCardComponent(params: Readonly<FlashCardParams>) {
         {params.reviseType === FlashCardTypesEnum.GUESS_NAME
           ? ''
           : params.flashCard?.definition}
-      </h4>
+      </p>
     </div>
   );
 }

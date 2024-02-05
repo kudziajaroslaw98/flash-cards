@@ -12,74 +12,34 @@ export default function StatsListComponent() {
     Stats
   >('stats', DEFAULT_STATS);
 
+  const labels: Record<keyof StatsModel, string> = {
+    answers: 'Answers',
+    correctAnswers: 'Correct answers',
+    incorrectAnswers: 'Incorrect answers',
+    createdFlashCards: 'Created Flash Cards',
+    accuracy: 'Accuracy',
+  };
+
   return (
-    <div className='flex h-full w-full items-start justify-center pt-24'>
+    <div className='flex h-full w-full flex-col items-center justify-center gap-8'>
+      <h4 className='text-green-400'>Your statistics</h4>
+
       <div className='flex max-w-2xl flex-wrap justify-center gap-4'>
-        <CardComponent
-          backgroundGradientWidth={100}
-          class='min-h-44 w-full max-w-44 flex-col items-center justify-center gap-4'
-        >
-          <h2 className='text-5xl font-bold text-green-400 dark:text-green-500'>
-            {statistics.answers}
-          </h2>
+        {Object.entries(statistics).map(([key, value]) => (
+          <CardComponent
+            key={key}
+            backgroundGradientWidth={100}
+            class='w-full max-w-80 items-center justify-between sm:min-h-44 sm:max-w-44 sm:flex-col sm:gap-4'
+          >
+            <h1 className='w-36 text-green-400 sm:w-auto dark:text-green-500'>
+              {key !== 'accuracy' ? value : (value * 100).toFixed(0) + '%'}
+            </h1>
 
-          <h4 className='w-full text-center font-semibold text-gray-600 dark:text-slate-200'>
-            Answers
-          </h4>
-        </CardComponent>
-
-        <CardComponent
-          backgroundGradientWidth={100}
-          class='min-h-44 w-full  max-w-44 flex-col items-center justify-center gap-4'
-        >
-          <h2 className='text-5xl font-bold text-green-400 dark:text-green-500'>
-            {statistics.correctAnswers}
-          </h2>
-
-          <h4 className='w-full text-center font-semibold text-gray-600 dark:text-slate-200'>
-            Correct answers
-          </h4>
-        </CardComponent>
-
-        <CardComponent
-          backgroundGradientWidth={100}
-          class='min-h-44 w-full max-w-44 flex-col items-center justify-center gap-4'
-        >
-          <h2 className='text-5xl font-bold text-green-400 dark:text-green-500'>
-            {statistics.incorrectAnswers}
-          </h2>
-
-          <h4 className='w-full text-center font-semibold text-gray-600 dark:text-slate-200'>
-            Incorrect answers
-          </h4>
-        </CardComponent>
-
-        <CardComponent
-          backgroundGradientWidth={100}
-          class='min-h-44 w-full max-w-44 flex-col items-center justify-center gap-4'
-        >
-          <h2 className='text-5xl font-bold text-green-400 dark:text-green-500'>
-            {statistics.createdFlashCards}
-          </h2>
-
-          <h4 className='w-full text-center font-semibold text-gray-600 dark:text-slate-200'>
-            Created <br />
-            Flash Cards
-          </h4>
-        </CardComponent>
-
-        <CardComponent
-          backgroundGradientWidth={100}
-          class='min-h-44 w-full max-w-44 flex-col items-center justify-center gap-4'
-        >
-          <h2 className='text-5xl font-bold text-green-400 dark:text-green-500'>
-            {statistics.accuracy * 100}%
-          </h2>
-
-          <h4 className='w-full text-center font-semibold text-gray-600 dark:text-slate-200'>
-            Accuracy
-          </h4>
-        </CardComponent>
+            <p className='grow font-semibold text-gray-600 sm:w-full sm:text-center dark:text-slate-200'>
+              {labels[key as keyof StatsModel]}
+            </p>
+          </CardComponent>
+        ))}
       </div>
     </div>
   );

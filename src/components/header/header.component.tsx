@@ -75,7 +75,7 @@ export default function HeaderComponent() {
         <div className='flex items-center justify-center gap-4'>
           <Link
             href={'/dashboard'}
-            className='flex items-center justify-center gap-2 text-xl font-thin tracking-wider text-green-400 dark:text-green-500'
+            className='flex items-center justify-center gap-2 text-xl font-thin tracking-wider'
           >
             <span>
               <Image
@@ -86,14 +86,17 @@ export default function HeaderComponent() {
               />
             </span>
 
-            <span className='font-black tracking-tighter'>FLASHCARDS</span>
+            <h5 className='font-black tracking-tighter text-green-400 dark:text-green-500'>
+              FLASHCARDS
+            </h5>
           </Link>
 
           <span className='hidden items-center gap-1 text-gray-500 lg:flex dark:text-slate-300'>
             <span>
               <HashtagIcon className='h-4 w-4' />
             </span>
-            <span>Learning words made easy</span>
+
+            <p>Learning words made easy</p>
           </span>
         </div>
 

@@ -79,3 +79,31 @@ select:-webkit-autofill:focus {
   font-size: 1rem;
   line-height: 1.5rem;
 }
+
+.text-default {
+  @apply text-gray-600 dark:text-slate-200;
+}
+
+h1 {
+  @apply text-5xl font-extrabold;
+}
+
+h2 {
+  @apply text-4xl font-bold;
+}
+
+h3 {
+  @apply text-3xl font-bold;
+}
+
+h4 {
+  @apply text-2xl font-bold;
+}
+
+h5 {
+  @apply text-xl font-bold;
+}
+
+h6 {
+  @apply text-lg font-bold;
+}

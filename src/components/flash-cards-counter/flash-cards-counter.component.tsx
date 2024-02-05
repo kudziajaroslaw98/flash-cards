@@ -10,7 +10,8 @@ export default function FlashCardsCounter(params: CounterParams) {
       <h4 className='text-8xl font-bold text-green-400 dark:text-green-500'>
         {params.count}
       </h4>
-      <h4 className='mt-2 text-gray-600 dark:text-slate-400'>Learned words</h4>
+
+      <h5 className='text-default mt-2'>Learned words</h5>
     </span>
   );
 }

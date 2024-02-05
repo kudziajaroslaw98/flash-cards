@@ -72,8 +72,8 @@ export default function DropdownComponent<T>(
         onClick={() => toggleDropdownVisibility()}
       >
         <label className='flex w-full cursor-pointer items-center justify-between gap-4 font-semibold'>
-          <span>{picked?.label}</span>
-          <span>
+          <span className='text-inherit'>{picked?.label}</span>
+          <span className='text-inherit'>
             <ChevronDownIcon className='h-4 w-4' />{' '}
           </span>
         </label>
