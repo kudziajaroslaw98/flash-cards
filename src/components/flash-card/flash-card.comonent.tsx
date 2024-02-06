@@ -1,7 +1,7 @@
 import { FlashCardTypesEnum } from '#/shared/enums/flash-card-types.enum';
 import { FlashCardModel } from '#/shared/models/flash-card.model';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
-import React from 'react';
+import type React from 'react';
 
 interface FlashCardParams {
   flashCard: FlashCardModel;

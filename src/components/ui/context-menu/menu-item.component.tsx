@@ -1,5 +1,5 @@
 import { ContextMenuItem } from '#/components/ui/context-menu/context-menu.component';
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 
 interface MenuItemProps {
   visible: boolean;

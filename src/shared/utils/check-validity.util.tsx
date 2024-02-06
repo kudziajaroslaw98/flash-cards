@@ -1,5 +1,5 @@
 import { InputValidation } from '#/components/ui/input/input.component';
-import { Dispatch, SetStateAction } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import { z } from 'zod';
 
 export default function checkValidity(

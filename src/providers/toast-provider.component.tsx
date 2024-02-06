@@ -5,7 +5,12 @@ import { createContext, PropsWithChildren, useContext, useMemo } from 'react';
 
 type ToastContextType = ReturnType<typeof useToast>;
 
-export const ToastContext = createContext<ToastContextType | null>(null);
+export const ToastContext = createContext<ToastContextType | null>({
+  clear: () => null,
+  close: () => null,
+  show: () => null,
+  toasts: [],
+});
 
 export default function ToastProvider(props: Readonly<PropsWithChildren>) {
   const { toasts, show, close, clear } = useToast();
