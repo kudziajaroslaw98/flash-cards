@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { flashCardsReducer } from './reducers/flashcards.reducer';
+import { statsReducer } from './reducers/stats.reducer';
 
 export const store = configureStore({
   reducer: {
     flashCards: flashCardsReducer,
+    stats: statsReducer,
   },
 });
 

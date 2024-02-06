@@ -7,22 +7,26 @@ import { useState } from 'react';
 import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter.component';
 import EditableFlashCardRowComponent from '#/components/flash-cards-table/editable-flash-card-row.component';
 import ButtonComponent from '#/components/ui/button/button.component';
-import { useAppSelector } from '#/hooks/store-hooks.hook';
-import { useStatsContext } from '#/providers/stats.provider';
+import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import { FlashCardModel } from '#/shared/models/flash-card.model';
 import { UUID } from '#/shared/types/uuid.type';
+
 import {
-  add as addNewFlashCard,
-  remove as removeFlashCards,
-  update as updateFlashCard,
+  addNewFlashCard,
+  removeFlashCards,
+  updateFlashCard,
 } from '#/store/reducers/flashcards.reducer';
+import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
+import { statsSelectors } from '#/store/selectors/stats.selectors';
 
 export default function FlashCardsTable() {
-  const { value: statistics, update: updateStatistics } = useStatsContext();
+  const statistics = useAppSelector(statsSelectors.selectStats);
   const flashCardsArray = useAppSelector(
     flashCardSelectors.selectFlashCardsArray,
   );
+  const dispatch = useAppDispatch();
+
   const [selected, setSelected] = useState<UUID[]>([]);
 
   const isSelected = (flashCard: FlashCardModel) => {
@@ -40,14 +44,19 @@ export default function FlashCardsTable() {
   };
 
   const removeSelected = () => {
-    removeFlashCards(selected);
+    dispatch(removeFlashCards(selected));
     setSelected([]);
   };
 
   const addNewRecord = () => {
-    addNewFlashCard();
+    dispatch(addNewFlashCard());
 
-    updateStatistics(statistics.createdFlashCards + 1, 'createdFlashCards');
+    dispatch(
+      updateStatistics({
+        updatedValue: statistics.createdFlashCards + 1,
+        property: 'createdFlashCards',
+      }),
+    );
 
     setTimeout(() => {
       window.document.body.scrollIntoView({
@@ -58,11 +67,19 @@ export default function FlashCardsTable() {
   };
 
   const wordChange = (flashCard: FlashCardModel, value: string) => {
-    updateFlashCard({ flashCard, updatedValue: value, property: 'word' });
+    dispatch(
+      updateFlashCard({ flashCard, updatedValue: value, property: 'word' }),
+    );
   };
 
   const definitionChange = (flashCard: FlashCardModel, value: string) => {
-    updateFlashCard({ flashCard, updatedValue: value, property: 'definition' });
+    dispatch(
+      updateFlashCard({
+        flashCard,
+        updatedValue: value,
+        property: 'definition',
+      }),
+    );
   };
 
   return (

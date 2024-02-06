@@ -6,14 +6,15 @@ import { useEffect, useState } from 'react';
 import FlashCardComponent from '#/components/flash-card/flash-card.comonent';
 import ButtonComponent from '#/components/ui/button/button.component';
 import DropdownComponent from '#/components/ui/dropdown/dropdown.component';
-import { useAppSelector } from '#/hooks/store-hooks.hook';
+import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
-import { useStatsContext } from '#/providers/stats.provider';
 import { FlashCardTypesEnum } from '#/shared/enums/flash-card-types.enum';
 import { FlashCardModel } from '#/shared/models/flash-card.model';
 import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
-import { update as updateFlashCard } from '#/store/reducers/flashcards.reducer';
+import { updateFlashCard } from '#/store/reducers/flashcards.reducer';
+import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
+import { statsSelectors } from '#/store/selectors/stats.selectors';
 import LinkComponent from '../ui/link/link.component';
 
 export default function FlashCardReviseComponent() {
@@ -28,8 +29,9 @@ export default function FlashCardReviseComponent() {
   const flashCardsArray = useAppSelector(
     flashCardSelectors.selectFlashCardsArray,
   );
+  const statistics = useAppSelector(statsSelectors.selectStats);
 
-  const { value: statistics, update: updateStatistics } = useStatsContext();
+  const dispatch = useAppDispatch();
 
   const { pickedItems: randomCards, reshuffle } =
     useRandomArrayItems<FlashCardModel>(
@@ -57,27 +59,31 @@ export default function FlashCardReviseComponent() {
     if (correct) {
       clonedStats.correctAnswers += 1;
       if (revisedCard && revisedCard?.weight > 0.01) {
-        updateFlashCard({
-          flashCard: flashCard,
-          updatedValue: (flashCard.weight - 0.01).toFixed(2),
-          property: 'weight',
-        });
+        dispatch(
+          updateFlashCard({
+            flashCard: flashCard,
+            updatedValue: (flashCard.weight - 0.01).toFixed(2),
+            property: 'weight',
+          }),
+        );
       }
     } else {
       clonedStats.incorrectAnswers += 1;
 
-      updateFlashCard({
-        flashCard: flashCard,
-        updatedValue: (flashCard.weight + 0.01).toFixed(2),
-        property: 'weight',
-      });
+      dispatch(
+        updateFlashCard({
+          flashCard: flashCard,
+          updatedValue: (flashCard.weight + 0.01).toFixed(2),
+          property: 'weight',
+        }),
+      );
     }
 
     clonedStats.accuracy = parseFloat(
       (clonedStats.correctAnswers / clonedStats.answers).toFixed(2),
     );
 
-    updateStatistics(clonedStats);
+    dispatch(updateStatistics({ updatedValue: clonedStats }));
     setClickedCard(flashCard);
     setClicked(true);
   };

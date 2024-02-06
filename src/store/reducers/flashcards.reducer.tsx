@@ -12,13 +12,10 @@ export const flashCardsSlice = createSlice({
   initialState,
   reducers: {
     setFlashCards: (state, action: PayloadAction<FlashCards>) => {
-      console.log('🚀 ~ action.payload:', action.payload);
-
-      state = { ...action.payload };
-      console.log('🚀 ~ action.payload:', action.payload);
+      state = action.payload;
       return state;
     },
-    add: (state) => {
+    addNewFlashCard: (state) => {
       const flashCardsClone = { ...state };
       const newUuid = uuid() as UUID;
       const newFlashCards = typedInstanceFactory(flashCardsClone, {
@@ -34,7 +31,7 @@ export const flashCardsSlice = createSlice({
       state = newFlashCards;
       return state;
     },
-    remove: (state, action: PayloadAction<UUID[]>) => {
+    removeFlashCards: (state, action: PayloadAction<UUID[]>) => {
       const flashCardsClone = { ...state };
 
       action.payload.forEach((flashCardUuid) => {
@@ -48,7 +45,7 @@ export const flashCardsSlice = createSlice({
       state = flashCardsClone;
       return state;
     },
-    update: (
+    updateFlashCard: (
       state,
       action: PayloadAction<{
         flashCard: FlashCardModel;
@@ -75,6 +72,11 @@ export const flashCardsSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { setFlashCards, add, remove, update } = flashCardsSlice.actions;
+export const {
+  setFlashCards,
+  addNewFlashCard,
+  removeFlashCards,
+  updateFlashCard,
+} = flashCardsSlice.actions;
 
 export const flashCardsReducer = flashCardsSlice.reducer;

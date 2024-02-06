@@ -3,10 +3,12 @@
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import useInterval from '#/hooks/use-interval.hook';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
-import { FlashCardModel } from '#/shared/models/flash-card.model';
+import { DEFAULT_STATS } from '#/shared/defaults/stats.default';
 import { FlashCards } from '#/shared/types/local-storage-flash-card.type';
 import { setFlashCards } from '#/store/reducers/flashcards.reducer';
+import { setStats } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
+import { statsSelectors } from '#/store/selectors/stats.selectors';
 import {
   PropsWithChildren,
   createContext,
@@ -30,21 +32,16 @@ export default function SyncSessionProvider(
 ) {
   const dispatch = useAppDispatch();
   const words = useAppSelector(flashCardSelectors.selectFlashCards);
-  const { value: flashCards } = useLocalStorage<FlashCardModel, FlashCards>(
-    'words',
-    {},
-  );
+  const stats = useAppSelector(statsSelectors.selectStats);
+
+  const { value: flashCardsLS } = useLocalStorage('words', {} as FlashCards);
+  const { value: statsLS } = useLocalStorage('stats', DEFAULT_STATS);
 
   const { isLoggedIn } = useSessionContext();
 
   const initialRender = useRef<boolean>(true);
   // const MIN_IN_MS = 60_000;
   // const DEFAULT_SYNC_INTERVAL_IN_MS = MIN_IN_MS * 5;
-  useEffect(() => {
-    if (Object.values(flashCards).length === 0) return;
-
-    dispatch(setFlashCards(flashCards));
-  }, [flashCards]);
 
   const sync = useCallback(() => {
     console.log('syncing');
@@ -58,7 +55,8 @@ export default function SyncSessionProvider(
     //   body: JSON.stringify({ words }),
     // });
     console.log('🚀 ~ words:', words);
-  }, [isLoggedIn, words]);
+    console.log('🚀 ~ stats:', stats);
+  }, [isLoggedIn, words, stats]);
 
   useInterval(
     () => {
@@ -73,6 +71,18 @@ export default function SyncSessionProvider(
     //     : DEFAULT_SYNC_INTERVAL_IN_MS
     //   : null,
   );
+
+  useEffect(() => {
+    if (Object.values(flashCardsLS).length === 0) return;
+
+    dispatch(setFlashCards(flashCardsLS));
+  }, [flashCardsLS]);
+
+  useEffect(() => {
+    if (Object.values(statsLS).length === 0) return;
+
+    dispatch(setStats(statsLS));
+  }, [statsLS]);
 
   return (
     <SyncSessionContext.Provider value={{ sync }}>

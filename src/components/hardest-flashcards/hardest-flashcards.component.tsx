@@ -6,8 +6,8 @@ import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import FlashCardComponent from '../flash-card/flash-card.comonent';
 
 export default function HardestFlashcardsComponent() {
-  const flashCardsArray = Object.values(
-    useAppSelector(flashCardSelectors.selectFlashCards),
+  const flashCardsArray = useAppSelector(
+    flashCardSelectors.selectFlashCardsArray,
   );
 
   return (
