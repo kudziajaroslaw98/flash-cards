@@ -1,16 +1,14 @@
 'use client';
 
-import useLocalStorage from '#/hooks/use-local-storage.hook';
-import { FlashCardTypesEnum } from '#/utils/enums/flash-card-types.enum';
-import { FlashCardModel } from '#/utils/models/flash-card.model';
-import { FlashCards } from '#/utils/types/local-storage-flash-card.type';
+import { useAppSelector } from '#/hooks/store-hooks.hook';
+import { FlashCardTypesEnum } from '#/shared/enums/flash-card-types.enum';
+import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import FlashCardComponent from '../flash-card/flash-card.comonent';
 
 export default function HardestFlashcardsComponent() {
-  const { arrayOfValues: flashCardsArray } = useLocalStorage<
-    FlashCardModel,
-    FlashCards
-  >('words', {});
+  const flashCardsArray = Object.values(
+    useAppSelector(flashCardSelectors.selectFlashCards),
+  );
 
   return (
     <div className='flex flex-col items-center justify-center gap-8'>

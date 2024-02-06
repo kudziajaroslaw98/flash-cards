@@ -1,5 +1,5 @@
 import TextAreaComponent from '#/components/ui/text-area/text-area.component';
-import { FlashCardModel } from '#/utils/models/flash-card.model';
+import { FlashCardModel } from '#/shared/models/flash-card.model';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
 import { motion } from 'framer-motion';
 

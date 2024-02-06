@@ -2,17 +2,16 @@
 
 import CardComponent from '#/components/ui/card/card.component';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
-import { DEFAULT_STATS } from '#/utils/defaults/stats.default';
-import { StatsModel } from '#/utils/interfaces/stats.model';
-import { Stats } from '#/utils/types/local-storage-stats.type';
+import { DEFAULT_STATS } from '#/shared/defaults/stats.default';
+import { Stats } from '#/shared/types/local-storage-stats.type';
 
 export default function StatsListComponent() {
-  const { value: statistics } = useLocalStorage<
-    StatsModel[keyof StatsModel],
-    Stats
-  >('stats', DEFAULT_STATS);
+  const { value: statistics } = useLocalStorage<Stats[keyof Stats], Stats>(
+    'stats',
+    DEFAULT_STATS,
+  );
 
-  const labels: Record<keyof StatsModel, string> = {
+  const labels: Record<keyof Stats, string> = {
     answers: 'Answers',
     correctAnswers: 'Correct answers',
     incorrectAnswers: 'Incorrect answers',
@@ -36,7 +35,7 @@ export default function StatsListComponent() {
             </h1>
 
             <p className='grow font-semibold text-gray-600 sm:w-full sm:text-center dark:text-slate-200'>
-              {labels[key as keyof StatsModel]}
+              {labels[key as keyof Stats]}
             </p>
           </CardComponent>
         ))}

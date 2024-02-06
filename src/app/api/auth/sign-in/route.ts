@@ -1,7 +1,7 @@
-import checkValidity from '#/utils/functions/check-validity.util';
-import { ApiResponse } from '#/utils/models/api-response.model';
-import { SignInResponse } from '#/utils/types/sign-in-response.type';
-import { signInValidationScheme } from '#/utils/validation-schemes/sign-in-validation.scheme';
+import { ApiResponse } from '#/shared/types/api-response.type';
+import { SignInResponse } from '#/shared/types/sign-in-response.type';
+import checkValidity from '#/shared/utils/check-validity.util';
+import { signInValidationScheme } from '#/shared/validation-schemes/sign-in-validation.scheme';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 

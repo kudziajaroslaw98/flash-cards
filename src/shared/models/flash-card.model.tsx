@@ -1,4 +1,4 @@
-import { UUID } from 'node:crypto';
+import { UUID } from '#/shared/types/uuid.type';
 import { v4 } from 'uuid';
 
 export class FlashCardModel {

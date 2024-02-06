@@ -1,9 +1,6 @@
-'use client';
-
 import HamburgerMenuComponent from '#/components/hamburger-menu/hamburger-menu.component';
 import LinkComponent from '#/components/ui/link/link.component';
-import useLocalStorage from '#/hooks/use-local-storage.hook';
-import { NavigationItem } from '#/utils/interfaces/navigation-item.interface';
+import { NavigationItem } from '#/shared/types/navigation-item.type';
 import {
   AcademicCapIcon,
   HashtagIcon,
@@ -12,13 +9,9 @@ import {
 } from '@heroicons/react/24/solid';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 export default function HeaderComponent() {
-  const pathname = usePathname();
-
-  const [navigationItems, setNavigationItems] = useState<NavigationItem[]>([
+  const navigationItems: NavigationItem[] = [
     {
       label: 'Dashboard',
       href: '/dashboard',
@@ -34,40 +27,7 @@ export default function HeaderComponent() {
       href: '/revise',
       icon: <LanguageIcon className='h-4 w-4' />,
     },
-  ]);
-
-  useEffect(() => {
-    setNavigationItems(
-      navigationItems.map((item) => {
-        item.active = pathname === item.href;
-        return item;
-      }),
-    );
-  }, [pathname]);
-
-  const { value, setToLocalStorage } = useLocalStorage('theme', {
-    theme: 'dark',
-  });
-
-  const changeTheme = () => {
-    setToLocalStorage({ theme: value.theme === 'dark' ? 'light' : 'dark' });
-  };
-
-  const isDarkMode = (): boolean => {
-    return value.theme === 'dark';
-  };
-
-  useEffect(() => {
-    if (
-      value.theme === 'dark' ||
-      (!('theme' in value) &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches)
-    ) {
-      document.querySelector('html')?.classList.add('dark');
-    } else {
-      document.querySelector('html')?.classList.remove('dark');
-    }
-  }, [value.theme]);
+  ];
 
   return (
     <header className='fixed left-0 top-0 z-30 h-20 w-full bg-gray-50/5 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/5'>
@@ -108,16 +68,11 @@ export default function HeaderComponent() {
                 href={item.href}
                 label={item.label}
                 icon={item.icon}
-                active={item.active}
               />
             ))}
           </div>
 
-          <HamburgerMenuComponent
-            changeTheme={changeTheme}
-            isDarkMode={isDarkMode}
-            navigationItems={navigationItems}
-          />
+          <HamburgerMenuComponent navigationItems={navigationItems} />
         </div>
       </div>
     </header>

@@ -6,13 +6,14 @@ import { useEffect, useState } from 'react';
 import FlashCardComponent from '#/components/flash-card/flash-card.comonent';
 import ButtonComponent from '#/components/ui/button/button.component';
 import DropdownComponent from '#/components/ui/dropdown/dropdown.component';
-import useLocalStorage from '#/hooks/use-local-storage.hook';
+import { useAppSelector } from '#/hooks/store-hooks.hook';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
-import { DEFAULT_STATS } from '#/utils/defaults/stats.default';
-import { FlashCardTypesEnum } from '#/utils/enums/flash-card-types.enum';
-import getRandomRangedNumber from '#/utils/functions/get-random-ranged-number.util';
-import { FlashCardModel } from '#/utils/models/flash-card.model';
-import { FlashCards } from '#/utils/types/local-storage-flash-card.type';
+import { useStatsContext } from '#/providers/stats.provider';
+import { FlashCardTypesEnum } from '#/shared/enums/flash-card-types.enum';
+import { FlashCardModel } from '#/shared/models/flash-card.model';
+import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
+import { update as updateFlashCard } from '#/store/reducers/flashcards.reducer';
+import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import LinkComponent from '../ui/link/link.component';
 
 export default function FlashCardReviseComponent() {
@@ -24,14 +25,11 @@ export default function FlashCardReviseComponent() {
   const [dropdownItems] = useState(Object.values(FlashCardTypesEnum));
   const [clicked, setClicked] = useState(false);
 
-  const {
-    arrayOfValues: flashCardsArray,
-    value: flashCards,
-    setToLocalStorage: setFlashCards,
-  } = useLocalStorage<FlashCardModel, FlashCards>('words', {});
+  const flashCardsArray = useAppSelector(
+    flashCardSelectors.selectFlashCardsArray,
+  );
 
-  const { value: statistics, setToLocalStorage: setStatistics } =
-    useLocalStorage('stats', DEFAULT_STATS);
+  const { value: statistics, update: updateStatistics } = useStatsContext();
 
   const { pickedItems: randomCards, reshuffle } =
     useRandomArrayItems<FlashCardModel>(
@@ -52,7 +50,6 @@ export default function FlashCardReviseComponent() {
     }
 
     const correct = isCorrect(flashCard);
-    const clonedFlashCards = { ...flashCards };
     const clonedStats = { ...statistics };
 
     clonedStats.answers += 1;
@@ -60,19 +57,27 @@ export default function FlashCardReviseComponent() {
     if (correct) {
       clonedStats.correctAnswers += 1;
       if (revisedCard && revisedCard?.weight > 0.01) {
-        (clonedFlashCards[flashCard.uuid].weight -= 0.01).toFixed(2);
+        updateFlashCard({
+          flashCard: flashCard,
+          updatedValue: (flashCard.weight - 0.01).toFixed(2),
+          property: 'weight',
+        });
       }
     } else {
       clonedStats.incorrectAnswers += 1;
-      (clonedFlashCards[flashCard.uuid].weight += 0.01).toFixed(2);
+
+      updateFlashCard({
+        flashCard: flashCard,
+        updatedValue: (flashCard.weight + 0.01).toFixed(2),
+        property: 'weight',
+      });
     }
 
     clonedStats.accuracy = parseFloat(
       (clonedStats.correctAnswers / clonedStats.answers).toFixed(2),
     );
 
-    setFlashCards(clonedFlashCards);
-    setStatistics(clonedStats);
+    updateStatistics(clonedStats);
     setClickedCard(flashCard);
     setClicked(true);
   };

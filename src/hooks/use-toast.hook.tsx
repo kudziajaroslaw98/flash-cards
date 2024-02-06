@@ -1,5 +1,6 @@
+import { UUID } from '#/shared/types/uuid.type';
 import { omit } from 'lodash';
-import { UUID } from 'node:crypto';
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { v4 } from 'uuid';
 

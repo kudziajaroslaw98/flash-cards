@@ -2,10 +2,10 @@
 
 import FormComponent from '#/components/form-component/form.component';
 import useFetch from '#/hooks/use-fetch.hook';
-import { ApiRoutes } from '#/utils/enums/api-routes.enum';
-import { ApiResponse } from '#/utils/models/api-response.model';
-import { SignUpResponse } from '#/utils/types/sign-up-response.type';
-import { signUpValidationScheme } from '#/utils/validation-schemes/sign-up-validation.scheme';
+import { ApiRoutes } from '#/shared/enums/api-routes.enum';
+import { ApiResponse } from '#/shared/types/api-response.type';
+import { SignUpResponse } from '#/shared/types/sign-up-response.type';
+import { signUpValidationScheme } from '#/shared/validation-schemes/sign-up-validation.scheme';
 import { CheckBadgeIcon, RocketLaunchIcon } from '@heroicons/react/24/solid';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -165,6 +165,7 @@ export default function SignUpFormComponent() {
             <p className='text-center'>
               Confirmation link was sent to your email.
             </p>
+
             <p className='text-center'>
               You just need to click on it to activate your account.
             </p>

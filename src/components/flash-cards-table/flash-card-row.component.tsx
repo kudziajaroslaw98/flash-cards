@@ -1,4 +1,4 @@
-import { FlashCardModel } from '#/utils/models/flash-card.model';
+import { FlashCardModel } from '#/shared/models/flash-card.model';
 import { PropsWithChildren } from 'react';
 
 interface FlashCardRowProps {

@@ -1,4 +1,4 @@
-import { Stats } from '#/utils/types/local-storage-stats.type';
+import { Stats } from '#/shared/types/local-storage-stats.type';
 
 export const DEFAULT_STATS: Stats = {
   answers: 0,
