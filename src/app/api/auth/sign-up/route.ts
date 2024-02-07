@@ -1,5 +1,5 @@
-import { ApiResponse } from '#/shared/types/api-response.type';
-import { SignUpResponse } from '#/shared/types/sign-up-response.type';
+import { ApiResponse } from '#/shared/types/api/api-response.type';
+import { SignUpResponse } from '#/shared/types/api/sign-up-response.type';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { signUpValidationScheme } from '#/shared/validation-schemes/sign-up-validation.scheme';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';

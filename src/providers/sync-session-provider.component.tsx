@@ -1,6 +1,7 @@
 'use client';
 
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
+import useFetch from '#/hooks/use-fetch.hook';
 import useInterval from '#/hooks/use-interval.hook';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
 import { DEFAULT_STATS } from '#/shared/defaults/stats.default';
@@ -13,11 +14,11 @@ import {
   PropsWithChildren,
   createContext,
   useCallback,
-  useContext,
   useEffect,
   useRef,
 } from 'react';
 import { useSessionContext } from './session-provider.component';
+import { useToastContext } from './toast-provider.component';
 
 export type SyncSessionContextType = {
   sync: () => void;
@@ -31,48 +32,79 @@ export default function SyncSessionProvider(
   props: Readonly<PropsWithChildren>,
 ) {
   const dispatch = useAppDispatch();
-  const flashcards = useAppSelector(flashCardSelectors.selectFlashCards);
+  const flashcards = useAppSelector(flashCardSelectors.selectFlashCardsArray);
   const stats = useAppSelector(statsSelectors.selectStats);
+  const { fetch } = useFetch();
+  const { show } = useToastContext();
 
   const { value: flashCardsLS } = useLocalStorage(
     'flashcards',
     {} as FlashCards,
   );
   const { value: statsLS } = useLocalStorage('stats', DEFAULT_STATS);
+  const { value: themeLS } = useLocalStorage('theme', {
+    theme: 'dark',
+  });
+  const { value: metadata, setToLocalStorage: setMetadata } = useLocalStorage(
+    'metadata',
+    {
+      lastSyncAt: null,
+      updatedAt: null,
+    },
+  );
 
   const { isLoggedIn } = useSessionContext();
 
   const initialRender = useRef<boolean>(true);
-  // const MIN_IN_MS = 60_000;
-  // const DEFAULT_SYNC_INTERVAL_IN_MS = MIN_IN_MS * 5;
+  const MIN_IN_MS = 60_000;
+  const DEFAULT_SYNC_INTERVAL_IN_MS = MIN_IN_MS * 5;
 
-  const sync = useCallback(() => {
+  const syncWithDB = useCallback(async () => {
     console.log('syncing');
     if (!isLoggedIn) return;
     console.log('syncing proceed');
 
-    // const fetchBody = JSON.stringify({ words: words, stats: stats });
+    const fetchBody = JSON.stringify({
+      flashcards,
+      stats,
+      theme: themeLS.theme,
+      lastSyncAt: metadata.lastSyncAt,
+      updatedAt: metadata.updatedAt,
+    });
 
-    // useFetch('/api/sync', {
+    // const response = await fetch<ApiResponse<unknown>>('/api/sync', {
     //   method: 'POST',
-    //   body: JSON.stringify({ words }),
+    //   body: fetchBody,
     // });
+
+    // if (!response.success && response.error) {
+    //   show({
+    //     timeInSeconds: 10,
+    //     title: response.error,
+    //     type: 'error',
+    //   });
+    // }
+
+    // if (response.success) {
+    // setLastSync({ lastSyncAt: new Date() });
+    // }
+
+    // console.log(response);
+
     console.log('🚀 ~ words:', flashcards);
     console.log('🚀 ~ stats:', stats);
-  }, [isLoggedIn, flashcards, stats]);
+  }, [isLoggedIn, flashcards, stats, themeLS, metadata]);
 
   useInterval(
     () => {
-      sync();
+      syncWithDB();
       initialRender.current = false;
     },
-    null,
-    // todo: uncomment when useFetch is implemented
-    // isLoggedIn
-    //   ? initialRender.current
-    //     ? 0
-    //     : DEFAULT_SYNC_INTERVAL_IN_MS
-    //   : null,
+    isLoggedIn
+      ? initialRender.current
+        ? 0
+        : DEFAULT_SYNC_INTERVAL_IN_MS
+      : null,
   );
 
   useEffect(() => {
@@ -88,20 +120,8 @@ export default function SyncSessionProvider(
   }, [statsLS]);
 
   return (
-    <SyncSessionContext.Provider value={{ sync }}>
+    <SyncSessionContext.Provider value={{ sync: syncWithDB }}>
       {props.children}
     </SyncSessionContext.Provider>
   );
 }
-
-export const useSyncSessionContext = () => {
-  const context = useContext(SyncSessionContext);
-
-  if (!context) {
-    throw new Error(
-      'useSyncSessionContext must be used within SyncSessionProvider',
-    );
-  }
-
-  return context;
-};

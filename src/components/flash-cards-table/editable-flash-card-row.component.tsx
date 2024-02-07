@@ -16,7 +16,7 @@ export default function EditableFlashCardRowComponent(
 ) {
   return (
     <motion.tr
-      key={props.flashCard.uuid}
+      key={props.flashCard.frontUuid}
       onKeyDown={(e) =>
         e.key === 'Enter' && props.toggleSelected(props.flashCard)
       }
@@ -59,7 +59,7 @@ export default function EditableFlashCardRowComponent(
               ? 'border-green-400/50'
               : 'border-transparent dark:border-slate-700'
           }`}
-          id={`word-${props.flashCard.uuid}`}
+          id={`word-${props.flashCard.frontUuid}`}
           onInput={(value) =>
             props.wordChange(props.flashCard, value.currentTarget.value)
           }
@@ -73,7 +73,7 @@ export default function EditableFlashCardRowComponent(
           }`}
           onInput={(value) => props.definitionChange(props.flashCard, value)}
           value={props.flashCard.definition}
-          id={`definition-top-${props.flashCard.uuid}`}
+          id={`definition-top-${props.flashCard.frontUuid}`}
         />
       </motion.td>
 
@@ -86,7 +86,7 @@ export default function EditableFlashCardRowComponent(
           }`}
           onInput={(value) => props.definitionChange(props.flashCard, value)}
           value={props.flashCard.definition}
-          id={`definition-right-${props.flashCard.uuid}`}
+          id={`definition-right-${props.flashCard.frontUuid}`}
         />
       </motion.td>
     </motion.tr>

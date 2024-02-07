@@ -8,7 +8,7 @@ export interface ToastModel {
   uuid: UUID;
   title: string;
   type: 'success' | 'error' | 'warning' | 'info';
-  timeInMs: number;
+  timeInSeconds: number;
 }
 
 interface InternalToastModel extends ToastModel {
@@ -40,7 +40,7 @@ export default function useToast() {
       [uuid]: {
         ...toast,
         uuid,
-        dueTo: new Date(new Date().getTime() + toast.timeInMs),
+        dueTo: new Date(new Date().getTime() + toast.timeInSeconds * 1000),
       },
     };
 

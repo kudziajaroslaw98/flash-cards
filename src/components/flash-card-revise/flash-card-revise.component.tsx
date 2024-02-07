@@ -124,7 +124,7 @@ export default function FlashCardReviseComponent() {
         <div className='grid w-full auto-rows-fr grid-cols-1 flex-col items-center justify-center gap-3 sm:grid-cols-2-auto'>
           {randomCards.map((flashCard) => (
             <FlashCardComponent
-              key={flashCard.uuid}
+              key={flashCard.frontUuid}
               flashCard={flashCard}
               reviseType={reviseType}
               correct={isCorrect(flashCard)}
@@ -136,13 +136,13 @@ export default function FlashCardReviseComponent() {
         </div>
       </div>
 
-      <div className='fixed bottom-0 left-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md sm:bottom-32 dark:bg-slate-950/10'>
+      <div className='fixed bottom-0 left-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md dark:bg-slate-950/10 sm:bottom-32'>
         <ButtonComponent
           label={'Reshuffle'}
           icon={<ArrowPathIcon className='h-4 w-4' />}
           iconPosition={'right'}
           class={
-            'max-w-80 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 md:!w-52 dark:bg-green-500 dark:hover:bg-green-400'
+            'max-w-80 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 dark:bg-green-500 dark:hover:bg-green-400 md:h-10 md:!w-52'
           }
           onClick={reshuffleFlashCards}
         />

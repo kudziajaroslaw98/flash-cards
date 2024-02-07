@@ -30,16 +30,16 @@ export default function FlashCardsTable() {
   const [selected, setSelected] = useState<UUID[]>([]);
 
   const isSelected = (flashCard: FlashCardModel) => {
-    return selected.includes(flashCard.uuid);
+    return selected.includes(flashCard.frontUuid);
   };
 
   const toggleSelected = (flashCard: FlashCardModel) => {
-    const isFlashCardSelected = selected.includes(flashCard.uuid);
+    const isFlashCardSelected = selected.includes(flashCard.frontUuid);
 
     if (isFlashCardSelected) {
-      setSelected(selected.filter((item) => flashCard.uuid !== item));
+      setSelected(selected.filter((item) => flashCard.frontUuid !== item));
     } else {
-      setSelected([...selected, flashCard.uuid]);
+      setSelected([...selected, flashCard.frontUuid]);
     }
   };
 
@@ -107,7 +107,7 @@ export default function FlashCardsTable() {
             <AnimatePresence>
               {flashCardsArray.map((flashCard, index) => (
                 <EditableFlashCardRowComponent
-                  key={flashCard.uuid}
+                  key={flashCard.frontUuid}
                   flashCard={flashCard}
                   definitionChange={definitionChange}
                   wordChange={wordChange}
@@ -123,14 +123,14 @@ export default function FlashCardsTable() {
 
       <div className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'>
         <ButtonComponent
-          class='w-full bg-green-400 py-2 hover:bg-green-500 active:focus:bg-green-600 md:h-12 dark:bg-green-500 dark:hover:bg-green-500 dark:active:focus:bg-green-700'
+          class='w-full bg-green-400 py-2 hover:bg-green-500 active:focus:bg-green-600 dark:bg-green-500 dark:hover:bg-green-500 dark:active:focus:bg-green-700 md:h-12'
           onClick={addNewRecord}
           icon={<PlusIcon className='h-4 w-4' />}
         />
 
         {flashCardsArray.length > 0 && (
           <ButtonComponent
-            class='w-full bg-red-400 py-2 hover:bg-red-500 active:focus:bg-red-600 md:h-12 dark:bg-red-500 dark:hover:bg-red-600 dark:active:focus:bg-red-700'
+            class='w-full bg-red-400 py-2 hover:bg-red-500 active:focus:bg-red-600 dark:bg-red-500 dark:hover:bg-red-600 dark:active:focus:bg-red-700 md:h-12'
             disabled={selected.length === 0}
             onClick={removeSelected}
             icon={<TrashIcon className='h-4 w-4' />}

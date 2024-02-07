@@ -20,7 +20,7 @@ export const flashCardsSlice = createSlice({
       const newUuid = uuid() as UUID;
       const newFlashCards = typedInstanceFactory(flashCardsClone, {
         [newUuid]: {
-          uuid: newUuid,
+          frontUuid: newUuid,
           word: 'new-word',
           definition: 'new-definition',
           order: Object.values(state).length,
@@ -59,12 +59,12 @@ export const flashCardsSlice = createSlice({
       const { flashCard, updatedValue, property } = action.payload;
 
       if (property) {
-        flashCardsClone[flashCard.uuid] = {
+        flashCardsClone[flashCard.frontUuid] = {
           ...flashCard,
           [property]: updatedValue,
         };
       } else {
-        flashCardsClone[flashCard.uuid] = updatedValue as FlashCardModel;
+        flashCardsClone[flashCard.frontUuid] = updatedValue as FlashCardModel;
       }
 
       state = flashCardsClone;

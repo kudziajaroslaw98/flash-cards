@@ -19,7 +19,7 @@ export default function HardestFlashcardsComponent() {
           .slice(0, 4)
           .map((flashCard) => (
             <FlashCardComponent
-              key={flashCard.uuid}
+              key={flashCard.frontUuid}
               flashCard={flashCard}
               reviseType={FlashCardTypesEnum.SHOW_ALL}
             />
