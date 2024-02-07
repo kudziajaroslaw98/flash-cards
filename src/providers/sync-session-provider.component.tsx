@@ -31,10 +31,13 @@ export default function SyncSessionProvider(
   props: Readonly<PropsWithChildren>,
 ) {
   const dispatch = useAppDispatch();
-  const words = useAppSelector(flashCardSelectors.selectFlashCards);
+  const flashcards = useAppSelector(flashCardSelectors.selectFlashCards);
   const stats = useAppSelector(statsSelectors.selectStats);
 
-  const { value: flashCardsLS } = useLocalStorage('words', {} as FlashCards);
+  const { value: flashCardsLS } = useLocalStorage(
+    'flashcards',
+    {} as FlashCards,
+  );
   const { value: statsLS } = useLocalStorage('stats', DEFAULT_STATS);
 
   const { isLoggedIn } = useSessionContext();
@@ -54,9 +57,9 @@ export default function SyncSessionProvider(
     //   method: 'POST',
     //   body: JSON.stringify({ words }),
     // });
-    console.log('🚀 ~ words:', words);
+    console.log('🚀 ~ words:', flashcards);
     console.log('🚀 ~ stats:', stats);
-  }, [isLoggedIn, words, stats]);
+  }, [isLoggedIn, flashcards, stats]);
 
   useInterval(
     () => {

@@ -33,12 +33,12 @@ export const statsSlice = createSlice({
       }
 
       state = StatsClone as Stats;
+      localStorage.setItem('stats', JSON.stringify(StatsClone));
       return state;
     },
   },
 });
 
-// Action creators are generated for each case reducer function
 export const { setStats, updateStatistics } = statsSlice.actions;
 
 export const statsReducer = statsSlice.reducer;

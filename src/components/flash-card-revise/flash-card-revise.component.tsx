@@ -62,7 +62,7 @@ export default function FlashCardReviseComponent() {
         dispatch(
           updateFlashCard({
             flashCard: flashCard,
-            updatedValue: (flashCard.weight - 0.01).toFixed(2),
+            updatedValue: +(flashCard.weight - 0.01).toFixed(2),
             property: 'weight',
           }),
         );
@@ -73,7 +73,7 @@ export default function FlashCardReviseComponent() {
       dispatch(
         updateFlashCard({
           flashCard: flashCard,
-          updatedValue: (flashCard.weight + 0.01).toFixed(2),
+          updatedValue: +(flashCard.weight + 0.01).toFixed(2),
           property: 'weight',
         }),
       );

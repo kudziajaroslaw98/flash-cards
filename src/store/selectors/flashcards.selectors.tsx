@@ -7,9 +7,7 @@ const selectFlashCardsArray = createSelector([flashCardsState], (flashCards) =>
   Object.values(flashCards),
 );
 
-const selectFlashCards = flashCardsState;
-
 export const flashCardSelectors = {
   selectFlashCardsArray,
-  selectFlashCards,
+  selectFlashCards: flashCardsState,
 };

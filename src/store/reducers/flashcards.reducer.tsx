@@ -28,6 +28,7 @@ export const flashCardsSlice = createSlice({
         },
       });
 
+      localStorage.setItem('flashcards', JSON.stringify(newFlashCards));
       state = newFlashCards;
       return state;
     },
@@ -42,6 +43,7 @@ export const flashCardsSlice = createSlice({
         flashCard.order = index;
       });
 
+      localStorage.setItem('flashcards', JSON.stringify(flashCardsClone));
       state = flashCardsClone;
       return state;
     },
@@ -66,12 +68,12 @@ export const flashCardsSlice = createSlice({
       }
 
       state = flashCardsClone;
+      localStorage.setItem('flashcards', JSON.stringify(flashCardsClone));
       return state;
     },
   },
 });
 
-// Action creators are generated for each case reducer function
 export const {
   setFlashCards,
   addNewFlashCard,

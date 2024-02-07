@@ -24,7 +24,7 @@ export default function FlashCardsTable() {
   const statistics = useAppSelector(statsSelectors.selectStats);
   const flashCardsArray = useAppSelector(
     flashCardSelectors.selectFlashCardsArray,
-  );
+  ).sort((head, tail) => head.order - tail.order);
   const dispatch = useAppDispatch();
 
   const [selected, setSelected] = useState<UUID[]>([]);
