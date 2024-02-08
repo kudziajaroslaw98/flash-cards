@@ -67,7 +67,6 @@ export default function SyncSessionProvider(
 
   const { isLoggedIn } = useSessionContext();
 
-  const shouldSync = useRef<boolean>(false);
   const initialRender = useRef<boolean>(true);
   const MIN_IN_MS = 60_000;
   const DEFAULT_SYNC_INTERVAL_IN_MS = MIN_IN_MS * 5;
