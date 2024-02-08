@@ -12,6 +12,11 @@ export const statsSlice = createSlice({
       state = action.payload;
       return state;
     },
+    setStatsAfterSync: (state, action: PayloadAction<Stats>) => {
+      state = action.payload;
+      localStorage.setItem('stats', JSON.stringify(action.payload));
+      return state;
+    },
     updateStatistics: (
       state,
       action: PayloadAction<{
@@ -39,6 +44,7 @@ export const statsSlice = createSlice({
   },
 });
 
-export const { setStats, updateStatistics } = statsSlice.actions;
+export const { setStats, setStatsAfterSync, updateStatistics } =
+  statsSlice.actions;
 
 export const statsReducer = statsSlice.reducer;

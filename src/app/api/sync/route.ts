@@ -1,5 +1,5 @@
+import { DEFAULT_STATS } from '#/shared/defaults/stats.default';
 import { FlashCardModel } from '#/shared/models/flash-card.model';
-import { ApiResponse } from '#/shared/types/api/api-response.type';
 import { ApiSyncResponse } from '#/shared/types/api/api-sync-response.type';
 import { StatsModel } from '#/shared/types/stats.type';
 import checkValidity from '#/shared/utils/check-validity.util';
@@ -18,52 +18,63 @@ type requestBody = {
   updatedAt: Date | null;
 };
 
-const getUserUuid = async (supabase: SupabaseClient) => {
+async function getUserUuid(supabase: SupabaseClient) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (user === null || user === undefined) {
-    throw { message: 'User not found' };
+    throw new Error('User not found');
   }
 
   return user.id;
-};
+}
 
-const validateBody = (body: Record<string, unknown>) => {
+async function validateBody(body: Record<string, unknown>) {
   const validityCheck = checkValidity(body, syncBodyValidationScheme);
 
   if (!validityCheck.valid) {
-    throw { message: validityCheck.error };
+    throw new Error(validityCheck.error);
   }
-};
+}
 
-const newUserSync = (
+async function newUserSync(
   body: requestBody,
   supabase: SupabaseClient,
   userUuid: string,
   newLastSyncAt: Date,
-) => {
-  supabase.from('metadata').insert({
-    userUuid,
-    lastSyncAt: newLastSyncAt,
-    theme: body.theme,
-  });
+) {
+  await supabase.from('metadata').upsert(
+    {
+      userUuid,
+      lastSyncAt: newLastSyncAt,
+      theme: body.theme,
+    },
+    { onConflict: 'userUuid', ignoreDuplicates: false },
+  );
 
-  supabase.from('stats').insert({
-    userUuid,
-    ...body.stats,
-  });
+  await supabase.from('stats').upsert(
+    {
+      userUuid,
+      ...body.stats,
+    },
+    { onConflict: 'userUuid', ignoreDuplicates: false },
+  );
 
-  supabase.from('flashcards').insert(
+  await supabase.from('flashcards').upsert(
     body.flashcards.map((flashcard) => ({
       userUuid,
       ...flashcard,
     })),
+    { onConflict: 'frontUuid', ignoreDuplicates: false },
   );
-};
+}
 
-const fetchDataFromDb = async (supabase: SupabaseClient, userUuid: string) => {
+async function fetchDataFromDb(
+  supabase: SupabaseClient,
+  userUuid: string,
+  newLastSyncAt: Date,
+) {
   const flashcards = await supabase
     .from('flashcards')
     .select('frontUuid, word, definition, weight, order')
@@ -71,49 +82,74 @@ const fetchDataFromDb = async (supabase: SupabaseClient, userUuid: string) => {
 
   const stats = await supabase
     .from('stats')
-    .select('*')
+    .select(
+      'accuracy, answers, correctAnswers, createdFlashCards, incorrectAnswers',
+    )
     .eq('userUuid', userUuid)
     .maybeSingle();
 
+  await supabase
+    .from('metadata')
+    .update({ lastSyncAt: newLastSyncAt })
+    .eq('userUuid', userUuid);
+
   return {
     flashcards: flashcards.data !== null ? flashcards.data : [],
-    stats: stats.data,
+    stats: stats.data !== null ? stats.data : DEFAULT_STATS,
   };
-};
+}
 
-const upsertDataInDb = async (
+async function upsertDataInDb(
   body: requestBody,
   supabase: SupabaseClient,
   userUuid: string,
-) => {
-  // const flashcards = await supabase
-  //   .from('flashcards')
-  //   .select('frontUuid, word, definition, weight, order')
-  //   .eq('userUuid', userUuid);
-  // const stats = await supabase
-  //   .from('stats')
-  //   .select('*')
-  //   .eq('userUuid', userUuid)
-  //   .maybeSingle();
-  // make sure you delete records which don't exist in the body.flashcards
-  // return { flashcards, stats };
-};
+  newLastSyncAt: Date,
+) {
+  const flashCardsUuids = body.flashcards.map(
+    (flashcard) => flashcard.frontUuid,
+  );
 
-const getFlashCardsCount = async (
-  supabase: SupabaseClient,
-  userUuid: string,
-) => {
+  const flashcardsUuidsToDelete = await supabase.rpc('get_missing_uuids', {
+    flashCardsUuids,
+  });
+
+  await supabase.from('flashcards').upsert(
+    body.flashcards.map((flashcard) => ({
+      userUuid,
+      ...flashcard,
+    })),
+    { onConflict: 'frontUuid', ignoreDuplicates: false },
+  );
+
+  await supabase
+    .from('stats')
+    .update({ ...body.stats })
+    .eq('userUuid', userUuid);
+
+  await supabase
+    .from('metadata')
+    .update({ theme: body.theme, lastSyncAt: newLastSyncAt })
+    .eq('userUuid', userUuid);
+
+  if (flashcardsUuidsToDelete.data !== null) {
+    await supabase
+      .from('flashcards')
+      .delete()
+      .in('frontUuid', flashcardsUuidsToDelete.data);
+  }
+}
+
+async function getFlashCardsCount(supabase: SupabaseClient, userUuid: string) {
   const flashCardsCount = await supabase
     .from('flashcards')
-    .select('*')
+    .select()
     .eq('userUuid', userUuid)
     .select();
 
   return flashCardsCount.count === null ? 0 : flashCardsCount.count;
-};
+}
 
 export async function POST(request: Request) {
-  let response: ApiResponse<ApiSyncResponse>;
   const newLastSyncAt = new Date();
 
   try {
@@ -135,43 +171,45 @@ export async function POST(request: Request) {
 
     const userUuid = await getUserUuid(supabase);
 
-    // get user stats, flashcards, theme and lastSyncAt from supabase
-
     const metadata = await supabase
       .from('metadata')
-      .select('*')
+      .select()
       .eq('userUuid', userUuid)
       .maybeSingle();
 
     const flashcardsCount = await getFlashCardsCount(supabase, userUuid);
 
-    if (metadata.data?.lastSyncAt === null) {
-      newUserSync(body, supabase, userUuid, newLastSyncAt);
+    if (metadata.data.lastSyncAt === null) {
+      await newUserSync(body, supabase, userUuid, newLastSyncAt);
     } else {
       if (
         body.lastSyncAt === null ||
-        body.lastSyncAt < metadata.data.lastSyncAt
+        new Date(body.lastSyncAt) < new Date(metadata.data.lastSyncAt)
       ) {
-        const { flashcards, stats } = await fetchDataFromDb(supabase, userUuid);
+        const { flashcards, stats } = await fetchDataFromDb(
+          supabase,
+          userUuid,
+          newLastSyncAt,
+        );
 
         responseBody.flashcards = flashcards;
         responseBody.stats = stats;
       } else if (
         body.lastSyncAt === metadata.data.lastSyncAt ||
         (body.updatedAt !== null &&
-          body.updatedAt > metadata.data.lastSyncAt &&
+          new Date(body.updatedAt) > new Date(metadata.data.lastSyncAt) &&
           body.flashcards.length > flashcardsCount)
       ) {
-        upsertDataInDb(body, supabase, userUuid);
+        await upsertDataInDb(body, supabase, userUuid, newLastSyncAt);
       }
     }
 
     return Response.json({ success: true, data: responseBody });
-  } catch (error: { message: string }) {
+  } catch (error) {
     return Response.json({
       success: false,
       error:
-        error.message ||
+        error ||
         'An error occurred while syncing your data. Please try again later.',
     });
   }

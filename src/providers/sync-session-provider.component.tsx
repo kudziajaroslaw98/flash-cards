@@ -5,9 +5,18 @@ import useFetch from '#/hooks/use-fetch.hook';
 import useInterval from '#/hooks/use-interval.hook';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
 import { DEFAULT_STATS } from '#/shared/defaults/stats.default';
+import { ApiResponse } from '#/shared/types/api/api-response.type';
+import { ApiSyncResponse } from '#/shared/types/api/api-sync-response.type';
 import { FlashCards } from '#/shared/types/local-storage-flash-card.type';
-import { setFlashCards } from '#/store/reducers/flashcards.reducer';
-import { setStats } from '#/store/reducers/stats.reducer';
+import {
+  Metadata,
+  MetadataModel,
+} from '#/shared/types/local-storage-metadata.type';
+import {
+  setFlashCards,
+  setFlashCardsAfterSync,
+} from '#/store/reducers/flashcards.reducer';
+import { setStats, setStatsAfterSync } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { statsSelectors } from '#/store/selectors/stats.selectors';
 import {
@@ -42,19 +51,23 @@ export default function SyncSessionProvider(
     {} as FlashCards,
   );
   const { value: statsLS } = useLocalStorage('stats', DEFAULT_STATS);
-  const { value: themeLS } = useLocalStorage('theme', {
-    theme: 'dark',
-  });
-  const { value: metadata, setToLocalStorage: setMetadata } = useLocalStorage(
-    'metadata',
+  const { value: themeLS, setToLocalStorage: setTheme } = useLocalStorage(
+    'theme',
     {
-      lastSyncAt: null,
-      updatedAt: null,
+      theme: 'dark',
     },
   );
+  const { value: metadata, setToLocalStorage: setMetadata } = useLocalStorage<
+    MetadataModel[keyof MetadataModel],
+    Metadata
+  >('metadata', {
+    lastSyncAt: null,
+    updatedAt: null,
+  });
 
   const { isLoggedIn } = useSessionContext();
 
+  const shouldSync = useRef<boolean>(false);
   const initialRender = useRef<boolean>(true);
   const MIN_IN_MS = 60_000;
   const DEFAULT_SYNC_INTERVAL_IN_MS = MIN_IN_MS * 5;
@@ -72,27 +85,34 @@ export default function SyncSessionProvider(
       updatedAt: metadata.updatedAt,
     });
 
-    // const response = await fetch<ApiResponse<unknown>>('/api/sync', {
-    //   method: 'POST',
-    //   body: fetchBody,
-    // });
+    const response = await fetch<ApiResponse<ApiSyncResponse>>('/api/sync', {
+      method: 'POST',
+      body: fetchBody,
+    });
 
-    // if (!response.success && response.error) {
-    //   show({
-    //     timeInSeconds: 10,
-    //     title: response.error,
-    //     type: 'error',
-    //   });
-    // }
+    if (!response.success && response.error) {
+      show({
+        timeInSeconds: 10,
+        title: response.error,
+        type: 'error',
+      });
+    }
 
-    // if (response.success) {
-    // setLastSync({ lastSyncAt: new Date() });
-    // }
+    if (response.success) {
+      const flashcardsObject: FlashCards = {};
 
-    // console.log(response);
+      response.data.flashcards.forEach((flashcard) => {
+        flashcardsObject[flashcard.frontUuid] = flashcard;
+      });
 
-    console.log('🚀 ~ words:', flashcards);
-    console.log('🚀 ~ stats:', stats);
+      setMetadata({
+        lastSyncAt: response.data.lastSyncAt,
+        updatedAt: metadata.updatedAt,
+      });
+      setTheme({ theme: response.data.theme });
+      dispatch(setFlashCardsAfterSync(flashcardsObject));
+      dispatch(setStatsAfterSync(response.data.stats));
+    }
   }, [isLoggedIn, flashcards, stats, themeLS, metadata]);
 
   useInterval(

@@ -15,6 +15,11 @@ export const flashCardsSlice = createSlice({
       state = action.payload;
       return state;
     },
+    setFlashCardsAfterSync: (state, action: PayloadAction<FlashCards>) => {
+      state = action.payload;
+      localStorage.setItem('flashcards', JSON.stringify(action.payload));
+      return state;
+    },
     addNewFlashCard: (state) => {
       const flashCardsClone = { ...state };
       const newUuid = uuid() as UUID;
@@ -76,6 +81,7 @@ export const flashCardsSlice = createSlice({
 
 export const {
   setFlashCards,
+  setFlashCardsAfterSync,
   addNewFlashCard,
   removeFlashCards,
   updateFlashCard,
