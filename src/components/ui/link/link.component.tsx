@@ -2,18 +2,20 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
+import type { ReactNode } from 'react';
 
 export interface LinkProps {
   href: string;
   label: string;
   icon?: ReactNode;
-  active?: boolean;
   class?: string;
   onClick?: () => void;
 }
 
 export default function LinkComponent(props: LinkProps) {
+  const pathName = usePathname();
+
   return (
     <Link
       href={props.href}
@@ -24,7 +26,7 @@ export default function LinkComponent(props: LinkProps) {
         {props.icon && props.icon} {props.label}
       </p>
 
-      {props?.active && (
+      {props.href === pathName && (
         <motion.span
           layoutId='link-underline'
           className={`absolute -bottom-1 h-[2px] w-full rounded bg-green-500 group-hover:bg-green-400`}

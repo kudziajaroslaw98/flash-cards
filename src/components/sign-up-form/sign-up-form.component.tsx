@@ -2,10 +2,10 @@
 
 import FormComponent from '#/components/form-component/form.component';
 import useFetch from '#/hooks/use-fetch.hook';
-import { ApiRoutes } from '#/utils/enums/api-routes.enum';
-import { ApiResponse } from '#/utils/models/api-response.model';
-import { SignUpResponse } from '#/utils/types/sign-up-response.type';
-import { signUpValidationScheme } from '#/utils/validation-schemes/sign-up-validation.scheme';
+import { ApiRoutes } from '#/shared/enums/api-routes.enum';
+import { ApiResponse } from '#/shared/types/api/api-response.type';
+import { SignUpResponse } from '#/shared/types/api/sign-up-response.type';
+import { signUpValidationScheme } from '#/shared/validation-schemes/sign-up-validation.scheme';
 import { CheckBadgeIcon, RocketLaunchIcon } from '@heroicons/react/24/solid';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -103,7 +103,7 @@ export default function SignUpFormComponent() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           key={'signup-wrapper'}
-          className='relative flex w-full max-w-sm flex-col items-center justify-center gap-12 rounded p-8 sm:overflow-clip sm:border sm:border-gray-50 sm:bg-gray-100 sm:shadow-card-hovered dark:border-slate-800 dark:bg-slate-900'
+          className='relative flex w-full max-w-sm flex-col items-center justify-center gap-12 rounded p-8 dark:border-slate-800 dark:bg-slate-900 sm:overflow-clip sm:border sm:border-gray-50 sm:bg-gray-100 sm:shadow-card-hovered'
         >
           <h4 className='flex items-center justify-center gap-2 text-3xl font-semibold text-green-400'>
             <span>Sign Up</span>
@@ -125,7 +125,7 @@ export default function SignUpFormComponent() {
 
           <ButtonComponent
             class={
-              'flex max-w-80 gap-2 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 md:w-full dark:bg-green-500 dark:hover:bg-green-400'
+              'flex max-w-80 gap-2 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 dark:bg-green-500 dark:hover:bg-green-400 md:h-10 md:w-full'
             }
             onClick={handleSignUp}
             disabled={!formValid || isLoading}
@@ -165,6 +165,7 @@ export default function SignUpFormComponent() {
             <p className='text-center'>
               Confirmation link was sent to your email.
             </p>
+
             <p className='text-center'>
               You just need to click on it to activate your account.
             </p>

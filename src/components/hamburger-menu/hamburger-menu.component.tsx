@@ -6,7 +6,8 @@ import LinkComponent from '#/components/ui/link/link.component';
 import SwitchComponent from '#/components/ui/switch/switch.component';
 import { ToggleButtonComponent } from '#/components/ui/toggle-button/toggle-button.component';
 import { useSessionContext } from '#/providers/session-provider.component';
-import { NavigationItem } from '#/utils/interfaces/navigation-item.interface';
+import { useThemeContext } from '#/providers/theme-provider.component';
+import { NavigationItem } from '#/shared/types/navigation-item.type';
 import {
   Bars3Icon,
   MoonIcon,
@@ -15,21 +16,21 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 interface HamburgerMenuProps {
-  changeTheme: () => void;
-  isDarkMode: () => boolean;
   navigationItems: NavigationItem[];
 }
 
 export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
   const router = useRouter();
+  const pathName = usePathname();
   const [toggled, toggle] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const { isLoggedIn, session, logOut } = useSessionContext();
+  const { changeTheme, isDarkMode } = useThemeContext();
 
   useEffect(() => {
     const handler = (event: MouseEvent) => {
@@ -95,10 +96,10 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
           <SwitchComponent
             checkedLabel={'Dark mode'}
             uncheckedLabel={'Light mode'}
-            onClick={props.changeTheme}
-            value={props.isDarkMode()}
+            onClick={changeTheme}
+            value={isDarkMode}
           >
-            {props.isDarkMode() ? (
+            {isDarkMode ? (
               <MoonIcon className='h-4 w-4' />
             ) : (
               <SunIcon className='h-4 w-4' />
@@ -152,7 +153,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
         menuItems={props.navigationItems.map((item) => ({
           label: item.label,
           icon: item.icon,
-          active: item.active,
+          active: item.href === pathName,
           onClick: () => {
             router.push(item.href);
             setOpen(false);

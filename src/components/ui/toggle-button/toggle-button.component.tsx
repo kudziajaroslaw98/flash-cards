@@ -1,5 +1,5 @@
 import ButtonComponent from '#/components/ui/button/button.component';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface ToggleButtonProps extends BaseToggleButtonProps {
   type: 'icon-only';

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import addUpNumberArray from '#/utils/functions/add-up-number-array.util';
-import binarySearch from '#/utils/functions/binary-search-weights.util';
-import getRandomRangedFloat from '#/utils/functions/get-random-ranged-float';
+import addUpNumberArray from '#/shared/utils/add-up-number-array.util';
+import binarySearch from '#/shared/utils/binary-search-weights.util';
+import getRandomRangedFloat from '#/shared/utils/get-random-ranged-float';
 
 export interface UseRandomArrayItemsOutput<T> {
   pickedItems: T[];

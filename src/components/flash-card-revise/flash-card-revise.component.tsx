@@ -6,13 +6,15 @@ import { useEffect, useState } from 'react';
 import FlashCardComponent from '#/components/flash-card/flash-card.comonent';
 import ButtonComponent from '#/components/ui/button/button.component';
 import DropdownComponent from '#/components/ui/dropdown/dropdown.component';
-import useLocalStorage from '#/hooks/use-local-storage.hook';
+import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
-import { DEFAULT_STATS } from '#/utils/defaults/stats.default';
-import { FlashCardTypesEnum } from '#/utils/enums/flash-card-types.enum';
-import getRandomRangedNumber from '#/utils/functions/get-random-ranged-number.util';
-import { FlashCardModel } from '#/utils/models/flash-card.model';
-import { FlashCards } from '#/utils/types/local-storage-flash-card.type';
+import { FlashCardTypesEnum } from '#/shared/enums/flash-card-types.enum';
+import { FlashCardModel } from '#/shared/models/flash-card.model';
+import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
+import { updateFlashCard } from '#/store/reducers/flashcards.reducer';
+import { updateStatistics } from '#/store/reducers/stats.reducer';
+import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
+import { statsSelectors } from '#/store/selectors/stats.selectors';
 import LinkComponent from '../ui/link/link.component';
 
 export default function FlashCardReviseComponent() {
@@ -24,14 +26,12 @@ export default function FlashCardReviseComponent() {
   const [dropdownItems] = useState(Object.values(FlashCardTypesEnum));
   const [clicked, setClicked] = useState(false);
 
-  const {
-    arrayOfValues: flashCardsArray,
-    value: flashCards,
-    setToLocalStorage: setFlashCards,
-  } = useLocalStorage<FlashCardModel, FlashCards>('words', {});
+  const flashCardsArray = useAppSelector(
+    flashCardSelectors.selectFlashCardsArray,
+  );
+  const statistics = useAppSelector(statsSelectors.selectStats);
 
-  const { value: statistics, setToLocalStorage: setStatistics } =
-    useLocalStorage('stats', DEFAULT_STATS);
+  const dispatch = useAppDispatch();
 
   const { pickedItems: randomCards, reshuffle } =
     useRandomArrayItems<FlashCardModel>(
@@ -52,7 +52,6 @@ export default function FlashCardReviseComponent() {
     }
 
     const correct = isCorrect(flashCard);
-    const clonedFlashCards = { ...flashCards };
     const clonedStats = { ...statistics };
 
     clonedStats.answers += 1;
@@ -60,19 +59,31 @@ export default function FlashCardReviseComponent() {
     if (correct) {
       clonedStats.correctAnswers += 1;
       if (revisedCard && revisedCard?.weight > 0.01) {
-        (clonedFlashCards[flashCard.uuid].weight -= 0.01).toFixed(2);
+        dispatch(
+          updateFlashCard({
+            flashCard: flashCard,
+            updatedValue: +(flashCard.weight - 0.01).toFixed(2),
+            property: 'weight',
+          }),
+        );
       }
     } else {
       clonedStats.incorrectAnswers += 1;
-      (clonedFlashCards[flashCard.uuid].weight += 0.01).toFixed(2);
+
+      dispatch(
+        updateFlashCard({
+          flashCard: flashCard,
+          updatedValue: +(flashCard.weight + 0.01).toFixed(2),
+          property: 'weight',
+        }),
+      );
     }
 
     clonedStats.accuracy = parseFloat(
       (clonedStats.correctAnswers / clonedStats.answers).toFixed(2),
     );
 
-    setFlashCards(clonedFlashCards);
-    setStatistics(clonedStats);
+    dispatch(updateStatistics({ updatedValue: clonedStats }));
     setClickedCard(flashCard);
     setClicked(true);
   };
@@ -113,7 +124,7 @@ export default function FlashCardReviseComponent() {
         <div className='grid w-full auto-rows-fr grid-cols-1 flex-col items-center justify-center gap-3 sm:grid-cols-2-auto'>
           {randomCards.map((flashCard) => (
             <FlashCardComponent
-              key={flashCard.uuid}
+              key={flashCard.frontUuid}
               flashCard={flashCard}
               reviseType={reviseType}
               correct={isCorrect(flashCard)}
@@ -125,13 +136,13 @@ export default function FlashCardReviseComponent() {
         </div>
       </div>
 
-      <div className='fixed bottom-0 left-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md sm:bottom-32 dark:bg-slate-950/10'>
+      <div className='fixed bottom-0 left-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md dark:bg-slate-950/10 sm:bottom-32'>
         <ButtonComponent
           label={'Reshuffle'}
           icon={<ArrowPathIcon className='h-4 w-4' />}
           iconPosition={'right'}
           class={
-            'max-w-80 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 md:h-10 md:!w-52 dark:bg-green-500 dark:hover:bg-green-400'
+            'max-w-80 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 dark:bg-green-500 dark:hover:bg-green-400 md:h-10 md:!w-52'
           }
           onClick={reshuffleFlashCards}
         />

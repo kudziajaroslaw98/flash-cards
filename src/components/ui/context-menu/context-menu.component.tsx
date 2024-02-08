@@ -1,7 +1,7 @@
 'use client';
 
 import MenuItem from '#/components/ui/context-menu/menu-item.component';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export interface ContextMenuItem {
   label?: string;

@@ -1,18 +1,14 @@
 'use client';
 
 import CardComponent from '#/components/ui/card/card.component';
-import useLocalStorage from '#/hooks/use-local-storage.hook';
-import { DEFAULT_STATS } from '#/utils/defaults/stats.default';
-import { StatsModel } from '#/utils/interfaces/stats.model';
-import { Stats } from '#/utils/types/local-storage-stats.type';
+import { useAppSelector } from '#/hooks/store-hooks.hook';
+import { Stats } from '#/shared/types/local-storage-stats.type';
+import { statsSelectors } from '#/store/selectors/stats.selectors';
 
 export default function StatsListComponent() {
-  const { value: statistics } = useLocalStorage<
-    StatsModel[keyof StatsModel],
-    Stats
-  >('stats', DEFAULT_STATS);
+  const statistics = useAppSelector(statsSelectors.selectStats);
 
-  const labels: Record<keyof StatsModel, string> = {
+  const labels: Record<keyof Stats, string> = {
     answers: 'Answers',
     correctAnswers: 'Correct answers',
     incorrectAnswers: 'Incorrect answers',
@@ -25,7 +21,7 @@ export default function StatsListComponent() {
       <h4 className='text-green-400'>Your statistics</h4>
 
       <div className='flex max-w-2xl flex-wrap justify-center gap-4'>
-        {Object.entries(statistics).map(([key, value]) => (
+        {Object.entries(statistics)?.map(([key, value]) => (
           <CardComponent
             key={key}
             backgroundGradientWidth={100}
@@ -36,7 +32,7 @@ export default function StatsListComponent() {
             </h1>
 
             <p className='grow font-semibold text-gray-600 sm:w-full sm:text-center dark:text-slate-200'>
-              {labels[key as keyof StatsModel]}
+              {labels[key as keyof Stats]}
             </p>
           </CardComponent>
         ))}
