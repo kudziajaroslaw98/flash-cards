@@ -30,7 +30,7 @@ export default function HeaderComponent() {
   ];
 
   return (
-    <header className='fixed left-0 top-0 z-30 h-20 w-full bg-gray-50/5 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/5'>
+    <header className='fixed left-0 top-0 z-30 h-20 w-full bg-gray-50/5 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/5 md:hidden'>
       <div className='mx-auto flex h-full max-w-5xl items-center justify-between'>
         <div className='flex items-center justify-center gap-4'>
           <Link
@@ -51,7 +51,7 @@ export default function HeaderComponent() {
             </h5>
           </Link>
 
-          <span className='hidden items-center gap-1 text-gray-500 lg:flex dark:text-slate-300'>
+          <span className='hidden items-center gap-1 text-gray-500 dark:text-slate-300 lg:flex'>
             <span>
               <HashtagIcon className='h-4 w-4' />
             </span>

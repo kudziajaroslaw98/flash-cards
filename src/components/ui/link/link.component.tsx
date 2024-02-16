@@ -29,7 +29,7 @@ export default function LinkComponent(props: LinkProps) {
       {props.href === pathName && (
         <motion.span
           layoutId='link-underline'
-          className={`absolute -bottom-1 h-[2px] w-full rounded bg-green-500 group-hover:bg-green-400`}
+          className={`absolute -left-4 h-full w-[2px] rounded bg-green-500 group-hover:bg-green-400`}
         ></motion.span>
       )}
     </Link>
