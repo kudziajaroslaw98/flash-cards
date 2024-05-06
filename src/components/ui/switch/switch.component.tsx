@@ -1,11 +1,18 @@
 import type { PropsWithChildren } from 'react';
 
-interface SwitchProps {
-  value: boolean;
-  checkedLabel: string;
-  uncheckedLabel: string;
-  onClick: () => void;
-}
+type SwitchProps =
+  | {
+      showLabel: false;
+      value: boolean;
+      onClick: () => void;
+    }
+  | {
+      showLabel: true;
+      value: boolean;
+      checkedLabel: string;
+      uncheckedLabel: string;
+      onClick: () => void;
+    };
 
 export default function SwitchComponent(props: PropsWithChildren<SwitchProps>) {
   return (
@@ -30,9 +37,11 @@ export default function SwitchComponent(props: PropsWithChildren<SwitchProps>) {
         </div>
       </div>
 
-      <span className='ms-3 text-sm text-green-500 dark:text-slate-200'>
-        {props.value ? props.checkedLabel : props.uncheckedLabel}
-      </span>
+      {props.showLabel && (
+        <span className='ms-3 text-sm text-green-500 dark:text-slate-200'>
+          {props.value ? props.checkedLabel : props.uncheckedLabel}
+        </span>
+      )}
     </label>
   );
 }

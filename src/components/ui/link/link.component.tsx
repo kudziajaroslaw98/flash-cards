@@ -3,17 +3,17 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 
 export interface LinkProps {
   href: string;
-  label: string;
+  label?: string;
   icon?: ReactNode;
   class?: string;
   onClick?: () => void;
 }
 
-export default function LinkComponent(props: LinkProps) {
+export default function LinkComponent(props: PropsWithChildren<LinkProps>) {
   const pathName = usePathname();
 
   return (
@@ -22,8 +22,9 @@ export default function LinkComponent(props: LinkProps) {
       onClick={props.onClick}
       className={`group relative flex items-center justify-center text-green-500 underline-offset-2 transition-all hover:text-green-400 ${props.class} `}
     >
-      <p className='flex items-center gap-2'>
-        {props.icon && props.icon} {props.label}
+      <p className='flex items-center gap-4'>
+        {props?.icon && props.icon} {props?.label && props.label}
+        {props?.children}
       </p>
 
       {props.href === pathName && (

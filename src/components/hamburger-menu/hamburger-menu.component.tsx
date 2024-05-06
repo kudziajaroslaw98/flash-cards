@@ -3,21 +3,19 @@
 import ButtonComponent from '#/components/ui/button/button.component';
 import ContextMenuComponent from '#/components/ui/context-menu/context-menu.component';
 import LinkComponent from '#/components/ui/link/link.component';
-import SwitchComponent from '#/components/ui/switch/switch.component';
 import { ToggleButtonComponent } from '#/components/ui/toggle-button/toggle-button.component';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { useThemeContext } from '#/providers/theme-provider.component';
 import { NavigationItem } from '#/shared/types/navigation-item.type';
 import {
   Bars3Icon,
-  MoonIcon,
-  SunIcon,
   UserCircleIcon,
   XMarkIcon,
 } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import ThemeSwitchComponent from '../theme-switch/theme-switch.component';
 
 interface HamburgerMenuProps {
   navigationItems: NavigationItem[];
@@ -92,20 +90,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
             toggled={toggled}
           />
         }
-        afterMenuItems={
-          <SwitchComponent
-            checkedLabel={'Dark mode'}
-            uncheckedLabel={'Light mode'}
-            onClick={changeTheme}
-            value={isDarkMode}
-          >
-            {isDarkMode ? (
-              <MoonIcon className='h-4 w-4' />
-            ) : (
-              <SunIcon className='h-4 w-4' />
-            )}
-          </SwitchComponent>
-        }
+        afterMenuItems={<ThemeSwitchComponent showLabel />}
         beforeMenuItems={
           <div className='w-full'>
             {isLoggedIn && (
