@@ -55,12 +55,6 @@ export default function SidebarComponent() {
       items: [
         {
           type: 'item',
-          label: 'Sets',
-          href: '/flashcards/sets',
-          icon: <RectangleStackIcon className={iconSize} />,
-        },
-        {
-          type: 'item',
           label: 'Learn',
           href: '/flashcards/learn',
           icon: <AcademicCapIcon className={iconSize} />,
@@ -70,6 +64,12 @@ export default function SidebarComponent() {
           label: 'Revise',
           href: '/flashcards/revise',
           icon: <LanguageIcon className={iconSize} />,
+        },
+        {
+          type: 'item',
+          label: 'Sets',
+          href: '/flashcards/sets',
+          icon: <RectangleStackIcon className={iconSize} />,
         },
       ],
     },
@@ -85,13 +85,15 @@ export default function SidebarComponent() {
       ${expanded ? 'w-96' : 'w-20'}
     `}
     >
-      <div className='flex items-center justify-between border-b border-gray-300 p-4 '>
+      <div
+        className={`relative flex items-center border-b border-gray-300 p-4 ${expanded ? 'justify-between' : 'justify-center'}`}
+      >
         <Link
           href={'/dashboard'}
-          className='flex items-center gap-2 font-thin tracking-wider'
+          className={`flex items-center font-thin tracking-wider ${expanded && 'gap-2'}`}
         >
           <Image
-            width={16}
+            width={expanded ? 16 : 24}
             height={16}
             src={'/images/flash-cards-logo.svg'}
             alt={'Flash Cards Logo'}
@@ -110,7 +112,7 @@ export default function SidebarComponent() {
 
         <ToggleButtonComponent
           type='icon-only'
-          class='!h-5 !w-5 bg-green-400 p-0 hover:bg-green-500 active:focus:bg-green-600 dark:bg-green-500 dark:hover:bg-green-500 dark:active:focus:bg-green-700'
+          class='absolute -right-2 !h-5 !w-5 bg-green-400 !p-0 hover:bg-green-500 active:focus:bg-green-600 dark:bg-green-500 dark:hover:bg-green-500 dark:active:focus:bg-green-700'
           activeIcon={<ArrowLeftIcon className='h-3 w-3' />}
           inactiveIcon={<ArrowRightIcon className='h-3 w-3' />}
           toggled={expanded}
@@ -118,21 +120,23 @@ export default function SidebarComponent() {
         />
       </div>
 
-      <div className='flex w-full flex-col justify-center gap-8 p-4'>
-        <div className='hidden flex-col gap-8 md:flex'>
-          {navigation?.map((group) => (
+      <div className={`flex w-full flex-col justify-center gap-8 p-4`}>
+        <div
+          className={`hidden flex-col gap-8 md:flex ${!expanded && 'items-center'}`}
+        >
+          {navigation?.map((section) => (
             <>
-              {group?.type === 'item' && (
+              {section?.type === 'item' && (
                 <NavigationItemComponent
-                  item={group}
-                  expanded
+                  item={section}
+                  expanded={expanded}
                 />
               )}
 
-              {group?.type === 'group' && (
+              {section?.type === 'group' && (
                 <NavigationGroupComponent
-                  group={group}
-                  expanded
+                  group={section}
+                  expanded={expanded}
                 />
               )}
             </>

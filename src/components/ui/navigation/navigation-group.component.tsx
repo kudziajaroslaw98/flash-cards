@@ -1,5 +1,4 @@
 import { NavigationGroup } from '#/shared/types/navigation-group.type';
-import DividerComponent from '../divider/divider.component';
 import LinkComponent from '../link/link.component';
 
 export interface NavigationGroupProps {
@@ -16,8 +15,11 @@ export default function NavigationGroupComponent(props: NavigationGroupProps) {
       className='flex flex-col gap-2'
     >
       {(group?.label || group?.icon) && (
-        <h6 className='flex items-center gap-4 pl-2 text-green-400'>
+        <h6
+          className={`flex items-center pl-2 text-green-400  ${expanded && 'gap-4 pl-2'}`}
+        >
           <span className='transition-colors'>{group?.icon}</span>
+
           <span
             className={`overflow-clip transition-all ${expanded ? 'max-w-full ' : 'max-w-0'}`}
           >
@@ -26,13 +28,14 @@ export default function NavigationGroupComponent(props: NavigationGroupProps) {
         </h6>
       )}
 
-      {group?.divider && <DividerComponent />}
-
-      <div className={`ml-4 flex flex-col gap-4 pl-2`}>
+      <div
+        className={`flex flex-col gap-4 ${expanded && 'ml-4 border-l-2 pl-2'}`}
+      >
         {group.items.map((item) => (
           <LinkComponent
             key={item.href}
             href={item.href}
+            iconOnly={!expanded}
             class={`!items-start
                         !justify-start gap-4
                         rounded-md bg-gray-100/10 px-2 py-1
