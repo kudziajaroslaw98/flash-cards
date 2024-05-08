@@ -161,9 +161,9 @@ export default function FlashCardReviseComponent() {
       </h3>
 
       <LinkComponent
-        href='/learn'
+        href='/flashcards/learn'
         label=' You can add them here'
-        class='underline'
+        class='text-green-400 underline'
       />
     </div>
   );

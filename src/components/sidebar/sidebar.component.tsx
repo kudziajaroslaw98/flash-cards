@@ -8,7 +8,6 @@ import {
   ArrowRightIcon,
   BoltIcon,
   LanguageIcon,
-  RectangleStackIcon,
   Squares2X2Icon,
 } from '@heroicons/react/24/solid';
 import Image from 'next/image';
@@ -65,12 +64,12 @@ export default function SidebarComponent() {
           href: '/flashcards/revise',
           icon: <LanguageIcon className={iconSize} />,
         },
-        {
-          type: 'item',
-          label: 'Sets',
-          href: '/flashcards/sets',
-          icon: <RectangleStackIcon className={iconSize} />,
-        },
+        // {
+        //   type: 'item',
+        //   label: 'Sets',
+        //   href: '/flashcards/sets',
+        //   icon: <RectangleStackIcon className={iconSize} />,
+        // },
       ],
     },
   ];
