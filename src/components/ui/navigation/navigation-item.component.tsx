@@ -22,7 +22,7 @@ export default function NavigationItemComponent(props: NavigationItemProps) {
     >
       {item.icon}
       <span
-        className={`overflow-clip transition-all ${expanded ? 'max-w-full' : 'hidden max-w-0'}`}
+        className={`overflow-clip transition-all ${expanded ? 'max-w-full' : 'max-w-0'}`}
       >
         {item.label}
       </span>

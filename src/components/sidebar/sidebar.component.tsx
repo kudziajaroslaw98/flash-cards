@@ -81,12 +81,12 @@ export default function SidebarComponent() {
 
   return (
     <aside
-      className={`sticky top-4 z-50 hidden max-h-[calc(100vh-2rem)] flex-col rounded-md border border-gray-300 bg-gray-50 transition-all dark:border-slate-900 dark:bg-slate-950 md:flex
+      className={`sticky top-4 z-50 hidden max-h-[calc(100vh-2rem)] flex-col rounded-md border border-gray-300 bg-gray-50 transition-all dark:bg-slate-950 md:flex
       ${expanded ? 'w-96' : 'w-20'}
     `}
     >
       <div
-        className={`relative flex items-center border-b border-gray-300 p-4 dark:border-slate-900 ${expanded ? 'justify-between' : 'justify-center'}`}
+        className={`relative flex items-center border-b border-gray-300 p-4 ${expanded ? 'justify-between' : 'justify-center'}`}
       >
         <Link
           href={'/dashboard'}
@@ -100,7 +100,7 @@ export default function SidebarComponent() {
           />
 
           <h5
-            className={`overflow-clip text-lg font-bold tracking-tighter text-green-400 transition-all dark:text-green-500 ${expanded ? 'max-w-full' : 'hidden max-w-0'}`}
+            className={`overflow-clip text-lg font-bold tracking-tighter text-green-400 transition-all dark:text-green-500 ${expanded ? 'max-w-full' : 'max-w-0'}`}
           >
             FLASHC
             <span className='font-medium'>A</span>
