@@ -12,7 +12,7 @@ export default function NavigationGroupComponent(props: NavigationGroupProps) {
   return (
     <div
       key={`${group.label}_${group.items.length}`}
-      className='flex flex-col gap-2'
+      className={`flex flex-col ${expanded ? 'gap-4' : 'gap-6'}`}
     >
       {(group?.label || group?.icon) && (
         <h6
@@ -21,7 +21,7 @@ export default function NavigationGroupComponent(props: NavigationGroupProps) {
           <span className='transition-colors'>{group?.icon}</span>
 
           <span
-            className={`overflow-clip transition-all ${expanded ? 'max-w-full ' : 'max-w-0'}`}
+            className={`overflow-clip transition-all ${expanded ? 'max-w-full ' : 'hidden max-w-0'}`}
           >
             {group?.label}
           </span>
@@ -29,7 +29,7 @@ export default function NavigationGroupComponent(props: NavigationGroupProps) {
       )}
 
       <div
-        className={`flex flex-col gap-4 ${expanded && 'ml-4 border-l-2 pl-2'}`}
+        className={`flex flex-col gap-4 ${expanded && 'ml-4 border-l-2 border-gray-100 pl-2 dark:border-slate-900'}`}
       >
         {group.items.map((item) => (
           <LinkComponent
@@ -44,7 +44,7 @@ export default function NavigationGroupComponent(props: NavigationGroupProps) {
           >
             {item.icon}
             <span
-              className={`overflow-clip transition-all ${expanded ? 'max-w-full' : 'max-w-0'}`}
+              className={`overflow-clip transition-all ${expanded ? 'max-w-full' : 'hidden max-w-0'}`}
             >
               {item.label}
             </span>

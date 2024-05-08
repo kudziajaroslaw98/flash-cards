@@ -12,21 +12,21 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
-import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import ThemeSwitchComponent from '../theme-switch/theme-switch.component';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface HamburgerMenuProps {
   navigationItems: NavigationItem[];
 }
 
 export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
-  const router = useRouter();
-  const pathName = usePathname();
   const [toggled, toggle] = useState(false);
   const [isOpen, setOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement | null>(null);
   const { isLoggedIn, session, logOut } = useSessionContext();
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+  const pathName = usePathname();
 
   useEffect(() => {
     const handler = (event: MouseEvent) => {
