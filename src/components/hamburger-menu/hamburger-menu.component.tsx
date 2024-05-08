@@ -22,13 +22,13 @@ interface HamburgerMenuProps {
 }
 
 export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
-  const router = useRouter();
-  const pathName = usePathname();
   const [toggled, toggle] = useState(false);
   const [isOpen, setOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement | null>(null);
-  const { isLoggedIn, session, logOut } = useSessionContext();
   const { changeTheme, isDarkMode } = useThemeContext();
+  const { isLoggedIn, session, logOut } = useSessionContext();
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+  const pathName = usePathname();
 
   useEffect(() => {
     const handler = (event: MouseEvent) => {
