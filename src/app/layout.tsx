@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import { Inter, Roboto_Mono } from 'next/font/google';
 
 import HeaderComponent from '#/components/header/header.component';
+import SidebarComponent from '#/components/sidebar/sidebar.component';
 import ClientSideProviders from '#/providers/client-side-providers.component';
 import './globals.css';
 
@@ -38,14 +39,15 @@ export default function RootLayout({
       lang='en'
       className={`${inter.variable} ${roboto_mono.variable} flex font-sans`}
     >
-      <body className='min-w-screen relative flex w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950'>
+      <body className='min-w-screen relative flex w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950 md:pt-0'>
         <ClientSideProviders>
           <ToastsComponent />
-          <HeaderComponent />
 
-          <main className='mx-auto flex w-full max-w-6xl flex-col p-4'>
-            {children}
-          </main>
+          <div className='mx-auto flex h-full w-full max-w-6xl gap-24 p-4'>
+            <HeaderComponent />
+            <SidebarComponent />
+            <main className='relative flex w-full flex-col'>{children}</main>
+          </div>
         </ClientSideProviders>
       </body>
     </html>

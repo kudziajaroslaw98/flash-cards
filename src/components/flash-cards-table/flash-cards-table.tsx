@@ -123,14 +123,14 @@ export default function FlashCardsTable() {
 
       <div className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'>
         <ButtonComponent
-          class='w-full bg-green-400 py-2 hover:bg-green-500 active:focus:bg-green-600 dark:bg-green-500 dark:hover:bg-green-500 dark:active:focus:bg-green-700 md:h-12'
+          class='bg-green-400 py-2 hover:bg-green-500 active:focus:bg-green-600 dark:bg-green-500 dark:hover:bg-green-500 dark:active:focus:bg-green-700 md:h-12 md:w-12'
           onClick={addNewRecord}
           icon={<PlusIcon className='h-4 w-4' />}
         />
 
         {flashCardsArray.length > 0 && (
           <ButtonComponent
-            class='w-full bg-red-400 py-2 hover:bg-red-500 active:focus:bg-red-600 dark:bg-red-500 dark:hover:bg-red-600 dark:active:focus:bg-red-700 md:h-12'
+            class='bg-red-400 py-2 hover:bg-red-500 active:focus:bg-red-600 dark:bg-red-500 dark:hover:bg-red-600 dark:active:focus:bg-red-700 md:h-12 md:w-12'
             disabled={selected.length === 0}
             onClick={removeSelected}
             icon={<TrashIcon className='h-4 w-4' />}

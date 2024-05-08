@@ -136,7 +136,7 @@ export default function FlashCardReviseComponent() {
         </div>
       </div>
 
-      <div className='fixed bottom-0 left-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md dark:bg-slate-950/10 sm:bottom-32'>
+      <div className='absolute bottom-0 right-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md dark:bg-slate-950/10 sm:bottom-32'>
         <ButtonComponent
           label={'Reshuffle'}
           icon={<ArrowPathIcon className='h-4 w-4' />}
@@ -161,9 +161,9 @@ export default function FlashCardReviseComponent() {
       </h3>
 
       <LinkComponent
-        href='/learn'
+        href='/flashcards/learn'
         label=' You can add them here'
-        class='underline'
+        class='text-green-400 underline'
       />
     </div>
   );
