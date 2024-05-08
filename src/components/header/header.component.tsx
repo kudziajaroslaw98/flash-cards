@@ -13,18 +13,21 @@ import Link from 'next/link';
 export default function HeaderComponent() {
   const navigationItems: NavigationItem[] = [
     {
+      type: 'item',
       label: 'Dashboard',
       href: '/dashboard',
       icon: <HomeIcon className='h-4 w-4' />,
     },
     {
+      type: 'item',
       label: 'Learn',
-      href: '/learn',
+      href: '/flashcards/learn',
       icon: <AcademicCapIcon className='h-4 w-4' />,
     },
     {
+      type: 'item',
       label: 'Revise',
-      href: '/revise',
+      href: '/flashcards/revise',
       icon: <LanguageIcon className='h-4 w-4' />,
     },
   ];

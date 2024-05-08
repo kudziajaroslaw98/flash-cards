@@ -5,7 +5,6 @@ import ContextMenuComponent from '#/components/ui/context-menu/context-menu.comp
 import LinkComponent from '#/components/ui/link/link.component';
 import { ToggleButtonComponent } from '#/components/ui/toggle-button/toggle-button.component';
 import { useSessionContext } from '#/providers/session-provider.component';
-import { useThemeContext } from '#/providers/theme-provider.component';
 import { NavigationItem } from '#/shared/types/navigation-item.type';
 import {
   Bars3Icon,
@@ -22,13 +21,12 @@ interface HamburgerMenuProps {
 }
 
 export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
-  const router = useRouter();
-  const pathName = usePathname();
   const [toggled, toggle] = useState(false);
   const [isOpen, setOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement | null>(null);
   const { isLoggedIn, session, logOut } = useSessionContext();
-  const { changeTheme, isDarkMode } = useThemeContext();
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+  const pathName = usePathname();
 
   useEffect(() => {
     const handler = (event: MouseEvent) => {
