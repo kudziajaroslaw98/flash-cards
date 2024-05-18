@@ -1,5 +1,7 @@
 'use client';
 
+import { useSessionContext } from '#/providers/session-provider.component';
+import { APP_ROUTES } from '#/shared/defaults/app.routes';
 import { NavigationGroup } from '#/shared/types/navigation-group.type';
 import { NavigationItem } from '#/shared/types/navigation-item.type';
 import {
@@ -7,6 +9,7 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   BoltIcon,
+  EllipsisVerticalIcon,
   LanguageIcon,
   Squares2X2Icon,
 } from '@heroicons/react/24/solid';
@@ -15,27 +18,29 @@ import Link from 'next/link';
 import { useState } from 'react';
 import HamburgerMenuComponent from '../hamburger-menu/hamburger-menu.component';
 import ThemeSwitchComponent from '../theme-switch/theme-switch.component';
+import AvatarComponent from '../ui/avatar/avatar.component';
+import ButtonComponent from '../ui/button/button.component';
 import NavigationGroupComponent from '../ui/navigation/navigation-group.component';
 import NavigationItemComponent from '../ui/navigation/navigation-item.component';
 import { ToggleButtonComponent } from '../ui/toggle-button/toggle-button.component';
 
 export default function SidebarComponent() {
   const [expanded, toggleExpand] = useState<boolean>(true);
-  const iconSize = expanded
-    ? 'h-4 w-4 transition-all'
-    : 'h-5 w-5 transition-all';
-  const groupIconSize = 'h-5 w-5 transition-all';
+  const { isLoggedIn, session, logOut } = useSessionContext();
+
+  const iconSize = expanded ? 'h-4 w-4' : 'h-5 w-5';
+  const groupIconSize = 'h-5 w-5';
   const navigationItems: NavigationItem[] = [
     {
       type: 'item',
       label: 'Learn',
-      href: '/flashcards/learn',
+      href: APP_ROUTES.flashcards.learn,
       icon: <AcademicCapIcon className={iconSize} />,
     },
     {
       type: 'item',
       label: 'Revise',
-      href: '/flashcards/revise',
+      href: APP_ROUTES.flashcards.revise,
       icon: <LanguageIcon className={iconSize} />,
     },
   ];
@@ -44,7 +49,7 @@ export default function SidebarComponent() {
     {
       type: 'item',
       label: 'Dashboard',
-      href: '/dashboard',
+      href: APP_ROUTES.dashboard,
       icon: <Squares2X2Icon className={iconSize} />,
     },
     {
@@ -55,13 +60,13 @@ export default function SidebarComponent() {
         {
           type: 'item',
           label: 'Learn',
-          href: '/flashcards/learn',
+          href: APP_ROUTES.flashcards.learn,
           icon: <AcademicCapIcon className={iconSize} />,
         },
         {
           type: 'item',
           label: 'Revise',
-          href: '/flashcards/revise',
+          href: APP_ROUTES.flashcards.revise,
           icon: <LanguageIcon className={iconSize} />,
         },
         // {
@@ -80,12 +85,12 @@ export default function SidebarComponent() {
 
   return (
     <aside
-      className={`sticky top-4 z-50 hidden max-h-[calc(100vh-2rem)] flex-col rounded-md border border-gray-300 bg-gray-50 transition-all dark:border-slate-900 dark:bg-slate-950 md:flex
-      ${expanded ? 'w-96' : 'w-20'}
+      className={`sticky top-4 z-50 hidden max-h-[calc(100vh-2rem)] flex-col rounded-md border border-gray-200 bg-gray-50 transition-all dark:border-slate-900 dark:bg-slate-950 md:flex
+      ${expanded ? 'w-80' : 'w-20'}
     `}
     >
       <div
-        className={`relative flex items-center border-b border-gray-300 p-4 dark:border-slate-900 ${expanded ? 'justify-between' : 'justify-center'}`}
+        className={`relative flex items-center border-b border-gray-200 p-4 dark:border-slate-900 ${expanded ? 'justify-between' : 'justify-center'}`}
       >
         <Link
           href={'/dashboard'}
@@ -119,12 +124,12 @@ export default function SidebarComponent() {
         />
       </div>
 
-      <div className={`flex w-full flex-col justify-center gap-8 p-4`}>
+      <div className={`flex h-full w-full flex-col justify-center gap-8 p-4`}>
         <div
           className={`hidden flex-col gap-8 md:flex ${!expanded && 'items-center'}`}
         >
           {navigation?.map((section) => (
-            <>
+            <span key={section.label}>
               {section?.type === 'item' && (
                 <NavigationItemComponent
                   item={section}
@@ -138,7 +143,7 @@ export default function SidebarComponent() {
                   expanded={expanded}
                 />
               )}
-            </>
+            </span>
           ))}
         </div>
 
@@ -146,8 +151,40 @@ export default function SidebarComponent() {
           <HamburgerMenuComponent navigationItems={navigationItems} />
         </span>
 
-        <div>
-          <ThemeSwitchComponent showLabel={expanded} />
+        <div className='flex h-full w-full items-end justify-center'>
+          <div className='flex flex-col items-center justify-center gap-8'>
+            <ThemeSwitchComponent showLabel={expanded} />
+
+            <div className='flex items-center justify-center gap-2'>
+              <AvatarComponent
+                avatarClass='h-12 w-12'
+                text={`${session?.user?.user_metadata?.firstName} ${session?.user?.user_metadata?.lastName}`}
+              ></AvatarComponent>
+
+              <div className={`w-32 flex-col ${expanded ? 'flex' : 'hidden'}`}>
+                <span className='flex overflow-hidden text-ellipsis font-extrabold text-slate-800 dark:text-gray-100'>
+                  {session?.user?.user_metadata?.firstName}{' '}
+                  {session?.user?.user_metadata?.lastName}
+                </span>
+
+                <span className='w-full overflow-hidden text-ellipsis text-xs text-gray-400 dark:text-slate-500'>
+                  {session?.user?.email}
+                </span>
+              </div>
+
+              <ButtonComponent
+                icon={<EllipsisVerticalIcon className={`cursor-pointer`} />}
+                class={`
+                  ${expanded ? 'flex' : 'hidden'}
+                  !h-8 !w-8 
+                  text-slate-800 
+                  hover:bg-green-500 hover:text-gray-100
+                  active:focus:bg-green-600 active:focus:text-gray-300 
+                  dark:text-gray-100 dark:hover:bg-green-400 
+                `}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </aside>

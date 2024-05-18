@@ -6,15 +6,12 @@ import LinkComponent from '#/components/ui/link/link.component';
 import { ToggleButtonComponent } from '#/components/ui/toggle-button/toggle-button.component';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { NavigationItem } from '#/shared/types/navigation-item.type';
-import {
-  Bars3Icon,
-  UserCircleIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/solid';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import ThemeSwitchComponent from '../theme-switch/theme-switch.component';
-import { usePathname, useRouter } from 'next/navigation';
+import AvatarComponent from '../ui/avatar/avatar.component';
 
 interface HamburgerMenuProps {
   navigationItems: NavigationItem[];
@@ -93,8 +90,11 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
           <div className='w-full'>
             {isLoggedIn && (
               <div className='flex flex-col gap-3'>
-                <div className='flex w-full flex-col items-center justify-center'>
-                  <UserCircleIcon className='h-8 w-8' />
+                <div className='flex w-full flex-col items-center justify-center gap-2'>
+                  <AvatarComponent
+                    avatarClass='h-12 w-12'
+                    text={`${session?.user?.user_metadata?.firstName} ${session?.user?.user_metadata?.lastName}`}
+                  />
 
                   <span className='text-inherit'>
                     {session?.user?.user_metadata?.firstName}{' '}
