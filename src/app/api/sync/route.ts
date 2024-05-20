@@ -15,7 +15,6 @@ type requestBody = {
   stats: StatsModel;
   theme: 'light' | 'dark';
   lastSyncAt: Date | null;
-  updatedAt: Date | null;
 };
 
 async function getUserUuid(supabase: SupabaseClient) {
@@ -138,16 +137,6 @@ async function upsertDataInDb(
       .in('frontUuid', flashcardsUuidsToDelete.data);
   }
 }
-
-// async function getFlashCardsCount(supabase: SupabaseClient, userUuid: string) {
-//   const flashCardsCount = await supabase
-//     .from('flashcards')
-//     .select()
-//     .eq('userUuid', userUuid)
-//     .select();
-
-//   return flashCardsCount.count === null ? 0 : flashCardsCount.count;
-// }
 
 export async function POST(request: Request) {
   const newLastSyncAt = new Date();

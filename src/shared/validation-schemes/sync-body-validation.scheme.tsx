@@ -19,5 +19,4 @@ export const syncBodyValidationScheme = z.object({
   }),
   theme: z.union([z.string().includes('light'), z.string().includes('dark')]),
   lastSyncAt: z.union([z.coerce.date(), z.null()]),
-  updatedAt: z.union([z.coerce.date(), z.null()]),
 });
