@@ -78,7 +78,9 @@ export default function useToast() {
     }
 
     setToast(
-      Object.values(internalToasts).map((toast) => omit(toast, ['dueTo'])),
+      Object.values(internalToasts ?? []).map((toast) =>
+        omit(toast, ['dueTo']),
+      ),
     );
 
     return () => {
