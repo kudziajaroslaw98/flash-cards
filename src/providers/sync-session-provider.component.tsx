@@ -62,7 +62,6 @@ export default function SyncSessionProvider(
     Metadata
   >('metadata', {
     lastSyncAt: null,
-    updatedAt: null,
   });
 
   const { isLoggedIn } = useSessionContext();
@@ -81,7 +80,6 @@ export default function SyncSessionProvider(
       stats,
       theme: themeLS.theme,
       lastSyncAt: metadata.lastSyncAt,
-      updatedAt: metadata.updatedAt,
     });
 
     const response = await fetch<ApiResponse<ApiSyncResponse>>('/api/sync', {
@@ -106,7 +104,6 @@ export default function SyncSessionProvider(
 
       setMetadata({
         lastSyncAt: response.data.lastSyncAt,
-        updatedAt: metadata.updatedAt,
       });
       setTheme({ theme: response.data.theme });
       dispatch(setFlashCardsAfterSync(flashcardsObject));
