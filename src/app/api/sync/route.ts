@@ -15,7 +15,6 @@ type requestBody = {
   stats: StatsModel;
   theme: 'light' | 'dark';
   lastSyncAt: Date | null;
-  updatedAt: Date | null;
 };
 
 async function getUserUuid(supabase: SupabaseClient) {
@@ -139,16 +138,6 @@ async function upsertDataInDb(
   }
 }
 
-async function getFlashCardsCount(supabase: SupabaseClient, userUuid: string) {
-  const flashCardsCount = await supabase
-    .from('flashcards')
-    .select()
-    .eq('userUuid', userUuid)
-    .select();
-
-  return flashCardsCount.count === null ? 0 : flashCardsCount.count;
-}
-
 export async function POST(request: Request) {
   const newLastSyncAt = new Date();
 
@@ -177,8 +166,6 @@ export async function POST(request: Request) {
       .eq('userUuid', userUuid)
       .maybeSingle();
 
-    const flashcardsCount = await getFlashCardsCount(supabase, userUuid);
-
     if (metadata.data.lastSyncAt === null) {
       await newUserSync(body, supabase, userUuid, newLastSyncAt);
     } else {
@@ -194,12 +181,7 @@ export async function POST(request: Request) {
 
         responseBody.flashcards = flashcards;
         responseBody.stats = stats;
-      } else if (
-        body.lastSyncAt === metadata.data.lastSyncAt ||
-        (body.updatedAt !== null &&
-          new Date(body.updatedAt) > new Date(metadata.data.lastSyncAt) &&
-          body.flashcards.length > flashcardsCount)
-      ) {
+      } else if (body.lastSyncAt !== metadata.data.lastSyncAt) {
         await upsertDataInDb(body, supabase, userUuid, newLastSyncAt);
       }
     }
