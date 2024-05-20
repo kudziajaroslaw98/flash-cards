@@ -4,4 +4,6 @@ export const APP_ROUTES = {
     learn: '/flashcards/learn',
     revise: '/flashcards/revise',
   },
+  signIn: '/sign-in',
+  signUp: '/sign-up',
 } as const;

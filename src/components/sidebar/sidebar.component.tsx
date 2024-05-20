@@ -15,18 +15,27 @@ import {
 } from '@heroicons/react/24/solid';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useRef, useState } from 'react';
 import HamburgerMenuComponent from '../hamburger-menu/hamburger-menu.component';
 import ThemeSwitchComponent from '../theme-switch/theme-switch.component';
 import AvatarComponent from '../ui/avatar/avatar.component';
 import ButtonComponent from '../ui/button/button.component';
+import ContextMenuComponent from '../ui/context-menu/context-menu.component';
 import NavigationGroupComponent from '../ui/navigation/navigation-group.component';
 import NavigationItemComponent from '../ui/navigation/navigation-item.component';
 import { ToggleButtonComponent } from '../ui/toggle-button/toggle-button.component';
 
 export default function SidebarComponent() {
   const [expanded, toggleExpand] = useState<boolean>(true);
+  const [toggled, toggle] = useState(false);
+  const [isOpen, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+
   const { isLoggedIn, session, logOut } = useSessionContext();
+  const firstName = session?.user?.user_metadata?.firstName;
+  const lastName = session?.user?.user_metadata?.lastName;
 
   const iconSize = expanded ? 'h-4 w-4' : 'h-5 w-5';
   const groupIconSize = 'h-5 w-5';
@@ -154,35 +163,102 @@ export default function SidebarComponent() {
         <div className='flex h-full w-full items-end justify-center'>
           <div className='flex flex-col items-center justify-center gap-8'>
             <ThemeSwitchComponent showLabel={expanded} />
+            <div
+              className='flex'
+              ref={menuRef}
+            >
+              <div className='flex items-center justify-center gap-2'>
+                <ContextMenuComponent
+                  open={!expanded && isOpen}
+                  name={'avatar-context'}
+                  afterMenuClass='py-4 justify-center'
+                  contextPossiton='top-left'
+                  triggerComponent={
+                    <AvatarComponent
+                      avatarClass='h-12 w-12'
+                      text={isLoggedIn ? `${firstName} ${lastName}` : 'Guest'}
+                      onClick={() => {
+                        if (!expanded) {
+                          setOpen(!isOpen);
+                          toggle(!toggled);
+                        }
+                      }}
+                    ></AvatarComponent>
+                  }
+                  menuItems={[
+                    {
+                      label: isLoggedIn ? 'Log Out' : 'Log In',
+                      onClick: () => {
+                        if (isLoggedIn) {
+                          logOut();
+                          setOpen(false);
+                          toggle(!toggled);
+                        } else {
+                          router.push(APP_ROUTES.signIn);
+                          setOpen(false);
+                          toggle(!toggled);
+                        }
+                      },
+                    },
+                  ]}
+                ></ContextMenuComponent>
 
-            <div className='flex items-center justify-center gap-2'>
-              <AvatarComponent
-                avatarClass='h-12 w-12'
-                text={`${session?.user?.user_metadata?.firstName} ${session?.user?.user_metadata?.lastName}`}
-              ></AvatarComponent>
+                <div
+                  className={`w-32 flex-col ${expanded ? 'flex' : 'hidden'}`}
+                >
+                  <span className='flex overflow-hidden text-ellipsis font-extrabold text-slate-800 dark:text-gray-100'>
+                    {isLoggedIn ? `${firstName} ${lastName}` : 'Guest'}
+                  </span>
 
-              <div className={`w-32 flex-col ${expanded ? 'flex' : 'hidden'}`}>
-                <span className='flex overflow-hidden text-ellipsis font-extrabold text-slate-800 dark:text-gray-100'>
-                  {session?.user?.user_metadata?.firstName}{' '}
-                  {session?.user?.user_metadata?.lastName}
-                </span>
+                  <span className='w-full overflow-hidden text-ellipsis text-xs text-gray-400 dark:text-slate-500'>
+                    {isLoggedIn ? session?.user?.email : 'You need to log in'}
+                  </span>
+                </div>
 
-                <span className='w-full overflow-hidden text-ellipsis text-xs text-gray-400 dark:text-slate-500'>
-                  {session?.user?.email}
-                </span>
+                <ContextMenuComponent
+                  open={expanded && isOpen}
+                  name={'dots-context'}
+                  afterMenuClass='py-4 justify-center'
+                  contextPossiton='top'
+                  triggerComponent={
+                    <ButtonComponent
+                      icon={
+                        <EllipsisVerticalIcon className={`cursor-pointer`} />
+                      }
+                      onClick={() => {
+                        if (expanded) {
+                          setOpen(!isOpen);
+                          toggle(!toggled);
+                        }
+                      }}
+                      class={`
+                      ${expanded ? 'flex' : 'hidden'}
+                      !h-8 !w-8 
+                      text-slate-800 
+                      hover:bg-green-500 hover:text-gray-100
+                      active:focus:bg-green-600 active:focus:text-gray-300 
+                      dark:text-gray-100 dark:hover:bg-green-400 
+                    `}
+                    />
+                  }
+                  menuItems={[
+                    {
+                      label: isLoggedIn ? 'Log Out' : 'Log In',
+                      onClick: () => {
+                        if (isLoggedIn) {
+                          logOut();
+                          setOpen(false);
+                          toggle(!toggled);
+                        } else {
+                          router.push(APP_ROUTES.signIn);
+                          setOpen(false);
+                          toggle(!toggled);
+                        }
+                      },
+                    },
+                  ]}
+                ></ContextMenuComponent>
               </div>
-
-              <ButtonComponent
-                icon={<EllipsisVerticalIcon className={`cursor-pointer`} />}
-                class={`
-                  ${expanded ? 'flex' : 'hidden'}
-                  !h-8 !w-8 
-                  text-slate-800 
-                  hover:bg-green-500 hover:text-gray-100
-                  active:focus:bg-green-600 active:focus:text-gray-300 
-                  dark:text-gray-100 dark:hover:bg-green-400 
-                `}
-              />
             </div>
           </div>
         </div>

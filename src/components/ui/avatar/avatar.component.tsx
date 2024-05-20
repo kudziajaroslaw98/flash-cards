@@ -14,7 +14,7 @@ export default function AvatarComponent(props: AvatarProps) {
 
   return (
     <button
-      onClick={() => onClick}
+      onClick={() => onClick && onClick()}
       className={`flex cursor-pointer items-center justify-center rounded-full bg-gray-200 text-sm font-semibold text-slate-800 active:focus:scale-95 dark:bg-slate-800 dark:text-gray-100 ${avatarClass ?? ''}`}
     >
       {firstLetters}
