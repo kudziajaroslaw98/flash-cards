@@ -33,21 +33,21 @@ export default function ContextMenuComponent(props: ContextMenuProps) {
 
   switch (props.contextPossiton) {
     case 'top':
-      contextMenuPositionStyle = `right-0 ${
+      contextMenuPositionStyle = `right-0 -top-2 ${
         props.open
           ? 'z-20 animate-fade-in-to-top'
           : '-z-10 animate-fade-out-to-bottom'
       }`;
       break;
     case 'top-right':
-      contextMenuPositionStyle = `right-0 ${
+      contextMenuPositionStyle = `right-0 -top-2 ${
         props.open
           ? 'z-20 animate-fade-in-to-top'
           : '-z-10 animate-fade-out-to-bottom'
       }`;
       break;
     case 'top-left':
-      contextMenuPositionStyle = `left-0 ${
+      contextMenuPositionStyle = `left-0 -top-2 ${
         props.open
           ? 'z-20 animate-fade-in-to-top'
           : '-z-10 animate-fade-out-to-bottom'
@@ -55,7 +55,7 @@ export default function ContextMenuComponent(props: ContextMenuProps) {
       break;
     case 'bottom':
     default:
-      contextMenuPositionStyle = `right-0 ${
+      contextMenuPositionStyle = `right-0 -bottom-2 ${
         props.open
           ? 'z-20 animate-fade-in-to-bottom'
           : '-z-10 animate-fade-out-to-top'
@@ -69,7 +69,7 @@ export default function ContextMenuComponent(props: ContextMenuProps) {
         {props.triggerComponent}
 
         <div
-          className={`${contextMenuPositionStyle} absolute -bottom-2 w-64 overflow-clip rounded border border-gray-200 dark:border-slate-800 md:w-52 `}
+          className={`${contextMenuPositionStyle} absolute  w-64 overflow-clip rounded border border-gray-200 dark:border-slate-800 md:w-52 `}
         >
           <ul className='flex h-auto w-full flex-col items-center'>
             <MenuItem
