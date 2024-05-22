@@ -109,7 +109,7 @@ async function upsertDataInDb(
   );
 
   const flashcardsUuidsToDelete = await supabase.rpc('get_missing_uuids', {
-    flashCardsUuids,
+    uuids: flashCardsUuids,
   });
 
   await supabase.from('flashcards').upsert(
@@ -181,7 +181,7 @@ export async function POST(request: Request) {
 
         responseBody.flashcards = flashcards;
         responseBody.stats = stats;
-      } else if (body.lastSyncAt !== metadata.data.lastSyncAt) {
+      } else if (body.lastSyncAt >= metadata.data.lastSyncAt) {
         await upsertDataInDb(body, supabase, userUuid, newLastSyncAt);
       }
     }

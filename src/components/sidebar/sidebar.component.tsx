@@ -7,9 +7,10 @@ import { NavigationItem } from '#/shared/types/navigation-item.type';
 import {
   AcademicCapIcon,
   ArrowLeftIcon,
+  ArrowRightEndOnRectangleIcon,
   ArrowRightIcon,
+  ArrowRightStartOnRectangleIcon,
   BoltIcon,
-  EllipsisVerticalIcon,
   LanguageIcon,
   Squares2X2Icon,
 } from '@heroicons/react/24/solid';
@@ -20,7 +21,6 @@ import { useRef, useState } from 'react';
 import HamburgerMenuComponent from '../hamburger-menu/hamburger-menu.component';
 import ThemeSwitchComponent from '../theme-switch/theme-switch.component';
 import AvatarComponent from '../ui/avatar/avatar.component';
-import ButtonComponent from '../ui/button/button.component';
 import ContextMenuComponent from '../ui/context-menu/context-menu.component';
 import NavigationGroupComponent from '../ui/navigation/navigation-group.component';
 import NavigationItemComponent from '../ui/navigation/navigation-item.component';
@@ -37,8 +37,8 @@ export default function SidebarComponent() {
   const firstName = session?.user?.user_metadata?.firstName;
   const lastName = session?.user?.user_metadata?.lastName;
 
-  const iconSize = expanded ? 'h-4 w-4' : 'h-5 w-5';
-  const groupIconSize = 'h-5 w-5';
+  const iconSize = expanded ? 'size-4' : 'size-5';
+  const groupIconSize = 'size-5';
   const navigationItems: NavigationItem[] = [
     {
       type: 'item',
@@ -125,9 +125,9 @@ export default function SidebarComponent() {
 
         <ToggleButtonComponent
           type='icon-only'
-          class='absolute -right-2 !h-5 !w-5 bg-green-400 !p-0 hover:bg-green-500 active:focus:bg-green-600 dark:bg-green-500 dark:hover:bg-green-500 dark:active:focus:bg-green-700'
-          activeIcon={<ArrowLeftIcon className='h-3 w-3' />}
-          inactiveIcon={<ArrowRightIcon className='h-3 w-3' />}
+          class='absolute -right-2 !size-5 bg-green-400 !p-0 hover:bg-green-500 active:focus:bg-green-600 dark:bg-green-500 dark:hover:bg-green-500 dark:active:focus:bg-green-700'
+          activeIcon={<ArrowLeftIcon className='size-3' />}
+          inactiveIcon={<ArrowRightIcon className='size-3' />}
           toggled={expanded}
           toggle={handleToggle}
         />
@@ -169,25 +169,28 @@ export default function SidebarComponent() {
             >
               <div className='flex items-center justify-center gap-2'>
                 <ContextMenuComponent
-                  open={!expanded && isOpen}
+                  open={isOpen}
                   name={'avatar-context'}
                   afterMenuClass='py-4 justify-center'
                   contextPossiton='top-left'
                   triggerComponent={
                     <AvatarComponent
-                      avatarClass='h-12 w-12'
+                      avatarClass='size-12'
                       text={isLoggedIn ? `${firstName} ${lastName}` : 'Guest'}
                       onClick={() => {
-                        if (!expanded) {
-                          setOpen(!isOpen);
-                          toggle(!toggled);
-                        }
+                        setOpen(!isOpen);
+                        toggle(!toggled);
                       }}
                     ></AvatarComponent>
                   }
                   menuItems={[
                     {
                       label: isLoggedIn ? 'Log Out' : 'Log In',
+                      icon: isLoggedIn ? (
+                        <ArrowRightStartOnRectangleIcon className='size-6' />
+                      ) : (
+                        <ArrowRightEndOnRectangleIcon className='size-6' />
+                      ),
                       onClick: () => {
                         if (isLoggedIn) {
                           logOut();
@@ -204,18 +207,18 @@ export default function SidebarComponent() {
                 ></ContextMenuComponent>
 
                 <div
-                  className={`w-32 flex-col ${expanded ? 'flex' : 'hidden'}`}
+                  className={`w-full max-w-32 flex-col ${expanded ? 'flex' : 'hidden'}`}
                 >
                   <span className='flex overflow-hidden text-ellipsis font-extrabold text-slate-800 dark:text-gray-100'>
                     {isLoggedIn ? `${firstName} ${lastName}` : 'Guest'}
                   </span>
 
                   <span className='w-full overflow-hidden text-ellipsis text-xs text-gray-400 dark:text-slate-500'>
-                    {isLoggedIn ? session?.user?.email : 'You need to log in'}
+                    {isLoggedIn ? session?.user?.email : 'Click here to log in'}
                   </span>
                 </div>
 
-                <ContextMenuComponent
+                {/* <ContextMenuComponent
                   open={expanded && isOpen}
                   name={'dots-context'}
                   afterMenuClass='py-4 justify-center'
@@ -257,7 +260,7 @@ export default function SidebarComponent() {
                       },
                     },
                   ]}
-                ></ContextMenuComponent>
+                ></ContextMenuComponent> */}
               </div>
             </div>
           </div>
