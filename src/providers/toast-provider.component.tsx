@@ -9,14 +9,15 @@ export const ToastContext = createContext<ToastContextType | null>({
   clear: () => null,
   close: () => null,
   show: () => null,
+  showAsync: () => null,
   toasts: [],
 });
 
 export default function ToastProvider(props: Readonly<PropsWithChildren>) {
-  const { toasts, show, close, clear } = useToast();
+  const { toasts, show, showAsync, close, clear } = useToast();
   const providerValue = useMemo(
-    () => ({ toasts, show, close, clear }),
-    [toasts, show, close, clear],
+    () => ({ toasts, show, showAsync, close, clear }),
+    [toasts, show, showAsync, close, clear],
   );
 
   return (

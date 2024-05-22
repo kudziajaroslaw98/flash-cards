@@ -44,7 +44,7 @@ export default function SyncSessionProvider(
   const flashcards = useAppSelector(flashCardSelectors.selectFlashCardsArray);
   const stats = useAppSelector(statsSelectors.selectStats);
   const { fetch } = useFetch();
-  const { show } = useToastContext();
+  const { showAsync } = useToastContext();
 
   const { value: flashCardsLS } = useLocalStorage(
     'flashcards',
@@ -82,18 +82,21 @@ export default function SyncSessionProvider(
       lastSyncAt: metadata.lastSyncAt,
     });
 
-    const response = await fetch<ApiResponse<ApiSyncResponse>>('/api/sync', {
+    const responsePromise = fetch<ApiResponse<ApiSyncResponse>>('/api/sync', {
       method: 'POST',
       body: fetchBody,
     });
 
-    if (!response.success && response.error) {
-      show({
-        timeInSeconds: 10,
-        title: response.error,
-        type: 'error',
-      });
-    }
+    showAsync(
+      {
+        pendingTitle: 'Syncing in progress',
+        successTitle: 'Syncing succeeded',
+        errorTitle: 'Syncing failed',
+      },
+      responsePromise,
+    );
+
+    const response = await responsePromise;
 
     if (response.success) {
       const flashcardsObject: FlashCards = {};
