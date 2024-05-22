@@ -1,8 +1,7 @@
-![FlashCards App logo](public/images/readme-flashcards-logo.png)
-
-# Flashcards App
-
-An interactive and customizable flashcards application to help you study efficiently without noise.
+<p align="center">
+  <a href="https://flash-cards-sage.vercel.app/flashcards/learn"><img src="public/images/readme-flashcards-logo.png" alt="Logo" height=100></a>
+  <p align="center"><b>An interactive and customizable flashcards application to help you study efficiently without noise.</b></p>
+</p>
 
 ## Table of Contents
 
@@ -15,7 +14,7 @@ An interactive and customizable flashcards application to help you study efficie
 - [Contributing](#contributing)
 - [License](#license)
 
-## Features ✅ {#features}
+## Features ✅
 
 - [x] Create, edit, and delete flashcards
 - [x] User-friendly interface
@@ -27,7 +26,7 @@ An interactive and customizable flashcards application to help you study efficie
 - [x] Offline Mode
 - [x] Intergating Local Storage and Supabase postgres Database.
 
-## Road Map 🛤️ {#road-map}
+## Road Map 🛤️
 
 - [ ] Review flashcards using a spaced repetition algorithm
 - [ ] Organize flashcards into decks
@@ -39,7 +38,7 @@ An interactive and customizable flashcards application to help you study efficie
 - [ ] Get custom domain name
 - [ ] Add Storybook
 
-## Tech Stack 🧬 {#tech-stack}
+## Tech Stack 🧬
 
 - Next.js
 - Supabase
@@ -52,7 +51,7 @@ An interactive and customizable flashcards application to help you study efficie
 - TypeScript
 - Storybook (soon)
 
-## Installation ⚒️ {#installation}
+## Installation ⚒️
 
 ```sh
    git clone https://github.com/kudziajaroslaw98/flash-cards.git
@@ -64,7 +63,7 @@ An interactive and customizable flashcards application to help you study efficie
 
 Next create `.env.local` and paste content of file `.env.template` and fill out the things required for application to work properly.
 
-## Usage ▶️ {#usage}
+## Usage ▶️
 
 ### Running dev
 
@@ -79,11 +78,11 @@ Next create `.env.local` and paste content of file `.env.template` and fill out 
    npm run start
 ```
 
-## Live Version {#live-version}
+## Live Version
 
 Experience the Flashcards App in action with our live version. This is a fully functional version of the app hosted online, allowing you to explore its features and interface without needing to install anything on your local machine.
 
-Access the Live Version: [Here](https://flash-cards-sage.vercel.app/dashboard)
+### [Live Version →](https://flash-cards-sage.vercel.app/dashboard)
 
 ### Note
 
@@ -93,7 +92,7 @@ The live demo is hosted on a sample database, so any changes you make will not a
 
 If you encounter any issues or have suggestions for improvements, please open an issue on our GitHub repository.
 
-## Contributing {#contributing}
+## Contributing
 
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
@@ -103,6 +102,6 @@ Contributions are what make the open-source community such an amazing place to l
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License {#license}
+## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
