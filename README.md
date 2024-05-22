@@ -10,11 +10,11 @@
 - [Tech Stack](#tech-stack)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Live Version](#live-demo)
+- [Live Version](#live-version)
 - [Contributing](#contributing)
 - [License](#license)
 
-## Features ✅
+## Features
 
 - [x] Create, edit, and delete flashcards
 - [x] User-friendly interface
@@ -26,7 +26,7 @@
 - [x] Offline Mode
 - [x] Intergating Local Storage and Supabase postgres Database.
 
-## Road Map 🛤️
+## Road Map
 
 - [ ] Review flashcards using a spaced repetition algorithm
 - [ ] Organize flashcards into decks
@@ -38,7 +38,7 @@
 - [ ] Get custom domain name
 - [ ] Add Storybook
 
-## Tech Stack 🧬
+## Tech Stack
 
 - Next.js
 - Supabase
@@ -51,7 +51,7 @@
 - TypeScript
 - Storybook (soon)
 
-## Installation ⚒️
+## Installation
 
 ```sh
    git clone https://github.com/kudziajaroslaw98/flash-cards.git
@@ -63,7 +63,7 @@
 
 Next create `.env.local` and paste content of file `.env.template` and fill out the things required for application to work properly.
 
-## Usage ▶️
+## Usage
 
 ### Running dev
 
