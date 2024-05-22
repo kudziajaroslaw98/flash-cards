@@ -3,6 +3,7 @@
 import { ToastModel } from '#/hooks/use-toast.hook';
 import { useToastContext } from '#/providers/toast-provider.component';
 import {
+  ArrowPathIcon,
   CheckCircleIcon,
   ExclamationCircleIcon,
   InformationCircleIcon,
@@ -23,6 +24,8 @@ export default function ToastsComponent() {
         return 'text-yellow-500';
       case 'info':
         return 'text-blue-500';
+      case 'async':
+        return 'text-violet-500';
       default:
         return 'text-gray-500';
     }
@@ -36,6 +39,8 @@ export default function ToastsComponent() {
         return 'border-red-400 dark:border-red-950/70 hover:bg-red-100 dark:hover:bg-red-950';
       case 'warning':
         return 'border-yellow-400 dark:border-yellow-950/70 hover:bg-yellow-100 dark:hover:bg-yellow-950';
+      case 'async':
+        return 'border-violet-400 dark:border-violet-950/70 hover:bg-violet-100 dark:hover:bg-violet-950';
       case 'info':
         return 'border-blue-400 dark:border-blue-950/70 hover:bg-blue-100 dark:hover:bg-blue-950';
     }
@@ -72,6 +77,10 @@ export default function ToastsComponent() {
 
               {toast.type === 'info' && (
                 <InformationCircleIcon className='h-6 w-6' />
+              )}
+
+              {toast.type === 'async' && (
+                <ArrowPathIcon className='h-6 w-6 animate-spin' />
               )}
             </div>
 
