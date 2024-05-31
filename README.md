@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<p align="center">
+  <a href="https://flash-cards-sage.vercel.app/flashcards/learn"><img src="public/images/readme-flashcards-logo.png" alt="Logo" height=100></a>
+  <p align="center"><b>An interactive and customizable flashcards application to help you study efficiently without noise.</b></p>
+</p>
 
-## Getting Started
+## Table of Contents
 
-First, run the development server:
+- [Features](#features)
+- [Road Map](#road-map)
+- [Tech Stack](#tech-stack)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Live Version](#live-version)
+- [Contributing](#contributing)
+- [License](#license)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Features
+
+- [x] Create, edit, and delete flashcards
+- [x] User-friendly interface
+- [x] Responsive design for mobile and desktop
+- [x] Dark Mode
+- [x] Logging in
+- [x] Synchronize your flashcards across all devices
+- [x] Simple repetition algorithm
+- [x] Offline Mode
+- [x] Intergating Local Storage and Supabase postgres Database.
+
+## Road Map
+
+- [ ] Review flashcards using a spaced repetition algorithm
+- [ ] Organize flashcards into decks
+- [ ] Community Section with shared decks
+- [ ] Daily word suggestion
+- [ ] Generating descriptions to words with AI
+- [ ] Generating new words for deck based on words that are already in it
+- [ ] Live updates (WebSockets)
+- [ ] Get custom domain name
+- [ ] Add Storybook
+- [ ] Importing flashcards from csv file
+
+## Tech Stack
+
+- Next.js
+- Supabase
+- FramerMotion
+- React
+- TailwindCSS
+- NextPWA
+- Redux
+- Zod
+- TypeScript
+- Storybook (soon)
+
+## Installation
+
+```sh
+   git clone https://github.com/kudziajaroslaw98/flash-cards.git
+
+   cd flash-cards
+
+   npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Next create `.env.local` and paste content of file `.env.template` and fill out the things required for application to work properly.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Running dev
 
-## Learn More
+```sh
+   npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Running production
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```sh
+   npm run build
+   npm run start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Live Version
 
-## Deploy on Vercel
+Experience the Flashcards App in action with our live version. This is a fully functional version of the app hosted online, allowing you to explore its features and interface without needing to install anything on your local machine.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### [Live Version →](https://flash-cards-sage.vercel.app/dashboard)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Note
+
+The live demo is hosted on a sample database, so any changes you make will not affect your personal data. This environment is set up for you to explore and test the app's functionality freely.
+
+### Feedback
+
+If you encounter any issues or have suggestions for improvements, please open an issue on our GitHub repository.
+
+## Contributing
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.

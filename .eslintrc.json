@@ -7,7 +7,7 @@
     "next/core-web-vitals",
     "eslint:recommended"
   ],
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "eslint-plugin-react-compiler"],
   "globals": {
     "React": "readonly"
   },
@@ -27,6 +27,7 @@
         "importNames": ["useSelector", "useDispatch"],
         "message": "Use typed hooks `useAppDispatch` and `useAppSelector` instead."
       }
-    ]
+    ],
+    "react-compiler/react-compiler": "error"
   }
 }
