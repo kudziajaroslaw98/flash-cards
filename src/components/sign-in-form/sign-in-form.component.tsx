@@ -1,7 +1,7 @@
 'use client';
 
 import FormComponent from '#/components/form-component/form.component';
-import ButtonComponent from '#/components/ui/button/button.component';
+import { Button } from '#/components/ui/button/button.component';
 import LinkComponent from '#/components/ui/link/link.component';
 import useFetch from '#/hooks/use-fetch.hook';
 import { APP_ROUTES } from '#/shared/defaults/app.routes';
@@ -98,15 +98,12 @@ export default function SignInComponent() {
           />
         </div>
 
-        <ButtonComponent
-          class={
-            'flex max-w-80 gap-2 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 dark:bg-green-500 dark:hover:bg-green-400 md:h-10 md:w-full'
-          }
+        <Button
           onClick={handleSignIn}
-          disabled={!formValid || isLoading}
+          disabled={!formValid}
           loading={isLoading}
           label='Sign in'
-        ></ButtonComponent>
+        ></Button>
 
         <div className='flex flex-col items-center justify-center gap-1'>
           <span className='text-gray-600 dark:text-slate-400'>

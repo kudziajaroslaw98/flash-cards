@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter.component';
 import EditableFlashCardRowComponent from '#/components/flash-cards-table/editable-flash-card-row.component';
-import ButtonComponent from '#/components/ui/button/button.component';
+import { Button } from '#/components/ui/button/button.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import { FlashCardModel } from '#/shared/models/flash-card.model';
 import { UUID } from '#/shared/types/uuid.type';
@@ -122,18 +122,19 @@ export default function FlashCardsTable() {
       )}
 
       <div className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'>
-        <ButtonComponent
-          class='bg-green-400 py-2 hover:bg-green-500 active:focus:bg-green-600 dark:bg-green-500 dark:hover:bg-green-500 dark:active:focus:bg-green-700 md:h-12 md:w-12'
+        <Button
           onClick={addNewRecord}
           icon={<PlusIcon className='h-4 w-4' />}
+          size={'icon'}
         />
 
         {flashCardsArray.length > 0 && (
-          <ButtonComponent
-            class='bg-red-400 py-2 hover:bg-red-500 active:focus:bg-red-600 dark:bg-red-500 dark:hover:bg-red-600 dark:active:focus:bg-red-700 md:h-12 md:w-12'
+          <Button
             disabled={selected.length === 0}
             onClick={removeSelected}
+            variant={'destructive'}
             icon={<TrashIcon className='h-4 w-4' />}
+            size={'icon'}
           />
         )}
       </div>

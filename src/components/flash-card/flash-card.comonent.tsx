@@ -48,7 +48,7 @@ export default function FlashCardComponent(params: Readonly<FlashCardParams>) {
     ) {
       return 'animate-shake shadow-card-hovered translate-y-1';
     } else {
-      return 'md:hover:translate-y-1 shadow-card md:hover:shadow-card-hovered';
+      return 'md:hover:translate-y-1 shadow-card dark:shadow-card-dark dark:md:hover:shadow-dark-card-hovered md:hover:shadow-card-hovered';
     }
   };
 
@@ -73,19 +73,19 @@ export default function FlashCardComponent(params: Readonly<FlashCardParams>) {
       }) => handleMouseMove(e.clientX, e.clientY, e.currentTarget)}
       onKeyDown={(event) => handleKeyDown(event)}
       tabIndex={0}
-      className={`group relative z-10 flex h-full min-h-32 w-full max-w-80 cursor-pointer flex-col justify-center gap-2 rounded-md border border-gray-50 bg-gray-100 p-4 transition-all active:scale-95 sm:justify-start sm:gap-3  dark:border-slate-800 dark:bg-slate-900 ${getClickedCardStyles()}`}
+      className={`group relative z-10 flex h-full min-h-32 w-full max-w-80 cursor-pointer flex-col justify-center gap-2 rounded-md border border-gray-200 bg-gray-50 p-4 transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-900  sm:justify-start sm:gap-3 ${getClickedCardStyles()}`}
     >
       <motion.div
         className='pointer-events-none absolute inset-0 z-10 flex opacity-0 transition-all group-hover:opacity-100 dark:hidden'
         style={{
-          background: useMotionTemplate`radial-gradient(300px circle at ${mouseX}px ${mouseY}px, rgb(226 226 226 / .6), transparent 60%)`,
+          background: useMotionTemplate`radial-gradient(300px circle at ${mouseX}px ${mouseY}px, rgb(226 226 226 / .2), transparent 60%)`,
         }}
       />
 
       <motion.div
         className='pointer-events-none absolute inset-0 z-10 hidden opacity-0 transition-all group-hover:opacity-100 dark:flex'
         style={{
-          background: useMotionTemplate`radial-gradient(300px circle at ${mouseX}px ${mouseY}px, rgb(10 15 27 / .6), transparent 60%)`,
+          background: useMotionTemplate`radial-gradient(300px circle at ${mouseX}px ${mouseY}px, rgb(10 15 27 / .2), transparent 60%)`,
         }}
       />
 

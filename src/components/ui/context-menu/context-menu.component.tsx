@@ -72,12 +72,14 @@ export default function ContextMenuComponent(props: ContextMenuProps) {
           className={`${contextMenuPositionStyle} absolute  w-64 overflow-clip rounded border border-gray-200 dark:border-slate-800 md:w-52 `}
         >
           <ul className='flex h-auto w-full flex-col items-center'>
-            <MenuItem
-              visible={!!props.beforeMenuItems}
-              class={props.beforeMenuClass}
-            >
-              {props.beforeMenuItems}
-            </MenuItem>
+            {!!props.beforeMenuItems && (
+              <MenuItem
+                visible={!!props.beforeMenuItems}
+                class={props.beforeMenuClass}
+              >
+                {props.beforeMenuItems}
+              </MenuItem>
+            )}
 
             {props.menuItems.map((item) => (
               <MenuItem
@@ -92,12 +94,14 @@ export default function ContextMenuComponent(props: ContextMenuProps) {
               </MenuItem>
             ))}
 
-            <MenuItem
-              class={props.afterMenuClass}
-              visible={!!props.afterMenuItems}
-            >
-              {props.afterMenuItems}
-            </MenuItem>
+            {!!props.afterMenuItems && (
+              <MenuItem
+                class={props.afterMenuClass}
+                visible={!!props.afterMenuItems}
+              >
+                {props.afterMenuItems}
+              </MenuItem>
+            )}
           </ul>
         </div>
       </div>
