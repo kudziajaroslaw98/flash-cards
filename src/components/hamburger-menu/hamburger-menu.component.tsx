@@ -12,9 +12,9 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import ThemeSwitchComponent from '../theme-switch/theme-switch.component';
-import { usePathname, useRouter } from 'next/navigation';
 
 interface HamburgerMenuProps {
   navigationItems: NavigationItem[];
@@ -109,7 +109,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
                     setOpen(false);
                     toggle(!toggled);
                   }}
-                  color='red'
+                  variant={'destructive'}
                   label='Log out'
                 />
               </div>
