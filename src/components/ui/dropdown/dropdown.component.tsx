@@ -1,58 +1,41 @@
 'use client';
 
+import { DictionaryValue } from '#/shared/types/dictionary-value.type';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
-import { isEqual } from 'lodash';
 import { useEffect, useState } from 'react';
 
 export interface DropdownParams<T> {
-  items: T[];
-  defaultValue: T;
-  onChange: (_value: T) => void;
-  labelByKey?: keyof T;
-}
-
-export interface DropdownItem<T> {
-  label: string;
-  item: T;
+  config: Record<string, DictionaryValue<T>>;
+  defaultValue: DictionaryValue<T>;
+  onChange: (_value: DictionaryValue<T>['value']) => void;
 }
 
 export default function DropdownComponent<T>(
   params: Readonly<DropdownParams<T>>,
 ) {
-  const [items, setItems] = useState<DropdownItem<T>[]>();
-  const [picked, setPicked] = useState<DropdownItem<T>>();
+  const [items, setItems] = useState<DictionaryValue<T>[]>();
+  const [picked, setPicked] = useState<DictionaryValue<T>>();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    let dropdownItems: DropdownItem<T>[];
-
-    if (params.labelByKey) {
-      dropdownItems = params.items.map((item) => ({
-        label: item[params.labelByKey as keyof T] as string,
-        item,
-      }));
-    } else {
-      dropdownItems = params.items.map((item) => ({
-        label: item as string,
-        item,
-      }));
-    }
-
-    const pickedItem = dropdownItems.filter((item) =>
-      isEqual(item.item, params.defaultValue),
-    )[0];
+    const dropdownItems: DictionaryValue<T>[] = Object.values(
+      params.config,
+    ).map((item) => ({
+      label: item.label,
+      value: item.value,
+    }));
 
     setItems(dropdownItems);
-    setPicked(pickedItem);
-  }, [params.items, params.defaultValue, params.labelByKey]);
+    setPicked(params.defaultValue);
+  }, [params.config, params.defaultValue]);
 
   useEffect(() => {
     if (picked) {
-      params.onChange(picked?.item);
+      params.onChange(picked?.value);
     }
   }, [picked, params]);
 
-  const changePickedItem = (pickedItem: DropdownItem<T>) => {
+  const changePickedItem = (pickedItem: DictionaryValue<T>) => {
     setPicked(pickedItem);
     toggleDropdownVisibility();
   };
@@ -82,6 +65,7 @@ export default function DropdownComponent<T>(
           <div className='absolute -top-2 left-0 z-20 mt-1 flex w-full -translate-y-[100%] animate-fade-in-to-top flex-col rounded-md border bg-gray-50 backdrop-blur-lg dark:border-slate-700 dark:bg-slate-800'>
             {items?.map((item) => (
               <div
+                className='flex h-12 w-full cursor-pointer items-center border-b px-4 py-2 font-semibold text-green-400 transition first:rounded-t-md last:rounded-b-md last:border-none hover:bg-green-400 hover:text-gray-50 dark:border-slate-700 dark:hover:bg-green-400 dark:hover:text-slate-100 md:h-10'
                 className='flex h-11 w-full cursor-pointer items-center border-b px-4 py-2 font-semibold text-green-400 transition first:rounded-t-md last:rounded-b-md last:border-none hover:bg-green-400 hover:text-gray-50 dark:border-slate-700 dark:hover:bg-green-400 dark:hover:text-slate-100 md:h-10'
                 key={item.label}
                 onClick={() => changePickedItem(item)}

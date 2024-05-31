@@ -4,6 +4,7 @@ import FormComponent from '#/components/form-component/form.component';
 import { Button } from '#/components/ui/button/button.component';
 import LinkComponent from '#/components/ui/link/link.component';
 import useFetch from '#/hooks/use-fetch.hook';
+import { APP_ROUTES } from '#/shared/defaults/app.routes';
 import { ApiRoutes } from '#/shared/enums/api-routes.enum';
 import { ApiResponse } from '#/shared/types/api/api-response.type';
 import { SignInResponse } from '#/shared/types/api/sign-in-response.type';
@@ -63,7 +64,9 @@ export default function SignInComponent() {
     } else {
       setRequestSuccess(true);
 
-      router.push(`${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/learn`);
+      router.push(
+        `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}${APP_ROUTES.flashcards.learn}`,
+      );
     }
 
     router.refresh();

@@ -62,14 +62,13 @@ export default function SyncSessionProvider(
     Metadata
   >('metadata', {
     lastSyncAt: null,
-    updatedAt: null,
   });
 
   const { isLoggedIn } = useSessionContext();
 
   const initialRender = useRef<boolean>(true);
   const MIN_IN_MS = 60_000;
-  const DEFAULT_SYNC_INTERVAL_IN_MS = MIN_IN_MS * 5;
+  const DEFAULT_SYNC_INTERVAL_IN_MS = MIN_IN_MS * 1;
 
   const syncWithDB = useCallback(async () => {
     console.log('syncing');
@@ -81,7 +80,6 @@ export default function SyncSessionProvider(
       stats,
       theme: themeLS.theme,
       lastSyncAt: metadata.lastSyncAt,
-      updatedAt: metadata.updatedAt,
     });
 
     const response = await fetch<ApiResponse<ApiSyncResponse>>('/api/sync', {
@@ -106,7 +104,6 @@ export default function SyncSessionProvider(
 
       setMetadata({
         lastSyncAt: response.data.lastSyncAt,
-        updatedAt: metadata.updatedAt,
       });
       setTheme({ theme: response.data.theme });
       dispatch(setFlashCardsAfterSync(flashcardsObject));

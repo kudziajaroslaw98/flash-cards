@@ -1,5 +1,6 @@
 import HamburgerMenuComponent from '#/components/hamburger-menu/hamburger-menu.component';
 import LinkComponent from '#/components/ui/link/link.component';
+import { APP_ROUTES } from '#/shared/defaults/app.routes';
 import { NavigationItem } from '#/shared/types/navigation-item.type';
 import {
   AcademicCapIcon,
@@ -15,19 +16,19 @@ export default function HeaderComponent() {
     {
       type: 'item',
       label: 'Dashboard',
-      href: '/dashboard',
+      href: APP_ROUTES.dashboard,
       icon: <HomeIcon className='h-4 w-4' />,
     },
     {
       type: 'item',
       label: 'Learn',
-      href: '/learn',
+      href: APP_ROUTES.flashcards.learn,
       icon: <AcademicCapIcon className='h-4 w-4' />,
     },
     {
       type: 'item',
       label: 'Revise',
-      href: '/revise',
+      href: APP_ROUTES.flashcards.revise,
       icon: <LanguageIcon className='h-4 w-4' />,
     },
   ];

@@ -19,9 +19,50 @@ interface ContextMenuProps {
   menuItems: ContextMenuItem[];
   name: string;
   open: boolean;
+  contextPossiton?:
+    | 'top'
+    | 'top-right'
+    | 'top-left'
+    | 'bottom'
+    | 'left'
+    | 'right';
 }
 
 export default function ContextMenuComponent(props: ContextMenuProps) {
+  let contextMenuPositionStyle = '';
+
+  switch (props.contextPossiton) {
+    case 'top':
+      contextMenuPositionStyle = `right-0 -top-2 ${
+        props.open
+          ? 'z-20 animate-fade-in-to-top'
+          : '-z-10 animate-fade-out-to-bottom'
+      }`;
+      break;
+    case 'top-right':
+      contextMenuPositionStyle = `right-0 -top-2 ${
+        props.open
+          ? 'z-20 animate-fade-in-to-top'
+          : '-z-10 animate-fade-out-to-bottom'
+      }`;
+      break;
+    case 'top-left':
+      contextMenuPositionStyle = `left-0 -top-2 ${
+        props.open
+          ? 'z-20 animate-fade-in-to-top'
+          : '-z-10 animate-fade-out-to-bottom'
+      }`;
+      break;
+    case 'bottom':
+    default:
+      contextMenuPositionStyle = `right-0 -bottom-2 ${
+        props.open
+          ? 'z-20 animate-fade-in-to-bottom'
+          : '-z-10 animate-fade-out-to-top'
+      }`;
+      break;
+  }
+
   return (
     <div>
       <div className='relative'>

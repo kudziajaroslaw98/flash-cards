@@ -1,5 +1,7 @@
 'use client';
 
+import { useSessionContext } from '#/providers/session-provider.component';
+import { APP_ROUTES } from '#/shared/defaults/app.routes';
 import { NavigationGroup } from '#/shared/types/navigation-group.type';
 import { NavigationItem } from '#/shared/types/navigation-item.type';
 import {
@@ -12,7 +14,8 @@ import {
 } from '@heroicons/react/24/solid';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useRef, useState } from 'react';
 import HamburgerMenuComponent from '../hamburger-menu/hamburger-menu.component';
 import ThemeSwitchComponent from '../theme-switch/theme-switch.component';
 import NavigationGroupComponent from '../ui/navigation/navigation-group.component';
@@ -21,21 +24,28 @@ import { ToggleButton } from '../ui/toggle-button/toggle-button.component';
 
 export default function SidebarComponent() {
   const [expanded, toggleExpand] = useState<boolean>(true);
-  const iconSize = expanded
-    ? 'h-4 w-4 transition-all'
-    : 'h-5 w-5 transition-all';
-  const groupIconSize = 'h-5 w-5 transition-all';
+  const [toggled, toggle] = useState(false);
+  const [isOpen, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+
+  const { isLoggedIn, session, logOut } = useSessionContext();
+  const firstName = session?.user?.user_metadata?.firstName;
+  const lastName = session?.user?.user_metadata?.lastName;
+
+  const iconSize = expanded ? 'size-4' : 'size-5';
+  const groupIconSize = 'size-5';
   const navigationItems: NavigationItem[] = [
     {
       type: 'item',
       label: 'Learn',
-      href: '/flashcards/learn',
+      href: APP_ROUTES.flashcards.learn,
       icon: <AcademicCapIcon className={iconSize} />,
     },
     {
       type: 'item',
       label: 'Revise',
-      href: '/flashcards/revise',
+      href: APP_ROUTES.flashcards.revise,
       icon: <LanguageIcon className={iconSize} />,
     },
   ];
@@ -44,7 +54,7 @@ export default function SidebarComponent() {
     {
       type: 'item',
       label: 'Dashboard',
-      href: '/dashboard',
+      href: APP_ROUTES.dashboard,
       icon: <Squares2X2Icon className={iconSize} />,
     },
     {
@@ -55,13 +65,13 @@ export default function SidebarComponent() {
         {
           type: 'item',
           label: 'Learn',
-          href: '/flashcards/learn',
+          href: APP_ROUTES.flashcards.learn,
           icon: <AcademicCapIcon className={iconSize} />,
         },
         {
           type: 'item',
           label: 'Revise',
-          href: '/flashcards/revise',
+          href: APP_ROUTES.flashcards.revise,
           icon: <LanguageIcon className={iconSize} />,
         },
         // {
@@ -80,12 +90,12 @@ export default function SidebarComponent() {
 
   return (
     <aside
-      className={`sticky top-4 z-50 hidden max-h-[calc(100vh-2rem)] flex-col rounded-md border border-gray-300 bg-gray-50 transition-all dark:border-slate-900 dark:bg-slate-950 md:flex
-      ${expanded ? 'w-96' : 'w-20'}
+      className={`sticky top-4 z-50 hidden max-h-[calc(100vh-2rem)] flex-col rounded-md border border-gray-200 bg-gray-50 transition-all dark:border-slate-900 dark:bg-slate-950 md:flex
+      ${expanded ? 'w-80' : 'w-20'}
     `}
     >
       <div
-        className={`relative flex items-center border-b border-gray-300 p-4 dark:border-slate-900 ${expanded ? 'justify-between' : 'justify-center'}`}
+        className={`relative flex items-center border-b border-gray-200 p-4 dark:border-slate-900 ${expanded ? 'justify-between' : 'justify-center'}`}
       >
         <Link
           href={'/dashboard'}
@@ -119,12 +129,12 @@ export default function SidebarComponent() {
         />
       </div>
 
-      <div className={`flex w-full flex-col justify-center gap-8 p-4`}>
+      <div className={`flex h-full w-full flex-col justify-center gap-8 p-4`}>
         <div
           className={`hidden flex-col gap-8 md:flex ${!expanded && 'items-center'}`}
         >
           {navigation?.map((section) => (
-            <>
+            <span key={section.label}>
               {section?.type === 'item' && (
                 <NavigationItemComponent
                   item={section}
@@ -138,7 +148,7 @@ export default function SidebarComponent() {
                   expanded={expanded}
                 />
               )}
-            </>
+            </span>
           ))}
         </div>
 

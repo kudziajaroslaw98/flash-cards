@@ -8,6 +8,7 @@ import { Button } from '#/components/ui/button/button.component';
 import DropdownComponent from '#/components/ui/dropdown/dropdown.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
+import { reviseTypeDictionary } from '#/shared/dictionaries/revise-type.dictionary';
 import { FlashCardTypesEnum } from '#/shared/enums/flash-card-types.enum';
 import { FlashCardModel } from '#/shared/models/flash-card.model';
 import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
@@ -23,7 +24,7 @@ export default function FlashCardReviseComponent() {
   );
   const [revisedCard, setRevisedCard] = useState<FlashCardModel>();
   const [clickedCard, setClickedCard] = useState<FlashCardModel>();
-  const [dropdownItems] = useState(Object.values(FlashCardTypesEnum));
+  const [dropdownItems] = useState(reviseTypeDictionary);
   const [clicked, setClicked] = useState(false);
 
   const flashCardsArray = useAppSelector(
@@ -145,9 +146,9 @@ export default function FlashCardReviseComponent() {
           size={'xlg'}
         />
 
-        <DropdownComponent
-          items={dropdownItems}
-          defaultValue={dropdownItems[0]}
+        <DropdownComponent<FlashCardTypesEnum>
+          config={dropdownItems}
+          defaultValue={dropdownItems['GUESS_DEFINITION']}
           onChange={(value) => changeReviseType(value)}
         />
       </div>
