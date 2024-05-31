@@ -2,7 +2,7 @@ import { ContextMenuItem } from '#/components/ui/context-menu/context-menu.compo
 import type { PropsWithChildren } from 'react';
 
 interface MenuItemProps {
-  visible: boolean;
+  visible?: boolean;
   class?: string;
   onClick?: ContextMenuItem['onClick'];
   active?: ContextMenuItem['active'];

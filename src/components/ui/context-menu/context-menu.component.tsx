@@ -23,44 +23,46 @@ interface ContextMenuProps {
 
 export default function ContextMenuComponent(props: ContextMenuProps) {
   return (
-    <div className='relative'>
-      <div>{props.triggerComponent}</div>
+    <div>
+      <div className='relative'>
+        {props.triggerComponent}
 
-      <div
-        className={`${
-          props.open
-            ? 'z-20 animate-fade-in-to-bottom'
-            : '-z-10 animate-fade-out-to-top'
-        } absolute -bottom-2 right-0 w-64 overflow-clip rounded border border-gray-200 md:w-52 dark:border-slate-700 `}
-      >
-        <ul className='flex h-auto w-full flex-col items-center'>
-          <MenuItem
-            visible={!!props.beforeMenuItems}
-            class={props.beforeMenuClass}
-          >
-            {props.beforeMenuItems}
-          </MenuItem>
+        <div
+          className={`${contextMenuPositionStyle} absolute  w-64 overflow-clip rounded border border-gray-200 dark:border-slate-800 md:w-52 `}
+        >
+          <ul className='flex h-auto w-full flex-col items-center'>
+            {!!props.beforeMenuItems && (
+              <MenuItem
+                visible={!!props.beforeMenuItems}
+                class={props.beforeMenuClass}
+              >
+                {props.beforeMenuItems}
+              </MenuItem>
+            )}
 
-          {props.menuItems.map((item) => (
-            <MenuItem
-              key={item.label}
-              active={item.active}
-              visible={true}
-              onClick={() => {
-                item.onClick();
-              }}
-            >
-              {item.icon && item.icon} {item.label}
-            </MenuItem>
-          ))}
+            {props.menuItems.map((item) => (
+              <MenuItem
+                key={item.label}
+                active={item.active}
+                visible={true}
+                onClick={() => {
+                  item.onClick();
+                }}
+              >
+                {item.icon && item.icon} {item.label}
+              </MenuItem>
+            ))}
 
-          <MenuItem
-            class={props.afterMenuClass}
-            visible={!!props.afterMenuItems}
-          >
-            {props.afterMenuItems}
-          </MenuItem>
-        </ul>
+            {!!props.afterMenuItems && (
+              <MenuItem
+                class={props.afterMenuClass}
+                visible={!!props.afterMenuItems}
+              >
+                {props.afterMenuItems}
+              </MenuItem>
+            )}
+          </ul>
+        </div>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { ArrowPathIcon } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 
 import FlashCardComponent from '#/components/flash-card/flash-card.comonent';
-import ButtonComponent from '#/components/ui/button/button.component';
+import { Button } from '#/components/ui/button/button.component';
 import DropdownComponent from '#/components/ui/dropdown/dropdown.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
@@ -137,14 +137,12 @@ export default function FlashCardReviseComponent() {
       </div>
 
       <div className='absolute bottom-0 right-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md dark:bg-slate-950/10 sm:bottom-32'>
-        <ButtonComponent
+        <Button
           label={'Reshuffle'}
           icon={<ArrowPathIcon className='h-4 w-4' />}
           iconPosition={'right'}
-          class={
-            'max-w-80 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 dark:bg-green-500 dark:hover:bg-green-400 md:h-10 md:!w-52'
-          }
           onClick={reshuffleFlashCards}
+          size={'xlg'}
         />
 
         <DropdownComponent
