@@ -11,16 +11,23 @@ interface ToggleButtonProps extends ButtonProps {
   toggle: () => void;
 }
 
-export function ToggleButton(props: ToggleButtonProps) {
+export function ToggleButton({
+  activeIcon,
+  inactiveIcon,
+  toggle,
+  toggled,
+  ...props
+}: ToggleButtonProps) {
   const icon = (
     <>
-      {props.toggled && props.activeIcon} {!props.toggled && props.inactiveIcon}
+      {toggled && activeIcon} {!toggled && inactiveIcon}
     </>
   );
   return (
     <Button
       onClick={(e) => {
-        props.toggle();
+        toggle();
+        toggle();
         props?.onClick && props.onClick(e);
       }}
       icon={icon}

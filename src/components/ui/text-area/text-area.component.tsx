@@ -2,13 +2,13 @@ import useDebounce from '#/hooks/use-debounce.hook';
 import { useEffect, useRef, useState } from 'react';
 
 export interface TextAreaProps {
-  class: string;
+  className: string;
   onInput: (_event: string) => void;
   value: string;
   id: string;
 }
 
-export default function TextAreaComponent(props: Readonly<TextAreaProps>) {
+export default function TextArea(props: Readonly<TextAreaProps>) {
   const [value, setValue] = useState(props.value);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -40,7 +40,7 @@ export default function TextAreaComponent(props: Readonly<TextAreaProps>) {
   return (
     <textarea
       ref={textAreaRef}
-      className={`h-8 w-full resize-none rounded-md p-2 outline-none ring-blue-400 transition-all focus:ring-1 ${props.class}`}
+      className={`h-8 w-full resize-none rounded-md p-2 outline-none ring-blue-400 transition-all focus:ring-1 ${props.className}`}
       id={props.id}
       value={value}
       onInput={(e) => {

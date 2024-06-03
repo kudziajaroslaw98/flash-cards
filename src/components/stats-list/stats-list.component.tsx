@@ -25,13 +25,13 @@ export default function StatsListComponent() {
           <CardComponent
             key={key}
             backgroundGradientWidth={100}
-            class='w-full max-w-80 items-center justify-between sm:min-h-44 sm:max-w-44 sm:flex-col sm:gap-4'
+            className='w-full max-w-80 items-center justify-between sm:min-h-44 sm:max-w-44 sm:flex-col sm:gap-4'
           >
-            <h1 className='w-36 text-green-400 sm:w-auto dark:text-green-500'>
+            <h1 className='flex h-16 w-36 items-center justify-center text-green-400 dark:text-green-500 sm:w-auto'>
               {key !== 'accuracy' ? value : (value * 100).toFixed(0) + '%'}
             </h1>
 
-            <p className='grow font-semibold text-gray-600 sm:w-full sm:text-center dark:text-slate-200'>
+            <p className='grow font-semibold text-gray-600 dark:text-slate-200 sm:w-full sm:text-center'>
               {labels[key as keyof Stats]}
             </p>
           </CardComponent>

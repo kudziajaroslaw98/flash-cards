@@ -3,9 +3,9 @@
 import { ArrowPathIcon } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 
-import FlashCardComponent from '#/components/flash-card/flash-card.comonent';
+import FlashCardComponent from '#/components/flash-card/flash-card.component';
 import { Button } from '#/components/ui/button/button.component';
-import DropdownComponent from '#/components/ui/dropdown/dropdown.component';
+import Dropdown from '#/components/ui/dropdown/dropdown.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
 import { reviseTypeDictionary } from '#/shared/dictionaries/revise-type.dictionary';
@@ -146,7 +146,7 @@ export default function FlashCardReviseComponent() {
           size={'xlg'}
         />
 
-        <DropdownComponent<FlashCardTypesEnum>
+        <Dropdown<FlashCardTypesEnum>
           config={dropdownItems}
           defaultValue={dropdownItems['GUESS_DEFINITION']}
           onChange={(value) => changeReviseType(value)}
@@ -162,7 +162,7 @@ export default function FlashCardReviseComponent() {
       <LinkComponent
         href='/flashcards/learn'
         label=' You can add them here'
-        class='text-green-400 underline'
+        className='text-green-400 underline'
       />
     </div>
   );

@@ -37,9 +37,11 @@ export default function FlashCardsTable() {
     const isFlashCardSelected = selected.includes(flashCard.frontUuid);
 
     if (isFlashCardSelected) {
-      setSelected(selected.filter((item) => flashCard.frontUuid !== item));
+      setSelected((prev) =>
+        prev.filter((item) => flashCard.frontUuid !== item),
+      );
     } else {
-      setSelected([...selected, flashCard.frontUuid]);
+      setSelected((prev) => [...prev, flashCard.frontUuid]);
     }
   };
 

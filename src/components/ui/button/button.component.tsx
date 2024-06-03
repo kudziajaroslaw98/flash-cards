@@ -9,23 +9,23 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          'border-transparent text-gray-50 bg-green-400 border-green-400 hover:bg-green-500 active:focus:bg-green-600 dark:bg-green-500 dark:border-green-500  dark:hover:bg-green-400 dark:active:focus:bg-green-700',
+          'border-transparent text-gray-50 bg-green-400 border-green-500 hover:bg-green-500 active:focus:bg-green-600',
         'primary-outline':
-          'text-green-400 hover:text-gray-50 bg-transparent border border-green-400 hover:bg-green-500 active:focus:bg-green-600 dark:bg-transparent dark:hover:bg-green-400 dark:active:focus:bg-green-700',
+          'text-green-500 hover:text-gray-50 bg-transparent border border-green-500 hover:bg-green-400 active:focus:bg-green-500',
         'primary-text':
-          'text-green-400 hover:text-gray-50 bg-transparent border-transparent  hover:bg-green-500 active:focus:bg-green-600 dark:bg-transparent dark:hover:bg-green-600 dark:active:focus:green-700',
+          'text-green-500 hover:text-gray-50 bg-transparent border-transparent  hover:bg-green-400 active:focus:bg-green-500',
         destructive:
-          'border-transparent text-gray-50 bg-red-400 border-red-400 hover:bg-red-500 active:focus:bg-red-600 dark:bg-red-500 dark:border-red-500 dark:hover:bg-red-600 dark:active:focus:bg-red-700',
+          'border-transparent text-gray-50 bg-red-400 border-red-500 hover:bg-red-500 active:focus:bg-red-600 dark:bg-red-500 dark:border-red-500 dark:hover:bg-red-600 dark:active:focus:bg-red-700',
         'destructive-outline':
-          'text-red-400 hover:text-gray-50 bg-transparent border border-red-400 hover:bg-red-500 active:focus:bg-red-600 dark:bg-transparent dark:hover:bg-red-400 dark:active:focus:bg-red-700',
+          'text-red-500 hover:text-gray-50 bg-transparent border border-red-500 hover:bg-red-500 active:focus:bg-red-600',
         'destructive-text':
-          'text-red-400 hover:text-gray-50 bg-transparent border-transparent  hover:bg-red-500 active:focus:bg-red-600 dark:bg-transparent dark:hover:bg-red-600 dark:active:focus:red-700',
+          'text-red-500 hover:text-gray-50 bg-transparent border-transparent  hover:bg-red-500 active:focus:bg-red-600',
         secondary:
-          'border-transparent text-gray-50 bg-blue-400 border-blue-400 hover:bg-blue-500 active:focus:bg-blue-600 dark:bg-blue-500 dark:border-blue-500  dark:hover:bg-blue-400 dark:active:focus:bg-blue-700',
+          'border-transparent text-gray-50 bg-blue-400 border-blue-500 hover:bg-blue-500 active:focus:bg-blue-600',
         'secondary-outline':
-          'text-blue-400 hover:text-gray-50 bg-transparent border border-blue-400 hover:bg-blue-500 active:focus:bg-blue-600 dark:bg-transparent dark:hover:bg-blue-400 dark:active:focus:bg-blue-700',
+          'text-blue-500 hover:text-gray-50 bg-transparent border border-blue-500 hover:bg-blue-500 active:focus:bg-blue-600',
         'secondary-text':
-          'text-blue-400 hover:text-gray-50 bg-transparent border-transparent  hover:bg-blue-500 active:focus:bg-blue-600 dark:bg-transparent dark:hover:bg-blue-600 dark:active:focus:blue-700',
+          'text-blue-500 hover:text-gray-50 bg-transparent border-transparent  hover:bg-blue-500 active:focus:bg-blue-600',
       },
       size: {
         default: 'h-10 px-4 py-2 md:w-auto',
@@ -47,11 +47,6 @@ const buttonVariants = cva(
   },
 );
 
-// h-12 w-full
-//       md:h-10
-// max-w-80 md:h-10 md:max-w-52
-// h-12 sm:max-w-80 md:h-12 md:max-w-12
-
 export interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
@@ -62,10 +57,13 @@ export interface ButtonProps
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, iconPosition, ...props }, ref) => {
+  (
+    { className, variant, disabled, loading, size, iconPosition, ...props },
+    ref,
+  ) => {
     return (
       <button
-        disabled={props.disabled || props.loading}
+        disabled={disabled || loading}
         ref={ref}
         className={cn([
           buttonVariants({ variant, size, iconPosition, className }),
@@ -75,9 +73,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ])}
         {...props}
       >
-        {props.loading && <ArrowPathIcon className={'h-4 w-4 animate-spin'} />}
+        {loading && <ArrowPathIcon className={'h-4 w-4 animate-spin'} />}
 
-        {!props.loading && props.icon}
+        {!loading && props.icon}
 
         {props?.label && props.label}
       </button>

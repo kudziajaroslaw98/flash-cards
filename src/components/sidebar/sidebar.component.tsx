@@ -21,7 +21,7 @@ import { useRef, useState } from 'react';
 import HamburgerMenuComponent from '../hamburger-menu/hamburger-menu.component';
 import ThemeSwitchComponent from '../theme-switch/theme-switch.component';
 import AvatarComponent from '../ui/avatar/avatar.component';
-import ContextMenuComponent from '../ui/context-menu/context-menu.component';
+import ContextMenu from '../ui/context-menu/context-menu.component';
 import NavigationGroupComponent from '../ui/navigation/navigation-group.component';
 import NavigationItemComponent from '../ui/navigation/navigation-item.component';
 import { ToggleButton } from '../ui/toggle-button/toggle-button.component';
@@ -168,11 +168,12 @@ export default function SidebarComponent() {
               ref={menuRef}
             >
               <div className='flex items-center justify-center gap-2'>
-                <ContextMenuComponent
+                <ContextMenu
                   open={isOpen}
+                  className='-left-4'
                   name={'avatar-context'}
                   afterMenuClass='py-4 justify-center'
-                  contextPossiton='top-left'
+                  contextPosition={'top-left'}
                   triggerComponent={
                     <AvatarComponent
                       avatarClass='size-12'
@@ -204,7 +205,7 @@ export default function SidebarComponent() {
                       },
                     },
                   ]}
-                ></ContextMenuComponent>
+                ></ContextMenu>
 
                 <div
                   className={`w-full max-w-32 flex-col ${expanded ? 'flex' : 'hidden'}`}

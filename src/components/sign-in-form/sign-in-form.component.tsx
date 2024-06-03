@@ -78,7 +78,7 @@ export default function SignInComponent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        className='relative flex w-full max-w-sm flex-col items-center justify-center gap-12 rounded p-8 dark:border-slate-800 dark:bg-slate-900 sm:overflow-clip sm:border sm:border-gray-50 sm:bg-gray-100 sm:shadow-card-hovered'
+        className='relative flex w-full max-w-sm flex-col items-center justify-center gap-12 rounded p-8 sm:overflow-clip sm:border sm:border-gray-50 sm:bg-gray-100 sm:shadow-card-hovered dark:sm:border-slate-800 dark:sm:bg-slate-900'
       >
         <h4 className='flex items-center justify-center gap-2 text-3xl font-semibold text-green-400'>
           <span>Sign in</span>
@@ -101,7 +101,7 @@ export default function SignInComponent() {
         <Button
           onClick={handleSignIn}
           disabled={!formValid}
-          loading={isLoading}
+          loading={isLoading ?? false}
           label='Sign in'
         ></Button>
 
@@ -113,7 +113,7 @@ export default function SignInComponent() {
           <LinkComponent
             label={'Click here'}
             href={'sign-up'}
-            class={'underline'}
+            className={'text-green-400 underline'}
           ></LinkComponent>
         </div>
       </motion.div>

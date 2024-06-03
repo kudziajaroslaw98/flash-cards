@@ -1,4 +1,7 @@
-import TextAreaComponent from '#/components/ui/text-area/text-area.component';
+import {
+  default as TextArea,
+  default as TextAreaComponent,
+} from '#/components/ui/text-area/text-area.component';
 import { FlashCardModel } from '#/shared/models/flash-card.model';
 import { motion } from 'framer-motion';
 
@@ -65,8 +68,8 @@ export default function EditableFlashCardRowComponent(
           }
           value={props.flashCard.word}
         />
-        <TextAreaComponent
-          class={`flex bg-transparent md:hidden ${
+        <TextArea
+          className={`flex bg-transparent md:hidden ${
             props.isSelected(props.flashCard)
               ? 'border-green-400/50 '
               : 'border-transparent dark:border-slate-700'
@@ -79,7 +82,7 @@ export default function EditableFlashCardRowComponent(
 
       <motion.td className='line-clamp-2 hidden w-full items-center p-2 px-4 text-sm text-gray-700 dark:text-slate-200 md:flex'>
         <TextAreaComponent
-          class={`hidden bg-transparent md:flex ${
+          className={`hidden bg-transparent md:flex ${
             props.isSelected(props.flashCard)
               ? 'border-green-400/50 '
               : 'border-transparent dark:border-slate-700'

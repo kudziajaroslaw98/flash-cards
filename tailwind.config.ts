@@ -92,15 +92,15 @@ const config: Config = {
         '2-auto': 'repeat(2, minmax(0, auto))',
       },
       boxShadow: {
-        card: '0 4px 4px rgb(0 0 0 / 0.02), 0 32px 15.3px rgb(0 0 0 / 0.02)',
+        card: '0 4px 4px rgb(0 0 0 / 0.02), 0 16px 15.3px rgb(0 0 0 / 0.02)',
         'card-dark':
-          '0 4px 4px rgb(143 143 143 / 0.02), 0 32px 15.3px rgb(143 143 143 / 0.02)',
+          '0 4px 4px rgb(143 143 143 / 0.02), 0 16px 15.3px rgb(143 143 143 / 0.02)',
         'table-row':
           '0 2.8px 2.2px rgb(0 0 0 / 0.010), 0 1.7px 2.3px rgb(0 0 0 / 0.010), 0 1.5px 1px rgb(0 0 0 / 0.010), 0 43px 55.9px rgb(0 0 0 / 0.010), 0 55.8px 60.4px rgb(0 0 0 / 0.010), 0 40px 80px rgb(0 0 0 / 0.010)',
         'card-hovered':
-          '0 4px 4px rgb(0 0 0 / 0.06), 0 32px 30px rgb(0 0 0 / 0.06)',
+          '0 4px 4px rgb(0 0 0 / 0.06), 0 16px 30px rgb(0 0 0 / 0.06)',
         'dark-card-hovered':
-          '0 4px 4px rgb(143 143 143 / 0.06), 0 32px 30px rgb(143 143 143 / 0.06)',
+          '0 4px 4px rgb(143 143 143 / 0.06), 0 16px 30px rgb(143 143 143 / 0.06)',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

@@ -1,6 +1,6 @@
 'use client';
 
-import InputComponent, {
+import Input, {
   InputComponentProps,
 } from '#/components/ui/input/input.component';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
@@ -166,7 +166,7 @@ export default function FormComponent<
     <form>
       {Object.entries(props.scheme.inputs).map(([inputName, inputProps]) => {
         return (
-          <InputComponent
+          <Input
             {...inputProps}
             key={inputName}
             valid={touchedInputs[inputName] ? inputsValidity[inputName] : true}

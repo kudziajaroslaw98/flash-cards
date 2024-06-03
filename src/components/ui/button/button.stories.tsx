@@ -4,12 +4,7 @@ import { Button } from './button.component';
 
 const meta: Meta<typeof Button> = {
   component: Button,
-};
-
-export default meta;
-type Story = StoryObj<typeof Button>;
-
-export const Playground: Story = {
+  tags: ['autodocs'],
   argTypes: {
     disabled: {
       type: 'boolean',
@@ -55,6 +50,9 @@ export const Playground: Story = {
   },
 };
 
+export default meta;
+type Story = StoryObj<typeof Button>;
+
 export const TextOnly: Story = {
   args: {
     label: 'Reshuffle',
@@ -87,6 +85,7 @@ export const TextWithIconRight: Story = {
 export const IconOnly: Story = {
   args: {
     icon: <ArrowPathIcon className='h-4 w-4' />,
+    size: 'icon',
   },
 };
 
@@ -94,6 +93,7 @@ export const IconOnlyDisabled: Story = {
   args: {
     icon: <ArrowPathIcon className='h-4 w-4' />,
     disabled: true,
+    size: 'icon',
   },
 };
 
@@ -101,6 +101,7 @@ export const Loading: Story = {
   args: {
     icon: <ArrowPathIcon className='h-4 w-4' />,
     loading: true,
+    size: 'icon',
   },
 };
 

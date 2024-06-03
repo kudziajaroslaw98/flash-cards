@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '#/components/ui/button/button.component';
-import ContextMenuComponent from '#/components/ui/context-menu/context-menu.component';
+import ContextMenu from '#/components/ui/context-menu/context-menu.component';
 import LinkComponent from '#/components/ui/link/link.component';
 import { ToggleButton } from '#/components/ui/toggle-button/toggle-button.component';
 import { useSessionContext } from '#/providers/session-provider.component';
@@ -68,7 +68,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
       className='flex'
       ref={menuRef}
     >
-      <ContextMenuComponent
+      <ContextMenu
         open={isOpen}
         name={'hamburger-menu'}
         afterMenuClass='py-4 justify-center'
@@ -128,7 +128,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
                     setOpen(false);
                   }}
                   href={'/sign-in'}
-                  class={'text-inherit underline'}
+                  className={'text-inherit underline'}
                 ></LinkComponent>
               </div>
             )}
@@ -144,7 +144,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
             toggle(!toggled);
           },
         }))}
-      ></ContextMenuComponent>
+      ></ContextMenu>
     </div>
   );
 }

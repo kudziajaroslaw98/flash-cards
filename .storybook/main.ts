@@ -9,7 +9,8 @@ const config: StorybookConfig = {
     '@storybook/addon-onboarding',
     '@storybook/addon-interactions',
     '@chromatic-com/storybook',
-    '@storybook/addon-themes'
+    '@storybook/addon-themes',
+    '@storybook/addon-a11y',
   ],
 
   framework: {
@@ -20,7 +21,7 @@ const config: StorybookConfig = {
   docs: {},
 
   typescript: {
-    reactDocgen: 'react-docgen-typescript'
-  }
+    reactDocgen: 'react-docgen-typescript',
+  },
 };
 export default config;

@@ -32,7 +32,7 @@ export interface InputComponentProps
   value: string;
 }
 
-function InputComponent(props: InputComponentProps) {
+function Input(props: InputComponentProps) {
   const [inputProps, setInputProps] = useState<Partial<InputComponentProps>>({
     value: '',
     onChange: () => {},
@@ -90,4 +90,4 @@ function InputComponent(props: InputComponentProps) {
   );
 }
 
-export default InputComponent;
+export default Input;
