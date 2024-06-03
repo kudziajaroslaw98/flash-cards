@@ -4,7 +4,7 @@
   "description": "Learning words made easy",
   "theme_color": "#020617",
   "background_color": "#020617",
-  "start_url": "/learn",
+  "start_url": "/flashcards/learn",
   "scope": "/",
   "display": "standalone",
   "icons": [

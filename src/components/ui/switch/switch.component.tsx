@@ -14,7 +14,7 @@ type SwitchProps =
       onClick: () => void;
     };
 
-export default function SwitchComponent(props: PropsWithChildren<SwitchProps>) {
+export default function Switch(props: PropsWithChildren<SwitchProps>) {
   return (
     <label className='relative inline-flex cursor-pointer items-center'>
       <input

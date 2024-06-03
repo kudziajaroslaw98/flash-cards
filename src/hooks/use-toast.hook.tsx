@@ -41,8 +41,9 @@ export default function useToast() {
 
   const show = (toast: Omit<ToastModel, 'uuid'>) => {
     const uuid = v4() as UUID;
-    const newToastSet = {
-      ...internalToasts,
+
+    setInternalToasts((prev) => ({
+      ...prev,
       [uuid]: {
         ...toast,
         uuid,
@@ -50,41 +51,44 @@ export default function useToast() {
           new Date().getTime() + (toast?.timeInSeconds ?? 1) * 1000,
         ),
       },
-    };
-
-    setInternalToasts(newToastSet);
+    }));
   };
 
   const showAsync = (config: AsyncToastConfig, promise: Promise<unknown>) => {
     const uuid = v4() as UUID;
-    const newToastSet = {
-      ...internalToasts,
+
+    setInternalToasts((prev) => ({
+      ...prev,
       [uuid]: {
         title: config.pendingTitle,
         type: 'async',
         uuid,
         dueTo: new Date(new Date().getTime() + 60 * 1000),
       },
-    };
-
-    setInternalToasts(newToastSet);
+    }));
 
     promise
       .then(() => {
-        close(uuid);
-        show({
-          title: config.successTitle,
-          type: 'success',
-          timeInSeconds: 3,
-        });
+        setInternalToasts((prev) => ({
+          ...prev,
+          [uuid]: {
+            title: config.successTitle,
+            type: 'success',
+            uuid,
+            dueTo: new Date(new Date().getTime() + 3 * 1000),
+          },
+        }));
       })
       .catch(() => {
-        close(uuid);
-        show({
-          title: config.errorTitle,
-          type: 'error',
-          timeInSeconds: 3,
-        });
+        setInternalToasts((prev) => ({
+          ...prev,
+          [uuid]: {
+            title: config.errorTitle,
+            type: 'error',
+            uuid,
+            dueTo: new Date(new Date().getTime() + 3 * 1000),
+          },
+        }));
       });
   };
 

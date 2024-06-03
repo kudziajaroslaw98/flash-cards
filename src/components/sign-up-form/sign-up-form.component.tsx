@@ -10,7 +10,7 @@ import { CheckBadgeIcon, RocketLaunchIcon } from '@heroicons/react/24/solid';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import ButtonComponent from '../ui/button/button.component';
+import { Button } from '../ui/button/button.component';
 import LinkComponent from '../ui/link/link.component';
 
 export default function SignUpFormComponent() {
@@ -103,7 +103,7 @@ export default function SignUpFormComponent() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           key={'signup-wrapper'}
-          className='relative flex w-full max-w-sm flex-col items-center justify-center gap-12 rounded p-8 dark:border-slate-800 dark:bg-slate-900 sm:overflow-clip sm:border sm:border-gray-50 sm:bg-gray-100 sm:shadow-card-hovered'
+          className='relative flex w-full max-w-sm flex-col items-center justify-center gap-12 rounded p-8 sm:overflow-clip sm:border sm:border-gray-50 sm:bg-gray-100 sm:shadow-card-hovered dark:sm:border-slate-800 dark:sm:bg-slate-900'
         >
           <h4 className='flex items-center justify-center gap-2 text-3xl font-semibold text-green-400'>
             <span>Sign Up</span>
@@ -123,10 +123,7 @@ export default function SignUpFormComponent() {
             />
           </div>
 
-          <ButtonComponent
-            class={
-              'flex max-w-80 gap-2 bg-green-400 hover:bg-green-500 active:focus:bg-green-600 disabled:border-gray-300 disabled:text-gray-400 dark:bg-green-500 dark:hover:bg-green-400 md:h-10 md:w-full'
-            }
+          <Button
             onClick={handleSignUp}
             disabled={!formValid || isLoading}
             loading={isLoading}
@@ -141,7 +138,7 @@ export default function SignUpFormComponent() {
             <LinkComponent
               label={'Click here'}
               href={'sign-in'}
-              class={'underline'}
+              className={'text-green-400 underline'}
             ></LinkComponent>
           </div>
         </motion.div>
@@ -151,7 +148,7 @@ export default function SignUpFormComponent() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           key={'confirmation-wrapper'}
-          className='relative flex w-full max-w-sm flex-col items-center justify-center gap-12 overflow-clip rounded border border-gray-50 bg-gray-100 p-8 shadow-card-hovered dark:border-slate-800 dark:bg-slate-900'
+          className='relative flex w-full max-w-sm flex-col items-center justify-center gap-12 overflow-clip rounded border p-8 shadow-card-hovered sm:border-gray-50 sm:bg-gray-100 dark:sm:border-slate-800 dark:sm:bg-slate-900'
         >
           <h4 className='flex items-center justify-center gap-2 text-3xl font-semibold text-green-400'>
             <span>You are almost there!</span>

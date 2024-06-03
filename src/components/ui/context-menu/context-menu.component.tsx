@@ -1,7 +1,33 @@
 'use client';
 
 import MenuItem from '#/components/ui/context-menu/menu-item.component';
-import type { ReactNode } from 'react';
+import { cn } from '#/shared/utils/cn.util';
+import { cva, VariantProps } from 'class-variance-authority';
+import {
+  type DetailedHTMLProps,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react';
+
+const contextMenuVariants = cva(
+  `absolute w-64 overflow-clip rounded border border-gray-200 dark:border-slate-800 md:w-52`,
+  {
+    variants: {
+      contextPosition: {
+        top: 'right-0 -top-2 data-[open=true]:z-20 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+        'top-right':
+          'right-0 -top-2 data-[open=true]:z-20 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+        'top-left':
+          'left-0 -top-2 data-[open=true]:z-20 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+        bottom:
+          'right-0 -bottom-2 data-[open=true]:z-20 data-[open=true]:animate-fade-in-to-bottom data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-top',
+      },
+    },
+    defaultVariants: {
+      contextPosition: 'bottom',
+    },
+  },
+);
 
 export interface ContextMenuItem {
   label?: string;
@@ -10,7 +36,9 @@ export interface ContextMenuItem {
   active?: boolean;
 }
 
-interface ContextMenuProps {
+interface ContextMenuProps
+  extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>,
+    VariantProps<typeof contextMenuVariants> {
   triggerComponent: ReactNode;
   beforeMenuItems?: ReactNode;
   beforeMenuClass?: string;
@@ -19,65 +47,31 @@ interface ContextMenuProps {
   menuItems: ContextMenuItem[];
   name: string;
   open: boolean;
-  contextPossiton?:
-    | 'top'
-    | 'top-right'
-    | 'top-left'
-    | 'bottom'
-    | 'left'
-    | 'right';
 }
 
-export default function ContextMenuComponent(props: ContextMenuProps) {
-  let contextMenuPositionStyle = '';
-
-  switch (props.contextPossiton) {
-    case 'top':
-      contextMenuPositionStyle = `right-0 -top-2 ${
-        props.open
-          ? 'z-20 animate-fade-in-to-top'
-          : '-z-10 animate-fade-out-to-bottom'
-      }`;
-      break;
-    case 'top-right':
-      contextMenuPositionStyle = `right-0 -top-2 ${
-        props.open
-          ? 'z-20 animate-fade-in-to-top'
-          : '-z-10 animate-fade-out-to-bottom'
-      }`;
-      break;
-    case 'top-left':
-      contextMenuPositionStyle = `left-0 -top-2 ${
-        props.open
-          ? 'z-20 animate-fade-in-to-top'
-          : '-z-10 animate-fade-out-to-bottom'
-      }`;
-      break;
-    case 'bottom':
-    default:
-      contextMenuPositionStyle = `right-0 -bottom-2 ${
-        props.open
-          ? 'z-20 animate-fade-in-to-bottom'
-          : '-z-10 animate-fade-out-to-top'
-      }`;
-      break;
-  }
-
+export default function ContextMenu({
+  contextPosition,
+  className,
+  ...props
+}: ContextMenuProps) {
   return (
     <div>
       <div className='relative'>
         {props.triggerComponent}
 
         <div
-          className={`${contextMenuPositionStyle} absolute  w-64 overflow-clip rounded border border-gray-200 dark:border-slate-800 md:w-52 `}
+          data-open={props.open}
+          className={cn([contextMenuVariants({ contextPosition }), className])}
         >
           <ul className='flex h-auto w-full flex-col items-center'>
-            <MenuItem
-              visible={!!props.beforeMenuItems}
-              class={props.beforeMenuClass}
-            >
-              {props.beforeMenuItems}
-            </MenuItem>
+            {!!props.beforeMenuItems && (
+              <MenuItem
+                visible={!!props.beforeMenuItems}
+                className={props.beforeMenuClass}
+              >
+                {props.beforeMenuItems}
+              </MenuItem>
+            )}
 
             {props.menuItems.map((item) => (
               <MenuItem
@@ -92,12 +86,14 @@ export default function ContextMenuComponent(props: ContextMenuProps) {
               </MenuItem>
             ))}
 
-            <MenuItem
-              class={props.afterMenuClass}
-              visible={!!props.afterMenuItems}
-            >
-              {props.afterMenuItems}
-            </MenuItem>
+            {!!props.afterMenuItems && (
+              <MenuItem
+                className={props.afterMenuClass}
+                visible={!!props.afterMenuItems}
+              >
+                {props.afterMenuItems}
+              </MenuItem>
+            )}
           </ul>
         </div>
       </div>

@@ -10,7 +10,7 @@ export interface LinkProps {
   label?: string;
   icon?: ReactNode;
   iconOnly?: boolean;
-  class?: string;
+  className?: string;
   onClick?: () => void;
 }
 
@@ -24,7 +24,7 @@ export default function LinkComponent(props: PropsWithChildren<LinkProps>) {
     <Link
       href={href}
       onClick={onClick}
-      className={`group relative flex items-center justify-center underline-offset-2 transition-all hover:text-green-400 ${props?.class} ${isPathActive && 'text-green-400'} `}
+      className={`group relative flex items-center justify-center underline-offset-2 transition-all hover:text-green-500 ${props?.className} ${isPathActive && 'text-green-400'} `}
     >
       <p className={`flex items-center ${iconOnly ? '' : 'gap-4'}`}>
         {icon && icon} {label && !iconOnly && label}

@@ -37,6 +37,7 @@
 - [ ] Live updates (WebSockets)
 - [ ] Get custom domain name
 - [ ] Add Storybook
+- [ ] Importing flashcards from csv file
 
 ## Tech Stack
 

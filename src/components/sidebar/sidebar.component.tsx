@@ -21,10 +21,10 @@ import { useRef, useState } from 'react';
 import HamburgerMenuComponent from '../hamburger-menu/hamburger-menu.component';
 import ThemeSwitchComponent from '../theme-switch/theme-switch.component';
 import AvatarComponent from '../ui/avatar/avatar.component';
-import ContextMenuComponent from '../ui/context-menu/context-menu.component';
+import ContextMenu from '../ui/context-menu/context-menu.component';
 import NavigationGroupComponent from '../ui/navigation/navigation-group.component';
 import NavigationItemComponent from '../ui/navigation/navigation-item.component';
-import { ToggleButtonComponent } from '../ui/toggle-button/toggle-button.component';
+import { ToggleButton } from '../ui/toggle-button/toggle-button.component';
 
 export default function SidebarComponent() {
   const [expanded, toggleExpand] = useState<boolean>(true);
@@ -123,9 +123,9 @@ export default function SidebarComponent() {
           </h5>
         </Link>
 
-        <ToggleButtonComponent
-          type='icon-only'
-          class='absolute -right-2 !size-5 bg-green-400 !p-0 hover:bg-green-500 active:focus:bg-green-600 dark:bg-green-500 dark:hover:bg-green-500 dark:active:focus:bg-green-700'
+        <ToggleButton
+          size='icon-mini'
+          className='absolute -right-2'
           activeIcon={<ArrowLeftIcon className='size-3' />}
           inactiveIcon={<ArrowRightIcon className='size-3' />}
           toggled={expanded}
@@ -168,11 +168,12 @@ export default function SidebarComponent() {
               ref={menuRef}
             >
               <div className='flex items-center justify-center gap-2'>
-                <ContextMenuComponent
+                <ContextMenu
                   open={isOpen}
+                  className='-left-4'
                   name={'avatar-context'}
                   afterMenuClass='py-4 justify-center'
-                  contextPossiton='top-left'
+                  contextPosition={'top-left'}
                   triggerComponent={
                     <AvatarComponent
                       avatarClass='size-12'
@@ -204,7 +205,7 @@ export default function SidebarComponent() {
                       },
                     },
                   ]}
-                ></ContextMenuComponent>
+                ></ContextMenu>
 
                 <div
                   className={`w-full max-w-32 flex-col ${expanded ? 'flex' : 'hidden'}`}
@@ -217,50 +218,6 @@ export default function SidebarComponent() {
                     {isLoggedIn ? session?.user?.email : 'Click here to log in'}
                   </span>
                 </div>
-
-                {/* <ContextMenuComponent
-                  open={expanded && isOpen}
-                  name={'dots-context'}
-                  afterMenuClass='py-4 justify-center'
-                  contextPossiton='top'
-                  triggerComponent={
-                    <ButtonComponent
-                      icon={
-                        <EllipsisVerticalIcon className={`cursor-pointer`} />
-                      }
-                      onClick={() => {
-                        if (expanded) {
-                          setOpen(!isOpen);
-                          toggle(!toggled);
-                        }
-                      }}
-                      class={`
-                      ${expanded ? 'flex' : 'hidden'}
-                      !h-8 !w-8 
-                      text-slate-800 
-                      hover:bg-green-500 hover:text-gray-100
-                      active:focus:bg-green-600 active:focus:text-gray-300 
-                      dark:text-gray-100 dark:hover:bg-green-400 
-                    `}
-                    />
-                  }
-                  menuItems={[
-                    {
-                      label: isLoggedIn ? 'Log Out' : 'Log In',
-                      onClick: () => {
-                        if (isLoggedIn) {
-                          logOut();
-                          setOpen(false);
-                          toggle(!toggled);
-                        } else {
-                          router.push(APP_ROUTES.signIn);
-                          setOpen(false);
-                          toggle(!toggled);
-                        }
-                      },
-                    },
-                  ]}
-                ></ContextMenuComponent> */}
               </div>
             </div>
           </div>

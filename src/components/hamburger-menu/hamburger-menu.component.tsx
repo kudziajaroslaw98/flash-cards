@@ -1,9 +1,9 @@
 'use client';
 
-import ButtonComponent from '#/components/ui/button/button.component';
-import ContextMenuComponent from '#/components/ui/context-menu/context-menu.component';
+import { Button } from '#/components/ui/button/button.component';
+import ContextMenu from '#/components/ui/context-menu/context-menu.component';
 import LinkComponent from '#/components/ui/link/link.component';
-import { ToggleButtonComponent } from '#/components/ui/toggle-button/toggle-button.component';
+import { ToggleButton } from '#/components/ui/toggle-button/toggle-button.component';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { NavigationItem } from '#/shared/types/navigation-item.type';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
@@ -48,7 +48,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
       exit={{ rotate: '0deg', opacity: 0 }}
       className='text-inherit'
     >
-      <XMarkIcon className='h-8 w-8' />
+      <XMarkIcon className='h-6 w-6' />
     </motion.span>
   );
 
@@ -59,7 +59,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
       exit={{ rotate: '0deg', opacity: 0 }}
       className='text-inherit'
     >
-      <Bars3Icon className='h-8 w-8' />
+      <Bars3Icon className='h-6 w-6' />
     </motion.span>
   );
 
@@ -68,14 +68,15 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
       className='flex'
       ref={menuRef}
     >
-      <ContextMenuComponent
+      <ContextMenu
         open={isOpen}
         name={'hamburger-menu'}
         afterMenuClass='py-4 justify-center'
         triggerComponent={
-          <ToggleButtonComponent
-            type={'icon-only'}
-            class='z-30 !px-2 !text-green-400 transition hover:bg-green-400 hover:!text-gray-50 active:focus:bg-green-500'
+          <ToggleButton
+            variant={'primary-text'}
+            size={'icon'}
+            className='z-30 w-10'
             activeIcon={activeIcon}
             inactiveIcon={inactiveIcon}
             toggle={() => {
@@ -102,13 +103,13 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
                   </span>
                 </div>
 
-                <ButtonComponent
+                <Button
                   onClick={() => {
                     logOut();
                     setOpen(false);
                     toggle(!toggled);
                   }}
-                  class='h-8 bg-red-300 hover:bg-red-400'
+                  color='red'
                   label='Log out'
                 />
               </div>
@@ -127,7 +128,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
                     setOpen(false);
                   }}
                   href={'/sign-in'}
-                  class={'text-inherit underline'}
+                  className={'text-inherit underline'}
                 ></LinkComponent>
               </div>
             )}
@@ -143,7 +144,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
             toggle(!toggled);
           },
         }))}
-      ></ContextMenuComponent>
+      ></ContextMenu>
     </div>
   );
 }
