@@ -39,14 +39,16 @@ export default function RootLayout({
       lang='en'
       className={`${inter.variable} ${roboto_mono.variable} flex font-sans`}
     >
-      <body className='min-w-screen relative flex w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950 md:pt-0'>
+      <body className='min-w-screen relative flex h-auto min-h-full w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950 md:pt-0'>
         <ClientSideProviders>
           <ToastsComponent />
 
-          <div className='mx-auto flex h-full w-full max-w-6xl gap-6 p-4'>
+          <div className='mx-auto flex h-auto min-h-full w-full max-w-6xl gap-6 p-4'>
             <HeaderComponent />
             <SidebarComponent />
-            <main className='relative flex w-full flex-col'>{children}</main>
+            <main className='relative flex h-auto min-h-full w-full flex-col md:pt-24'>
+              {children}
+            </main>
           </div>
         </ClientSideProviders>
       </body>

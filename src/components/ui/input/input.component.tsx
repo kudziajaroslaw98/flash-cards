@@ -1,11 +1,7 @@
 'use client';
 
-import {
-  DetailedHTMLProps,
-  InputHTMLAttributes,
-  useEffect,
-  useState,
-} from 'react';
+import { cn } from '#/shared/utils/cn.util';
+import { DetailedHTMLProps, InputHTMLAttributes, useRef } from 'react';
 
 export type InputValidation =
   | {
@@ -28,63 +24,77 @@ export interface InputComponentProps
   label?: string;
   for?: string;
   valid: boolean;
-  error: string | null;
+  error?: string | null;
   value: string;
+  icon?: React.ReactNode;
 }
 
-function Input(props: InputComponentProps) {
-  const [inputProps, setInputProps] = useState<Partial<InputComponentProps>>({
-    value: '',
-    onChange: () => {},
-  });
+function Input({
+  for: forProp,
+  valid,
+  value,
+  label,
+  required,
+  error = null,
+  className = '',
+  icon,
+  ...props
+}: InputComponentProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const copiedProps: Partial<InputComponentProps> = { ...props };
-
-    delete copiedProps.label;
-    delete copiedProps.valid;
-    delete copiedProps.for;
-    delete copiedProps.error;
-
-    setInputProps(copiedProps);
-  }, [props]);
+  const handleClick = () => {
+    inputRef.current?.focus();
+  };
 
   return (
     <label
-      className={`group relative flex w-full max-w-md flex-col pt-6`}
-      htmlFor={props.for}
+      className={`group relative flex w-full max-w-md flex-col ${label ? 'pt-6' : ''} ${className}`}
+      htmlFor={forProp}
+      onClick={handleClick}
     >
-      <input
-        {...inputProps}
-        className={`${!props.valid ? '!border-red-400' : ''} 
-        peer w-full rounded-md border border-green-400 bg-gray-100 p-2 px-6 text-base text-gray-800 outline-none transition-all placeholder:text-gray-100
-        focus:placeholder:text-gray-600 dark:bg-slate-900 dark:text-slate-200 dark:placeholder:text-slate-900 dark:focus:placeholder:text-slate-400
-        `}
-      />
+      <span
+        className={`flex w-full items-center gap-4 rounded-md border border-gray-300 bg-gray-100 p-2 px-4 dark:border-slate-800 dark:bg-slate-900 ${!valid ? '!border-red-400' : ''}`}
+      >
+        {icon && (
+          <span className='text-gray-500 dark:text-gray-500'>{icon}</span>
+        )}
+        {/* focus:placeholder:text-gray-600 dark:placeholder:text-slate-900 dark:focus:placeholder:text-slate-400 placeholder:text-gray-100*/}
 
-      {props.label && (
-        <span
-          className={`${
-            props.value && props.value !== ''
-              ? '-translate-y-8'
-              : '-translate-y-0'
-          } 
-          ${!props.valid ? '!text-red-400' : ''}
+        <input
+          {...props}
+          ref={inputRef}
+          className={cn([
+            !valid ? '!border-red-400' : '',
+            label
+              ? 'placeholder:text-gray-100 focus:placeholder:text-gray-600 dark:placeholder:text-slate-900 dark:focus:placeholder:text-slate-400'
+              : 'placeholder:text-gray-500 dark:placeholder:text-gray-500',
+            'peer w-full bg-gray-100 text-gray-800',
+            ' text-inherit outline-none transition-all dark:bg-slate-900 dark:text-slate-200 ',
+          ])}
+        />
+
+        {label && (
+          <span
+            className={`${
+              value && value !== '' ? '-translate-y-8' : '-translate-y-0'
+            } 
+          ${!valid ? '!text-red-400' : ''}
           absolute left-2 top-8 z-20 w-auto px-4 text-green-400 
           transition after:absolute after:left-0 after:-z-10 after:h-1 after:w-full after:translate-y-6 after:bg-gray-100
           group-hover:-translate-y-8 group-active:-translate-y-8 peer-focus:-translate-y-8
           dark:after:bg-slate-900`}
-        >
-          {`${props.label}${props.required ? '*' : ''}`}
-        </span>
-      )}
+          >
+            {`${label}${required ? '*' : ''}`}
+          </span>
+        )}
+      </span>
 
       <span
         className={`${
-          props.error ? 'max-h-12 opacity-100' : 'max-h-0 opacity-0'
+          error ? 'max-h-12 opacity-100' : 'max-h-0 opacity-0'
         } px-6 text-sm text-red-400 transition-all duration-700 ease-in-out`}
       >
-        {props.error}
+        {error}
       </span>
     </label>
   );

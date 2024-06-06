@@ -103,6 +103,7 @@ export default function SignInComponent() {
           disabled={!formValid}
           loading={isLoading ?? false}
           label='Sign in'
+          size={'full'}
         ></Button>
 
         <div className='flex flex-col items-center justify-center gap-1'>

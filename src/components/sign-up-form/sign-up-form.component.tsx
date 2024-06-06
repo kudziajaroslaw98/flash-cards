@@ -128,6 +128,7 @@ export default function SignUpFormComponent() {
             disabled={!formValid || isLoading}
             loading={isLoading}
             label='Sign up'
+            size={'full'}
           />
 
           <div className='flex flex-col items-center justify-center gap-1'>

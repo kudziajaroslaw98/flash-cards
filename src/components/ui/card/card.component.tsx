@@ -34,7 +34,7 @@ export default function Card({
         handleMouseMove(e.clientX, e.clientY, e.currentTarget)
       }
       className={cn([
-        `group relative flex cursor-pointer flex-col justify-center gap-2 rounded-md border border-gray-200 bg-gray-50 p-4 shadow-card transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-900 dark:shadow-card-dark md:hover:translate-y-1 md:hover:shadow-card-hovered dark:md:hover:shadow-dark-card-hovered`,
+        `group relative flex cursor-pointer flex-col gap-2 rounded-md border border-gray-200 bg-gray-50 p-4 shadow-card transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-900 dark:shadow-card-dark md:hover:translate-y-1 md:hover:shadow-card-hovered dark:md:hover:shadow-dark-card-hovered`,
         className,
       ])}
       {...omit(props, ['children'])}

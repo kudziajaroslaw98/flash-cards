@@ -12,6 +12,7 @@ import {
   ArrowRightStartOnRectangleIcon,
   BoltIcon,
   LanguageIcon,
+  RectangleStackIcon,
   Squares2X2Icon,
 } from '@heroicons/react/24/solid';
 import Image from 'next/image';
@@ -68,6 +69,12 @@ export default function SidebarComponent() {
       items: [
         {
           type: 'item',
+          label: 'Sets',
+          href: APP_ROUTES.flashcards.sets,
+          icon: <RectangleStackIcon className={iconSize} />,
+        },
+        {
+          type: 'item',
           label: 'Learn',
           href: APP_ROUTES.flashcards.learn,
           icon: <AcademicCapIcon className={iconSize} />,
@@ -78,12 +85,6 @@ export default function SidebarComponent() {
           href: APP_ROUTES.flashcards.revise,
           icon: <LanguageIcon className={iconSize} />,
         },
-        // {
-        //   type: 'item',
-        //   label: 'Sets',
-        //   href: '/flashcards/sets',
-        //   icon: <RectangleStackIcon className={iconSize} />,
-        // },
       ],
     },
   ];
@@ -94,7 +95,7 @@ export default function SidebarComponent() {
 
   return (
     <aside
-      className={`sticky top-4 z-50 hidden max-h-[calc(100vh-2rem)] flex-col rounded-md border border-gray-200 bg-gray-50 transition-all dark:border-slate-900 dark:bg-slate-950 md:flex
+      className={`min-h- sticky top-4 z-50 hidden max-h-[calc(100vh-2rem)] flex-col rounded-md border border-gray-200 bg-gray-50 transition-all dark:border-slate-900 dark:bg-slate-950 md:flex
       ${expanded ? 'w-80' : 'w-20'}
     `}
     >
@@ -170,6 +171,7 @@ export default function SidebarComponent() {
               <div className='flex items-center justify-center gap-2'>
                 <ContextMenu
                   open={isOpen}
+                  setOpen={setOpen}
                   className='-left-4'
                   name={'avatar-context'}
                   afterMenuClass='py-4 justify-center'

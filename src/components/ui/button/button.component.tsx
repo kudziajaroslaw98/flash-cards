@@ -32,8 +32,9 @@ const buttonVariants = cva(
         sm: 'h-9 px-3 md:w-auto',
         lg: 'h-11 px-8 md:w-auto',
         xlg: 'h-11 px-14 md:w-auto',
-        icon: 'h-10 md:w-10',
+        icon: 'h-10 min-w-10 md:w-10',
         'icon-mini': 'size-5',
+        full: 'w-full h-10 !max-w-auto',
       },
       iconPosition: {
         left: 'flex-row',
@@ -67,9 +68,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={cn([
           buttonVariants({ variant, size, iconPosition, className }),
-          props.icon && !props.label
-            ? 'sm:max-w-80 md:max-w-12'
-            : 'max-w-80 md:max-w-52',
         ])}
         {...props}
       >

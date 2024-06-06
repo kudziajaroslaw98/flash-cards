@@ -1,9 +1,11 @@
 'use client';
 
 import MenuItem from '#/components/ui/context-menu/menu-item.component';
+import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import { cn } from '#/shared/utils/cn.util';
 import { cva, VariantProps } from 'class-variance-authority';
 import {
+  useRef,
   type DetailedHTMLProps,
   type HTMLAttributes,
   type ReactNode,
@@ -47,19 +49,28 @@ interface ContextMenuProps
   menuItems: ContextMenuItem[];
   name: string;
   open: boolean;
+  setOpen: (value: boolean) => void;
 }
 
 export default function ContextMenu({
   contextPosition,
   className,
+  setOpen,
   ...props
 }: ContextMenuProps) {
+  const contextMenuWrapperRef = useRef<HTMLDivElement>(null);
+
+  useOutsideAlerter(contextMenuWrapperRef, () => {
+    setOpen && setOpen(false);
+  });
+
   return (
     <div>
       <div className='relative'>
         {props.triggerComponent}
 
         <div
+          ref={contextMenuWrapperRef}
           data-open={props.open}
           className={cn([contextMenuVariants({ contextPosition }), className])}
         >

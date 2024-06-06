@@ -109,7 +109,7 @@ export default function FlashCardReviseComponent() {
   }, [randomCards]);
 
   return flashCardsArray.length > 0 ? (
-    <div className='flex h-full flex-col justify-stretch pb-36'>
+    <div className='flex h-full flex-col justify-stretch sm:pb-36'>
       <div className='flex h-full flex-col items-center gap-2 md:gap-8'>
         <div
           className={`text-default mb-2 flex h-auto min-h-16 w-full max-w-80 flex-col items-center justify-center gap-4 px-4 text-center md:max-w-xl`}
@@ -137,7 +137,7 @@ export default function FlashCardReviseComponent() {
         </div>
       </div>
 
-      <div className='absolute bottom-0 right-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md dark:bg-slate-950/10 sm:bottom-32'>
+      <div className='sticky bottom-0 right-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md dark:bg-slate-950/10 sm:absolute md:bottom-32'>
         <Button
           label={'Reshuffle'}
           icon={<ArrowPathIcon className='h-4 w-4' />}
@@ -150,6 +150,7 @@ export default function FlashCardReviseComponent() {
           config={dropdownItems}
           defaultValue={dropdownItems['GUESS_DEFINITION']}
           onChange={(value) => changeReviseType(value)}
+          contextPosition={'top'}
         />
       </div>
     </div>
