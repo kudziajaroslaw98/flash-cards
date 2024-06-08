@@ -7,6 +7,7 @@ import {
   HashtagIcon,
   HomeIcon,
   LanguageIcon,
+  RectangleStackIcon,
 } from '@heroicons/react/24/solid';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -17,24 +18,30 @@ export default function HeaderComponent() {
       type: 'item',
       label: 'Dashboard',
       href: APP_ROUTES.dashboard,
-      icon: <HomeIcon className='h-4 w-4' />,
+      icon: <HomeIcon className='size-4' />,
+    },
+    {
+      type: 'item',
+      label: 'Sets',
+      href: APP_ROUTES.flashcards.sets,
+      icon: <RectangleStackIcon className='size-4' />,
     },
     {
       type: 'item',
       label: 'Learn',
       href: APP_ROUTES.flashcards.learn,
-      icon: <AcademicCapIcon className='h-4 w-4' />,
+      icon: <AcademicCapIcon className='size-4' />,
     },
     {
       type: 'item',
       label: 'Revise',
       href: APP_ROUTES.flashcards.revise,
-      icon: <LanguageIcon className='h-4 w-4' />,
+      icon: <LanguageIcon className='size-4' />,
     },
   ];
 
   return (
-    <header className='fixed left-0 top-0 z-30 h-20 w-full bg-gray-50/5 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/5 md:hidden'>
+    <header className='fixed left-0 top-0 z-30 h-20 w-full bg-gray-50/75 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/75 md:hidden'>
       <div className='mx-auto flex h-full max-w-5xl items-center justify-between'>
         <div className='flex items-center justify-center gap-4'>
           <Link
@@ -45,12 +52,12 @@ export default function HeaderComponent() {
               <Image
                 width={24}
                 height={24}
-                src={'/images/flash-cards-logo.svg'}
-                alt={'Flash Cards Logo'}
+                src={'/images/flash-fusion-logo.svg'}
+                alt={'Flash Fusion Logo'}
               />
             </span>
 
-            <h5 className='font-black tracking-tighter text-green-400 dark:text-green-500'>
+            <h5 className='bg-gradient-to-r from-green-600  to-green-400 bg-clip-text text-2xl font-black tracking-tighter text-transparent transition-all '>
               FLASHCARDS
             </h5>
           </Link>

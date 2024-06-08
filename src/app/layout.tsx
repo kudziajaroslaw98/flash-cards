@@ -43,7 +43,7 @@ export default function RootLayout({
         <ClientSideProviders>
           <ToastsComponent />
 
-          <div className='mx-auto flex h-auto min-h-full w-full max-w-6xl gap-6 p-4'>
+          <div className='mx-auto flex h-auto min-h-full w-full max-w-6xl gap-12 p-4 xl:gap-12'>
             <HeaderComponent />
             <SidebarComponent />
             <main className='relative flex h-auto min-h-full w-full flex-col md:pt-24'>

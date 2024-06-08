@@ -7,10 +7,11 @@ import FlashCardComponent from '#/components/flash-card/flash-card.component';
 import { Button } from '#/components/ui/button/button.component';
 import Dropdown from '#/components/ui/dropdown/dropdown.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
+import useKeyPress from '#/hooks/use-key-press.hook';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
 import { reviseTypeDictionary } from '#/shared/dictionaries/revise-type.dictionary';
 import { FlashCardTypesEnum } from '#/shared/enums/flash-card-types.enum';
-import { FlashCardModel } from '#/shared/models/flash-card.model';
+import { FlashCard } from '#/shared/models/flash-card.model';
 import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
 import { updateFlashCard } from '#/store/reducers/flashcards.reducer';
 import { updateStatistics } from '#/store/reducers/stats.reducer';
@@ -22,8 +23,8 @@ export default function FlashCardReviseComponent() {
   const [reviseType, setReviseType] = useState(
     FlashCardTypesEnum.GUESS_DEFINITION,
   );
-  const [revisedCard, setRevisedCard] = useState<FlashCardModel>();
-  const [clickedCard, setClickedCard] = useState<FlashCardModel>();
+  const [revisedCard, setRevisedCard] = useState<FlashCard>();
+  const [clickedCard, setClickedCard] = useState<FlashCard>();
   const [dropdownItems] = useState(reviseTypeDictionary);
   const [clicked, setClicked] = useState(false);
 
@@ -35,19 +36,19 @@ export default function FlashCardReviseComponent() {
   const dispatch = useAppDispatch();
 
   const { pickedItems: randomCards, reshuffle } =
-    useRandomArrayItems<FlashCardModel>(
+    useRandomArrayItems<FlashCard>(
       flashCardsArray,
       flashCardsArray.map((item) => item.weight),
       4,
     );
 
-  const isCorrect = (flashCard?: FlashCardModel) => {
+  const isCorrect = (flashCard?: FlashCard) => {
     const comparisonItem = flashCard ?? clickedCard;
 
     return revisedCard === comparisonItem;
   };
 
-  const changeClicked = (flashCard: FlashCardModel) => {
+  const changeClicked = (flashCard: FlashCard) => {
     if (clicked) {
       return;
     }
@@ -108,11 +109,13 @@ export default function FlashCardReviseComponent() {
     setRevisedCard(randomCards[getRandomRangedNumber(0, randomMax)]);
   }, [randomCards]);
 
+  useKeyPress(['r', 'ArrowRight'], reshuffleFlashCards);
+
   return flashCardsArray.length > 0 ? (
-    <div className='flex h-full flex-col justify-stretch sm:pb-36'>
-      <div className='flex h-full flex-col items-center gap-2 md:gap-8'>
+    <div className='flex h-full w-full flex-col justify-stretch'>
+      <div className='flex h-full w-full flex-col items-center gap-8 pb-44 sm:pb-0'>
         <div
-          className={`text-default mb-2 flex h-auto min-h-16 w-full max-w-80 flex-col items-center justify-center gap-4 px-4 text-center md:max-w-xl`}
+          className={`text-default mb-2 flex h-auto min-h-16 w-full flex-col items-center justify-center gap-4 px-4 text-center`}
         >
           {reviseType === FlashCardTypesEnum.GUESS_DEFINITION &&
             revisedCard && <h5 className='text-default'>{revisedCard.word}</h5>}
@@ -122,7 +125,7 @@ export default function FlashCardReviseComponent() {
           )}
         </div>
 
-        <div className='grid w-full auto-rows-fr grid-cols-1 flex-col items-center justify-center gap-3 sm:grid-cols-2-auto'>
+        <div className='grid w-full grid-cols-[repeat(auto-fit,minmax(18rem,1fr))] gap-4 lg:grid-cols-[repeat(auto-fit,minmax(25rem,1fr))]'>
           {randomCards.map((flashCard) => (
             <FlashCardComponent
               key={flashCard.frontUuid}
@@ -137,7 +140,7 @@ export default function FlashCardReviseComponent() {
         </div>
       </div>
 
-      <div className='sticky bottom-0 right-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md dark:bg-slate-950/10 sm:absolute md:bottom-32'>
+      <div className='fixed bottom-4 right-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md dark:bg-slate-950/10 sm:sticky sm:bottom-8 md:bottom-24'>
         <Button
           label={'Reshuffle'}
           icon={<ArrowPathIcon className='h-4 w-4' />}

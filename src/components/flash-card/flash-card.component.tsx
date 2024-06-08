@@ -1,13 +1,13 @@
 import { FlashCardTypesEnum } from '#/shared/enums/flash-card-types.enum';
-import { FlashCardModel } from '#/shared/models/flash-card.model';
+import { FlashCard } from '#/shared/models/flash-card.model';
 import type React from 'react';
 import { useCallback } from 'react';
 import Card from '../ui/card/card.component';
 
 interface FlashCardProps {
-  flashCard: FlashCardModel;
+  flashCard: FlashCard;
   reviseType: FlashCardTypesEnum;
-  onClick?: (_value: FlashCardModel) => void;
+  onClick?: (_value: FlashCard) => void;
   correct?: boolean;
   clickedOnFlashCard?: boolean;
   clickedOverall?: boolean;
@@ -61,10 +61,10 @@ export default function FlashCardComponent(props: Readonly<FlashCardProps>) {
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       tabIndex={0}
-      className={`z-10 h-full min-h-32 w-full max-w-80 flex-col ${getClickedCardStyles()}`}
+      className={`z-10 h-full w-full flex-col ${getClickedCardStyles()}`}
     >
       <h5
-        className={`text-default z-20 flex w-full items-center rounded-md sm:min-h-10 sm:items-start ${
+        className={`z-20 flex w-full items-center rounded-md sm:min-h-10 sm:items-start ${
           props.reviseType === FlashCardTypesEnum.GUESS_DEFINITION
             ? 'bg-gray-200 dark:bg-slate-800'
             : 'bg-transparent'
@@ -76,7 +76,7 @@ export default function FlashCardComponent(props: Readonly<FlashCardProps>) {
       </h5>
 
       <p
-        className={`text-default z-20 flex w-full min-w-72 items-center rounded-md text-sm sm:min-h-16 sm:items-start ${
+        className={`z-20 flex w-full items-center rounded-md text-sm sm:min-h-16 sm:items-start ${
           props.reviseType === FlashCardTypesEnum.GUESS_NAME
             ? 'bg-gray-200 dark:bg-slate-800'
             : 'bg-transparent'

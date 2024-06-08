@@ -1,9 +1,9 @@
-import { FlashCardModel } from '#/shared/models/flash-card.model';
+import { FlashCard } from '#/shared/models/flash-card.model';
 import { PropsWithChildren } from 'react';
 
 interface FlashCardRowProps {
   index: number;
-  flashCard: FlashCardModel;
+  flashCard: FlashCard;
 }
 
 export const FlashCardRowComponent = (

@@ -8,6 +8,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        disabled: '',
+        'disabled-outline':
+          'border-gray-300 dark:border-slate-800 bg-transparent text-gray-500 opacity-80 dark:bg-transparent',
+        'disabled-text':
+          'hover:bg-gray-200/50 dark:hover:bg-slate-800/50 border-transparent dark:border-transparent',
         primary:
           'border-transparent text-gray-50 bg-green-400 border-green-500 hover:bg-green-500 active:focus:bg-green-600',
         'primary-outline':
@@ -33,7 +38,8 @@ const buttonVariants = cva(
         lg: 'h-11 px-8 md:w-auto',
         xlg: 'h-11 px-14 md:w-auto',
         icon: 'h-10 min-w-10 md:w-10',
-        'icon-mini': 'size-5',
+        'icon-sm': 'size-7',
+        'icon-xs': 'size-5',
         full: 'w-full h-10 !max-w-auto',
       },
       iconPosition: {

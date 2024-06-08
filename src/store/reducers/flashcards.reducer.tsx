@@ -1,4 +1,4 @@
-import { FlashCardModel } from '#/shared/models/flash-card.model';
+import { FlashCard } from '#/shared/models/flash-card.model';
 import type { FlashCards } from '#/shared/types/local-storage-flash-card.type';
 import type { UUID } from '#/shared/types/uuid.type';
 import typedInstanceFactory from '#/shared/utils/typed-instance-factory.util';
@@ -55,9 +55,9 @@ export const flashCardsSlice = createSlice({
     updateFlashCard: (
       state,
       action: PayloadAction<{
-        flashCard: FlashCardModel;
+        flashCard: FlashCard;
         updatedValue: unknown;
-        property?: keyof FlashCardModel;
+        property?: keyof FlashCard;
       }>,
     ) => {
       const flashCardsClone = { ...state };
@@ -69,7 +69,7 @@ export const flashCardsSlice = createSlice({
           [property]: updatedValue,
         };
       } else {
-        flashCardsClone[flashCard.frontUuid] = updatedValue as FlashCardModel;
+        flashCardsClone[flashCard.frontUuid] = updatedValue as FlashCard;
       }
 
       state = flashCardsClone;

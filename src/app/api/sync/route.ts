@@ -1,5 +1,5 @@
 import { DEFAULT_STATS } from '#/shared/defaults/stats.default';
-import { FlashCardModel } from '#/shared/models/flash-card.model';
+import { FlashCard } from '#/shared/models/flash-card.model';
 import { ApiSyncResponse } from '#/shared/types/api/api-sync-response.type';
 import { StatsModel } from '#/shared/types/stats.type';
 import checkValidity from '#/shared/utils/check-validity.util';
@@ -11,7 +11,7 @@ import {
 import { cookies } from 'next/headers';
 
 type requestBody = {
-  flashcards: FlashCardModel[];
+  flashcards: FlashCard[];
   stats: StatsModel;
   theme: 'light' | 'dark';
   lastSyncAt: Date | null;

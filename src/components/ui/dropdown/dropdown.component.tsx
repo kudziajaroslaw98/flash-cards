@@ -33,7 +33,6 @@ const DropdownVariants = cva(
 interface BaseDropdownParams<T> extends VariantProps<typeof DropdownVariants> {
   config: Record<string, DictionaryValue<T>>;
   defaultValue?: DictionaryValue<T> | DictionaryValue<T>[];
-
   clearAll?: boolean;
   searchable?: boolean;
 }
@@ -129,8 +128,6 @@ export default function Dropdown<T>({
         setSelected(selected.filter((item) => item.value !== pickedItem.value));
       }
     } else {
-      console.log('im here');
-
       setVisible(false);
       setSelected([pickedItem]);
       setSearchValue('');
@@ -158,7 +155,13 @@ export default function Dropdown<T>({
       ref={dropdownWrapperRef}
     >
       <div
-        className={`group relative z-30 flex h-11 cursor-pointer items-center justify-center rounded-md border border-gray-300 bg-gray-100 px-4 text-gray-500 transition dark:border-slate-800 dark:bg-slate-900 `}
+        className={cn([
+          'group relative z-10 flex h-10 cursor-pointer items-center justify-center rounded-md border',
+          'bg-gray-100 px-4 transition dark:bg-slate-900',
+          selected.length > 0
+            ? 'border-green-500 text-green-500'
+            : 'border-gray-300 bg-gray-100 text-gray-500 dark:border-slate-800 dark:bg-slate-900',
+        ])}
       >
         {multiple ? (
           <DropdownLabel
@@ -176,7 +179,10 @@ export default function Dropdown<T>({
         {visible && (
           <div
             data-open={visible}
-            className={cn(DropdownVariants({ contextPosition }))}
+            className={cn([
+              DropdownVariants({ contextPosition }),
+              'text-gray-500',
+            ])}
           >
             {props.searchable && (
               <div className='min-w-fit border-b bg-gray-100 p-1  dark:border-slate-800 dark:bg-slate-900 '>

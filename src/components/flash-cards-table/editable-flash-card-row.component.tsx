@@ -2,16 +2,16 @@ import {
   default as TextArea,
   default as TextAreaComponent,
 } from '#/components/ui/text-area/text-area.component';
-import { FlashCardModel } from '#/shared/models/flash-card.model';
+import { FlashCard } from '#/shared/models/flash-card.model';
 import { motion } from 'framer-motion';
 
 interface EditableFlashCardRowProps {
   index: number;
-  flashCard: FlashCardModel;
-  toggleSelected: (_flashCard: FlashCardModel) => void;
-  isSelected: (_flashCard: FlashCardModel) => boolean;
-  definitionChange: (_flashCard: FlashCardModel, _value: string) => void;
-  wordChange: (_flashCard: FlashCardModel, _value: string) => void;
+  flashCard: FlashCard;
+  toggleSelected: (_flashCard: FlashCard) => void;
+  isSelected: (_flashCard: FlashCard) => boolean;
+  definitionChange: (_flashCard: FlashCard, _value: string) => void;
+  wordChange: (_flashCard: FlashCard, _value: string) => void;
 }
 
 export default function EditableFlashCardRowComponent(

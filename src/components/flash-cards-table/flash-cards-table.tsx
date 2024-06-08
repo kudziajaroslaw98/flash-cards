@@ -8,7 +8,7 @@ import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-c
 import EditableFlashCardRowComponent from '#/components/flash-cards-table/editable-flash-card-row.component';
 import { Button } from '#/components/ui/button/button.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
-import { FlashCardModel } from '#/shared/models/flash-card.model';
+import { FlashCard } from '#/shared/models/flash-card.model';
 import { UUID } from '#/shared/types/uuid.type';
 
 import {
@@ -29,11 +29,11 @@ export default function FlashCardsTable() {
 
   const [selected, setSelected] = useState<UUID[]>([]);
 
-  const isSelected = (flashCard: FlashCardModel) => {
+  const isSelected = (flashCard: FlashCard) => {
     return selected.includes(flashCard.frontUuid);
   };
 
-  const toggleSelected = (flashCard: FlashCardModel) => {
+  const toggleSelected = (flashCard: FlashCard) => {
     const isFlashCardSelected = selected.includes(flashCard.frontUuid);
 
     if (isFlashCardSelected) {
@@ -68,13 +68,13 @@ export default function FlashCardsTable() {
     }, 1);
   };
 
-  const wordChange = (flashCard: FlashCardModel, value: string) => {
+  const wordChange = (flashCard: FlashCard, value: string) => {
     dispatch(
       updateFlashCard({ flashCard, updatedValue: value, property: 'word' }),
     );
   };
 
-  const definitionChange = (flashCard: FlashCardModel, value: string) => {
+  const definitionChange = (flashCard: FlashCard, value: string) => {
     dispatch(
       updateFlashCard({
         flashCard,
