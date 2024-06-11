@@ -70,6 +70,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
     >
       <ContextMenu
         open={isOpen}
+        setOpen={setOpen}
         name={'hamburger-menu'}
         afterMenuClass='py-4 justify-center'
         triggerComponent={
