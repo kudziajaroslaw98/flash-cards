@@ -9,7 +9,7 @@ import Modal from '#/components/ui/modal/modal.component';
 import { ToggleButton } from '#/components/ui/toggle-button/toggle-button.component';
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import { FlashCardSet } from '#/shared/models/flashcard-set.model';
-import { signInValidationScheme } from '#/shared/validation-schemes/sign-in-validation.scheme';
+import { newSetValidationScheme } from '#/shared/validation-schemes/new-set-validation.scheme';
 import { StarIcon as StarIconOutline } from '@heroicons/react/24/outline';
 import { MagnifyingGlassIcon, StarIcon } from '@heroicons/react/24/solid';
 import { useRef, useState } from 'react';
@@ -18,6 +18,22 @@ export default function SetsPage() {
   const [isFavourite, toggleFavourite] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dialogRef = useRef(null);
+  const newSetScheme = {
+    inputs: {
+      name: {
+        type: 'text',
+        name: 'name',
+        label: 'Set name',
+        placeholder: 'Wild Animals',
+      },
+      description: {
+        type: 'textarea',
+        name: 'description',
+        label: 'Description',
+      },
+    },
+    validation: newSetValidationScheme,
+  };
 
   const Sets: FlashCardSet[] = [
     {
@@ -150,34 +166,29 @@ export default function SetsPage() {
           open={isModalOpen}
           onDialogClose={handleDialogClose}
           ref={dialogRef}
-          className='w-[30rem]'
+          className='max-w-96'
         >
           <Modal.Header>
             <h6>Create new set</h6>
           </Modal.Header>
 
-          <Modal.Body>
+          <Modal.Body className='flex flex-col items-center justify-center pb-8 pt-4'>
             <FormComponent
-              scheme={{
-                inputs: {
-                  email: {
-                    type: 'email',
-                    name: 'email',
-                    label: 'Email',
-                    placeholder: 'example@email.com',
-                  },
-                  password: {
-                    type: 'password',
-                    name: 'password',
-                    label: 'Password',
-                  },
-                },
-                validation: signInValidationScheme,
-              }}
-              emitFormValid={() => null}
-              emitFormValue={() => null}
+              className='w-full max-w-80 text-sm'
+              scheme={newSetScheme}
+              emitFormValid={() => {}}
+              emitFormValue={() => {}}
             />
           </Modal.Body>
+
+          <Modal.Footer className='flex items-center justify-end gap-2 py-4'>
+            <Button
+              label='Create'
+              onClick={() => setIsModalOpen(false)}
+              size={'sm'}
+              variant={'primary-text'}
+            ></Button>
+          </Modal.Footer>
         </Modal>
       </div>
     </div>

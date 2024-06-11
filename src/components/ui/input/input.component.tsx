@@ -25,6 +25,7 @@ export interface InputComponentProps
   for?: string;
   valid: boolean;
   error?: string | null;
+  touched?: boolean;
   value: string;
   icon?: React.ReactNode;
 }
@@ -35,6 +36,7 @@ function Input({
   value,
   label,
   required,
+  touched = false,
   error = null,
   className = '',
   icon,
@@ -42,18 +44,29 @@ function Input({
 }: InputComponentProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleClick = () => {
-    inputRef.current?.focus();
-  };
-
   return (
     <label
-      className={`group relative flex w-full max-w-md flex-col ${label ? 'pt-6' : ''} ${className}`}
+      className={`group relative flex w-full max-w-md flex-col ${label ? 'pt-2' : ''} ${className ?? ''}`}
       htmlFor={forProp}
-      onClick={handleClick}
     >
+      {label && (
+        <span
+          className={cn([
+            touched && !valid ? '!text-red-400' : '',
+            touched && valid ? '!text-green-400' : '',
+            'w-auto pb-2 pl-2 text-gray-400',
+          ])}
+        >
+          {`${label}${required ? '*' : ''}`}
+        </span>
+      )}
+
       <span
-        className={`flex w-full items-center gap-4 rounded-md border border-gray-300 bg-gray-100 p-2 px-4 dark:border-slate-800 dark:bg-slate-900 ${!valid ? '!border-red-400' : ''}`}
+        className={cn([
+          'flex w-full items-center gap-4 rounded-md border border-gray-300 bg-gray-100 p-2 px-4 dark:border-slate-800 dark:bg-slate-900',
+          touched && !valid ? '!border-red-400' : '',
+          touched && valid ? '!border-green-400' : '',
+        ])}
       >
         {icon && (
           <span className='text-gray-500 dark:text-gray-500'>{icon}</span>
@@ -63,29 +76,13 @@ function Input({
           {...props}
           ref={inputRef}
           className={cn([
-            !valid ? '!border-red-400' : '',
             label
-              ? 'placeholder:text-gray-100 focus:placeholder:text-gray-600 dark:placeholder:text-slate-900 dark:focus:placeholder:text-slate-400'
-              : 'placeholder:text-gray-500 dark:placeholder:text-gray-500',
+              ? 'placeholder:text-gray-300 dark:placeholder:text-slate-700'
+              : 'placeholder:text-gray-300 dark:placeholder:text-gray-500',
             'peer w-full bg-gray-100 text-gray-800',
             ' text-inherit outline-none transition-all dark:bg-slate-900 dark:text-slate-200 ',
           ])}
         />
-
-        {label && (
-          <span
-            className={`${
-              value && value !== '' ? '-translate-y-8' : '-translate-y-0'
-            } 
-          ${!valid ? '!text-red-400' : ''}
-          absolute left-2 top-8 z-20 w-auto px-4 text-green-400 
-          transition after:absolute after:left-0 after:-z-10 after:h-1 after:w-full after:translate-y-6 after:bg-gray-100
-          group-hover:-translate-y-8 group-active:-translate-y-8 peer-focus:-translate-y-8
-          dark:after:bg-slate-900`}
-          >
-            {`${label}${required ? '*' : ''}`}
-          </span>
-        )}
       </span>
 
       <span

@@ -1,9 +1,18 @@
 'use client';
 
 import Input, {
-  InputComponentProps,
+  type InputComponentProps,
 } from '#/components/ui/input/input.component';
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import isTextArea from '#/shared/guards/is-text-area.guard';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type FocusEvent,
+  type FormEvent,
+  type SetStateAction,
+} from 'react';
 import type {
   SafeParseError,
   SafeParseSuccess,
@@ -12,6 +21,9 @@ import type {
   ZodObject,
   ZodTypeAny,
 } from 'zod';
+import TextArea, {
+  type TextAreaProps,
+} from '../ui/text-area/text-area.component';
 
 type ZodSchemaFromBaseObject<T> =
   | ZodObject<Record<keyof T, ZodTypeAny>>
@@ -23,15 +35,15 @@ type FormScheme<T> = {
 };
 
 export default function FormComponent<
-  T extends Record<
-    string,
-    Omit<InputComponentProps, 'value' | 'error' | 'valid'>
-  >,
+  T extends
+    | Record<string, Omit<InputComponentProps, 'value' | 'error' | 'valid'>>
+    | Record<string, TextAreaProps>,
 >(props: {
   scheme: FormScheme<T>;
   initialValues?: Partial<Record<keyof T, string>>;
   emitFormValid: Dispatch<SetStateAction<boolean>>;
   emitFormValue: Dispatch<SetStateAction<Partial<Record<keyof T, string>>>>;
+  className?: string;
   formValid?: boolean;
   formError?: string;
   debug?: {
@@ -162,46 +174,110 @@ export default function FormComponent<
     props.emitFormValid(Object.values(valids).every((item) => item));
   };
 
+  const handleOnInput = (
+    event: FormEvent<HTMLInputElement> | FormEvent<HTMLTextAreaElement>,
+    inputName: string,
+    inputProps:
+      | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
+      | TextAreaProps,
+  ) => {
+    if (inputProps.onInput) {
+      inputProps.onInput(
+        event as FormEvent<HTMLInputElement> & FormEvent<HTMLTextAreaElement>,
+      );
+    }
+
+    props.emitFormValue({
+      ...formValues,
+      [inputName]: (event.target as HTMLInputElement | HTMLTextAreaElement)
+        ?.value,
+    } as Partial<Record<keyof T, string>>);
+
+    setFormValues((prev) => ({
+      ...prev,
+      [inputName]: (event.target as HTMLInputElement | HTMLTextAreaElement)
+        ?.value,
+    }));
+  };
+
+  const handleOnBlur = (
+    event:
+      | FocusEvent<HTMLTextAreaElement, Element>
+      | FocusEvent<HTMLInputElement, Element>,
+    inputProps:
+      | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
+      | TextAreaProps,
+  ) => {
+    if (inputProps.onBlur) {
+      inputProps.onBlur(
+        event as FocusEvent<HTMLTextAreaElement, Element> &
+          FocusEvent<HTMLInputElement, Element>,
+      );
+    }
+
+    checkFormValidity();
+  };
+
+  const handleOnFocus = (
+    event:
+      | FocusEvent<HTMLTextAreaElement, Element>
+      | FocusEvent<HTMLInputElement, Element>,
+    inputName: string,
+    inputProps:
+      | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
+      | TextAreaProps,
+  ) => {
+    if (inputProps.onFocus) {
+      inputProps.onFocus(
+        event as FocusEvent<HTMLTextAreaElement, Element> &
+          FocusEvent<HTMLInputElement, Element>,
+      );
+    }
+
+    setTouchedInputs((prev) => ({ ...prev, [inputName]: true }));
+  };
+
   return (
-    <form>
+    <form className={props.className}>
       {Object.entries(props.scheme.inputs).map(([inputName, inputProps]) => {
         return (
-          <Input
-            {...inputProps}
-            key={inputName}
-            valid={touchedInputs[inputName] ? inputsValidity[inputName] : true}
-            error={touchedInputs[inputName] ? inputsErrors[inputName] : null}
-            value={formValues[inputName] ?? ''}
-            onFocus={(e) => {
-              if (inputProps.onFocus) {
-                inputProps.onFocus(e);
-              }
+          <span key={inputName}>
+            {isTextArea(inputProps) && (
+              <TextArea
+                {...inputProps}
+                key={inputName}
+                value={formValues[inputName] ?? ''}
+                valid={
+                  touchedInputs[inputName] ? inputsValidity[inputName] : true
+                }
+                error={
+                  touchedInputs[inputName] ? inputsErrors[inputName] : null
+                }
+                touched={touchedInputs[inputName]}
+                onInput={(e) => handleOnInput(e, inputName, inputProps)}
+                onFocus={(e) => handleOnFocus(e, inputName, inputProps)}
+                onBlur={(e) => handleOnBlur(e, inputProps)}
+              ></TextArea>
+            )}
 
-              setTouchedInputs({ ...touchedInputs, [inputName]: true });
-            }}
-            onBlur={(e) => {
-              if (inputProps.onBlur) {
-                inputProps.onBlur(e);
-              }
-
-              checkFormValidity();
-            }}
-            onInput={(e) => {
-              if (inputProps.onInput) {
-                inputProps.onInput(e);
-              }
-
-              props.emitFormValue({
-                ...formValues,
-                [inputName]: e.currentTarget.value,
-              } as Partial<Record<keyof T, string>>);
-
-              setFormValues({
-                ...formValues,
-                [inputName]: e.currentTarget.value,
-              });
-            }}
-          />
+            {!isTextArea(inputProps) && (
+              <Input
+                {...inputProps}
+                key={inputName}
+                valid={
+                  touchedInputs[inputName] ? inputsValidity[inputName] : true
+                }
+                error={
+                  touchedInputs[inputName] ? inputsErrors[inputName] : null
+                }
+                touched={touchedInputs[inputName]}
+                value={formValues[inputName] ?? ''}
+                onInput={(e) => handleOnInput(e, inputName, inputProps)}
+                onFocus={(e) => handleOnFocus(e, inputName, inputProps)}
+                onBlur={(e) => handleOnBlur(e, inputProps)}
+              />
+            )}
+          </span>
         );
       })}
 

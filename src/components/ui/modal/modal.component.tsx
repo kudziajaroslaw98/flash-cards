@@ -50,11 +50,11 @@ const Modal = ({
       {open &&
         createPortal(
           <ModalContext.Provider value={{ closeVisible, onDialogClose }}>
-            <div className='absolute left-0 top-0 z-50 flex h-screen w-screen items-center justify-center bg-black/50 backdrop-blur-sm'>
+            <div className='fixed right-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black/50 backdrop-blur-sm'>
               <dialog
                 className={cn([
-                  'open:animate-fade-in transition',
-                  'flex h-auto min-h-80 max-w-[40rem] flex-col gap-6 rounded-md bg-gray-100  text-gray-800 dark:bg-slate-900 dark:text-gray-100',
+                  'transition open:animate-fade-in',
+                  'w-11/12 rounded-md bg-gray-100 text-gray-800 dark:bg-slate-900 dark:text-gray-100',
                   className,
                 ])}
                 open={open}
@@ -74,5 +74,6 @@ const Modal = ({
 Modal.Header = ModalHeader;
 Modal.Footer = ModalFooter;
 Modal.Body = ModalBody;
+
 Modal.displayName = 'Modal';
 export default Modal;

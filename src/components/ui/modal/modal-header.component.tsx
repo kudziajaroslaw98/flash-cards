@@ -1,13 +1,25 @@
+import { cn } from '#/shared/utils/cn.util';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { ReactNode, useContext } from 'react';
 import { Button } from '../button/button.component';
 import { ModalContext } from './modal.component';
 
-export const ModalHeader = ({ children }: { children: ReactNode }) => {
+export const ModalHeader = ({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) => {
   const { closeVisible, onDialogClose } = useContext(ModalContext);
 
   return (
-    <header className='flex w-full items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-slate-800'>
+    <header
+      className={cn([
+        'flex w-full items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-slate-800',
+        className,
+      ])}
+    >
       {children}
 
       {closeVisible && (
