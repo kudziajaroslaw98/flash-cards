@@ -58,7 +58,6 @@ function Input({
         {icon && (
           <span className='text-gray-500 dark:text-gray-500'>{icon}</span>
         )}
-        {/* focus:placeholder:text-gray-600 dark:placeholder:text-slate-900 dark:focus:placeholder:text-slate-400 placeholder:text-gray-100*/}
 
         <input
           {...props}

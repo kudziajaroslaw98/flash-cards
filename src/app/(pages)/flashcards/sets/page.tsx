@@ -1,16 +1,23 @@
 'use client';
+import FormComponent from '#/components/form-component/form.component';
 import Badge from '#/components/ui/badge/badge.component';
+import { Button } from '#/components/ui/button/button.component';
 import Card from '#/components/ui/card/card.component';
 import Dropdown from '#/components/ui/dropdown/dropdown.component';
 import Input from '#/components/ui/input/input.component';
+import Modal from '#/components/ui/modal/modal.component';
 import { ToggleButton } from '#/components/ui/toggle-button/toggle-button.component';
+import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import { FlashCardSet } from '#/shared/models/flashcard-set.model';
+import { signInValidationScheme } from '#/shared/validation-schemes/sign-in-validation.scheme';
 import { StarIcon as StarIconOutline } from '@heroicons/react/24/outline';
 import { MagnifyingGlassIcon, StarIcon } from '@heroicons/react/24/solid';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 export default function SetsPage() {
   const [isFavourite, toggleFavourite] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const dialogRef = useRef(null);
 
   const Sets: FlashCardSet[] = [
     {
@@ -53,6 +60,12 @@ export default function SetsPage() {
       category: 'Science',
     },
   ];
+
+  const handleDialogClose = () => {
+    setIsModalOpen(false);
+  };
+
+  useOutsideAlerter(dialogRef, handleDialogClose);
 
   return (
     <div className='flex h-full w-full grow flex-col items-center'>
@@ -126,6 +139,46 @@ export default function SetsPage() {
             </div>
           </Card>
         ))}
+      </div>
+
+      <div className='mt-8 grid grid-cols-[repeat(auto-fit,minmax(20rem,1fr))] gap-4'>
+        <Button
+          label='Create new set'
+          onClick={() => setIsModalOpen(true)}
+        ></Button>
+        <Modal
+          open={isModalOpen}
+          onDialogClose={handleDialogClose}
+          ref={dialogRef}
+          className='w-[30rem]'
+        >
+          <Modal.Header>
+            <h6>Create new set</h6>
+          </Modal.Header>
+
+          <Modal.Body>
+            <FormComponent
+              scheme={{
+                inputs: {
+                  email: {
+                    type: 'email',
+                    name: 'email',
+                    label: 'Email',
+                    placeholder: 'example@email.com',
+                  },
+                  password: {
+                    type: 'password',
+                    name: 'password',
+                    label: 'Password',
+                  },
+                },
+                validation: signInValidationScheme,
+              }}
+              emitFormValid={() => null}
+              emitFormValue={() => null}
+            />
+          </Modal.Body>
+        </Modal>
       </div>
     </div>
   );

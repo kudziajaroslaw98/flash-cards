@@ -17,6 +17,14 @@ const config: Config = {
         '400%': '400%',
       },
       keyframes: {
+        'fade-in': {
+          '0%': { opacity: '0', transform: 'translateY(5%)' },
+          '100%': { opacity: '1', transform: 'translateY(0%)' },
+        },
+        'fade-out': {
+          '0%': { opacity: '0', transform: 'translateY(0%)' },
+          '100%': { opacity: '1', transform: 'translateY(5%)' },
+        },
         'fade-in-to-bottom': {
           '0%': { opacity: '0', transform: 'translateY(95%)' },
           '100%': { opacity: '1', transform: 'translateY(100%)' },
@@ -81,6 +89,8 @@ const config: Config = {
       animation: {
         'background-gradient': 'background-gradient 12s ease infinite',
         'fade-in-to-bottom': 'fade-in-to-bottom .3s ease-in-out forwards',
+        'fade-in': 'fade-in .3s ease-in-out forwards',
+        'fade-out': 'fade-out .3s ease-in-out forwards',
         'fade-in-to-top': 'fade-in-to-top .3s ease-in-out forwards',
         'fade-out-to-top': 'fade-out-to-top .3s ease-in-out forwards',
         'fade-out-to-bottom': 'fade-out-to-bottom .3s ease-in-out forwards',

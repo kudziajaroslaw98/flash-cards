@@ -157,10 +157,10 @@ export default function Dropdown<T>({
       <div
         className={cn([
           'group relative z-10 flex h-10 cursor-pointer items-center justify-center rounded-md border',
-          'bg-gray-100 px-4 transition dark:bg-slate-900',
+          'px-4 transition ',
           selected.length > 0
             ? 'border-green-500 text-green-500'
-            : 'border-gray-300 bg-gray-100 text-gray-500 dark:border-slate-800 dark:bg-slate-900',
+            : 'border-gray-300  text-gray-500 dark:border-slate-800 ',
         ])}
       >
         {multiple ? (
