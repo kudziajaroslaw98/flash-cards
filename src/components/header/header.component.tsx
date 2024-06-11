@@ -52,12 +52,12 @@ export default function HeaderComponent() {
               <Image
                 width={24}
                 height={24}
-                src={'/images/flash-fusion-logo.svg'}
-                alt={'Flash Fusion Logo'}
+                src={'/images/flash-cards-logo.svg'}
+                alt={'Flash Cards Logo'}
               />
             </span>
 
-            <h5 className='bg-gradient-to-r from-green-600  to-green-400 bg-clip-text text-2xl font-black tracking-tighter text-transparent transition-all '>
+            <h5 className='bg-gradient-to-r from-green-600 to-green-400  bg-clip-text text-2xl font-black uppercase tracking-tighter text-transparent transition-all'>
               FLASHCARDS
             </h5>
           </Link>

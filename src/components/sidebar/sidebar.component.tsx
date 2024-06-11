@@ -109,14 +109,14 @@ export default function SidebarComponent() {
           <Image
             width={expanded ? 24 : 32}
             height={16}
-            src={'/images/flash-fusion-logo.svg'}
-            alt={'Flash Fusion Logo'}
+            src={'/images/flash-cards-logo.svg'}
+            alt={'Flash Cards Logo'}
           />
 
           <h5
-            className={`overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-2xl font-black tracking-tighter text-transparent transition-all ${expanded ? 'max-w-full' : 'hidden max-w-0'}`}
+            className={`overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-xl font-black uppercase tracking-tighter text-transparent transition-all ${expanded ? 'max-w-full' : 'hidden max-w-0'}`}
           >
-            Flash Fusion
+            FlashCards
           </h5>
         </Link>
 
