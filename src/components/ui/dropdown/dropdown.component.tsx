@@ -110,6 +110,7 @@ export default function Dropdown<T>({
   }, [items, searchValue]);
 
   const openDropdown = () => {
+    console.log('trigger change');
     if (!visible) {
       setVisible(true);
       setSearchValue('');
@@ -117,6 +118,7 @@ export default function Dropdown<T>({
   };
 
   const changePickedItem = (pickedItem: DictionaryValue<T>) => {
+    console.log('trigger change');
     if (multiple) {
       const index = selected.findIndex(
         (item) => item.value === pickedItem.value,
@@ -125,7 +127,9 @@ export default function Dropdown<T>({
       if (index === -1) {
         setSelected((prev) => [...prev, pickedItem]);
       } else {
-        setSelected(selected.filter((item) => item.value !== pickedItem.value));
+        setSelected((prev) =>
+          prev.filter((item) => item.value !== pickedItem.value),
+        );
       }
     } else {
       setVisible(false);
@@ -139,6 +143,7 @@ export default function Dropdown<T>({
   };
 
   const handleSearchValueChange = (event: FormEvent<HTMLInputElement>) => {
+    console.log('trigger change');
     setSearchValue(event.currentTarget?.value);
 
     if (event.currentTarget?.value !== '') {

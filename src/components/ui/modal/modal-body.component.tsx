@@ -9,8 +9,8 @@ export const ModalBody = ({
   className?: string;
 }) => {
   return (
-    <main className={cn(['flex w-full flex-col px-6 py-4', className])}>
+    <div className={cn(['flex w-full flex-col px-6 py-4', className])}>
       {children}
-    </main>
+    </div>
   );
 };

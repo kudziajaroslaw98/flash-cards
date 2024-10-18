@@ -21,9 +21,8 @@ export const flashCardsSlice = createSlice({
       return state;
     },
     addNewFlashCard: (state) => {
-      const flashCardsClone = { ...state };
       const newUuid = uuid() as UUID;
-      const newFlashCards = typedInstanceFactory(flashCardsClone, {
+      const newFlashCards = typedInstanceFactory(state, {
         [newUuid]: {
           frontUuid: newUuid,
           word: 'new-word',
@@ -38,18 +37,15 @@ export const flashCardsSlice = createSlice({
       return state;
     },
     removeFlashCards: (state, action: PayloadAction<UUID[]>) => {
-      const flashCardsClone = { ...state };
-
       action.payload.forEach((flashCardUuid) => {
-        delete flashCardsClone?.[flashCardUuid];
+        delete state?.[flashCardUuid];
       });
 
-      Object.values(flashCardsClone).forEach((flashCard, index) => {
+      Object.values(state).forEach((flashCard, index) => {
         flashCard.order = index;
       });
 
-      localStorage.setItem('flashcards', JSON.stringify(flashCardsClone));
-      state = flashCardsClone;
+      localStorage.setItem('flashcards', JSON.stringify(state));
       return state;
     },
     updateFlashCard: (

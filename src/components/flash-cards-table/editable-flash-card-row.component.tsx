@@ -1,7 +1,4 @@
-import {
-  default as TextArea,
-  default as TextAreaComponent,
-} from '#/components/ui/text-area/text-area.component';
+import { default as TextArea } from '#/components/ui/text-area/text-area.component';
 import { FlashCard } from '#/shared/models/flash-card.model';
 import { motion } from 'framer-motion';
 
@@ -57,11 +54,7 @@ export default function EditableFlashCardRowComponent(
       <motion.td className='z-20 flex w-full min-w-44 flex-col items-start gap-2 p-2 py-4 text-sm text-gray-800 dark:text-slate-200 md:w-auto md:flex-row md:items-center md:border-r md:border-r-slate-400/20 md:py-2'>
         <input
           type='text'
-          className={`w-full rounded-md bg-transparent p-2 text-base font-semibold outline-none ring-blue-400 transition-all focus:ring-1 md:text-sm ${
-            props.isSelected(props.flashCard)
-              ? 'border-green-400/50'
-              : 'border-transparent dark:border-slate-700'
-          }`}
+          className={`w-full rounded-md !border-transparent bg-gray-200/40 p-2 text-base font-semibold outline-none ring-blue-400 transition-all focus:ring-1 dark:bg-slate-900/20 md:text-sm`}
           id={`word-${props.flashCard.frontUuid}`}
           onInput={(value) =>
             props.wordChange(props.flashCard, value.currentTarget.value)
@@ -69,27 +62,25 @@ export default function EditableFlashCardRowComponent(
           value={props.flashCard.word}
         />
         <TextArea
-          className={`flex bg-transparent md:hidden ${
-            props.isSelected(props.flashCard)
-              ? 'border-green-400/50 '
-              : 'border-transparent dark:border-slate-700'
-          }`}
-          onInput={(value) => props.definitionChange(props.flashCard, value)}
+          className={`flex rounded-md !border-transparent bg-gray-200/40 pl-1 dark:bg-slate-900/20 md:hidden`}
+          onInput={(value) =>
+            props.definitionChange(props.flashCard, value.currentTarget.value)
+          }
           value={props.flashCard.definition}
           id={`definition-top-${props.flashCard.frontUuid}`}
+          valid={true}
         />
       </motion.td>
 
       <motion.td className='line-clamp-2 hidden w-full items-center p-2 px-4 text-sm text-gray-700 dark:text-slate-200 md:flex'>
-        <TextAreaComponent
-          className={`hidden bg-transparent md:flex ${
-            props.isSelected(props.flashCard)
-              ? 'border-green-400/50 '
-              : 'border-transparent dark:border-slate-700'
-          }`}
-          onInput={(value) => props.definitionChange(props.flashCard, value)}
+        <TextArea
+          className={`hidden !max-w-full rounded-md !border-transparent bg-gray-200/40 dark:bg-slate-900/20 md:flex`}
+          onInput={(value) =>
+            props.definitionChange(props.flashCard, value.currentTarget.value)
+          }
           value={props.flashCard.definition}
           id={`definition-right-${props.flashCard.frontUuid}`}
+          valid={true}
         />
       </motion.td>
     </motion.tr>

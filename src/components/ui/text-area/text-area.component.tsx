@@ -10,7 +10,6 @@ import {
 
 export interface TextAreaProps
   extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  type: 'textarea';
   className: string;
   valid: boolean;
   for?: string;

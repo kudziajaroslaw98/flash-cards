@@ -9,13 +9,13 @@ export const ModalFooter = ({
   className?: string;
 }) => {
   return (
-    <footer
+    <div
       className={cn([
         'w-full border-t border-gray-200 px-6 py-4 dark:border-slate-800',
         className,
       ])}
     >
       {children}
-    </footer>
+    </div>
   );
 };

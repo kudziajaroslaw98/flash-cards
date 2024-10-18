@@ -2,7 +2,7 @@ import { cn } from '#/shared/utils/cn.util';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { ReactNode, useContext } from 'react';
 import { Button } from '../button/button.component';
-import { ModalContext } from './modal.component';
+import { DialogContext } from '../dialog/dialog.component';
 
 export const ModalHeader = ({
   children,
@@ -11,10 +11,10 @@ export const ModalHeader = ({
   children: ReactNode;
   className?: string;
 }) => {
-  const { closeVisible, onDialogClose } = useContext(ModalContext);
+  const { isCloseButtonVisible, onDialogClose } = useContext(DialogContext);
 
   return (
-    <header
+    <div
       className={cn([
         'flex w-full items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-slate-800',
         className,
@@ -22,7 +22,7 @@ export const ModalHeader = ({
     >
       {children}
 
-      {closeVisible && (
+      {isCloseButtonVisible && (
         <Button
           variant='destructive-text'
           size='icon-sm'
@@ -30,6 +30,6 @@ export const ModalHeader = ({
           onClick={onDialogClose}
         />
       )}
-    </header>
+    </div>
   );
 };

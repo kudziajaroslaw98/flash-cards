@@ -1,44 +1,30 @@
 'use client';
-import FormComponent from '#/components/form-component/form.component';
+import { NewSetModal } from '#/components/new-set-modal/new-set-modal.component';
 import Badge from '#/components/ui/badge/badge.component';
 import { Button } from '#/components/ui/button/button.component';
 import Card from '#/components/ui/card/card.component';
 import Dropdown from '#/components/ui/dropdown/dropdown.component';
 import Input from '#/components/ui/input/input.component';
-import Modal from '#/components/ui/modal/modal.component';
 import { ToggleButton } from '#/components/ui/toggle-button/toggle-button.component';
-import useOutsideAlerter from '#/hooks/use-click-outside.hook';
+import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import { FlashCardSet } from '#/shared/models/flashcard-set.model';
-import { newSetValidationScheme } from '#/shared/validation-schemes/new-set-validation.scheme';
+import uuid from '#/shared/utils/uuid.util';
+import { newSetFormScheme } from '#/shared/validation-schemes/new-set-validation.scheme';
+import { addNewSet } from '#/store/reducers/sets.reducer';
+import { setsSelectors } from '#/store/selectors/sets.selectors';
 import { StarIcon as StarIconOutline } from '@heroicons/react/24/outline';
 import { MagnifyingGlassIcon, StarIcon } from '@heroicons/react/24/solid';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 export default function SetsPage() {
   const [isFavourite, toggleFavourite] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const dialogRef = useRef(null);
-  const newSetScheme = {
-    inputs: {
-      name: {
-        type: 'text',
-        name: 'name',
-        label: 'Set name',
-        placeholder: 'Wild Animals',
-      },
-      description: {
-        type: 'textarea',
-        name: 'description',
-        label: 'Description',
-      },
-    },
-    validation: newSetValidationScheme,
-  };
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const sets = useAppSelector(setsSelectors.selectSetsArray);
+  const dispatch = useAppDispatch();
 
   const Sets: FlashCardSet[] = [
     {
       frontUuid: '1',
-      uuid: '1',
       isFavourite: true,
       flashCards: [],
       name: 'Earth Science Essentials Part 1',
@@ -48,7 +34,6 @@ export default function SetsPage() {
     },
     {
       frontUuid: '2',
-      uuid: '2',
       isFavourite: false,
       flashCards: [],
       name: 'Wild Animals',
@@ -58,7 +43,6 @@ export default function SetsPage() {
     },
     {
       frontUuid: '3',
-      uuid: '3',
       isFavourite: false,
       flashCards: [],
       name: 'Greek Science',
@@ -67,7 +51,6 @@ export default function SetsPage() {
     },
     {
       frontUuid: '4',
-      uuid: '4',
       isFavourite: false,
       flashCards: [],
       name: 'Biology Secrects',
@@ -77,11 +60,21 @@ export default function SetsPage() {
     },
   ];
 
-  const handleDialogClose = () => {
-    setIsModalOpen(false);
+  const handleNewSet = (
+    set: Partial<Record<keyof typeof newSetFormScheme.inputs, string>>,
+  ) => {
+    const newUuid = uuid();
+    const newSet = {
+      ...set,
+      name: set.name || 'New Set',
+      description: set.description || 'No description',
+      frontUuid: newUuid,
+      isFavourite: false,
+      flashCards: [],
+      category: 'Science',
+    };
+    dispatch(addNewSet(newSet));
   };
-
-  useOutsideAlerter(dialogRef, handleDialogClose);
 
   return (
     <div className='flex h-full w-full grow flex-col items-center'>
@@ -103,9 +96,7 @@ export default function SetsPage() {
               learn: { label: 'Learn', value: 'learn' },
               revise: { label: 'Revise', value: 'revise' },
             }}
-            onChange={(value) => {
-              console.log(value);
-            }}
+            onChange={() => {}}
             label='Category'
             multiple
             clearAll
@@ -122,10 +113,10 @@ export default function SetsPage() {
         </div>
       </div>
 
-      <div className='mt-8 grid grid-cols-[repeat(auto-fit,minmax(20rem,1fr))] gap-4'>
-        {Sets.map((set) => (
+      <div className='mt-8 grid w-full grid-cols-[repeat(auto-fit,minmax(20rem,1fr))] gap-4'>
+        {sets.map((set) => (
           <Card
-            key={set.uuid}
+            key={set.frontUuid}
             className='flex flex-col justify-between gap-4 sm:min-h-44 sm:gap-4'
           >
             <div className='flex flex-col gap-4'>
@@ -160,36 +151,14 @@ export default function SetsPage() {
       <div className='mt-8 grid grid-cols-[repeat(auto-fit,minmax(20rem,1fr))] gap-4'>
         <Button
           label='Create new set'
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsDialogOpen(true)}
         ></Button>
-        <Modal
-          open={isModalOpen}
-          onDialogClose={handleDialogClose}
-          ref={dialogRef}
-          className='max-w-96'
-        >
-          <Modal.Header>
-            <h6>Create new set</h6>
-          </Modal.Header>
 
-          <Modal.Body className='flex flex-col items-center justify-center pb-8 pt-4'>
-            <FormComponent
-              className='w-full max-w-80 text-sm'
-              scheme={newSetScheme}
-              emitFormValid={() => {}}
-              emitFormValue={() => {}}
-            />
-          </Modal.Body>
-
-          <Modal.Footer className='flex items-center justify-end gap-2 py-4'>
-            <Button
-              label='Create'
-              onClick={() => setIsModalOpen(false)}
-              size={'sm'}
-              variant={'primary-text'}
-            ></Button>
-          </Modal.Footer>
-        </Modal>
+        <NewSetModal
+          setIsModalOpen={setIsDialogOpen}
+          isDialogOpen={isDialogOpen}
+          handleNewSet={handleNewSet}
+        />
       </div>
     </div>
   );

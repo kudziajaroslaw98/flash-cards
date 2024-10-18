@@ -12,10 +12,12 @@ import {
   Metadata,
   MetadataModel,
 } from '#/shared/types/local-storage-metadata.type';
+import { Sets } from '#/shared/types/local-storage-sets.type';
 import {
   setFlashCards,
   setFlashCardsAfterSync,
 } from '#/store/reducers/flashcards.reducer';
+import { setSets } from '#/store/reducers/sets.reducer';
 import { setStats, setStatsAfterSync } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { statsSelectors } from '#/store/selectors/stats.selectors';
@@ -50,6 +52,7 @@ export default function SyncSessionProvider(
     'flashcards',
     {} as FlashCards,
   );
+  const { value: setsLS } = useLocalStorage('sets', {} as Sets);
   const { value: statsLS } = useLocalStorage('stats', DEFAULT_STATS);
   const { value: themeLS, setToLocalStorage: setTheme } = useLocalStorage(
     'theme',
@@ -137,6 +140,12 @@ export default function SyncSessionProvider(
 
     dispatch(setStats(statsLS));
   }, [statsLS]);
+
+  useEffect(() => {
+    if (Object.values(setsLS).length === 0) return;
+
+    dispatch(setSets(setsLS));
+  }, [setsLS]);
 
   return (
     <SyncSessionContext.Provider value={{ sync: syncWithDB }}>

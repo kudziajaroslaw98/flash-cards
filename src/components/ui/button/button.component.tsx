@@ -13,6 +13,8 @@ const buttonVariants = cva(
           'border-gray-300 dark:border-slate-800 bg-transparent text-gray-500 opacity-80 dark:bg-transparent',
         'disabled-text':
           'hover:bg-gray-200/50 dark:hover:bg-slate-800/50 border-transparent dark:border-transparent',
+        'disabled-fill':
+          'text-gray-500 bg-gray-200/50 hover:bg-gray-200/25 dark:bg-slate-800/50 dark:hover:bg-slate-800/25 border-transparent dark:border-transparent',
         primary:
           'border-transparent text-gray-50 bg-green-400 border-green-500 hover:bg-green-500 active:focus:bg-green-600',
         'primary-outline':

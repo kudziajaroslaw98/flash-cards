@@ -1,3 +1,4 @@
+import { UUID } from '../types/uuid.type';
 import { FlashCardSet } from './flashcard-set.model';
 
 export type CommunitySet = FlashCardSet & {
@@ -5,4 +6,5 @@ export type CommunitySet = FlashCardSet & {
   creatorId: string;
   createdAt: Date;
   favouriteCount: number;
+  uuid: UUID;
 };
