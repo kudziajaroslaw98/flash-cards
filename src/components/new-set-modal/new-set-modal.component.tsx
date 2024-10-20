@@ -11,9 +11,7 @@ interface NewSetModalProps {
   isDialogOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   handleNewSet: (
-    set: Partial<
-      Record<keyof typeof newSetFormScheme.arguments.inputs, string>
-    >,
+    set: Record<keyof typeof newSetFormScheme.arguments.inputs, string>,
   ) => void;
   categories: DictionaryValue<string>[];
 }
@@ -25,7 +23,7 @@ export const NewSetModal = ({
   categories,
 }: NewSetModalProps) => {
   const [formValue, setFormValue] = useState<
-    Partial<Record<keyof typeof newSetFormScheme.arguments.inputs, string>>
+    Record<keyof typeof newSetFormScheme.arguments.inputs, string>
   >({});
   const getFormScheme = useCallback(() => {
     return newSetFormScheme(categories);
@@ -36,7 +34,6 @@ export const NewSetModal = ({
   };
 
   const handleDialogSubmit = () => {
-    console.log(formValue);
     setIsModalOpen(false);
     handleNewSet(formValue);
     setFormValue({});

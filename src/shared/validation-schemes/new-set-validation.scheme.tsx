@@ -31,6 +31,7 @@ export const newSetFormScheme = (
       label: 'Category',
       controlLabel: 'Category',
       config: dictionaryItems,
+      addNew: true,
       clearAll: true,
     },
   },

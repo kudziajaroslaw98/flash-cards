@@ -137,6 +137,7 @@ export default function SetsPage() {
                 height: 0,
                 marginTop: 0,
                 opacity: 0,
+                zIndex: -20,
               }}
             >
               <Card

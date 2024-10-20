@@ -6,6 +6,7 @@ import { cn } from '#/shared/utils/cn.util';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import { cva, VariantProps } from 'class-variance-authority';
 import { FormEvent, useEffect, useRef, useState } from 'react';
+import { Button } from '../button/button.component';
 import Input from '../input/input.component';
 import DropdownItem from './dropdown-item.component';
 import DropdownLabel from './dropdown-label.component';
@@ -37,6 +38,7 @@ interface BaseDropdownProps<T> extends VariantProps<typeof DropdownVariants> {
   clearAll?: boolean;
   searchable?: boolean;
   labelClassName?: string;
+  addNew?: boolean;
   // Form Control Props
   controlLabel?: string;
   touched?: boolean;
@@ -45,6 +47,7 @@ interface BaseDropdownProps<T> extends VariantProps<typeof DropdownVariants> {
   error?: string | null;
   onBlur?: () => void;
   onFocus?: () => void;
+  onAddNew?: (value: string) => void;
 }
 
 export type DropdownProps<T> =
@@ -79,13 +82,16 @@ export default function Dropdown<T>({
   touched = false,
   ...props
 }: Readonly<DropdownProps<T>>) {
-  const [items, setItems] = useState<DictionaryValue<T>[]>();
+  const [items, setItems] = useState<DictionaryValue<T>[]>([]);
   const [selected, setSelected] = useState<DictionaryValue<T>[]>([]);
   const [visible, setVisible] = useState(false);
 
   const [searchValue, setSearchValue] = useState('');
   const [filteredItems, setFilteredItems] = useState<DictionaryValue<T>[]>();
   const [isSearching, setIsSearching] = useState(false);
+
+  const [isInAddNewMode, setIsInAddNewMode] = useState(false);
+  const [newItemValue, setNewItemValue] = useState('');
 
   const dropdownWrapperRef = useRef<HTMLDivElement>(null);
 
@@ -115,7 +121,7 @@ export default function Dropdown<T>({
         return false;
       }),
     );
-  }, [config, value]);
+  }, [config]);
 
   useEffect(() => {
     setFilteredItems(
@@ -180,6 +186,32 @@ export default function Dropdown<T>({
     if (onFocus) {
       onFocus();
     }
+  };
+
+  const handleToggleAddNew = () => {
+    setIsInAddNewMode((prev) => !prev);
+  };
+
+  const handleAddNewElement = () => {
+    const newItem = {
+      value: newItemValue,
+      label: newItemValue,
+    } as DictionaryValue<T>;
+
+    setItems((prev) => [...prev, newItem]);
+    setSelected((prev) => [...prev, newItem]);
+    setIsInAddNewMode(false);
+    setNewItemValue('');
+
+    if (multiple) {
+      onChange([...selected, newItem].map((item) => item.value));
+    } else {
+      onChange(newItem.value);
+    }
+  };
+
+  const handleNewElementChange = (event: FormEvent<HTMLInputElement>) => {
+    setNewItemValue(event.currentTarget.value);
   };
 
   return (
@@ -253,7 +285,6 @@ export default function Dropdown<T>({
                   />
                 </div>
               )}
-
               <div className={props.searchable || props.clearAll ? 'py-3' : ''}>
                 {isSearching &&
                   filteredItems?.map((item) => (
@@ -276,6 +307,51 @@ export default function Dropdown<T>({
                     />
                   ))}
               </div>
+              {props.addNew && !isInAddNewMode && (
+                <div
+                  className='hover:text-green-40 flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-100 px-4 py-2 text-gray-500 transition hover:text-gray-700  dark:border-slate-800 dark:bg-slate-900  dark:hover:text-gray-300'
+                  onClick={handleToggleAddNew}
+                  onKeyDown={(event) =>
+                    event.key === 'Enter' && handleToggleAddNew()
+                  }
+                  tabIndex={0}
+                >
+                  Add new
+                </div>
+              )}
+              {props.addNew && isInAddNewMode && (
+                <div className={props.clearAll ? 'pb-4' : ''}>
+                  <div className='min-w-fit border-b bg-gray-100 p-1 py-2 dark:border-slate-800 dark:bg-slate-900 '>
+                    <Input
+                      value={searchValue}
+                      valid={true}
+                      placeholder='New element...'
+                      for='new_element'
+                      className='min-w-52 text-sm'
+                      onInput={handleNewElementChange}
+                      tabIndex={0}
+                    />
+                  </div>
+
+                  <div className='hover:text-green-40 flex h-11 w-full cursor-pointer items-center justify-center gap-2 border-t bg-gray-100 px-4 py-6 text-gray-500 transition hover:text-gray-700  dark:border-slate-800 dark:bg-slate-900  dark:hover:text-gray-300'>
+                    <Button
+                      label='Cancel'
+                      onClick={handleToggleAddNew}
+                      variant={'destructive-outline'}
+                      size={'sm'}
+                      className='!w-full'
+                    />
+
+                    <Button
+                      label='Add'
+                      onClick={handleAddNewElement}
+                      variant={'primary'}
+                      size={'sm'}
+                      className='!w-full'
+                    />
+                  </div>
+                </div>
+              )}
 
               {props.clearAll && (
                 <div
