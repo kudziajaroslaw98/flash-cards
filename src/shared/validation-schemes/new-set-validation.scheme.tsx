@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { DictionaryValue } from '../types/dictionary-value.type';
 
 export const newSetValidationScheme = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -6,9 +7,12 @@ export const newSetValidationScheme = z.object({
     .string()
     .min(1, 'Description is required')
     .max(255, 'Description is too long'),
+  category: z.string().optional(),
 });
 
-export const newSetFormScheme = {
+export const newSetFormScheme = (
+  dictionaryItems: DictionaryValue<string>[],
+) => ({
   inputs: {
     name: {
       type: 'text',
@@ -21,6 +25,14 @@ export const newSetFormScheme = {
       name: 'description',
       label: 'Description',
     },
+    category: {
+      type: 'dropdown',
+      multiple: false,
+      label: 'Category',
+      controlLabel: 'Category',
+      config: dictionaryItems,
+      clearAll: true,
+    },
   },
   validation: newSetValidationScheme,
-};
+});

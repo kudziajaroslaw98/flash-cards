@@ -151,9 +151,10 @@ export default function FlashCardReviseComponent() {
 
         <Dropdown<FlashCardTypesEnum>
           config={dropdownItems}
-          defaultValue={dropdownItems['GUESS_DEFINITION']}
+          value={FlashCardTypesEnum.GUESS_DEFINITION}
           onChange={(value) => changeReviseType(value)}
           contextPosition={'top'}
+          labelClassName='max-w-80 md:max-w-52'
         />
       </div>
     </div>

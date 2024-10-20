@@ -1,6 +1,7 @@
 import { newSetFormScheme } from '#/shared/validation-schemes/new-set-validation.scheme';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
+import { DictionaryValue } from '#/shared/types/dictionary-value.type';
 import FormComponent from '../form-component/form.component';
 import { Button } from '../ui/button/button.component';
 import Dialog from '../ui/dialog/dialog.component';
@@ -10,18 +11,25 @@ interface NewSetModalProps {
   isDialogOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   handleNewSet: (
-    set: Partial<Record<keyof typeof newSetFormScheme.inputs, string>>,
+    set: Partial<
+      Record<keyof typeof newSetFormScheme.arguments.inputs, string>
+    >,
   ) => void;
+  categories: DictionaryValue<string>[];
 }
 
 export const NewSetModal = ({
   isDialogOpen,
   setIsModalOpen,
   handleNewSet,
+  categories,
 }: NewSetModalProps) => {
   const [formValue, setFormValue] = useState<
-    Partial<Record<keyof typeof newSetFormScheme.inputs, string>>
+    Partial<Record<keyof typeof newSetFormScheme.arguments.inputs, string>>
   >({});
+  const getFormScheme = useCallback(() => {
+    return newSetFormScheme(categories);
+  }, [categories]);
 
   const handleDialogClose = () => {
     setIsModalOpen(false);
@@ -47,9 +55,16 @@ export const NewSetModal = ({
         <Modal.Body className='flex flex-col items-center justify-center pb-8 pt-4'>
           <FormComponent
             className='w-full max-w-80 text-sm'
-            scheme={newSetFormScheme}
+            scheme={getFormScheme()}
             emitFormValid={() => {}}
             emitFormValue={setFormValue}
+            debug={{
+              errors: true,
+              inputs: true,
+              touch: true,
+              validity: true,
+              values: true,
+            }}
           />
         </Modal.Body>
 

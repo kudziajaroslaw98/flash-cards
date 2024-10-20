@@ -22,11 +22,13 @@ export default function SignInComponent() {
         name: 'email',
         label: 'Email',
         placeholder: 'example@email.com',
+        disabled: true,
       },
       password: {
         type: 'password',
         name: 'password',
         label: 'Password',
+        disabled: true,
       },
     },
     validation: signInValidationScheme,

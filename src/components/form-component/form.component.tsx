@@ -3,13 +3,13 @@
 import Input, {
   type InputComponentProps,
 } from '#/components/ui/input/input.component';
+import isDropdown from '#/shared/guards/is-dropdown.guard';
 import isTextArea from '#/shared/guards/is-text-area.guard';
 import {
   useEffect,
   useRef,
   useState,
   type Dispatch,
-  type FocusEvent,
   type FormEvent,
   type SetStateAction,
 } from 'react';
@@ -21,6 +21,7 @@ import type {
   ZodObject,
   ZodTypeAny,
 } from 'zod';
+import Dropdown from '../ui/dropdown/dropdown.component';
 import TextArea, {
   type TextAreaProps,
 } from '../ui/text-area/text-area.component';
@@ -64,7 +65,7 @@ export default function FormComponent<
   const [defaultValids, setDefaultValids] = useState<Record<string, boolean>>(
     {},
   );
-  const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const [formValues, setFormValues] = useState<Record<string, unknown>>({});
   const [formInputs, setFormInputs] = useState<string[]>([]);
   const [touchedInputs, setTouchedInputs] = useState<Record<string, boolean>>(
     {},
@@ -177,16 +178,7 @@ export default function FormComponent<
   const handleOnInput = (
     event: FormEvent<HTMLInputElement> | FormEvent<HTMLTextAreaElement>,
     inputName: string,
-    inputProps:
-      | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
-      | TextAreaProps,
   ) => {
-    if (inputProps.onInput) {
-      inputProps.onInput(
-        event as FormEvent<HTMLInputElement> & FormEvent<HTMLTextAreaElement>,
-      );
-    }
-
     props.emitFormValue({
       ...formValues,
       [inputName]: (event.target as HTMLInputElement | HTMLTextAreaElement)
@@ -200,40 +192,23 @@ export default function FormComponent<
     }));
   };
 
-  const handleOnBlur = (
-    event:
-      | FocusEvent<HTMLTextAreaElement, Element>
-      | FocusEvent<HTMLInputElement, Element>,
-    inputProps:
-      | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
-      | TextAreaProps,
-  ) => {
-    if (inputProps.onBlur) {
-      inputProps.onBlur(
-        event as FocusEvent<HTMLTextAreaElement, Element> &
-          FocusEvent<HTMLInputElement, Element>,
-      );
-    }
+  const handleOnChange = (value: unknown | unknown[], inputName: string) => {
+    props.emitFormValue({
+      ...formValues,
+      [inputName]: value,
+    } as Partial<Record<keyof T, string>>);
 
+    setFormValues((prev) => ({
+      ...prev,
+      [inputName]: value,
+    }));
+  };
+
+  const handleOnBlur = () => {
     checkFormValidity();
   };
 
-  const handleOnFocus = (
-    event:
-      | FocusEvent<HTMLTextAreaElement, Element>
-      | FocusEvent<HTMLInputElement, Element>,
-    inputName: string,
-    inputProps:
-      | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
-      | TextAreaProps,
-  ) => {
-    if (inputProps.onFocus) {
-      inputProps.onFocus(
-        event as FocusEvent<HTMLTextAreaElement, Element> &
-          FocusEvent<HTMLInputElement, Element>,
-      );
-    }
-
+  const handleOnFocus = (inputName: string) => {
     setTouchedInputs((prev) => ({ ...prev, [inputName]: true }));
   };
 
@@ -246,7 +221,7 @@ export default function FormComponent<
               <TextArea
                 {...inputProps}
                 key={inputName}
-                value={formValues[inputName] ?? ''}
+                value={(formValues[inputName] as string) ?? ''}
                 valid={
                   touchedInputs[inputName] ? inputsValidity[inputName] : true
                 }
@@ -254,13 +229,31 @@ export default function FormComponent<
                   touchedInputs[inputName] ? inputsErrors[inputName] : null
                 }
                 touched={touchedInputs[inputName]}
-                onInput={(e) => handleOnInput(e, inputName, inputProps)}
-                onFocus={(e) => handleOnFocus(e, inputName, inputProps)}
-                onBlur={(e) => handleOnBlur(e, inputProps)}
+                onInput={(e) => handleOnInput(e, inputName)}
+                onFocus={() => handleOnFocus(inputName)}
+                onBlur={handleOnBlur}
               ></TextArea>
             )}
 
-            {!isTextArea(inputProps) && (
+            {isDropdown(inputProps) && (
+              <Dropdown
+                {...inputProps}
+                key={inputName}
+                value={formValues[inputName]}
+                valid={
+                  touchedInputs[inputName] ? inputsValidity[inputName] : true
+                }
+                error={
+                  touchedInputs[inputName] ? inputsErrors[inputName] : null
+                }
+                touched={touchedInputs[inputName]}
+                onChange={(e) => handleOnChange(e, inputName)}
+                onFocus={() => handleOnFocus(inputName)}
+                onBlur={handleOnBlur}
+              ></Dropdown>
+            )}
+
+            {!isTextArea(inputProps) && !isDropdown(inputProps) && (
               <Input
                 {...inputProps}
                 key={inputName}
@@ -272,9 +265,9 @@ export default function FormComponent<
                 }
                 touched={touchedInputs[inputName]}
                 value={formValues[inputName] ?? ''}
-                onInput={(e) => handleOnInput(e, inputName, inputProps)}
-                onFocus={(e) => handleOnFocus(e, inputName, inputProps)}
-                onBlur={(e) => handleOnBlur(e, inputProps)}
+                onInput={(e) => handleOnInput(e, inputName)}
+                onFocus={() => handleOnFocus(inputName)}
+                onBlur={handleOnBlur}
               />
             )}
           </span>

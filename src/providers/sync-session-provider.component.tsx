@@ -1,24 +1,18 @@
 'use client';
 
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
-import useFetch from '#/hooks/use-fetch.hook';
 import useInterval from '#/hooks/use-interval.hook';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
 import { DEFAULT_STATS } from '#/shared/defaults/stats.default';
-import { ApiResponse } from '#/shared/types/api/api-response.type';
-import { ApiSyncResponse } from '#/shared/types/api/api-sync-response.type';
 import { FlashCards } from '#/shared/types/local-storage-flash-card.type';
 import {
   Metadata,
   MetadataModel,
 } from '#/shared/types/local-storage-metadata.type';
 import { Sets } from '#/shared/types/local-storage-sets.type';
-import {
-  setFlashCards,
-  setFlashCardsAfterSync,
-} from '#/store/reducers/flashcards.reducer';
+import { setFlashCards } from '#/store/reducers/flashcards.reducer';
 import { setSets } from '#/store/reducers/sets.reducer';
-import { setStats, setStatsAfterSync } from '#/store/reducers/stats.reducer';
+import { setStats } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { statsSelectors } from '#/store/selectors/stats.selectors';
 import {
@@ -29,7 +23,6 @@ import {
   useRef,
 } from 'react';
 import { useSessionContext } from './session-provider.component';
-import { useToastContext } from './toast-provider.component';
 
 export type SyncSessionContextType = {
   sync: () => void;
@@ -45,8 +38,8 @@ export default function SyncSessionProvider(
   const dispatch = useAppDispatch();
   const flashcards = useAppSelector(flashCardSelectors.selectFlashCardsArray);
   const stats = useAppSelector(statsSelectors.selectStats);
-  const { fetch } = useFetch();
-  const { showAsync } = useToastContext();
+  // const { fetch } = useFetch();
+  // const { showAsync } = useToastContext();
 
   const { value: flashCardsLS } = useLocalStorage(
     'flashcards',
@@ -74,47 +67,52 @@ export default function SyncSessionProvider(
   const DEFAULT_SYNC_INTERVAL_IN_MS = MIN_IN_MS * 1;
 
   const syncWithDB = useCallback(async () => {
-    console.log('syncing');
-    if (!isLoggedIn) return;
-    console.log('syncing proceed');
+    setTheme(themeLS);
+    setMetadata(metadata);
+    return;
+    // TODO: finish when all functionality is implemented
 
-    const fetchBody = JSON.stringify({
-      flashcards,
-      stats,
-      theme: themeLS.theme,
-      lastSyncAt: metadata.lastSyncAt,
-    });
+    // console.log('syncing');
+    // if (!isLoggedIn) return;
+    // console.log('syncing proceed');
 
-    const responsePromise = fetch<ApiResponse<ApiSyncResponse>>('/api/sync', {
-      method: 'POST',
-      body: fetchBody,
-    });
+    // const fetchBody = JSON.stringify({
+    //   flashcards,
+    //   stats,
+    //   theme: themeLS.theme,
+    //   lastSyncAt: metadata.lastSyncAt,
+    // });
 
-    showAsync(
-      {
-        pendingTitle: 'Syncing in progress',
-        successTitle: 'Syncing succeeded',
-        errorTitle: 'Syncing failed',
-      },
-      responsePromise,
-    );
+    // const responsePromise = fetch<ApiResponse<ApiSyncResponse>>('/api/sync', {
+    //   method: 'POST',
+    //   body: fetchBody,
+    // });
 
-    const response = await responsePromise;
+    // showAsync(
+    //   {
+    //     pendingTitle: 'Syncing in progress',
+    //     successTitle: 'Syncing succeeded',
+    //     errorTitle: 'Syncing failed',
+    //   },
+    //   responsePromise,
+    // );
 
-    if (response.success) {
-      const flashcardsObject: FlashCards = {};
+    // const response = await responsePromise;
 
-      response.data.flashcards.forEach((flashcard) => {
-        flashcardsObject[flashcard.frontUuid] = flashcard;
-      });
+    // if (response.success) {
+    //   const flashcardsObject: FlashCards = {};
 
-      setMetadata({
-        lastSyncAt: response.data.lastSyncAt,
-      });
-      setTheme({ theme: response.data.theme });
-      dispatch(setFlashCardsAfterSync(flashcardsObject));
-      dispatch(setStatsAfterSync(response.data.stats));
-    }
+    //   response.data.flashcards.forEach((flashcard) => {
+    //     flashcardsObject[flashcard.frontUuid] = flashcard;
+    //   });
+
+    //   setMetadata({
+    //     lastSyncAt: response.data.lastSyncAt,
+    //   });
+    //   setTheme({ theme: response.data.theme });
+    //   dispatch(setFlashCardsAfterSync(flashcardsObject));
+    //   dispatch(setStatsAfterSync(response.data.stats));
+    // }
   }, [isLoggedIn, flashcards, stats, themeLS, metadata]);
 
   useInterval(
