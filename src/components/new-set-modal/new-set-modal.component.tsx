@@ -51,7 +51,7 @@ export const NewSetModal = ({
 
         <Modal.Body className='flex flex-col items-center justify-center pb-8 pt-4'>
           <FormComponent
-            className='w-full max-w-80 text-sm'
+            className='w-full max-w-80'
             scheme={getFormScheme()}
             emitFormValid={() => {}}
             emitFormValue={setFormValue}

@@ -51,10 +51,10 @@ export default function EditableFlashCardRowComponent(
         {props.index + 1}
       </motion.td>
 
-      <motion.td className='z-20 flex w-full min-w-44 flex-col items-start gap-2 p-2 py-4 text-sm text-gray-800 dark:text-slate-200 md:w-auto md:flex-row md:items-center md:border-r md:border-r-slate-400/20 md:py-2'>
+      <motion.td className='z-20 flex w-full min-w-44 flex-col items-start gap-2 p-2 py-4 text-sm text-gray-800 dark:text-slate-200 md:w-auto md:flex-row  md:border-r md:border-r-slate-400/20 md:py-2'>
         <input
           type='text'
-          className={`w-full rounded-md !border-transparent bg-gray-200/40 p-2 text-base font-semibold outline-none ring-blue-400 transition-all focus:ring-1 dark:bg-slate-900/20 md:text-sm`}
+          className={`h-10 w-full rounded-md !border-transparent bg-gray-200/40 p-2 text-base font-semibold outline-none ring-blue-400 transition-all focus:ring-1 dark:bg-slate-900/20 md:text-sm`}
           id={`word-${props.flashCard.frontUuid}`}
           onInput={(value) =>
             props.wordChange(props.flashCard, value.currentTarget.value)
@@ -74,7 +74,7 @@ export default function EditableFlashCardRowComponent(
 
       <motion.td className='line-clamp-2 hidden w-full items-center p-2 px-4 text-sm text-gray-700 dark:text-slate-200 md:flex'>
         <TextArea
-          className={`hidden !max-w-full rounded-md !border-transparent bg-gray-200/40 dark:bg-slate-900/20 md:flex`}
+          className={`hidden rounded-md !border-transparent bg-gray-200/40 dark:bg-slate-900/20 md:flex`}
           onInput={(value) =>
             props.definitionChange(props.flashCard, value.currentTarget.value)
           }

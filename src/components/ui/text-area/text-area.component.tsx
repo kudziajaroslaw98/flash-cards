@@ -33,8 +33,10 @@ export default function TextArea({
 
   const adjustHeight = useDebounce(() => {
     if (textAreaRef.current) {
-      textAreaRef.current.style.height = '36px';
-      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+      const minHeight = 40;
+
+      textAreaRef.current.style.height = '40px';
+      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight >= minHeight ? textAreaRef.current.scrollHeight : minHeight}px`;
     }
   }, 75);
 
@@ -66,7 +68,7 @@ export default function TextArea({
 
   return (
     <label
-      className={`group relative flex w-full max-w-md flex-col ${label ? 'pt-2' : ''} ${className ?? ''}`}
+      className={`group relative flex w-full flex-col ${label ? 'pt-2' : ''} ${className ?? ''}`}
       htmlFor={forProp}
     >
       {label && (
@@ -74,7 +76,7 @@ export default function TextArea({
           className={cn([
             touched && !valid ? '!text-red-400' : '',
             touched && valid ? '!text-green-400' : '',
-            'w-auto pb-2 pl-2 text-gray-400 dark:text-slate-500',
+            'w-auto pb-2 pl-2 text-sm  text-gray-400 dark:text-slate-500',
           ])}
         >
           {`${label}${required ? '*' : ''}`}
@@ -87,7 +89,7 @@ export default function TextArea({
           touched && !valid ? '!border-red-400' : '',
           touched && valid ? '!border-green-400' : '',
           'flex w-full items-center gap-4 rounded-md border border-gray-300 bg-gray-100 p-2 px-4 dark:border-slate-800 dark:bg-slate-900',
-          'resize-nonep-2 h-10 outline-none ring-blue-400 transition-all focus:ring-1',
+          'h-10 resize-none text-sm outline-none ring-blue-400 transition-all focus:ring-1',
           label
             ? 'placeholder:text-gray-300  dark:placeholder:text-slate-700'
             : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',

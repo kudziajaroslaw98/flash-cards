@@ -95,7 +95,7 @@ export default function SetsPage() {
       <div className='flex w-full flex-col justify-between gap-4 lg:flex-row lg:items-center'>
         <h4 className='w-52 text-green-400'>Your Decks</h4>
 
-        <div className='flex w-full items-center justify-end gap-2'>
+        <div className='flex w-full items-center justify-end gap-2 text-sm'>
           <Input
             value=''
             valid={true}

@@ -54,7 +54,7 @@ function Input({
           className={cn([
             touched && !valid ? '!text-red-400' : '',
             touched && valid ? '!text-green-400' : '',
-            'w-auto pb-2 pl-2 text-gray-400',
+            'w-auto pb-2 pl-2 text-sm text-gray-400',
           ])}
         >
           {`${label}${required ? '*' : ''}`}
@@ -63,7 +63,7 @@ function Input({
 
       <span
         className={cn([
-          'flex w-full items-center gap-4 rounded-md border border-gray-300 bg-gray-100 p-2 px-4 dark:border-slate-800 dark:bg-slate-900',
+          'flex h-10 w-full items-center gap-4 rounded-md border border-gray-300 bg-gray-100 p-2 px-4 dark:border-slate-800 dark:bg-slate-900',
           touched && !valid ? '!border-red-400' : '',
           touched && valid ? '!border-green-400' : '',
         ])}
@@ -79,7 +79,7 @@ function Input({
             label
               ? 'placeholder:text-gray-300 dark:placeholder:text-slate-700'
               : 'placeholder:text-gray-300 dark:placeholder:text-gray-500',
-            'peer w-full bg-gray-100 text-gray-800',
+            'peer w-full bg-gray-100 text-sm text-gray-800',
             ' text-inherit outline-none transition-all dark:bg-slate-900 dark:text-slate-200 ',
           ])}
         />

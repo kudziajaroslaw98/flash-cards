@@ -217,7 +217,7 @@ export default function Dropdown<T>({
   return (
     <label
       className={cn([
-        'roup relative flex w-full max-w-md flex-col',
+        'group relative flex w-full max-w-md flex-col',
         controlLabel ? 'pt-2' : '',
         labelClassName ?? '',
       ])}
@@ -227,7 +227,7 @@ export default function Dropdown<T>({
           className={cn([
             touched && !valid ? '!text-red-400' : '',
             touched && valid ? '!text-green-400' : '',
-            'w-auto pb-2 pl-2 text-gray-400',
+            'w-auto pb-2  pl-2 text-sm text-gray-400',
           ])}
         >
           {`${controlLabel}${required ? '*' : ''}`}
@@ -240,7 +240,7 @@ export default function Dropdown<T>({
       >
         <div
           className={cn([
-            'group relative z-10 flex h-10 cursor-pointer items-center justify-center rounded-md border',
+            'group relative z-10 flex h-10 cursor-pointer items-center justify-center rounded-md border text-sm',
             'px-4 transition ',
             selected.length > 0
               ? 'border-green-500 text-green-500'
@@ -320,8 +320,8 @@ export default function Dropdown<T>({
                 </div>
               )}
               {props.addNew && isInAddNewMode && (
-                <div className={props.clearAll ? 'pb-4' : ''}>
-                  <div className='min-w-fit border-b bg-gray-100 p-1 py-2 dark:border-slate-800 dark:bg-slate-900 '>
+                <div>
+                  <div className='min-w-fit  bg-gray-100 p-1 py-2 dark:border-slate-800 dark:bg-slate-900 '>
                     <Input
                       value={searchValue}
                       valid={true}

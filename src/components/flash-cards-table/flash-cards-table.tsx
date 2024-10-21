@@ -1,6 +1,6 @@
 'use client';
 
-import { PlusIcon, TrashIcon } from '@heroicons/react/24/solid';
+import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 
@@ -84,6 +84,23 @@ export default function FlashCardsTable() {
     );
   };
 
+  const editSelectedRecords = () => {
+    selected.forEach((frontUuid) => {
+      dispatch(
+        updateFlashCard({
+          flashCard: flashCardsArray.find(
+            (flashCard) => flashCard.frontUuid === frontUuid,
+          )!,
+          updatedValue:
+            flashCardsArray.find(
+              (flashCard) => flashCard.frontUuid === frontUuid,
+            )!.order + 1,
+          property: 'order',
+        }),
+      );
+    });
+  };
+
   return (
     <div className='flex w-full flex-col gap-6 py-8'>
       <FlashCardsCounterComponent count={flashCardsArray.length} />
@@ -128,6 +145,14 @@ export default function FlashCardsTable() {
           onClick={addNewRecord}
           icon={<PlusIcon className='h-4 w-4' />}
           size={'icon'}
+        />
+
+        <Button
+          onClick={editSelectedRecords}
+          icon={<PencilIcon className='h-4 w-4' />}
+          size={'icon'}
+          disabled={selected.length === 0}
+          variant={'secondary'}
         />
 
         {flashCardsArray.length > 0 && (
