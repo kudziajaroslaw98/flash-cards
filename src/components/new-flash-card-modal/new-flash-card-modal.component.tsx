@@ -56,8 +56,9 @@ export const NewFlashCardModal = ({
             emitFormValue={setFormValue}
             initialValues={
               (selectedFlashCards.length > 0 && {
-                word: selectedFlashCards[0].word,
-                definition: selectedFlashCards[0].definition,
+                question: selectedFlashCards[0].question,
+                questionAddition: selectedFlashCards[0].questionAddition,
+                answer: selectedFlashCards[0].answer,
               }) ||
               {}
             }

@@ -22,14 +22,17 @@ export const flashCardsSlice = createSlice({
     },
     addNewFlashCard: (
       state,
-      action: PayloadAction<Pick<FlashCard, 'word' | 'definition'>>,
+      action: PayloadAction<
+        Pick<FlashCard, 'question' | 'questionAddition' | 'answer'>
+      >,
     ) => {
       const newUuid = uuid() as UUID;
       const newFlashCards = typedInstanceFactory(state, {
         [newUuid]: {
           frontUuid: newUuid,
-          word: action.payload.word,
-          definition: action.payload.definition,
+          question: action.payload.question,
+          questionAddition: action.payload.questionAddition,
+          answer: action.payload.answer,
           order: Object.values(state).length,
           weight: 0.5,
         },

@@ -4,13 +4,13 @@ import { cva, VariantProps } from 'class-variance-authority';
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
 
 const buttonVariants = cva(
-  `inline-flex w-full max-w-80 items-center justify-center gap-2 rounded-md border transition active:scale-95 disabled:!border-gray-300 disabled:!bg-transparent disabled:!text-gray-400 disabled:!opacity-80 dark:disabled:!bg-transparent`,
+  `inline-flex w-full max-w-80 items-center justify-center gap-2 rounded-md border transition active:scale-95 disabled:!border-gray-300 dark:disabled:!border-gray-800/40 disabled:!bg-transparent disabled:!text-gray-400 disabled:!opacity-80 dark:disabled:!bg-transparent`,
   {
     variants: {
       variant: {
         disabled: '',
         'disabled-outline':
-          'border-gray-300 dark:border-slate-800 bg-transparent text-gray-500 opacity-80 dark:bg-transparent',
+          'border-gray-200 dark:border-slate-800/40 bg-transparent text-gray-500 opacity-80 dark:bg-transparent',
         'disabled-text':
           'hover:bg-gray-200/50 dark:hover:bg-slate-800/50 border-transparent dark:border-transparent',
         'disabled-fill':

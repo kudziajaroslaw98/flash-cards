@@ -1,91 +1,161 @@
-import { FlashCardTypesEnum } from '#/shared/enums/flash-card-types.enum';
+import useLongPress from '#/hooks/use-long-press.hook';
 import { FlashCard } from '#/shared/models/flash-card.model';
-import type React from 'react';
-import { useCallback } from 'react';
+import { cn } from '#/shared/utils/cn.util';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
 import Card from '../ui/card/card.component';
 
 interface FlashCardProps {
   flashCard: FlashCard;
-  reviseType: FlashCardTypesEnum;
-  onClick?: (_value: FlashCard) => void;
-  correct?: boolean;
-  clickedOnFlashCard?: boolean;
-  clickedOverall?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  onSelect?: (flashCard: FlashCard) => void;
+  isSelected?: boolean;
 }
 
-export default function FlashCardComponent(props: Readonly<FlashCardProps>) {
-  const getClickedCardStyles = useCallback(() => {
-    if (
-      props?.correct &&
-      props?.clickedOnFlashCard &&
-      props?.reviseType !== FlashCardTypesEnum.SHOW_ALL
-    ) {
-      return 'ring ring-green-400/60';
-    } else if (
-      !props?.correct &&
-      props.clickedOnFlashCard &&
-      props?.reviseType !== FlashCardTypesEnum.SHOW_ALL
-    ) {
-      return 'ring ring-red-400/60';
-    } else if (
-      props?.correct &&
-      props.clickedOverall &&
-      !props?.clickedOnFlashCard &&
-      props?.reviseType !== FlashCardTypesEnum.SHOW_ALL
-    ) {
-      return 'animate-shake ring ring-green-400/20';
-    } else {
-      return '';
-    }
-  }, [props]);
+export default function FlashCardComponent({
+  isSelected,
+  flashCard,
+  onSelect,
+  ...props
+}: Readonly<FlashCardProps>) {
+  const [isFlipped, setIsFlipped] = useState(false);
+  // const getClickedCardStyles = useCallback(() => {
+  //   if (
+  //     props?.correct &&
+  //     props?.clickedOnFlashCard &&
+  //     props?.reviseType !== FlashCardTypesEnum.SHOW_ALL
+  //   ) {
+  //     return 'ring ring-green-400/60';
+  //   } else if (
+  //     !props?.correct &&
+  //     props.clickedOnFlashCard &&
+  //     props?.reviseType !== FlashCardTypesEnum.SHOW_ALL
+  //   ) {
+  //     return 'ring ring-red-400/60';
+  //   } else if (
+  //     props?.correct &&
+  //     props.clickedOverall &&
+  //     !props?.clickedOnFlashCard &&
+  //     props?.reviseType !== FlashCardTypesEnum.SHOW_ALL
+  //   ) {
+  //     return 'animate-shake ring ring-green-400/20';
+  //   } else {
+  //     return '';
+  //   }
+  // }, [props]);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    switch (event.key) {
-      case ' ':
-      case 'Enter':
-        props?.onClick?.(props.flashCard);
-        break;
-      default:
-        break;
-    }
-  };
+  // const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  //   switch (event.key) {
+  //     case ' ':
+  //     case 'Enter':
+  //       props?.onClick?.(flashCard);
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // };
+
+  // const handleCardClick = () => {
+  //   if (props?.onClick) {
+  //     props.onClick(flashCard);
+  //   }
+  // };
 
   const handleCardClick = () => {
-    if (props?.onClick) {
-      props.onClick(props.flashCard);
+    console.log('touch');
+
+    setIsFlipped((prev) => !prev);
+  };
+
+  const handleOnSelect = (flashCard: FlashCard) => {
+    if (onSelect) {
+      onSelect(flashCard);
     }
   };
 
-  return (
-    <Card
-      onClick={handleCardClick}
-      onKeyDown={handleKeyDown}
-      tabIndex={0}
-      className={`z-10 h-full w-full flex-col ${getClickedCardStyles()} ${props.reviseType !== FlashCardTypesEnum.SHOW_ALL ? '!gap-0 sm:!gap-4' : ''}`}
-    >
-      <h5
-        className={`z-20 flex w-full items-center justify-center rounded-md text-center sm:min-h-10 sm:items-start ${
-          props.reviseType === FlashCardTypesEnum.GUESS_DEFINITION
-            ? 'bg-gray-200 dark:bg-slate-800'
-            : 'bg-transparent'
-        }`}
-      >
-        {props.reviseType === FlashCardTypesEnum.GUESS_DEFINITION
-          ? ''
-          : props.flashCard?.word}
-      </h5>
+  const [onStart, onEnd] = useLongPress<FlashCard>(
+    (value) => handleOnSelect(value as FlashCard),
+    () => handleCardClick(),
+    300,
+  );
 
-      <p
-        className={`z-20 flex w-full items-center justify-center rounded-md px-4 text-center text-sm text-gray-500 dark:text-slate-400 sm:min-h-16 sm:items-start ${
-          props.reviseType === FlashCardTypesEnum.GUESS_NAME
-            ? 'bg-gray-200 dark:bg-slate-800'
-            : 'bg-transparent'
-        }`}
-      >
-        {props.reviseType === FlashCardTypesEnum.GUESS_NAME
-          ? ''
-          : props.flashCard?.definition}
-      </p>
-    </Card>
+  return (
+    <>
+      {!isFlipped && (
+        <motion.div
+          key={flashCard.frontUuid + '1'}
+          animate={{ x: '0%', opacity: 100, zIndex: 20 }}
+          initial={{ x: '10%', opacity: 0, zIndex: -20 }}
+          exit={{
+            x: '-5%',
+            opacity: 0,
+            zIndex: -20,
+          }}
+          className='flex justify-center'
+        >
+          <Card
+            key={flashCard.frontUuid}
+            // onKeyDown={handleKeyDown}
+            tabIndex={0}
+            className={cn([
+              'z-10 h-96 w-80 flex-col items-center p-4',
+              isSelected ? 'ring ring-green-400/60' : '',
+            ])}
+            onTouchStart={() => onStart(flashCard)}
+            onTouchEnd={() => onEnd()}
+            onTouchMove={() => onEnd()}
+            onMouseDown={() => onStart(flashCard)}
+            onMouseUp={() => onEnd()}
+            {...props}
+          >
+            <h5
+              className={`z-20 flex h-20 w-full items-center justify-center rounded-md text-center text-sm`}
+            >
+              Q: {flashCard.question}
+            </h5>
+
+            <h2 className='text z-20 flex h-full w-full justify-center rounded-md pt-16 text-center text-5xl text-green-400'>
+              {flashCard.questionAddition}
+            </h2>
+          </Card>
+        </motion.div>
+      )}
+
+      {isFlipped && (
+        <motion.div
+          key={flashCard.frontUuid + '2'}
+          animate={{ x: '0%', opacity: 100, zIndex: 20 }}
+          initial={{ x: '10%', opacity: 0, zIndex: -20 }}
+          exit={{
+            x: '-5%',
+            opacity: 0,
+            zIndex: -20,
+          }}
+          className='flex justify-center'
+        >
+          <Card
+            key={flashCard.frontUuid}
+            // onKeyDown={handleKeyDown}
+            tabIndex={0}
+            className={cn([
+              'z-10 h-96 w-80 flex-col items-center p-4',
+              isSelected ? 'ring ring-green-400/60' : '',
+            ])}
+            onTouchStart={() => onStart(flashCard)}
+            onTouchEnd={() => onEnd()}
+            onTouchMove={() => onEnd()}
+            onMouseDown={() => onStart(flashCard)}
+            onMouseUp={() => onEnd()}
+            {...props}
+          >
+            <p
+              className={`z-20 flex h-full w-full items-center justify-center rounded-md px-4 text-center text-gray-500 dark:text-slate-400`}
+            >
+              {flashCard.answer}
+            </p>
+          </Card>
+        </motion.div>
+      )}
+    </>
   );
 }

@@ -1,4 +1,3 @@
-import { DEFAULT_STATS } from '#/shared/defaults/stats.default';
 import { FlashCard } from '#/shared/models/flash-card.model';
 import { ApiSyncResponse } from '#/shared/types/api/api-sync-response.type';
 import { StatsModel } from '#/shared/types/stats.type';
@@ -69,34 +68,34 @@ async function newUserSync(
   );
 }
 
-async function fetchDataFromDb(
-  supabase: SupabaseClient,
-  userUuid: string,
-  newLastSyncAt: Date,
-) {
-  const flashcards = await supabase
-    .from('flashcards')
-    .select('frontUuid, word, definition, weight, order')
-    .eq('userUuid', userUuid);
+// async function fetchDataFromDb(
+//   supabase: SupabaseClient,
+//   userUuid: string,
+//   newLastSyncAt: Date,
+// ) {
+//   const flashcards = await supabase
+//     .from('flashcards')
+//     .select('frontUuid, word, definition, weight, order')
+//     .eq('userUuid', userUuid);
 
-  const stats = await supabase
-    .from('stats')
-    .select(
-      'accuracy, answers, correctAnswers, createdFlashCards, incorrectAnswers',
-    )
-    .eq('userUuid', userUuid)
-    .maybeSingle();
+//   const stats = await supabase
+//     .from('stats')
+//     .select(
+//       'accuracy, answers, correctAnswers, createdFlashCards, incorrectAnswers',
+//     )
+//     .eq('userUuid', userUuid)
+//     .maybeSingle();
 
-  await supabase
-    .from('metadata')
-    .update({ lastSyncAt: newLastSyncAt })
-    .eq('userUuid', userUuid);
+//   await supabase
+//     .from('metadata')
+//     .update({ lastSyncAt: newLastSyncAt })
+//     .eq('userUuid', userUuid);
 
-  return {
-    flashcards: flashcards.data !== null ? flashcards.data : [],
-    stats: stats.data !== null ? stats.data : DEFAULT_STATS,
-  };
-}
+//   return {
+//     flashcards: flashcards.data !== null ? flashcards.data : [],
+//     stats: stats.data !== null ? stats.data : DEFAULT_STATS,
+//   };
+// }
 
 async function upsertDataInDb(
   body: requestBody,
@@ -173,14 +172,14 @@ export async function POST(request: Request) {
         body.lastSyncAt === null ||
         new Date(body.lastSyncAt) < new Date(metadata.data.lastSyncAt)
       ) {
-        const { flashcards, stats } = await fetchDataFromDb(
-          supabase,
-          userUuid,
-          newLastSyncAt,
-        );
-
-        responseBody.flashcards = flashcards;
-        responseBody.stats = stats;
+        // TODO: fix this
+        // const { flashcards, stats } = await fetchDataFromDb(
+        //   supabase,
+        //   userUuid,
+        //   newLastSyncAt,
+        // );
+        // // responseBody.flashcards = flashcards;
+        // responseBody.stats = stats;
       } else if (body.lastSyncAt >= metadata.data.lastSyncAt) {
         await upsertDataInDb(body, supabase, userUuid, newLastSyncAt);
       }

@@ -10,6 +10,7 @@ import {
 
 export interface TextAreaProps
   extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+  type: 'textarea';
   className: string;
   valid: boolean;
   for?: string;
@@ -92,10 +93,10 @@ export default function TextArea({
         className={cn([
           touched && !valid ? '!border-red-400' : '',
           touched && valid ? '!border-green-400' : '',
-          'flex w-full items-center gap-4 rounded-md border border-gray-300 bg-gray-100 p-2 px-4 dark:border-slate-800 dark:bg-slate-900',
+          'flex w-full items-center gap-4 rounded-md border border-gray-200 bg-gray-100 p-2 px-4 dark:border-slate-800/40 dark:bg-slate-900',
           'h-10 resize-none text-sm outline-none ring-blue-400 transition-all focus:ring-1',
           label
-            ? 'placeholder:text-gray-300  dark:placeholder:text-slate-700'
+            ? 'placeholder:text-gray-400  dark:placeholder:text-slate-700'
             : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
           'text-gray-800 text-inherit dark:text-slate-200',
           className,

@@ -4,7 +4,8 @@ import { v4 } from 'uuid';
 export class FlashCard {
   public frontUuid: UUID = v4() as UUID;
   public weight: number = 0.5;
-  public word!: string;
-  public definition!: string;
+  public question!: string;
+  public questionAddition!: string;
+  public answer!: string;
   public order!: number;
 }

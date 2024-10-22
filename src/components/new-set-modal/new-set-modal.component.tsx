@@ -55,18 +55,6 @@ export const NewSetModal = ({
             scheme={getFormScheme()}
             emitFormValid={() => {}}
             emitFormValue={setFormValue}
-            initialValues={{
-              name: 'dupa',
-              description: 'dupa',
-              category: 'Science',
-            }}
-            debug={{
-              errors: true,
-              inputs: true,
-              touch: true,
-              validity: true,
-              values: true,
-            }}
           />
         </Modal.Body>
 

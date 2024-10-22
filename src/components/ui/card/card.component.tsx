@@ -5,6 +5,11 @@ import { DetailedHTMLProps, HTMLAttributes, PropsWithChildren } from 'react';
 export interface CardProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   backgroundGradientWidth?: number;
+  onTouchStart?: () => void;
+  onTouchEnd?: () => void;
+  onTouchMove?: () => void;
+  onMouseDown?: () => void;
+  onMouseUp?: () => void;
 }
 
 export default function Card({
@@ -33,7 +38,7 @@ export default function Card({
         handleMouseMove(e.clientX, e.clientY, e.currentTarget)
       }
       className={cn([
-        `text-default group relative flex cursor-pointer flex-col gap-4 rounded-md border border-gray-200 bg-gray-50 p-4 shadow-card transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-900 dark:shadow-card-dark md:hover:translate-y-1 md:hover:shadow-card-hovered dark:md:hover:shadow-dark-card-hovered`,
+        `text-default group relative flex cursor-pointer flex-col gap-4 rounded-md border border-gray-200 bg-gray-50 p-4 shadow-card transition-all active:scale-95 dark:border-slate-800/40 dark:bg-slate-900 dark:shadow-card-dark md:hover:translate-y-1 md:hover:shadow-card-hovered dark:md:hover:shadow-dark-card-hovered`,
         className,
       ])}
       {...props}

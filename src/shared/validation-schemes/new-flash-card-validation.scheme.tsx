@@ -1,26 +1,33 @@
 import { z } from 'zod';
 
 export const newFlashCardValidationScheme = z.object({
-  word: z.string().min(1, 'Word is required'),
-  definition: z
+  question: z.string().min(1, 'Question is required'),
+  questionAddition: z.string().min(1, 'Addition is required'),
+  answer: z
     .string()
-    .min(1, 'Definition is required')
-    .max(255, 'Definition is too long'),
+    .min(1, 'Answer is required')
+    .max(255, 'Answer is too long'),
 });
 
 export const newFlashCardScheme = {
   inputs: {
-    word: {
+    question: {
       type: 'text',
-      name: 'name',
-      label: 'Word',
-      placeholder: 'Your new word',
+      name: 'question',
+      label: 'Question',
+      placeholder: 'What is the definition of word below?',
     },
-    definition: {
+    questionAddition: {
+      type: 'text',
+      name: 'questionAddition',
+      label: 'Addition',
+      placeholder: 'Prowess',
+    },
+    answer: {
       type: 'textarea',
-      name: 'definition',
-      label: 'Definition',
-      placeholder: 'Definition of your new word',
+      name: 'answer',
+      label: 'Answer',
+      placeholder: 'Military valor and skill.',
     },
   },
   validation: newFlashCardValidationScheme,

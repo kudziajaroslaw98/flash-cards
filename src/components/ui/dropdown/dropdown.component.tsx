@@ -12,7 +12,7 @@ import DropdownItem from './dropdown-item.component';
 import DropdownLabel from './dropdown-label.component';
 
 const DropdownVariants = cva(
-  `absolute flex-col overflow-clip rounded-md border dark:border-slate-800 dark:bg-slate-800 flex w-full min-w-fit bg-gray-50/95 backdrop-blur-lg`,
+  `absolute flex-col overflow-clip rounded-md border dark:border-slate-800/40 dark:bg-slate-800 flex w-full min-w-fit bg-gray-50/95 backdrop-blur-lg`,
   {
     variants: {
       contextPosition: {
@@ -244,7 +244,7 @@ export default function Dropdown<T>({
             'px-4 transition ',
             selected.length > 0
               ? 'border-green-500 text-green-500'
-              : 'border-gray-300  text-gray-500 dark:border-slate-800 ',
+              : 'border-gray-200  text-gray-500 dark:border-slate-800/40 ',
             error ? 'border-red-400 text-red-400 dark:border-red-400' : '',
           ])}
           onClick={handleClickOnDropdown}
@@ -272,7 +272,7 @@ export default function Dropdown<T>({
               ])}
             >
               {props.searchable && (
-                <div className='min-w-fit border-b bg-gray-100 p-1  dark:border-slate-800 dark:bg-slate-900 '>
+                <div className='min-w-fit border-b bg-gray-100 p-1  dark:border-slate-800/40 dark:bg-slate-900 '>
                   <Input
                     value={searchValue}
                     valid={true}
@@ -309,7 +309,7 @@ export default function Dropdown<T>({
               </div>
               {props.addNew && !isInAddNewMode && (
                 <div
-                  className='hover:text-green-40 flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-100 px-4 py-2 text-gray-500 transition hover:text-gray-700  dark:border-slate-800 dark:bg-slate-900  dark:hover:text-gray-300'
+                  className='hover:text-green-40 flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-100 px-4 py-2 text-gray-500 transition hover:text-green-400  dark:border-slate-800/40 dark:bg-slate-900'
                   onClick={handleToggleAddNew}
                   onKeyDown={(event) =>
                     event.key === 'Enter' && handleToggleAddNew()
@@ -321,7 +321,7 @@ export default function Dropdown<T>({
               )}
               {props.addNew && isInAddNewMode && (
                 <div>
-                  <div className='min-w-fit  bg-gray-100 p-1 py-2 dark:border-slate-800 dark:bg-slate-900 '>
+                  <div className='min-w-fit  bg-gray-100 p-1 py-2 dark:border-slate-800/40 dark:bg-slate-900 '>
                     <Input
                       value={searchValue}
                       valid={true}
@@ -333,7 +333,7 @@ export default function Dropdown<T>({
                     />
                   </div>
 
-                  <div className='hover:text-green-40 flex h-11 w-full cursor-pointer items-center justify-center gap-2 border-t bg-gray-100 px-4 py-6 text-gray-500 transition hover:text-gray-700  dark:border-slate-800 dark:bg-slate-900  dark:hover:text-gray-300'>
+                  <div className='flex h-11 w-full cursor-pointer items-center justify-center gap-2 border-t bg-gray-100 px-4 py-6 text-gray-500 transition hover:text-green-400 dark:border-slate-800/40  dark:bg-slate-900'>
                     <Button
                       label='Cancel'
                       onClick={handleToggleAddNew}
@@ -355,7 +355,7 @@ export default function Dropdown<T>({
 
               {props.clearAll && (
                 <div
-                  className='hover:text-green-40 flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-100 px-4 py-2 text-gray-500 transition hover:text-gray-700  dark:border-slate-800 dark:bg-slate-900  dark:hover:text-gray-300'
+                  className='flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-100 px-4 py-2 text-gray-500 transition hover:text-green-400  dark:border-slate-800/40 dark:bg-slate-900'
                   onClick={clearPicked}
                   onKeyDown={(event) => event.key === 'Enter' && clearPicked()}
                   tabIndex={0}

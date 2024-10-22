@@ -97,7 +97,7 @@ export default function SetsPage() {
 
         <div className='flex w-full items-center justify-end gap-2 text-sm'>
           <Input
-            value=''
+            value={searchedText}
             valid={true}
             placeholder='Search in decks...'
             for='search'

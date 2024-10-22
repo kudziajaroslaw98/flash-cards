@@ -1,15 +1,15 @@
 'use client';
 
-import { ArrowPathIcon } from '@heroicons/react/24/solid';
+import {
+  ArrowPathIcon,
+  ArrowTurnLeftDownIcon,
+} from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 
 import { Button } from '#/components/ui/button/button.component';
-import Dropdown from '#/components/ui/dropdown/dropdown.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import useKeyPress from '#/hooks/use-key-press.hook';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
-import { reviseTypeDictionary } from '#/shared/dictionaries/revise-type.dictionary';
-import { FlashCardTypesEnum } from '#/shared/enums/flash-card-types.enum';
 import { FlashCard } from '#/shared/models/flash-card.model';
 import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
 import { updateFlashCard } from '#/store/reducers/flashcards.reducer';
@@ -20,12 +20,8 @@ import FlashCardComponent from '../flash-card/flash-card.component';
 import LinkComponent from '../ui/link/link.component';
 
 export default function FlashCardReviseComponent() {
-  const [reviseType, setReviseType] = useState(
-    FlashCardTypesEnum.GUESS_DEFINITION,
-  );
   const [revisedCard, setRevisedCard] = useState<FlashCard>();
   const [clickedCard, setClickedCard] = useState<FlashCard>();
-  const [dropdownItems] = useState(reviseTypeDictionary);
   const [clicked, setClicked] = useState(false);
 
   const flashCardsArray = useAppSelector(
@@ -98,10 +94,6 @@ export default function FlashCardReviseComponent() {
     reshuffle();
   };
 
-  const changeReviseType = (value: FlashCardTypesEnum) => {
-    setReviseType(value);
-  };
-
   useEffect(() => {
     const isFullRevise = randomCards.length === 4;
     const randomMax = isFullRevise ? 3 : randomCards.length - 1;
@@ -118,47 +110,48 @@ export default function FlashCardReviseComponent() {
   return flashCardsArray.length > 0 ? (
     <div className='flex h-full w-full flex-col justify-stretch'>
       <div className='flex h-full w-full flex-col items-center gap-8 pb-44'>
-        <div
-          className={`text-default mb-2 flex h-auto min-h-16 w-full flex-col items-center justify-center gap-4 px-4 text-center`}
-        >
-          {reviseType === FlashCardTypesEnum.GUESS_DEFINITION &&
-            revisedCard && <h5 className='text-default'>{revisedCard.word}</h5>}
+        <div className='grid w-full items-center justify-center'>
+          <div className='flex w-full items-center justify-end gap-2 md:translate-x-20'>
+            <ArrowTurnLeftDownIcon className='size-5 text-green-400' />
+            <span className='w-32 text-xs italic text-gray-600 dark:text-slate-500'>
+              Click on the card to flip it
+            </span>
+          </div>
 
-          {reviseType === FlashCardTypesEnum.GUESS_NAME && revisedCard && (
-            <h5 className='text-default'>{revisedCard.definition}</h5>
-          )}
+          <div>
+            {revisedCard && (
+              <FlashCardComponent
+                key={revisedCard.frontUuid}
+                flashCard={revisedCard}
+              />
+            )}
+          </div>
         </div>
 
-        <div className='grid w-full grid-cols-[repeat(auto-fit,minmax(18rem,1fr))] gap-4 lg:grid-cols-[repeat(auto-fit,minmax(25rem,1fr))]'>
-          {randomCards.map((flashCard) => (
-            <FlashCardComponent
-              key={flashCard.frontUuid}
-              flashCard={flashCard}
-              reviseType={reviseType}
-              correct={isCorrect(flashCard)}
-              clickedOnFlashCard={flashCard === clickedCard}
-              clickedOverall={clicked}
-              onClick={(flashCard) => changeClicked(flashCard)}
-            />
+        <div className='mt-8 grid gap-2 xl:grid-cols-[repeat(2,minmax(20rem,1fr))]'>
+          {randomCards.map((flashCard, index) => (
+            <div
+              className='flex w-[320px] cursor-pointer gap-4 rounded-md border border-gray-200 p-4 hover:bg-gray-100 dark:dark:border-slate-800/40 dark:hover:bg-slate-800'
+              key={`answer-${flashCard.frontUuid}`}
+            >
+              <span className='flex size-8 min-h-8 min-w-8 items-center justify-center rounded-md bg-green-400 text-gray-100 dark:text-slate-900'>
+                {index + 1}
+              </span>
+              <span className='flex w-[280px] text-sm text-gray-800 dark:text-slate-400'>
+                {flashCard.answer}
+              </span>
+            </div>
           ))}
         </div>
       </div>
 
-      <div className='fixed bottom-4 right-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md dark:bg-slate-950/10 sm:sticky sm:bottom-8 md:bottom-24'>
+      <div className='fixed bottom-4 right-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md dark:bg-slate-950/10 sm:sticky sm:bottom-8'>
         <Button
           label={'Reshuffle'}
           icon={<ArrowPathIcon className='h-4 w-4' />}
           iconPosition={'right'}
           onClick={reshuffleFlashCards}
           size={'xlg'}
-        />
-
-        <Dropdown<FlashCardTypesEnum>
-          config={dropdownItems}
-          value={FlashCardTypesEnum.GUESS_DEFINITION}
-          onChange={(value) => changeReviseType(value)}
-          contextPosition={'top'}
-          labelClassName='max-w-80 md:max-w-52'
         />
       </div>
     </div>

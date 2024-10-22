@@ -1,4 +1,6 @@
+/* eslint-disable */
 import type { Config } from 'tailwindcss';
+const plugin = require('tailwindcss/plugin')
 
 const config: Config = {
   darkMode: 'class',
@@ -12,6 +14,11 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-inter)'],
         mono: ['var(--font-roboto-mono)'],
+      },
+      textShadow: {
+        sm: '0 1px 2px var(--tw-shadow-color)',
+        DEFAULT: '0 2px 4px var(--tw-shadow-color)',
+        lg: '0 8px 16px var(--tw-shadow-color)',
       },
       backgroundSize: {
         '400%': '400%',
@@ -119,6 +126,19 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // @ts-ignore
+    plugin(function ({ matchUtilities, theme }) {
+      matchUtilities(
+        {
+    // @ts-ignore
+          'text-shadow': (value) => ({
+            textShadow: value,
+          }),
+        },
+        { values: theme('textShadow') }
+      )
+    }),
+  ],
 };
 export default config;

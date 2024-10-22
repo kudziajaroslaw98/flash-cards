@@ -6,8 +6,6 @@ interface EditableFlashCardRowProps {
   flashCard: FlashCard;
   toggleSelected: (_flashCard: FlashCard) => void;
   isSelected: (_flashCard: FlashCard) => boolean;
-  definitionChange: (_flashCard: FlashCard, _value: string) => void;
-  wordChange: (_flashCard: FlashCard, _value: string) => void;
 }
 
 export default function EditableFlashCardRowComponent(
@@ -53,14 +51,14 @@ export default function EditableFlashCardRowComponent(
           className={` w-full rounded-md !border-transparent text-lg font-semibold outline-none ring-blue-400 transition-all focus:ring-1 md:text-base`}
           key={`word-${props.flashCard.frontUuid}`}
         >
-          {props.flashCard.word}
+          {props.flashCard.question}
         </div>
 
         <div
           className={`flex rounded-md !border-transparent text-gray-500 dark:text-slate-400  md:hidden`}
           key={`definition-top-${props.flashCard.frontUuid}`}
         >
-          {props.flashCard.definition}
+          {props.flashCard.question}
         </div>
       </motion.td>
 
@@ -69,7 +67,7 @@ export default function EditableFlashCardRowComponent(
           className={`hidden rounded-md !border-transparent md:flex`}
           key={`definition-right-${props.flashCard.frontUuid}`}
         >
-          {props.flashCard.definition}
+          {props.flashCard.answer}
         </div>
       </motion.td>
     </motion.tr>
