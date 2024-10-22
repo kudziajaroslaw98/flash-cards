@@ -1,33 +1,30 @@
-import { newSetFormScheme } from '#/shared/validation-schemes/new-set-validation.scheme';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
-import { DictionaryValue } from '#/shared/types/dictionary-value.type';
+import { FlashCard } from '#/shared/models/flash-card.model';
+import { newFlashCardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';
 import FormComponent from '../form-component/form.component';
 import { Button } from '../ui/button/button.component';
 import Dialog from '../ui/dialog/dialog.component';
 import Modal from '../ui/modal/modal.component';
 
-interface NewSetModalProps {
+interface NewFlashCardModalProps {
   isDialogOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  handleNewSet: (
-    set: Record<keyof typeof newSetFormScheme.arguments.inputs, string>,
+  handleNewFlashCard: (
+    flashCard: Record<keyof typeof newFlashCardScheme.inputs, string>,
   ) => void;
-  categories: DictionaryValue<string>[];
+  selectedFlashCards: FlashCard[];
 }
 
-export const NewSetModal = ({
+export const NewFlashCardModal = ({
   isDialogOpen,
   setIsModalOpen,
-  handleNewSet,
-  categories,
-}: NewSetModalProps) => {
+  handleNewFlashCard,
+  selectedFlashCards,
+}: NewFlashCardModalProps) => {
   const [formValue, setFormValue] = useState<
-    Record<keyof typeof newSetFormScheme.arguments.inputs, string>
+    Partial<Record<keyof typeof newFlashCardScheme.inputs, string>>
   >({});
-  const getFormScheme = useCallback(() => {
-    return newSetFormScheme(categories);
-  }, [categories]);
 
   const handleDialogClose = () => {
     setIsModalOpen(false);
@@ -35,7 +32,9 @@ export const NewSetModal = ({
 
   const handleDialogSubmit = () => {
     setIsModalOpen(false);
-    handleNewSet(formValue);
+    handleNewFlashCard(
+      formValue as Record<keyof typeof newFlashCardScheme.inputs, string>,
+    );
     setFormValue({});
   };
 
@@ -52,21 +51,16 @@ export const NewSetModal = ({
         <Modal.Body className='flex flex-col items-center justify-center pb-8 pt-4'>
           <FormComponent
             className='w-full max-w-80'
-            scheme={getFormScheme()}
+            scheme={newFlashCardScheme}
             emitFormValid={() => {}}
             emitFormValue={setFormValue}
-            initialValues={{
-              name: 'dupa',
-              description: 'dupa',
-              category: 'Science',
-            }}
-            debug={{
-              errors: true,
-              inputs: true,
-              touch: true,
-              validity: true,
-              values: true,
-            }}
+            initialValues={
+              (selectedFlashCards.length > 0 && {
+                word: selectedFlashCards[0].word,
+                definition: selectedFlashCards[0].definition,
+              }) ||
+              {}
+            }
           />
         </Modal.Body>
 
@@ -83,4 +77,4 @@ export const NewSetModal = ({
   );
 };
 
-NewSetModal.displayName = 'NewSetModal';
+NewFlashCardModal.displayName = 'NewFlashCardModal';

@@ -3,7 +3,6 @@
 import { ArrowPathIcon } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 
-import FlashCardComponent from '#/components/flash-card/flash-card.component';
 import { Button } from '#/components/ui/button/button.component';
 import Dropdown from '#/components/ui/dropdown/dropdown.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
@@ -17,6 +16,7 @@ import { updateFlashCard } from '#/store/reducers/flashcards.reducer';
 import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { statsSelectors } from '#/store/selectors/stats.selectors';
+import FlashCardComponent from '../flash-card/flash-card.component';
 import LinkComponent from '../ui/link/link.component';
 
 export default function FlashCardReviseComponent() {
@@ -110,10 +110,14 @@ export default function FlashCardReviseComponent() {
   }, [randomCards]);
 
   useKeyPress(['r', 'ArrowRight'], reshuffleFlashCards);
+  useKeyPress(['1'], () => changeClicked(randomCards[0]));
+  useKeyPress(['2'], () => changeClicked(randomCards[1]));
+  useKeyPress(['3'], () => changeClicked(randomCards[2]));
+  useKeyPress(['4'], () => changeClicked(randomCards[3]));
 
   return flashCardsArray.length > 0 ? (
     <div className='flex h-full w-full flex-col justify-stretch'>
-      <div className='flex h-full w-full flex-col items-center gap-8 pb-44 sm:pb-0'>
+      <div className='flex h-full w-full flex-col items-center gap-8 pb-44'>
         <div
           className={`text-default mb-2 flex h-auto min-h-16 w-full flex-col items-center justify-center gap-4 px-4 text-center`}
         >

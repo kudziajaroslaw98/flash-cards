@@ -1,4 +1,3 @@
-import { default as TextArea } from '#/components/ui/text-area/text-area.component';
 import { FlashCard } from '#/shared/models/flash-card.model';
 import { motion } from 'framer-motion';
 
@@ -17,13 +16,14 @@ export default function EditableFlashCardRowComponent(
   return (
     <motion.tr
       key={props.flashCard.frontUuid}
+      onClick={() => props.toggleSelected(props.flashCard)}
       onKeyDown={(e) =>
         e.key === 'Enter' && props.toggleSelected(props.flashCard)
       }
-      className={`flex rounded-md border shadow-table-row transition-all ${
+      className={`flex cursor-pointer rounded-md border shadow-table-row transition-all ${
         props.isSelected(props.flashCard)
           ? 'border-green-400/50 bg-green-100 dark:border-green-600/40 dark:bg-green-500/20'
-          : 'border-transparent bg-gray-100 dark:border-slate-700 dark:bg-slate-800'
+          : 'border-transparent bg-gray-100 dark:border-slate-800 dark:bg-slate-900'
       }`}
       transition={{
         duration: 0.3,
@@ -44,44 +44,33 @@ export default function EditableFlashCardRowComponent(
         opacity: 0,
       }}
     >
-      <motion.td
-        onClick={() => props.toggleSelected(props.flashCard)}
-        className='flex min-w-12 cursor-pointer items-center justify-center border-r border-r-slate-400/20 p-2 text-sm dark:text-slate-300'
-      >
+      <motion.td className='flex min-w-12 cursor-pointer items-start justify-center border-r border-r-slate-300/20 p-4 text-sm dark:border-r-slate-700/20 dark:text-slate-300'>
         {props.index + 1}
       </motion.td>
 
-      <motion.td className='z-20 flex w-full min-w-44 flex-col items-start gap-2 p-2 py-4 text-sm text-gray-800 dark:text-slate-200 md:w-auto md:flex-row  md:border-r md:border-r-slate-400/20 md:py-2'>
-        <input
-          type='text'
-          className={`h-10 w-full rounded-md !border-transparent bg-gray-200/40 p-2 text-base font-semibold outline-none ring-blue-400 transition-all focus:ring-1 dark:bg-slate-900/20 md:text-sm`}
-          id={`word-${props.flashCard.frontUuid}`}
-          onInput={(value) =>
-            props.wordChange(props.flashCard, value.currentTarget.value)
-          }
-          value={props.flashCard.word}
-        />
-        <TextArea
-          className={`flex rounded-md !border-transparent bg-gray-200/40 pl-1 dark:bg-slate-900/20 md:hidden`}
-          onInput={(value) =>
-            props.definitionChange(props.flashCard, value.currentTarget.value)
-          }
-          value={props.flashCard.definition}
-          id={`definition-top-${props.flashCard.frontUuid}`}
-          valid={true}
-        />
+      <motion.td className='z-20 flex w-full min-w-44 flex-col items-start gap-2 p-4 text-sm text-gray-800 dark:text-slate-200 md:w-auto md:flex-row  md:border-r md:border-r-slate-300/20 md:dark:border-r-slate-700/20 '>
+        <div
+          className={` w-full rounded-md !border-transparent text-lg font-semibold outline-none ring-blue-400 transition-all focus:ring-1 md:text-base`}
+          key={`word-${props.flashCard.frontUuid}`}
+        >
+          {props.flashCard.word}
+        </div>
+
+        <div
+          className={`flex rounded-md !border-transparent text-gray-500 dark:text-slate-400  md:hidden`}
+          key={`definition-top-${props.flashCard.frontUuid}`}
+        >
+          {props.flashCard.definition}
+        </div>
       </motion.td>
 
-      <motion.td className='line-clamp-2 hidden w-full items-center p-2 px-4 text-sm text-gray-700 dark:text-slate-200 md:flex'>
-        <TextArea
-          className={`hidden rounded-md !border-transparent bg-gray-200/40 dark:bg-slate-900/20 md:flex`}
-          onInput={(value) =>
-            props.definitionChange(props.flashCard, value.currentTarget.value)
-          }
-          value={props.flashCard.definition}
-          id={`definition-right-${props.flashCard.frontUuid}`}
-          valid={true}
-        />
+      <motion.td className='hidden w-full items-start  p-4 text-sm text-gray-500  dark:text-slate-400 md:flex'>
+        <div
+          className={`hidden rounded-md !border-transparent md:flex`}
+          key={`definition-right-${props.flashCard.frontUuid}`}
+        >
+          {props.flashCard.definition}
+        </div>
       </motion.td>
     </motion.tr>
   );

@@ -9,7 +9,6 @@ import EditableFlashCardRowComponent from '#/components/flash-cards-table/editab
 import { Button } from '#/components/ui/button/button.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import { FlashCard } from '#/shared/models/flash-card.model';
-import { UUID } from '#/shared/types/uuid.type';
 
 import {
   addNewFlashCard,
@@ -19,6 +18,7 @@ import {
 import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { statsSelectors } from '#/store/selectors/stats.selectors';
+import { NewFlashCardModal } from '../new-flash-card-modal/new-flash-card-modal.component';
 
 export default function FlashCardsTable() {
   const statistics = useAppSelector(statsSelectors.selectStats);
@@ -27,31 +27,37 @@ export default function FlashCardsTable() {
   ).sort((head, tail) => head.order - tail.order);
   const dispatch = useAppDispatch();
 
-  const [selected, setSelected] = useState<UUID[]>([]);
+  const [selected, setSelected] = useState<FlashCard[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const isSelected = (flashCard: FlashCard) => {
-    return selected.includes(flashCard.frontUuid);
+    return (
+      selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
+      -1
+    );
   };
 
   const toggleSelected = (flashCard: FlashCard) => {
-    const isFlashCardSelected = selected.includes(flashCard.frontUuid);
+    const isFlashCardSelected =
+      selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
+      -1;
 
     if (isFlashCardSelected) {
       setSelected((prev) =>
-        prev.filter((item) => flashCard.frontUuid !== item),
+        prev.filter((item) => flashCard.frontUuid !== item.frontUuid),
       );
     } else {
-      setSelected((prev) => [...prev, flashCard.frontUuid]);
+      setSelected((prev) => [...prev, flashCard]);
     }
   };
 
   const removeSelected = () => {
-    dispatch(removeFlashCards(selected));
+    dispatch(removeFlashCards(selected.map((item) => item.frontUuid)));
     setSelected([]);
   };
 
-  const addNewRecord = () => {
-    dispatch(addNewFlashCard());
+  const addNewRecord = (flashCard: Pick<FlashCard, 'word' | 'definition'>) => {
+    dispatch(addNewFlashCard(flashCard));
 
     dispatch(
       updateStatistics({
@@ -85,20 +91,20 @@ export default function FlashCardsTable() {
   };
 
   const editSelectedRecords = () => {
-    selected.forEach((frontUuid) => {
-      dispatch(
-        updateFlashCard({
-          flashCard: flashCardsArray.find(
-            (flashCard) => flashCard.frontUuid === frontUuid,
-          )!,
-          updatedValue:
-            flashCardsArray.find(
-              (flashCard) => flashCard.frontUuid === frontUuid,
-            )!.order + 1,
-          property: 'order',
-        }),
-      );
-    });
+    // selected.forEach((frontUuid) => {
+    //   dispatch(
+    //     updateFlashCard({
+    //       flashCard: flashCardsArray.find(
+    //         (flashCard) => flashCard.frontUuid === frontUuid,
+    //       )!,
+    //       updatedValue:
+    //         flashCardsArray.find(
+    //           (flashCard) => flashCard.frontUuid === frontUuid,
+    //         )!.order + 1,
+    //       property: 'order',
+    //     }),
+    //   );
+    // });
   };
 
   return (
@@ -142,13 +148,13 @@ export default function FlashCardsTable() {
 
       <div className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'>
         <Button
-          onClick={addNewRecord}
+          onClick={() => setIsModalOpen(true)}
           icon={<PlusIcon className='h-4 w-4' />}
           size={'icon'}
         />
 
         <Button
-          onClick={editSelectedRecords}
+          onClick={() => setIsModalOpen(true)}
           icon={<PencilIcon className='h-4 w-4' />}
           size={'icon'}
           disabled={selected.length === 0}
@@ -165,6 +171,13 @@ export default function FlashCardsTable() {
           />
         )}
       </div>
+
+      <NewFlashCardModal
+        isDialogOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        handleNewFlashCard={addNewRecord}
+        selectedFlashCards={selected}
+      />
     </div>
   );
 }

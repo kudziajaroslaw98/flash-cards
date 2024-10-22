@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '#/shared/utils/cn.util';
-import { DetailedHTMLProps, InputHTMLAttributes, useRef } from 'react';
+import { DetailedHTMLProps, InputHTMLAttributes } from 'react';
 
 export type InputValidation =
   | {
@@ -33,7 +33,6 @@ export interface InputComponentProps
 function Input({
   for: forProp,
   valid,
-  value,
   label,
   required,
   touched = false,
@@ -42,8 +41,6 @@ function Input({
   icon,
   ...props
 }: InputComponentProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
   return (
     <label
       className={`group relative flex w-full max-w-md flex-col ${label ? 'pt-2' : ''} ${className ?? ''}`}
@@ -74,7 +71,6 @@ function Input({
 
         <input
           {...props}
-          ref={inputRef}
           className={cn([
             label
               ? 'placeholder:text-gray-300 dark:placeholder:text-slate-700'

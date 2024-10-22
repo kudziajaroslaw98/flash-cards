@@ -20,13 +20,16 @@ export const flashCardsSlice = createSlice({
       localStorage.setItem('flashcards', JSON.stringify(action.payload));
       return state;
     },
-    addNewFlashCard: (state) => {
+    addNewFlashCard: (
+      state,
+      action: PayloadAction<Pick<FlashCard, 'word' | 'definition'>>,
+    ) => {
       const newUuid = uuid() as UUID;
       const newFlashCards = typedInstanceFactory(state, {
         [newUuid]: {
           frontUuid: newUuid,
-          word: 'new-word',
-          definition: 'new-definition',
+          word: action.payload.word,
+          definition: action.payload.definition,
           order: Object.values(state).length,
           weight: 0.5,
         },

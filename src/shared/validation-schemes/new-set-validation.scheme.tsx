@@ -24,6 +24,7 @@ export const newSetFormScheme = (
       type: 'textarea',
       name: 'description',
       label: 'Description',
+      placeholder: 'Set description',
     },
     category: {
       type: 'dropdown',

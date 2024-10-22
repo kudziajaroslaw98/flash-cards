@@ -121,7 +121,7 @@ export default function Dropdown<T>({
         return false;
       }),
     );
-  }, [config]);
+  }, [config, value]);
 
   useEffect(() => {
     setFilteredItems(

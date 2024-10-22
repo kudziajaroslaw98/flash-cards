@@ -58,6 +58,10 @@ export default function TextArea({
     adjustHeight();
   }, [value, adjustHeight]);
 
+  useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
+
   const handleOnInput = (event: FormEvent<HTMLTextAreaElement>) => {
     setValue(event.currentTarget.value);
 

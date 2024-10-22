@@ -61,10 +61,10 @@ export default function FlashCardComponent(props: Readonly<FlashCardProps>) {
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       tabIndex={0}
-      className={`z-10 h-full w-full flex-col ${getClickedCardStyles()}`}
+      className={`z-10 h-full w-full flex-col ${getClickedCardStyles()} ${props.reviseType !== FlashCardTypesEnum.SHOW_ALL ? '!gap-0 sm:!gap-4' : ''}`}
     >
       <h5
-        className={`z-20 flex w-full items-center rounded-md sm:min-h-10 sm:items-start ${
+        className={`z-20 flex w-full items-center justify-center rounded-md text-center sm:min-h-10 sm:items-start ${
           props.reviseType === FlashCardTypesEnum.GUESS_DEFINITION
             ? 'bg-gray-200 dark:bg-slate-800'
             : 'bg-transparent'
@@ -76,7 +76,7 @@ export default function FlashCardComponent(props: Readonly<FlashCardProps>) {
       </h5>
 
       <p
-        className={`z-20 flex w-full items-center rounded-md text-sm sm:min-h-16 sm:items-start ${
+        className={`z-20 flex w-full items-center justify-center rounded-md px-4 text-center text-sm text-gray-500 dark:text-slate-400 sm:min-h-16 sm:items-start ${
           props.reviseType === FlashCardTypesEnum.GUESS_NAME
             ? 'bg-gray-200 dark:bg-slate-800'
             : 'bg-transparent'
