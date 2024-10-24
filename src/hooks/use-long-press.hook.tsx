@@ -1,12 +1,12 @@
-import { useCallback, useRef } from 'react';
+import { MouseEvent, TouchEvent, useCallback, useRef } from 'react';
 
 export default function useLongPress<T>(
   // callback that is invoked at the specified duration or `onEndLongPress`
   longPressCallback: (value?: T) => void,
-  shortClickCallback: (value?: T) => void = () => {},
+  shortClickCallback: () => void = () => {},
   // long press duration in milliseconds
   longPressThreshold = 300,
-) {
+): [(value?: T) => void, (e: MouseEvent | TouchEvent) => void, () => void] {
   // used to persist the timer state
   // non zero values means the value has never been fired before
   const timerRef = useRef<number>(0);
@@ -16,7 +16,6 @@ export default function useLongPress<T>(
   const endTimer = () => {
     clearTimeout(timerRef.current || 0);
     timerRef.current = 0;
-    clickLockRef.current = false;
   };
 
   // init timer
@@ -24,6 +23,7 @@ export default function useLongPress<T>(
     (value?: T) => {
       // stop any previously set timers
       endTimer();
+      clickLockRef.current = false;
 
       // set new timeout
       timerRef.current = window.setTimeout(() => {
@@ -37,11 +37,12 @@ export default function useLongPress<T>(
 
   // determine to end timer early and invoke the callback or do nothing
   const onEndLongPress = useCallback(
-    (value?: T) => {
+    (e: MouseEvent | TouchEvent) => {
       // run the callback fn the timer hasn't gone off yet (non zero)
+      e.preventDefault();
       if (timerRef.current) {
         if (!clickLockRef.current) {
-          shortClickCallback(value);
+          shortClickCallback();
         }
         endTimer();
       }
@@ -56,5 +57,5 @@ export default function useLongPress<T>(
     }
   }, []);
 
-  return [onStartLongPress, onEndLongPress, onClickAndMove, endTimer];
+  return [onStartLongPress, onEndLongPress, onClickAndMove];
 }

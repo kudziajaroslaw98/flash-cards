@@ -19,47 +19,6 @@ export default function FlashCardComponent({
   ...props
 }: Readonly<FlashCardProps>) {
   const [isFlipped, setIsFlipped] = useState(false);
-  // const getClickedCardStyles = useCallback(() => {
-  //   if (
-  //     props?.correct &&
-  //     props?.clickedOnFlashCard &&
-  //     props?.reviseType !== FlashCardTypesEnum.SHOW_ALL
-  //   ) {
-  //     return 'ring ring-green-400/60';
-  //   } else if (
-  //     !props?.correct &&
-  //     props.clickedOnFlashCard &&
-  //     props?.reviseType !== FlashCardTypesEnum.SHOW_ALL
-  //   ) {
-  //     return 'ring ring-red-400/60';
-  //   } else if (
-  //     props?.correct &&
-  //     props.clickedOverall &&
-  //     !props?.clickedOnFlashCard &&
-  //     props?.reviseType !== FlashCardTypesEnum.SHOW_ALL
-  //   ) {
-  //     return 'animate-shake ring ring-green-400/20';
-  //   } else {
-  //     return '';
-  //   }
-  // }, [props]);
-
-  // const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-  //   switch (event.key) {
-  //     case ' ':
-  //     case 'Enter':
-  //       props?.onClick?.(flashCard);
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // };
-
-  // const handleCardClick = () => {
-  //   if (props?.onClick) {
-  //     props.onClick(flashCard);
-  //   }
-  // };
 
   const [onStart, onEnd, onMove] = useLongPress<FlashCard>(
     (value) => onSelect && onSelect(value as FlashCard),
@@ -67,11 +26,17 @@ export default function FlashCardComponent({
   );
 
   return (
-    <>
+    <div
+      onMouseDown={() => onStart(flashCard)}
+      onMouseUp={onEnd}
+      onTouchStart={() => onStart(flashCard)}
+      onTouchEnd={onEnd}
+      onTouchMove={onMove}
+    >
       {!isFlipped && (
         <motion.div
           key={flashCard.frontUuid + '1'}
-          animate={{ x: '0%', opacity: 100, zIndex: 20 }}
+          animate={{ x: '0%', opacity: 100, zIndex: 21 }}
           initial={{ x: '10%', opacity: 0, zIndex: -20 }}
           exit={{
             x: '-5%',
@@ -88,11 +53,6 @@ export default function FlashCardComponent({
               'z-10 h-96 w-80 flex-col items-center p-4',
               isSelected ? 'ring ring-green-400/60' : '',
             ])}
-            onMouseDown={() => onStart(flashCard)}
-            onMouseUp={() => onEnd(flashCard)}
-            onTouchStart={() => onStart(flashCard)}
-            onTouchEnd={() => onEnd(flashCard)}
-            onTouchMove={() => onMove(flashCard)}
             {...props}
           >
             <h5
@@ -128,11 +88,6 @@ export default function FlashCardComponent({
               'z-10 h-96 w-80 flex-col items-center p-4',
               isSelected ? 'ring ring-green-400/60' : '',
             ])}
-            onMouseDown={() => onStart(flashCard)}
-            onMouseUp={() => onEnd(flashCard)}
-            onTouchStart={() => onStart(flashCard)}
-            onTouchEnd={() => onEnd(flashCard)}
-            onTouchMove={() => onMove(flashCard)}
             {...props}
           >
             <p
@@ -143,6 +98,6 @@ export default function FlashCardComponent({
           </Card>
         </motion.div>
       )}
-    </>
+    </div>
   );
 }
