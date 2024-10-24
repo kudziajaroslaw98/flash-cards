@@ -5,11 +5,6 @@ import { DetailedHTMLProps, HTMLAttributes, PropsWithChildren } from 'react';
 export interface CardProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   backgroundGradientWidth?: number;
-  onTouchStart?: () => void;
-  onTouchEnd?: () => void;
-  onTouchMove?: () => void;
-  onMouseDown?: () => void;
-  onMouseUp?: () => void;
 }
 
 export default function Card({

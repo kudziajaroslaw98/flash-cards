@@ -153,8 +153,8 @@ export default function FlashCardsTable() {
                 <FlashCardComponent
                   flashCard={flashCard}
                   size={'sm'}
-                  onSelect={toggleSelected}
                   isSelected={isSelected(flashCard)}
+                  onSelect={() => toggleSelected(flashCard)}
                 />
               </div>
             ))}

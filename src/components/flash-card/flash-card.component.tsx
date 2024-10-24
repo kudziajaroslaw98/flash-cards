@@ -8,8 +8,8 @@ import Card from '../ui/card/card.component';
 interface FlashCardProps {
   flashCard: FlashCard;
   size?: 'sm' | 'md' | 'lg';
-  onSelect?: (flashCard: FlashCard) => void;
   isSelected?: boolean;
+  onSelect?: (flashCard: FlashCard) => void;
 }
 
 export default function FlashCardComponent({
@@ -61,22 +61,9 @@ export default function FlashCardComponent({
   //   }
   // };
 
-  const handleCardClick = () => {
-    console.log('touch');
-
-    setIsFlipped((prev) => !prev);
-  };
-
-  const handleOnSelect = (flashCard: FlashCard) => {
-    if (onSelect) {
-      onSelect(flashCard);
-    }
-  };
-
-  const [onStart, onEnd] = useLongPress<FlashCard>(
-    (value) => handleOnSelect(value as FlashCard),
-    () => handleCardClick(),
-    300,
+  const [onStart, onEnd, onMove] = useLongPress<FlashCard>(
+    (value) => onSelect && onSelect(value as FlashCard),
+    () => setIsFlipped((prev) => !prev),
   );
 
   return (
@@ -101,11 +88,11 @@ export default function FlashCardComponent({
               'z-10 h-96 w-80 flex-col items-center p-4',
               isSelected ? 'ring ring-green-400/60' : '',
             ])}
-            onTouchStart={() => onStart(flashCard)}
-            onTouchEnd={() => onEnd()}
-            onTouchMove={() => onEnd()}
             onMouseDown={() => onStart(flashCard)}
-            onMouseUp={() => onEnd()}
+            onMouseUp={() => onEnd(flashCard)}
+            onTouchStart={() => onStart(flashCard)}
+            onTouchEnd={() => onEnd(flashCard)}
+            onTouchMove={() => onMove(flashCard)}
             {...props}
           >
             <h5
@@ -141,11 +128,11 @@ export default function FlashCardComponent({
               'z-10 h-96 w-80 flex-col items-center p-4',
               isSelected ? 'ring ring-green-400/60' : '',
             ])}
-            onTouchStart={() => onStart(flashCard)}
-            onTouchEnd={() => onEnd()}
-            onTouchMove={() => onEnd()}
             onMouseDown={() => onStart(flashCard)}
-            onMouseUp={() => onEnd()}
+            onMouseUp={() => onEnd(flashCard)}
+            onTouchStart={() => onStart(flashCard)}
+            onTouchEnd={() => onEnd(flashCard)}
+            onTouchMove={() => onMove(flashCard)}
             {...props}
           >
             <p
