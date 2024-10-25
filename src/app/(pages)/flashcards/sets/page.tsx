@@ -9,8 +9,8 @@ import { ToggleButton } from '#/components/ui/toggle-button/toggle-button.compon
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import { FlashCardSet } from '#/shared/models/flashcard-set.model';
 import { DictionaryValue } from '#/shared/types/dictionary-value.type';
+import { UUID } from '#/shared/types/uuid.type';
 import uuid from '#/shared/utils/uuid.util';
-import { newSetFormScheme } from '#/shared/validation-schemes/new-set-validation.scheme';
 import { addNewSet, updateSet } from '#/store/reducers/sets.reducer';
 import { setsSelectors } from '#/store/selectors/sets.selectors';
 import { StarIcon as StarIconOutline } from '@heroicons/react/24/outline';
@@ -30,24 +30,17 @@ export default function SetsPage() {
   );
   const dispatch = useAppDispatch();
 
-  const handleNewSet = (
-    set: Record<keyof typeof newSetFormScheme.arguments.inputs, string>,
-  ) => {
+  const handleNewSet = (set: Partial<FlashCardSet>) => {
     const newUuid = uuid();
-    let categories;
 
-    if (set.category) {
-      categories = Array.isArray(set.category) ? set.category : [set.category];
-    }
-
-    const newSet = {
+    const newSet: FlashCardSet = {
       ...set,
-      name: set.name,
-      description: set.description,
-      frontUuid: newUuid,
+      name: set.name ?? '',
+      description: set.description ?? '',
+      frontUuid: newUuid as UUID,
       isFavourite: false,
       flashCards: [],
-      categories,
+      category: set.category,
     };
     dispatch(addNewSet(newSet));
   };
@@ -97,6 +90,7 @@ export default function SetsPage() {
 
         <div className='flex w-full items-center justify-end gap-2 text-sm'>
           <Input
+            type='text'
             value={searchedText}
             valid={true}
             placeholder='Search in decks...'

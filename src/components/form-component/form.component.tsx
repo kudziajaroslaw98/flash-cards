@@ -4,9 +4,11 @@ import Input, {
   type InputComponentProps,
 } from '#/components/ui/input/input.component';
 import isDropdown from '#/shared/guards/is-dropdown.guard';
+import isInput from '#/shared/guards/is-input.guard';
 import isTextArea from '#/shared/guards/is-text-area.guard';
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
   type Dispatch,
@@ -21,7 +23,7 @@ import type {
   ZodObject,
   ZodTypeAny,
 } from 'zod';
-import Dropdown from '../ui/dropdown/dropdown.component';
+import Dropdown, { DropdownProps } from '../ui/dropdown/dropdown.component';
 import TextArea, {
   type TextAreaProps,
 } from '../ui/text-area/text-area.component';
@@ -30,20 +32,28 @@ type ZodSchemaFromBaseObject<T> =
   | ZodObject<Record<keyof T, ZodTypeAny>>
   | ZodEffects<ZodObject<Record<keyof T, ZodTypeAny>>>;
 
-type FormScheme<T> = {
-  validation: ZodSchemaFromBaseObject<T>;
-  inputs: T;
+type FormScheme<SchemeType> = {
+  validation: ZodSchemaFromBaseObject<SchemeType>;
+  inputs: SchemeType;
 };
 
 export default function FormComponent<
-  T extends
-    | Record<string, Omit<InputComponentProps, 'value' | 'error' | 'valid'>>
-    | Record<string, TextAreaProps>,
+  T,
+  InputType extends
+    | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
+    | TextAreaProps
+    | DropdownProps<unknown> =
+    | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
+    | TextAreaProps
+    | DropdownProps<unknown>,
+  SchemeType extends Partial<Record<string, InputType>> = Partial<
+    Record<string, InputType>
+  >,
 >(props: {
-  scheme: FormScheme<T>;
-  initialValues?: Partial<Record<keyof T, string>>;
-  emitFormValid: Dispatch<SetStateAction<boolean>>;
-  emitFormValue: Dispatch<SetStateAction<Partial<Record<keyof T, string>>>>;
+  scheme: FormScheme<SchemeType>;
+  initialValues?: T;
+  emitFormValid?: Dispatch<SetStateAction<boolean>>;
+  emitFormValue: Dispatch<SetStateAction<Partial<T>>>;
   className?: string;
   formValid?: boolean;
   formError?: string;
@@ -65,7 +75,9 @@ export default function FormComponent<
   const [defaultValids, setDefaultValids] = useState<Record<string, boolean>>(
     {},
   );
-  const [formValues, setFormValues] = useState<Record<string, unknown>>({});
+  const [formValues, setFormValues] = useState<
+    Record<string, unknown | unknown[]>
+  >({});
   const [formInputs, setFormInputs] = useState<string[]>([]);
   const [touchedInputs, setTouchedInputs] = useState<Record<string, boolean>>(
     {},
@@ -75,21 +87,28 @@ export default function FormComponent<
   useEffect(() => {
     if (initialRender.current) {
       let initialInputs: string[] = [];
-      let initialValids = {};
-      let initialErrors = {};
-      let initialValues = {};
+      let initialValids: Record<string, boolean> = {};
+      let initialErrors: Record<string, string | null> = {};
+      let tmpValues: Record<string, string> = {};
 
       Object.entries(props.scheme.inputs).forEach(([inputName]) => {
         initialInputs = [...initialInputs, inputName];
         initialValids = { ...initialValids, [inputName]: true };
         initialErrors = { ...initialErrors, [inputName]: null };
-        initialValues = {
-          ...initialValues,
+        tmpValues = {
+          ...tmpValues,
+          // @ts-expect-error Generic type generate error here
           [inputName]: props.initialValues?.[inputName]
-            ? props.initialValues?.[inputName]
+            ? // @ts-expect-error  Generic type generate error here
+              props.initialValues?.[inputName]
             : '',
         };
       });
+
+      const initialValues: Record<keyof T, string> = {
+        ...props.initialValues,
+        ...tmpValues,
+      } as Record<keyof T, string>;
 
       setFormInputs(initialInputs);
       setInputsValidity(initialValids);
@@ -153,6 +172,8 @@ export default function FormComponent<
     const output: SafeParseSuccess<unknown> | SafeParseError<unknown> =
       props.scheme.validation.safeParse(formValues);
 
+    console.log('output - ', output);
+
     let valids = defaultValids;
     let errors = {};
 
@@ -172,7 +193,8 @@ export default function FormComponent<
 
     setInputsErrors(errors);
     setInputsValidity(valids);
-    props.emitFormValid(Object.values(valids).every((item) => item));
+    props.emitFormValid &&
+      props.emitFormValid(Object.values(valids).every((item) => item));
   };
 
   const handleOnInput = (
@@ -183,7 +205,7 @@ export default function FormComponent<
       ...formValues,
       [inputName]: (event.target as HTMLInputElement | HTMLTextAreaElement)
         ?.value,
-    } as Partial<Record<keyof T, string>>);
+    } as T);
 
     setFormValues((prev) => ({
       ...prev,
@@ -196,7 +218,7 @@ export default function FormComponent<
     props.emitFormValue({
       ...formValues,
       [inputName]: value,
-    } as Partial<Record<keyof T, string>>);
+    } as T);
 
     setFormValues((prev) => ({
       ...prev,
@@ -212,16 +234,20 @@ export default function FormComponent<
     setTouchedInputs((prev) => ({ ...prev, [inputName]: true }));
   };
 
+  const schemeInputs = useMemo(() => {
+    return Object.entries(props.scheme.inputs) as [string, InputType][];
+  }, [props.scheme.inputs]);
+
   return (
     <form className={props.className}>
-      {Object.entries(props.scheme.inputs).map(([inputName, inputProps]) => {
+      {schemeInputs.map(([inputName, inputProps]) => {
         return (
           <span key={inputName}>
             {isTextArea(inputProps) && (
               <TextArea
                 {...inputProps}
                 key={inputName}
-                value={(formValues[inputName] as string) ?? ''}
+                value={formValues[inputName] as string}
                 valid={
                   touchedInputs[inputName] ? inputsValidity[inputName] : true
                 }
@@ -253,7 +279,7 @@ export default function FormComponent<
               ></Dropdown>
             )}
 
-            {!isTextArea(inputProps) && !isDropdown(inputProps) && (
+            {isInput(inputProps) && (
               <Input
                 {...inputProps}
                 key={inputName}
@@ -264,7 +290,7 @@ export default function FormComponent<
                   touchedInputs[inputName] ? inputsErrors[inputName] : null
                 }
                 touched={touchedInputs[inputName]}
-                value={formValues[inputName] ?? ''}
+                value={(formValues[inputName] as string) ?? ''}
                 onInput={(e) => handleOnInput(e, inputName)}
                 onFocus={() => handleOnFocus(inputName)}
                 onBlur={handleOnBlur}

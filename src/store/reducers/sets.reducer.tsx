@@ -18,8 +18,11 @@ export const setsSlice = createSlice({
       localStorage.setItem('sets', JSON.stringify(action.payload));
       return state;
     },
-    addNewSet: (state, action: PayloadAction<FlashCardSet>) => {
-      const newSets = { ...state, [action.payload.frontUuid]: action.payload };
+    addNewSet: (state, action: PayloadAction<Partial<FlashCardSet>>) => {
+      const newSets = {
+        ...state,
+        [action.payload.frontUuid as string]: action.payload,
+      };
 
       localStorage.setItem('sets', JSON.stringify(newSets));
       state = newSets;

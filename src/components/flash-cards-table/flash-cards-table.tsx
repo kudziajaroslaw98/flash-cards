@@ -2,7 +2,7 @@
 
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter.component';
 import { Button } from '#/components/ui/button/button.component';
@@ -12,6 +12,7 @@ import { FlashCard } from '#/shared/models/flash-card.model';
 import {
   addNewFlashCard,
   removeFlashCards,
+  updateFlashCard,
 } from '#/store/reducers/flashcards.reducer';
 import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
@@ -28,6 +29,7 @@ export default function FlashCardsTable() {
 
   const [selected, setSelected] = useState<FlashCard[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInSelectionMode, setIsInSelectionMode] = useState(false);
 
   const isSelected = (flashCard: FlashCard) => {
     return (
@@ -75,38 +77,26 @@ export default function FlashCardsTable() {
     }, 1);
   };
 
-  // const wordChange = (flashCard: FlashCard, value: string) => {
-  //   dispatch(
-  //     updateFlashCard({ flashCard, updatedValue: value, property: 'word' }),
-  //   );
-  // };
+  useEffect(() => {
+    if (selected.length > 0) {
+      setIsInSelectionMode(true);
+    } else {
+      setIsInSelectionMode(false);
+    }
+  }, [selected]);
 
-  // const definitionChange = (flashCard: FlashCard, value: string) => {
-  //   dispatch(
-  //     updateFlashCard({
-  //       flashCard,
-  //       updatedValue: value,
-  //       property: 'definition',
-  //     }),
-  //   );
-  // };
-
-  // const editSelectedRecords = () => {
-  // selected.forEach((frontUuid) => {
-  //   dispatch(
-  //     updateFlashCard({
-  //       flashCard: flashCardsArray.find(
-  //         (flashCard) => flashCard.frontUuid === frontUuid,
-  //       )!,
-  //       updatedValue:
-  //         flashCardsArray.find(
-  //           (flashCard) => flashCard.frontUuid === frontUuid,
-  //         )!.order + 1,
-  //       property: 'order',
-  //     }),
-  //   );
-  // });
-  // };
+  const editSelectedRecords = (editRecords: Partial<FlashCard>) => {
+    selected.map((selectedFlashcard) => {
+      dispatch(
+        updateFlashCard({
+          flashCard: flashCardsArray.find(
+            (flashCard) => flashCard.frontUuid === selectedFlashcard.frontUuid,
+          )!,
+          updatedValue: editRecords,
+        }),
+      );
+    });
+  };
 
   return (
     <div className='flex w-full flex-col gap-6 py-8'>
@@ -155,6 +145,7 @@ export default function FlashCardsTable() {
                   size={'sm'}
                   isSelected={isSelected(flashCard)}
                   onSelect={() => toggleSelected(flashCard)}
+                  isInSelectionMode={isInSelectionMode}
                 />
               </div>
             ))}
@@ -192,6 +183,7 @@ export default function FlashCardsTable() {
         isDialogOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         handleNewFlashCard={addNewRecord}
+        handleEditFlashCard={editSelectedRecords}
         selectedFlashCards={selected}
       />
     </div>

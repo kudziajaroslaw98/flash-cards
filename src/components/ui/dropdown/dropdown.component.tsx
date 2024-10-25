@@ -274,6 +274,7 @@ export default function Dropdown<T>({
               {props.searchable && (
                 <div className='min-w-fit border-b bg-gray-100 p-1  dark:border-slate-800/40 dark:bg-slate-900 '>
                   <Input
+                    type='text'
                     value={searchValue}
                     valid={true}
                     placeholder='Search in decks...'
@@ -323,6 +324,7 @@ export default function Dropdown<T>({
                 <div>
                   <div className='min-w-fit  bg-gray-100 p-1 py-2 dark:border-slate-800/40 dark:bg-slate-900 '>
                     <Input
+                      type='text'
                       value={searchValue}
                       valid={true}
                       placeholder='New element...'

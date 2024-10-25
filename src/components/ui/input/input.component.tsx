@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '#/shared/utils/cn.util';
-import { DetailedHTMLProps, InputHTMLAttributes } from 'react';
+import type { HTMLInputTypeAttribute, InputHTMLAttributes } from 'react';
 
 export type InputValidation =
   | {
@@ -12,22 +12,16 @@ export type InputValidation =
       valid: true;
     };
 
-interface NarrowedInputHTMLAttributes<T> extends InputHTMLAttributes<T> {
-  value: string;
-}
-
 export interface InputComponentProps
-  extends DetailedHTMLProps<
-    NarrowedInputHTMLAttributes<HTMLInputElement>,
-    HTMLInputElement
-  > {
+  extends InputHTMLAttributes<HTMLInputElement> {
+  type: HTMLInputTypeAttribute;
   label?: string;
   for?: string;
   valid: boolean;
   error?: string | null;
   touched?: boolean;
-  value: string;
   icon?: React.ReactNode;
+  value?: string;
 }
 
 function Input({
@@ -38,6 +32,7 @@ function Input({
   touched = false,
   error = null,
   className = '',
+  type = 'text',
   icon,
   ...props
 }: InputComponentProps) {
@@ -71,6 +66,7 @@ function Input({
 
         <input
           {...props}
+          type={type}
           className={cn([
             label
               ? 'placeholder:text-gray-400 dark:placeholder:text-slate-700'

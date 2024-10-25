@@ -13,6 +13,7 @@ interface NewFlashCardModalProps {
   handleNewFlashCard: (
     flashCard: Record<keyof typeof newFlashCardScheme.inputs, string>,
   ) => void;
+  handleEditFlashCard: (editRecords: Partial<FlashCard>) => void;
   selectedFlashCards: FlashCard[];
 }
 
@@ -20,11 +21,10 @@ export const NewFlashCardModal = ({
   isDialogOpen,
   setIsModalOpen,
   handleNewFlashCard,
+  handleEditFlashCard,
   selectedFlashCards,
 }: NewFlashCardModalProps) => {
-  const [formValue, setFormValue] = useState<
-    Partial<Record<keyof typeof newFlashCardScheme.inputs, string>>
-  >({});
+  const [formValue, setFormValue] = useState<Partial<FlashCard>>({});
 
   const handleDialogClose = () => {
     setIsModalOpen(false);
@@ -32,9 +32,15 @@ export const NewFlashCardModal = ({
 
   const handleDialogSubmit = () => {
     setIsModalOpen(false);
-    handleNewFlashCard(
-      formValue as Record<keyof typeof newFlashCardScheme.inputs, string>,
-    );
+
+    if (selectedFlashCards.length > 0) {
+      handleEditFlashCard(formValue);
+    } else {
+      handleNewFlashCard(
+        formValue as Record<keyof typeof newFlashCardScheme.inputs, string>,
+      );
+    }
+
     setFormValue({});
   };
 
@@ -49,25 +55,20 @@ export const NewFlashCardModal = ({
         </Modal.Header>
 
         <Modal.Body className='flex flex-col items-center justify-center pb-8 pt-4'>
-          <FormComponent
+          <FormComponent<FlashCard>
             className='w-full max-w-80'
             scheme={newFlashCardScheme}
-            emitFormValid={() => {}}
             emitFormValue={setFormValue}
-            initialValues={
-              (selectedFlashCards.length > 0 && {
-                question: selectedFlashCards[0].question,
-                questionAddition: selectedFlashCards[0].questionAddition,
-                answer: selectedFlashCards[0].answer,
-              }) ||
-              {}
-            }
+            initialValues={selectedFlashCards[0]}
+            debug={{
+              values: true,
+            }}
           />
         </Modal.Body>
 
         <Modal.Footer className='flex items-center justify-end gap-2 py-4'>
           <Button
-            label='Create'
+            label={selectedFlashCards.length > 0 ? 'Edit' : 'Create'}
             onClick={handleDialogSubmit}
             size={'sm'}
             variant={'primary-text'}
