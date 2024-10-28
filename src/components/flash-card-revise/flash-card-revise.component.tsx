@@ -13,7 +13,7 @@ import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
 import type { FlashCard } from '#/shared/models/flash-card.model';
 import { cn } from '#/shared/utils/cn.util';
 import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
-import { updateFlashCards } from '#/store/reducers/flashcards.reducer';
+import { updateFlashCard } from '#/store/reducers/flashcards.reducer';
 import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { statsSelectors } from '#/store/selectors/stats.selectors';
@@ -59,7 +59,7 @@ export default function FlashCardReviseComponent() {
       clonedStats.correctAnswers += 1;
       if (revisedCard && revisedCard?.weight > 0.01) {
         dispatch(
-          updateFlashCards({
+          updateFlashCard({
             flashCard: flashCard,
             updatedValue: +(flashCard.weight - 0.01).toFixed(2),
             property: 'weight',
@@ -70,7 +70,7 @@ export default function FlashCardReviseComponent() {
       clonedStats.incorrectAnswers += 1;
 
       dispatch(
-        updateFlashCards({
+        updateFlashCard({
           flashCard: flashCard,
           updatedValue: +(flashCard.weight + 0.01).toFixed(2),
           property: 'weight',
