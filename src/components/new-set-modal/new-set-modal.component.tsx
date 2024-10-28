@@ -52,10 +52,6 @@ export const NewSetModal = ({
             className='w-full max-w-80'
             scheme={getFormScheme}
             emitFormValue={setFormValue}
-            debug={{
-              values: true,
-              errors: true,
-            }}
           />
         </Modal.Body>
 
