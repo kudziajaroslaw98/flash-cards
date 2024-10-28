@@ -31,8 +31,7 @@ export default function FlashCardsTable() {
   const [selected, setSelected] = useState<FlashCard[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
-
-  const tileSize: 'sm' | 'md' | 'lg' = 'sm';
+  const [tileSize] = useState<'sm' | 'md' | 'lg'>('sm');
 
   const isSelected = (flashCard: FlashCard) => {
     return (
