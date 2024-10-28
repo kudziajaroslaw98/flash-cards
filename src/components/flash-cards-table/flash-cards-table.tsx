@@ -155,7 +155,10 @@ export default function FlashCardsTable() {
 
       <div className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'>
         <Button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setIsModalOpen(true);
+            setIsInEditMode(false);
+          }}
           icon={<PlusIcon className='h-4 w-4' />}
           size={'icon'}
         />

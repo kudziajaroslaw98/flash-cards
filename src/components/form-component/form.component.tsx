@@ -116,7 +116,7 @@ export default function FormComponent<
     setDefaultValids(initialValids);
 
     initialRender.current = false;
-  }, [props.initialValues, props.scheme]);
+  }, [props.initialValues, props.scheme.inputs]);
 
   useEffect(() => {
     if (props?.formValid !== undefined && props?.formValid === false) {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import useKeyPress from '#/hooks/use-key-press.hook';
 import { FlashCard } from '#/shared/models/flash-card.model';
 import { UUID } from '#/shared/types/uuid.type';
 import uuid from '#/shared/utils/uuid.util';
@@ -62,6 +63,9 @@ export const NewFlashCardModal = ({
 
   const handleDialogClose = () => {
     setIsModalOpen(false);
+    setCurrentIndex(0);
+    setFormValue({});
+    setFlashCards(selectedFlashCards);
   };
 
   const handleDialogSubmit = () => {
@@ -75,6 +79,7 @@ export const NewFlashCardModal = ({
 
     setFormValue({});
     setCurrentIndex(0);
+    setFlashCards(selectedFlashCards);
   };
 
   const handleRightButtonClick = () => {
@@ -110,6 +115,9 @@ export const NewFlashCardModal = ({
       setCurrentIndex((prev) => prev - 1);
     }
   };
+
+  useKeyPress(['ArrowRight'], handleRightButtonClick);
+  useKeyPress(['ArrowLeft'], handleLeftButtonClick);
 
   return (
     <Dialog

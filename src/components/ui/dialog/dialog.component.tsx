@@ -1,4 +1,5 @@
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
+import useKeyPress from '#/hooks/use-key-press.hook';
 import {
   createContext,
   DetailedHTMLProps,
@@ -38,6 +39,8 @@ const Dialog = ({
       onDialogClose();
     }
   });
+
+  useKeyPress(['Escape'], onDialogClose);
 
   return (
     <>

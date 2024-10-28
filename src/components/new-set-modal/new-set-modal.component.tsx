@@ -1,5 +1,5 @@
 import { newSetFormScheme } from '#/shared/validation-schemes/new-set-validation.scheme';
-import { useCallback, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { FlashCardSet } from '#/shared/models/flashcard-set.model';
 import { DictionaryValue } from '#/shared/types/dictionary-value.type';
@@ -22,9 +22,10 @@ export const NewSetModal = ({
   categories,
 }: NewSetModalProps) => {
   const [formValue, setFormValue] = useState<Partial<FlashCardSet>>({});
-  const getFormScheme = useCallback(() => {
-    return newSetFormScheme(categories);
-  }, [categories]);
+  const getFormScheme = useMemo(
+    () => newSetFormScheme(categories),
+    [categories],
+  );
 
   const handleDialogClose = () => {
     setIsModalOpen(false);
@@ -49,7 +50,7 @@ export const NewSetModal = ({
         <Modal.Body className='flex flex-col items-center justify-center pb-8 pt-4'>
           <FormComponent<FlashCardSet>
             className='w-full max-w-80'
-            scheme={getFormScheme()}
+            scheme={getFormScheme}
             emitFormValue={setFormValue}
             debug={{
               values: true,
