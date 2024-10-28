@@ -85,39 +85,37 @@ export default function FormComponent<
   const initialRender = useRef(true);
 
   useEffect(() => {
-    if (initialRender.current) {
-      let initialInputs: string[] = [];
-      let initialValids: Record<string, boolean> = {};
-      let initialErrors: Record<string, string | null> = {};
-      let tmpValues: Record<string, string> = {};
+    let initialInputs: string[] = [];
+    let initialValids: Record<string, boolean> = {};
+    let initialErrors: Record<string, string | null> = {};
+    let tmpValues: Record<string, string> = {};
 
-      Object.entries(props.scheme.inputs).forEach(([inputName]) => {
-        initialInputs = [...initialInputs, inputName];
-        initialValids = { ...initialValids, [inputName]: true };
-        initialErrors = { ...initialErrors, [inputName]: null };
-        tmpValues = {
-          ...tmpValues,
-          // @ts-expect-error Generic type generate error here
-          [inputName]: props.initialValues?.[inputName]
-            ? // @ts-expect-error  Generic type generate error here
-              props.initialValues?.[inputName]
-            : '',
-        };
-      });
-
-      const initialValues: Record<keyof T, string> = {
-        ...props.initialValues,
+    Object.entries(props.scheme.inputs).forEach(([inputName]) => {
+      initialInputs = [...initialInputs, inputName];
+      initialValids = { ...initialValids, [inputName]: true };
+      initialErrors = { ...initialErrors, [inputName]: null };
+      tmpValues = {
         ...tmpValues,
-      } as Record<keyof T, string>;
+        // @ts-expect-error Generic type generate error here
+        [inputName]: props.initialValues?.[inputName]
+          ? // @ts-expect-error  Generic type generate error here
+            props.initialValues?.[inputName]
+          : '',
+      };
+    });
 
-      setFormInputs(initialInputs);
-      setInputsValidity(initialValids);
-      setInputsErrors(initialErrors);
-      setFormValues(initialValues);
-      setDefaultValids(initialValids);
+    const initialValues: Record<keyof T, string> = {
+      ...props.initialValues,
+      ...tmpValues,
+    } as Record<keyof T, string>;
 
-      initialRender.current = false;
-    }
+    setFormInputs(initialInputs);
+    setInputsValidity(initialValids);
+    setInputsErrors(initialErrors);
+    setFormValues(initialValues);
+    setDefaultValids(initialValids);
+
+    initialRender.current = false;
   }, [props.initialValues, props.scheme]);
 
   useEffect(() => {
@@ -171,8 +169,6 @@ export default function FormComponent<
   const checkFormValidity = () => {
     const output: SafeParseSuccess<unknown> | SafeParseError<unknown> =
       props.scheme.validation.safeParse(formValues);
-
-    console.log('output - ', output);
 
     let valids = defaultValids;
     let errors = {};

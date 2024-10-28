@@ -11,9 +11,9 @@ import { FlashCard } from '#/shared/models/flash-card.model';
 
 import { cn } from '#/shared/utils/cn.util';
 import {
-  addNewFlashCard,
+  addNewFlashCards,
   removeFlashCards,
-  updateFlashCard,
+  updateFlashCards,
 } from '#/store/reducers/flashcards.reducer';
 import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
@@ -31,6 +31,7 @@ export default function FlashCardsTable() {
   const [selected, setSelected] = useState<FlashCard[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
+  const [isInEditMode, setIsInEditMode] = useState(false);
   const [tileSize] = useState<'sm' | 'md' | 'lg'>('sm');
 
   const isSelected = (flashCard: FlashCard) => {
@@ -59,14 +60,12 @@ export default function FlashCardsTable() {
     setSelected([]);
   };
 
-  const addNewRecord = (
-    flashCard: Pick<FlashCard, 'question' | 'questionAddition' | 'answer'>,
-  ) => {
-    dispatch(addNewFlashCard(flashCard));
+  const addNewRecord = (flashCards: Partial<FlashCard>[]) => {
+    dispatch(addNewFlashCards(flashCards));
 
     dispatch(
       updateStatistics({
-        updatedValue: statistics.createdFlashCards + 1,
+        updatedValue: statistics.createdFlashCards + flashCards.length,
         property: 'createdFlashCards',
       }),
     );
@@ -87,17 +86,8 @@ export default function FlashCardsTable() {
     }
   }, [selected]);
 
-  const editSelectedRecords = (editRecords: Partial<FlashCard>) => {
-    selected.map((selectedFlashcard) => {
-      dispatch(
-        updateFlashCard({
-          flashCard: flashCardsArray.find(
-            (flashCard) => flashCard.frontUuid === selectedFlashcard.frontUuid,
-          )!,
-          updatedValue: editRecords,
-        }),
-      );
-    });
+  const editSelectedRecords = (editRecords: Partial<FlashCard>[]) => {
+    dispatch(updateFlashCards(editRecords));
   };
 
   return (
@@ -171,7 +161,10 @@ export default function FlashCardsTable() {
         />
 
         <Button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setIsInEditMode(true);
+            setIsModalOpen(true);
+          }}
           icon={<PencilIcon className='h-4 w-4' />}
           size={'icon'}
           disabled={selected.length === 0}
@@ -194,7 +187,8 @@ export default function FlashCardsTable() {
         setIsModalOpen={setIsModalOpen}
         handleNewFlashCard={addNewRecord}
         handleEditFlashCard={editSelectedRecords}
-        selectedFlashCards={selected}
+        selectedFlashCards={isInEditMode ? selected : []}
+        isInEditMode={isInEditMode}
       />
     </div>
   );
