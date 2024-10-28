@@ -9,6 +9,7 @@ import { Button } from '#/components/ui/button/button.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import { FlashCard } from '#/shared/models/flash-card.model';
 
+import { cn } from '#/shared/utils/cn.util';
 import {
   addNewFlashCard,
   removeFlashCards,
@@ -30,6 +31,8 @@ export default function FlashCardsTable() {
   const [selected, setSelected] = useState<FlashCard[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
+
+  const tileSize: 'sm' | 'md' | 'lg' = 'sm';
 
   const isSelected = (flashCard: FlashCard) => {
     return (
@@ -136,13 +139,21 @@ export default function FlashCardsTable() {
       )} */}
 
       {flashCardsArray.length > 0 && (
-        <div className='grid w-full grid-cols-[repeat(auto-fit,minmax(20rem,1fr))] gap-4 2xl:grid-cols-[repeat(3,minmax(20rem,1fr))]'>
+        <div
+          className={cn([
+            'grid w-full justify-center gap-4',
+            // 'm-[0 auto] inline-flex w-full flex-wrap gap-4',
+            tileSize === 'sm' && 'grid-cols-[repeat(auto-fit,11rem)]',
+            tileSize === 'md' && 'grid-cols-[repeat(auto-fit,16rem)]',
+            tileSize === 'lg' && 'grid-cols-[repeat(auto-fit,20rem)]',
+          ])}
+        >
           <AnimatePresence mode='popLayout'>
             {flashCardsArray.map((flashCard) => (
               <div key={flashCard.frontUuid}>
                 <FlashCardComponent
                   flashCard={flashCard}
-                  size={'sm'}
+                  size={tileSize}
                   isSelected={isSelected(flashCard)}
                   onSelect={() => toggleSelected(flashCard)}
                   isInSelectionMode={isInSelectionMode}

@@ -1,5 +1,5 @@
 import useLongPress from '#/hooks/use-long-press.hook';
-import { FlashCard } from '#/shared/models/flash-card.model';
+import type { FlashCard } from '#/shared/models/flash-card.model';
 import { cn } from '#/shared/utils/cn.util';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
@@ -12,6 +12,7 @@ interface FlashCardProps {
   isSelected?: boolean;
   onSelect?: (flashCard: FlashCard) => void;
   isInSelectionMode?: boolean;
+  flipBlocked?: boolean;
 }
 
 export default function FlashCardComponent({
@@ -19,6 +20,8 @@ export default function FlashCardComponent({
   flashCard,
   onSelect,
   isInSelectionMode,
+  flipBlocked = false,
+  size = 'lg',
   ...props
 }: Readonly<FlashCardProps>) {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -28,7 +31,7 @@ export default function FlashCardComponent({
     () => {
       if (isInSelectionMode) {
         onSelect && onSelect(flashCard);
-      } else {
+      } else if (!flipBlocked) {
         setIsFlipped(!isFlipped);
       }
     },
@@ -63,8 +66,11 @@ export default function FlashCardComponent({
             // onKeyDown={handleKeyDown}
             tabIndex={0}
             className={cn([
-              'z-10 h-96 w-80 flex-col items-center p-4',
+              'z-10 flex-col items-center p-4',
               isSelected ? 'ring ring-green-400/60' : '',
+              size === 'sm' && 'h-56 w-44',
+              size === 'md' && 'h-72 w-64',
+              size === 'lg' && 'h-96 w-80',
             ])}
             {...props}
           >
@@ -73,12 +79,24 @@ export default function FlashCardComponent({
             )}
 
             <h5
-              className={`z-20 flex h-20 w-full items-center justify-center rounded-md text-center text-sm`}
+              className={cn([
+                'z-20 flex h-20 w-full items-center justify-center rounded-md text-center',
+                size === 'sm' && 'text-xs',
+                size === 'md' && 'text-sm',
+                size === 'lg' && 'text-sm',
+              ])}
             >
               Q: {flashCard.question}
             </h5>
 
-            <h2 className='text z-20 flex h-full w-full justify-center rounded-md pt-16 text-center text-5xl text-green-400'>
+            <h2
+              className={cn([
+                'z-20 flex h-full w-full justify-center rounded-md pt-16 text-center text-green-400',
+                size === 'sm' && 'pt-6 text-2xl',
+                size === 'md' && 'pt-10 text-3xl',
+                size === 'lg' && 'pt-16 text-5xl',
+              ])}
+            >
               {flashCard.questionAddition}
             </h2>
           </Card>
@@ -102,11 +120,19 @@ export default function FlashCardComponent({
             className={cn([
               'z-10 h-96 w-80 flex-col items-center p-4',
               isSelected ? 'ring ring-green-400/60' : '',
+              size === 'sm' && 'h-56 w-48',
+              size === 'md' && 'h-72 w-64',
+              size === 'lg' && 'h-96 w-80',
             ])}
             {...props}
           >
             <p
-              className={`z-20 flex h-full w-full items-center justify-center rounded-md px-4 text-center text-gray-500 dark:text-slate-400`}
+              className={cn([
+                'z-20 flex h-full w-full items-center justify-center rounded-md px-4 text-center text-gray-500 dark:text-slate-400',
+                size === 'sm' && 'text-xs',
+                size === 'md' && 'text-sm',
+                size === 'lg' && 'text-base',
+              ])}
             >
               {flashCard.answer}
             </p>

@@ -10,7 +10,8 @@ import { Button } from '#/components/ui/button/button.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import useKeyPress from '#/hooks/use-key-press.hook';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
-import { FlashCard } from '#/shared/models/flash-card.model';
+import type { FlashCard } from '#/shared/models/flash-card.model';
+import { cn } from '#/shared/utils/cn.util';
 import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
 import { updateFlashCard } from '#/store/reducers/flashcards.reducer';
 import { updateStatistics } from '#/store/reducers/stats.reducer';
@@ -111,8 +112,14 @@ export default function FlashCardReviseComponent() {
     <div className='flex h-full w-full flex-col justify-stretch'>
       <div className='flex h-full w-full flex-col items-center gap-8 pb-44'>
         <div className='grid w-full items-center justify-center'>
-          <div className='flex w-full items-center justify-end gap-2 md:translate-x-20'>
+          <div
+            className={cn([
+              'flex w-full items-center justify-end gap-2 opacity-0 transition md:translate-x-20',
+              clicked && 'opacity-100',
+            ])}
+          >
             <ArrowTurnLeftDownIcon className='size-5 text-green-400' />
+
             <span className='w-32 text-xs italic text-gray-600 dark:text-slate-500'>
               Click on the card to flip it
             </span>
@@ -123,6 +130,7 @@ export default function FlashCardReviseComponent() {
               <FlashCardComponent
                 key={revisedCard.frontUuid}
                 flashCard={revisedCard}
+                flipBlocked={!clicked}
               />
             )}
           </div>
@@ -131,12 +139,22 @@ export default function FlashCardReviseComponent() {
         <div className='mt-8 grid gap-2 xl:grid-cols-[repeat(2,minmax(20rem,1fr))]'>
           {randomCards.map((flashCard, index) => (
             <div
-              className='flex w-[320px] cursor-pointer gap-4 rounded-md border border-gray-200 p-4 hover:bg-gray-100 dark:dark:border-slate-800/40 dark:hover:bg-slate-800'
+              className={cn([
+                clickedCard?.frontUuid === flashCard.frontUuid &&
+                  isCorrect(flashCard) &&
+                  'border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
+                clickedCard?.frontUuid === flashCard.frontUuid &&
+                  !isCorrect(flashCard) &&
+                  'border-red-400/50 bg-red-100 hover:!bg-red-100 dark:!border-red-400/40 dark:bg-red-400/20 dark:hover:!bg-red-400/20',
+                'flex w-[320px] cursor-pointer gap-4 rounded-md border border-gray-200 p-4 transition hover:bg-gray-100 dark:dark:border-slate-800/40 dark:hover:bg-slate-800',
+              ])}
               key={`answer-${flashCard.frontUuid}`}
+              onClick={() => changeClicked(flashCard)}
             >
               <span className='flex size-8 min-h-8 min-w-8 items-center justify-center rounded-md bg-green-400 text-gray-100 dark:text-slate-900'>
                 {index + 1}
               </span>
+
               <span className='flex w-[280px] text-sm text-gray-800 dark:text-slate-400'>
                 {flashCard.answer}
               </span>
@@ -145,7 +163,7 @@ export default function FlashCardReviseComponent() {
         </div>
       </div>
 
-      <div className='fixed bottom-4 right-0 z-40 flex h-40 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 backdrop-blur-md dark:bg-slate-950/10 sm:sticky sm:bottom-8'>
+      <div className='fixed bottom-0 right-0 z-40 flex h-16 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 px-2 backdrop-blur-md dark:bg-slate-950/10 sm:sticky sm:bottom-8'>
         <Button
           label={'Reshuffle'}
           icon={<ArrowPathIcon className='h-4 w-4' />}
