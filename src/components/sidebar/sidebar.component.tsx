@@ -170,8 +170,6 @@ export default function SidebarComponent() {
             >
               <div className='flex items-center justify-center gap-2'>
                 <ContextMenu
-                  open={isOpen}
-                  setOpen={setOpen}
                   className='-left-4'
                   name={'avatar-context'}
                   afterMenuClass='py-4 justify-center'

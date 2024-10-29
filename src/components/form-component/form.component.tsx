@@ -1,83 +1,25 @@
 'use client';
 
-import Input, {
-  type InputComponentProps,
-} from '#/components/ui/input/input.component';
+import Input from '#/components/ui/input/input.component';
 import isDropdown from '#/shared/guards/is-dropdown.guard';
 import isInput from '#/shared/guards/is-input.guard';
 import isTextArea from '#/shared/guards/is-text-area.guard';
+import { FormScheme } from '#/shared/types/form-scheme.type';
+import { isDifferent } from '#/shared/utils/is-different.util';
 import {
   useEffect,
-  useMemo,
   useRef,
   useState,
   type Dispatch,
   type FormEvent,
   type SetStateAction,
 } from 'react';
-import type {
-  SafeParseError,
-  SafeParseSuccess,
-  ZodEffects,
-  ZodIssueBase,
-  ZodObject,
-  ZodTypeAny,
-} from 'zod';
-import Dropdown, { DropdownProps } from '../ui/dropdown/dropdown.component';
-import TextArea, {
-  type TextAreaProps,
-} from '../ui/text-area/text-area.component';
+import type { SafeParseError, SafeParseSuccess, ZodIssueBase } from 'zod';
+import Dropdown from '../ui/dropdown/dropdown.component';
+import TextArea from '../ui/text-area/text-area.component';
 
-type ZodSchemaFromBaseObject<T> =
-  | ZodObject<Record<keyof T, ZodTypeAny>>
-  | ZodEffects<ZodObject<Record<keyof T, ZodTypeAny>>>;
-
-type FormScheme<SchemeType> = {
-  validation: ZodSchemaFromBaseObject<SchemeType>;
-  inputs: SchemeType;
-};
-
-function isDifferent(a: unknown, b: unknown): boolean {
-  if (a === b) return false;
-
-  // Check if both values are arrays
-  if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) return true;
-
-    return a.some((val, index) => isDifferent(val, b[index]));
-  }
-
-  // Check if both values are objects (but not null)
-  if (a && b && typeof a === 'object' && typeof b === 'object') {
-    const objectA = a as Record<string, unknown>;
-    const objectB = b as Record<string, unknown>;
-
-    const aKeys = Object.keys(a);
-    const bKeys = Object.keys(b);
-
-    if (aKeys.length !== bKeys.length) return true;
-
-    return aKeys.some((key) => isDifferent(objectA[key], objectB[key]));
-  }
-
-  // Default case: treat as primitives or different types
-  return true;
-}
-
-export default function FormComponent<
-  T,
-  InputType extends
-    | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
-    | TextAreaProps
-    | DropdownProps<unknown> =
-    | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
-    | TextAreaProps
-    | DropdownProps<unknown>,
-  SchemeType extends Partial<Record<string, InputType>> = Partial<
-    Record<string, InputType>
-  >,
->(props: {
-  scheme: FormScheme<SchemeType>;
+export default function FormComponent<T>(props: {
+  scheme: FormScheme<T>;
   initialValues?: T;
   emitFormValid?: Dispatch<SetStateAction<boolean>>;
   emitFormValue: Dispatch<SetStateAction<Partial<T>>>;
@@ -261,13 +203,9 @@ export default function FormComponent<
     setTouchedInputs((prev) => ({ ...prev, [inputName]: true }));
   };
 
-  const schemeInputs = useMemo(() => {
-    return Object.entries(props.scheme.inputs) as [string, InputType][];
-  }, [props.scheme.inputs]);
-
   return (
     <form className={props.className}>
-      {schemeInputs.map(([inputName, inputProps]) => {
+      {Object.entries(props.scheme.inputs).map(([inputName, inputProps]) => {
         return (
           <span key={inputName}>
             {isTextArea(inputProps) && (

@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import type { FlashCard } from '../models/flash-card.model';
+import type { FormScheme } from '../types/form-scheme.type';
 
 export const newFlashCardValidationScheme = z.object({
   question: z.string().min(1, 'Question is required'),
@@ -9,7 +11,9 @@ export const newFlashCardValidationScheme = z.object({
     .max(255, 'Answer is too long'),
 });
 
-export const newFlashCardScheme = {
+export const newFlashCardScheme: FormScheme<
+  Pick<FlashCard, 'question' | 'questionAddition' | 'answer'>
+> = {
   inputs: {
     question: {
       type: 'text',

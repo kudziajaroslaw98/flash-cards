@@ -77,7 +77,7 @@ export const AssignFlashCardsModal = ({
         </Modal.Header>
 
         <Modal.Body className='flex flex-col items-center justify-center pb-8 pt-4'>
-          <FormComponent<Partial<FlashCardSet>>
+          <FormComponent<Pick<FlashCardSet, 'flashCards'>>
             className='w-full max-w-80'
             scheme={getFormScheme}
             emitFormValue={setFormValue}

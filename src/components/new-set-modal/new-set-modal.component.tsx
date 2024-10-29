@@ -48,7 +48,9 @@ export const NewSetModal = ({
         </Modal.Header>
 
         <Modal.Body className='flex flex-col items-center justify-center pb-8 pt-4'>
-          <FormComponent<FlashCardSet>
+          <FormComponent<
+            Pick<FlashCardSet, 'name' | 'description' | 'category'>
+          >
             className='w-full max-w-80'
             scheme={getFormScheme}
             emitFormValue={setFormValue}
