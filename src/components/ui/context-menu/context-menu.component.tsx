@@ -6,6 +6,7 @@ import { cn } from '#/shared/utils/cn.util';
 import { cva, VariantProps } from 'class-variance-authority';
 import {
   useRef,
+  useState,
   type DetailedHTMLProps,
   type HTMLAttributes,
   type ReactNode,
@@ -48,30 +49,32 @@ interface ContextMenuProps
   afterMenuClass?: string;
   menuItems: ContextMenuItem[];
   name: string;
-  open: boolean;
-  setOpen: (value: boolean) => void;
 }
 
 export default function ContextMenu({
   contextPosition,
   className,
-  setOpen,
   ...props
 }: ContextMenuProps) {
   const contextMenuWrapperRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
 
   useOutsideAlerter(contextMenuWrapperRef, () => {
-    setOpen && setOpen(false);
+    open && setOpen(false);
   });
+
+  const handleTriggerClick = () => {
+    setOpen(!open);
+  };
 
   return (
     <div>
       <div className='relative'>
-        {props.triggerComponent}
+        <div onClick={handleTriggerClick}>{props.triggerComponent}</div>
 
         <div
           ref={contextMenuWrapperRef}
-          data-open={props.open}
+          data-open={open}
           className={cn([contextMenuVariants({ contextPosition }), className])}
         >
           <ul className='flex h-auto w-full flex-col items-center'>

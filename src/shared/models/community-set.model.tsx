@@ -1,5 +1,5 @@
 import { UUID } from '../types/uuid.type';
-import { FlashCardSet } from './flashcard-set.model';
+import { FlashCardSet } from './flash-card-set.model';
 
 export type CommunitySet = FlashCardSet & {
   isPublic: boolean;

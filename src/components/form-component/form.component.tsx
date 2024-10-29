@@ -37,6 +37,33 @@ type FormScheme<SchemeType> = {
   inputs: SchemeType;
 };
 
+function isDifferent(a: unknown, b: unknown): boolean {
+  if (a === b) return false;
+
+  // Check if both values are arrays
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return true;
+
+    return a.some((val, index) => isDifferent(val, b[index]));
+  }
+
+  // Check if both values are objects (but not null)
+  if (a && b && typeof a === 'object' && typeof b === 'object') {
+    const objectA = a as Record<string, unknown>;
+    const objectB = b as Record<string, unknown>;
+
+    const aKeys = Object.keys(a);
+    const bKeys = Object.keys(b);
+
+    if (aKeys.length !== bKeys.length) return true;
+
+    return aKeys.some((key) => isDifferent(objectA[key], objectB[key]));
+  }
+
+  // Default case: treat as primitives or different types
+  return true;
+}
+
 export default function FormComponent<
   T,
   InputType extends
@@ -82,40 +109,44 @@ export default function FormComponent<
   const [touchedInputs, setTouchedInputs] = useState<Record<string, boolean>>(
     {},
   );
-  const initialRender = useRef(true);
+  const initialValuesRef = useRef<T | null>(null);
 
   useEffect(() => {
-    let initialInputs: string[] = [];
-    let initialValids: Record<string, boolean> = {};
-    let initialErrors: Record<string, string | null> = {};
-    let tmpValues: Record<string, string> = {};
+    if (
+      initialValuesRef.current === null ||
+      isDifferent(initialValuesRef.current, props.initialValues)
+    ) {
+      let initialInputs: string[] = [];
+      let initialValids: Record<string, boolean> = {};
+      let initialErrors: Record<string, string | null> = {};
+      let tmpValues: Record<string, string> = {};
 
-    Object.entries(props.scheme.inputs).forEach(([inputName]) => {
-      initialInputs = [...initialInputs, inputName];
-      initialValids = { ...initialValids, [inputName]: true };
-      initialErrors = { ...initialErrors, [inputName]: null };
-      tmpValues = {
+      Object.entries(props.scheme.inputs).forEach(([inputName]) => {
+        initialInputs = [...initialInputs, inputName];
+        initialValids = { ...initialValids, [inputName]: true };
+        initialErrors = { ...initialErrors, [inputName]: null };
+        tmpValues = {
+          ...tmpValues,
+          // @ts-expect-error Generic type generate error here
+          [inputName]: props.initialValues?.[inputName]
+            ? // @ts-expect-error  Generic type generate error here
+              props.initialValues?.[inputName]
+            : '',
+        };
+      });
+
+      const initialValues: Record<keyof T, string> = {
+        ...props.initialValues,
         ...tmpValues,
-        // @ts-expect-error Generic type generate error here
-        [inputName]: props.initialValues?.[inputName]
-          ? // @ts-expect-error  Generic type generate error here
-            props.initialValues?.[inputName]
-          : '',
-      };
-    });
+      } as Record<keyof T, string>;
 
-    const initialValues: Record<keyof T, string> = {
-      ...props.initialValues,
-      ...tmpValues,
-    } as Record<keyof T, string>;
-
-    setFormInputs(initialInputs);
-    setInputsValidity(initialValids);
-    setInputsErrors(initialErrors);
-    setFormValues(initialValues);
-    setDefaultValids(initialValids);
-
-    initialRender.current = false;
+      setFormInputs(initialInputs);
+      setInputsValidity(initialValids);
+      setInputsErrors(initialErrors);
+      setFormValues(initialValues);
+      setDefaultValids(initialValids);
+      initialValuesRef.current = props.initialValues ?? null;
+    }
   }, [props.initialValues, props.scheme.inputs]);
 
   useEffect(() => {

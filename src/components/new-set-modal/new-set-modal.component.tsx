@@ -1,7 +1,7 @@
 import { newSetFormScheme } from '#/shared/validation-schemes/new-set-validation.scheme';
 import { useMemo, useState } from 'react';
 
-import { FlashCardSet } from '#/shared/models/flashcard-set.model';
+import { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import { DictionaryValue } from '#/shared/types/dictionary-value.type';
 import FormComponent from '../form-component/form.component';
 import { Button } from '../ui/button/button.component';

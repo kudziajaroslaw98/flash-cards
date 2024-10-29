@@ -127,8 +127,8 @@ export default function Dropdown<T>({
     setFilteredItems(
       items?.filter((item) =>
         item.label
-          .toLocaleLowerCase()
-          .includes(searchValue.toLocaleLowerCase()),
+          ?.toLocaleLowerCase()
+          ?.includes(searchValue?.toLocaleLowerCase()),
       ),
     );
   }, [items, searchValue]);
@@ -277,7 +277,7 @@ export default function Dropdown<T>({
                     type='text'
                     value={searchValue}
                     valid={true}
-                    placeholder='Search in decks...'
+                    placeholder={`Search in ${multipleLabel ?? label}...`}
                     for='search'
                     icon={<MagnifyingGlassIcon className='h-4 w-4' />}
                     className='min-w-52 text-sm'

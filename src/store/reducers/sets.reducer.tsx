@@ -1,4 +1,4 @@
-import { FlashCardSet } from '#/shared/models/flashcard-set.model';
+import { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import { Sets } from '#/shared/types/local-storage-sets.type';
 import { UUID } from '#/shared/types/uuid.type';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -21,7 +21,10 @@ export const setsSlice = createSlice({
     addNewSet: (state, action: PayloadAction<Partial<FlashCardSet>>) => {
       const newSets = {
         ...state,
-        [action.payload.frontUuid as string]: action.payload,
+        [action.payload.frontUuid as string]: {
+          ...action.payload,
+          hardlink: action.payload.name?.replace(/ /g, '-').toLowerCase(),
+        },
       };
 
       localStorage.setItem('sets', JSON.stringify(newSets));

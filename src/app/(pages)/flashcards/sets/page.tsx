@@ -7,7 +7,7 @@ import Dropdown from '#/components/ui/dropdown/dropdown.component';
 import Input from '#/components/ui/input/input.component';
 import { ToggleButton } from '#/components/ui/toggle-button/toggle-button.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
-import { FlashCardSet } from '#/shared/models/flashcard-set.model';
+import { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import { DictionaryValue } from '#/shared/types/dictionary-value.type';
 import { UUID } from '#/shared/types/uuid.type';
 import uuid from '#/shared/utils/uuid.util';
@@ -16,6 +16,7 @@ import { setsSelectors } from '#/store/selectors/sets.selectors';
 import { StarIcon as StarIconOutline } from '@heroicons/react/24/outline';
 import { MagnifyingGlassIcon, StarIcon } from '@heroicons/react/24/solid';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function SetsPage() {
@@ -29,11 +30,12 @@ export default function SetsPage() {
     setsSelectors.selectCategoriesAsDictionary,
   );
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const handleNewSet = (set: Partial<FlashCardSet>) => {
     const newUuid = uuid();
 
-    const newSet: FlashCardSet = {
+    const newSet: Partial<FlashCardSet> = {
       ...set,
       name: set.name ?? '',
       description: set.description ?? '',
@@ -85,39 +87,43 @@ export default function SetsPage() {
 
   return (
     <div className='flex h-full w-full grow flex-col items-center md:pb-24'>
-      <div className='flex w-full flex-col justify-between gap-4 lg:flex-row lg:items-center'>
+      <div className='flex w-full flex-col justify-between gap-4 '>
         <h4 className='w-52 text-green-400'>Your Decks</h4>
 
-        <div className='flex w-full items-center justify-end gap-2 text-sm'>
-          <Input
-            type='text'
-            value={searchedText}
-            valid={true}
-            placeholder='Search in decks...'
-            for='search'
-            icon={<MagnifyingGlassIcon className='h-4 w-4' />}
-            className='!max-w-56'
-            onChange={handleSearchedTextChange}
-          />
+        <div className='flex w-full flex-col items-center justify-center gap-2 text-sm sm:flex-row sm:justify-end'>
+          <span className='flex w-full justify-center sm:w-auto'>
+            <Input
+              type='text'
+              value={searchedText}
+              valid={true}
+              placeholder='Search in decks...'
+              for='search'
+              icon={<MagnifyingGlassIcon className='h-4 w-4' />}
+              className='!w-full !max-w-80 sm:!w-56'
+              onChange={handleSearchedTextChange}
+            />
+          </span>
 
-          <Dropdown
-            config={categories}
-            onChange={setSearchedCategory}
-            multiple
-            multipleLabel='Categories'
-            label='Category'
-            clearAll
-            searchable
-            labelClassName='!w-52'
-          />
+          <span className='flex w-full flex-col items-center justify-center gap-2 sm:w-auto sm:flex-row'>
+            <Dropdown
+              config={categories}
+              onChange={setSearchedCategory}
+              multiple
+              multipleLabel='Categories'
+              label='Category'
+              clearAll
+              searchable
+              labelClassName='!w-full !max-w-80 sm:!w-56'
+            />
 
-          <ToggleButton
-            toggled={isFavourite}
-            toggle={() => toggleFavourite(!isFavourite)}
-            activeIcon={<StarIcon className='h-4 w-4' />}
-            inactiveIcon={<StarIconOutline className='h-4 w-4' />}
-            size={'icon'}
-          />
+            <ToggleButton
+              toggled={isFavourite}
+              toggle={() => toggleFavourite(!isFavourite)}
+              activeIcon={<StarIcon className='h-4 w-4' />}
+              inactiveIcon={<StarIconOutline className='h-4 w-4' />}
+              size={'icon'}
+            />
+          </span>
         </div>
       </div>
 
@@ -137,6 +143,7 @@ export default function SetsPage() {
               <Card
                 key={set.frontUuid}
                 className='flex h-full flex-col justify-between gap-4 sm:min-h-44 sm:gap-4'
+                onClick={() => router.push(`/flashcards/sets/${set.hardlink}`)}
               >
                 <div className='flex flex-col gap-4'>
                   <h5 className='text-base font-bold text-gray-800 dark:text-slate-200'>
