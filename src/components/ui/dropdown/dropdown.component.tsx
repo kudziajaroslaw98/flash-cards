@@ -48,6 +48,7 @@ interface BaseDropdownProps<T> extends VariantProps<typeof DropdownVariants> {
   onBlur?: () => void;
   onFocus?: () => void;
   onAddNew?: (value: string) => void;
+  name?: string;
 }
 
 export type DropdownProps<T> =
