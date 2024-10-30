@@ -14,7 +14,6 @@
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.2",
     "@heroicons/react": "^2.1.5",
-    "@million/lint": "^1.0.0-rc.20",
     "@reduxjs/toolkit": "^2.1.0",
     "@storybook/addon-a11y": "^8.1.5",
     "@supabase/auth-helpers-nextjs": "^0.8.7",
@@ -27,7 +26,6 @@
     "framer-motion": "^10.18.0",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
-    "million": "^3.1.1",
     "next": "14.0.4",
     "prettier-plugin-organize-attributes": "^1.0.0",
     "prettier-plugin-sort-imports": "^1.8.1",
