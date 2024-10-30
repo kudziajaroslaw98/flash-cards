@@ -1,9 +1,12 @@
 'use client';
 
 import MenuItem from '#/components/ui/context-menu/menu-item.component';
+import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import { cn } from '#/shared/utils/cn.util';
 import { cva, VariantProps } from 'class-variance-authority';
 import {
+  useRef,
+  useState,
   type DetailedHTMLProps,
   type HTMLAttributes,
   type ReactNode,
@@ -46,7 +49,6 @@ interface ContextMenuProps
   afterMenuClass?: string;
   menuItems: ContextMenuItem[];
   name: string;
-  open: boolean;
 }
 
 export default function ContextMenu({
@@ -54,13 +56,25 @@ export default function ContextMenu({
   className,
   ...props
 }: ContextMenuProps) {
+  const contextMenuWrapperRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+
+  useOutsideAlerter(contextMenuWrapperRef, () => {
+    open && setOpen(false);
+  });
+
+  const handleTriggerClick = () => {
+    setOpen(!open);
+  };
+
   return (
     <div>
       <div className='relative'>
-        {props.triggerComponent}
+        <div onClick={handleTriggerClick}>{props.triggerComponent}</div>
 
         <div
-          data-open={props.open}
+          ref={contextMenuWrapperRef}
+          data-open={open}
           className={cn([contextMenuVariants({ contextPosition }), className])}
         >
           <ul className='flex h-auto w-full flex-col items-center'>

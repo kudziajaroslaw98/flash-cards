@@ -3,6 +3,7 @@ export const APP_ROUTES = {
   flashcards: {
     learn: '/flashcards/learn',
     revise: '/flashcards/revise',
+    sets: '/flashcards/sets',
   },
   signIn: '/sign-in',
   signUp: '/sign-up',

@@ -12,6 +12,7 @@ import {
   ArrowRightStartOnRectangleIcon,
   BoltIcon,
   LanguageIcon,
+  RectangleStackIcon,
   Squares2X2Icon,
 } from '@heroicons/react/24/solid';
 import Image from 'next/image';
@@ -21,10 +22,10 @@ import { useRef, useState } from 'react';
 import HamburgerMenuComponent from '../hamburger-menu/hamburger-menu.component';
 import ThemeSwitchComponent from '../theme-switch/theme-switch.component';
 import AvatarComponent from '../ui/avatar/avatar.component';
+import { Button } from '../ui/button/button.component';
 import ContextMenu from '../ui/context-menu/context-menu.component';
 import NavigationGroupComponent from '../ui/navigation/navigation-group.component';
 import NavigationItemComponent from '../ui/navigation/navigation-item.component';
-import { ToggleButton } from '../ui/toggle-button/toggle-button.component';
 
 export default function SidebarComponent() {
   const [expanded, toggleExpand] = useState<boolean>(true);
@@ -68,6 +69,12 @@ export default function SidebarComponent() {
       items: [
         {
           type: 'item',
+          label: 'Sets',
+          href: APP_ROUTES.flashcards.sets,
+          icon: <RectangleStackIcon className={iconSize} />,
+        },
+        {
+          type: 'item',
           label: 'Learn',
           href: APP_ROUTES.flashcards.learn,
           icon: <AcademicCapIcon className={iconSize} />,
@@ -78,12 +85,6 @@ export default function SidebarComponent() {
           href: APP_ROUTES.flashcards.revise,
           icon: <LanguageIcon className={iconSize} />,
         },
-        // {
-        //   type: 'item',
-        //   label: 'Sets',
-        //   href: '/flashcards/sets',
-        //   icon: <RectangleStackIcon className={iconSize} />,
-        // },
       ],
     },
   ];
@@ -95,41 +96,41 @@ export default function SidebarComponent() {
   return (
     <aside
       className={`sticky top-4 z-50 hidden max-h-[calc(100vh-2rem)] flex-col rounded-md border border-gray-200 bg-gray-50 transition-all dark:border-slate-900 dark:bg-slate-950 md:flex
-      ${expanded ? 'w-80' : 'w-20'}
+      ${expanded ? 'w-60 min-w-60' : 'w-20 min-w-20'}
     `}
     >
       <div
-        className={`relative flex items-center border-b border-gray-200 p-4 dark:border-slate-900 ${expanded ? 'justify-between' : 'justify-center'}`}
+        className={`relative flex items-center justify-center border-b border-gray-200 p-4 dark:border-slate-900`}
       >
         <Link
           href={'/dashboard'}
-          className={`flex items-center font-thin tracking-wider ${expanded && 'gap-2'}`}
+          className={`flex items-center font-thin tracking-wider ${expanded && 'gap-4'}`}
         >
           <Image
-            width={expanded ? 16 : 24}
+            width={expanded ? 24 : 32}
             height={16}
             src={'/images/flash-cards-logo.svg'}
             alt={'Flash Cards Logo'}
           />
 
           <h5
-            className={`overflow-clip text-lg font-bold tracking-tighter text-green-400 transition-all dark:text-green-500 ${expanded ? 'max-w-full' : 'hidden max-w-0'}`}
+            className={`overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-xl font-black uppercase tracking-tighter text-transparent transition-all ${expanded ? 'max-w-full' : 'hidden max-w-0'}`}
           >
-            FLASHC
-            <span className='font-medium'>A</span>
-            <span className='font-light'>R</span>
-            <span className='font-extralight'>D</span>
-            <span className='font-thin'>S</span>
+            FlashCards
           </h5>
         </Link>
 
-        <ToggleButton
-          size='icon-mini'
+        <Button
+          size='icon-xs'
           className='absolute -right-2'
-          activeIcon={<ArrowLeftIcon className='size-3' />}
-          inactiveIcon={<ArrowRightIcon className='size-3' />}
-          toggled={expanded}
-          toggle={handleToggle}
+          icon={
+            expanded ? (
+              <ArrowLeftIcon className='size-3' />
+            ) : (
+              <ArrowRightIcon className='size-3' />
+            )
+          }
+          onClick={handleToggle}
         />
       </div>
 
@@ -169,7 +170,6 @@ export default function SidebarComponent() {
             >
               <div className='flex items-center justify-center gap-2'>
                 <ContextMenu
-                  open={isOpen}
                   className='-left-4'
                   name={'avatar-context'}
                   afterMenuClass='py-4 justify-center'

@@ -1,4 +1,6 @@
+/* eslint-disable */
 import type { Config } from 'tailwindcss';
+const plugin = require('tailwindcss/plugin')
 
 const config: Config = {
   darkMode: 'class',
@@ -13,10 +15,23 @@ const config: Config = {
         sans: ['var(--font-inter)'],
         mono: ['var(--font-roboto-mono)'],
       },
+      textShadow: {
+        sm: '0 1px 2px var(--tw-shadow-color)',
+        DEFAULT: '0 2px 4px var(--tw-shadow-color)',
+        lg: '0 8px 16px var(--tw-shadow-color)',
+      },
       backgroundSize: {
         '400%': '400%',
       },
       keyframes: {
+        'fade-in': {
+          '0%': { opacity: '0', transform: 'translateY(5%)' },
+          '100%': { opacity: '1', transform: 'translateY(0%)' },
+        },
+        'fade-out': {
+          '0%': { opacity: '0', transform: 'translateY(0%)' },
+          '100%': { opacity: '1', transform: 'translateY(5%)' },
+        },
         'fade-in-to-bottom': {
           '0%': { opacity: '0', transform: 'translateY(95%)' },
           '100%': { opacity: '1', transform: 'translateY(100%)' },
@@ -81,6 +96,8 @@ const config: Config = {
       animation: {
         'background-gradient': 'background-gradient 12s ease infinite',
         'fade-in-to-bottom': 'fade-in-to-bottom .3s ease-in-out forwards',
+        'fade-in': 'fade-in .3s ease-in-out forwards',
+        'fade-out': 'fade-out .3s ease-in-out forwards',
         'fade-in-to-top': 'fade-in-to-top .3s ease-in-out forwards',
         'fade-out-to-top': 'fade-out-to-top .3s ease-in-out forwards',
         'fade-out-to-bottom': 'fade-out-to-bottom .3s ease-in-out forwards',
@@ -109,6 +126,19 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // @ts-ignore
+    plugin(function ({ matchUtilities, theme }) {
+      matchUtilities(
+        {
+    // @ts-ignore
+          'text-shadow': (value) => ({
+            textShadow: value,
+          }),
+        },
+        { values: theme('textShadow') }
+      )
+    }),
+  ],
 };
 export default config;

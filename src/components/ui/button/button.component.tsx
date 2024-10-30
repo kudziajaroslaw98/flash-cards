@@ -4,10 +4,17 @@ import { cva, VariantProps } from 'class-variance-authority';
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
 
 const buttonVariants = cva(
-  `inline-flex w-full max-w-80 items-center justify-center gap-2 rounded-md border transition active:scale-95 disabled:!border-gray-300 disabled:!bg-transparent disabled:!text-gray-400 disabled:!opacity-80 dark:disabled:!bg-transparent`,
+  `inline-flex w-full max-w-80 items-center justify-center gap-2 rounded-md border transition active:scale-95 disabled:!border-gray-300 dark:disabled:!border-gray-800/40 disabled:!bg-transparent disabled:!text-gray-400 disabled:!opacity-80 dark:disabled:!bg-transparent ring-0 outline-0`,
   {
     variants: {
       variant: {
+        disabled: '',
+        'disabled-outline':
+          'border-gray-200 dark:border-slate-800/40 bg-transparent text-gray-500 opacity-80 dark:bg-transparent',
+        'disabled-text':
+          'hover:bg-gray-200/50 dark:hover:bg-slate-800/50 border-transparent dark:border-transparent',
+        'disabled-fill':
+          'text-gray-500 bg-gray-200/50 hover:bg-gray-200/25 dark:bg-slate-800/50 dark:hover:bg-slate-800/25 border-transparent dark:border-transparent',
         primary:
           'border-transparent text-gray-50 bg-green-400 border-green-500 hover:bg-green-500 active:focus:bg-green-600',
         'primary-outline':
@@ -29,11 +36,13 @@ const buttonVariants = cva(
       },
       size: {
         default: 'h-10 px-4 py-2 md:w-auto',
-        sm: 'h-9 px-3 md:w-auto',
-        lg: 'h-11 px-8 md:w-auto',
-        xlg: 'h-11 px-14 md:w-auto',
-        icon: 'h-10 md:w-10',
-        'icon-mini': 'size-5',
+        sm: 'h-9 px-3 md:w-auto text-sm',
+        lg: 'h-10 px-8 md:w-auto',
+        xlg: 'h-10 px-14 md:w-auto',
+        icon: 'h-10 min-w-10 md:w-10',
+        'icon-sm': 'size-7',
+        'icon-xs': 'size-5',
+        full: 'w-full h-10 !max-w-auto',
       },
       iconPosition: {
         left: 'flex-row',
@@ -67,9 +76,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={cn([
           buttonVariants({ variant, size, iconPosition, className }),
-          props.icon && !props.label
-            ? 'sm:max-w-80 md:max-w-12'
-            : 'max-w-80 md:max-w-52',
         ])}
         {...props}
       >

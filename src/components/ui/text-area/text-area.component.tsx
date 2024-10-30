@@ -1,21 +1,56 @@
 import useDebounce from '#/hooks/use-debounce.hook';
-import { useEffect, useRef, useState } from 'react';
+import { cn } from '#/shared/utils/cn.util';
+import {
+  FormEvent,
+  TextareaHTMLAttributes,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
-export interface TextAreaProps {
+export interface TextAreaProps
+  extends Pick<
+    TextareaHTMLAttributes<HTMLTextAreaElement>,
+    | 'value'
+    | 'onChange'
+    | 'onInput'
+    | 'required'
+    | 'onBlur'
+    | 'onFocus'
+    | 'id'
+    | 'name'
+    | 'tabIndex'
+  > {
+  type?: 'textarea';
   className: string;
-  onInput: (_event: string) => void;
-  value: string;
-  id: string;
+  valid: boolean;
+  for?: string;
+  label?: string;
+  touched?: boolean;
+  error?: string | null;
 }
 
-export default function TextArea(props: Readonly<TextAreaProps>) {
+export default function TextArea({
+  for: forProp,
+  className,
+  valid,
+  label,
+  required,
+  touched = false,
+  error = null,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  type = 'textarea',
+  ...props
+}: TextAreaProps) {
   const [value, setValue] = useState(props.value);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const adjustHeight = useDebounce(() => {
     if (textAreaRef.current) {
-      textAreaRef.current.style.height = '36px';
-      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+      const minHeight = 40;
+
+      textAreaRef.current.style.height = '40px';
+      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight >= minHeight ? textAreaRef.current.scrollHeight : minHeight}px`;
     }
   }, 75);
 
@@ -37,16 +72,60 @@ export default function TextArea(props: Readonly<TextAreaProps>) {
     adjustHeight();
   }, [value, adjustHeight]);
 
+  useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
+
+  const handleOnInput = (event: FormEvent<HTMLTextAreaElement>) => {
+    setValue(event.currentTarget.value);
+
+    if (props.onInput) {
+      props.onInput(event);
+    }
+  };
+
   return (
-    <textarea
-      ref={textAreaRef}
-      className={`h-8 w-full resize-none rounded-md p-2 outline-none ring-blue-400 transition-all focus:ring-1 ${props.className}`}
-      id={props.id}
-      value={value}
-      onInput={(e) => {
-        setValue(e.currentTarget.value);
-        props.onInput(e.currentTarget.value);
-      }}
-    ></textarea>
+    <label
+      className={`group relative flex w-full flex-col ${label ? 'pt-2' : ''} ${className ?? ''}`}
+      htmlFor={forProp}
+    >
+      {label && (
+        <span
+          className={cn([
+            touched && !valid ? '!text-red-400' : '',
+            touched && valid ? '!text-green-400' : '',
+            'w-auto pb-2 pl-2 text-sm  text-gray-400 dark:text-slate-500',
+          ])}
+        >
+          {`${label}${required ? '*' : ''}`}
+        </span>
+      )}
+      <textarea
+        {...props}
+        ref={textAreaRef}
+        className={cn([
+          touched && !valid ? '!border-red-400' : '',
+          touched && valid ? '!border-green-400' : '',
+          'flex w-full items-center gap-4 rounded-md border border-gray-200 bg-gray-100 p-2 px-4 dark:border-slate-800/40 dark:bg-slate-900',
+          'h-10 resize-none text-sm outline-none ring-blue-400 transition-all focus:ring-1',
+          label
+            ? 'placeholder:text-gray-400  dark:placeholder:text-slate-700'
+            : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+          'text-gray-800 text-inherit dark:text-slate-200',
+          className,
+        ])}
+        id={props.id}
+        value={value}
+        onInput={handleOnInput}
+      ></textarea>
+
+      <span
+        className={`${
+          error ? 'max-h-12 opacity-100' : 'max-h-0 opacity-0'
+        } px-6 text-sm text-red-400 transition-all duration-700 ease-in-out`}
+      >
+        {error}
+      </span>
+    </label>
   );
 }

@@ -1,91 +1,123 @@
-import { FlashCardTypesEnum } from '#/shared/enums/flash-card-types.enum';
-import { FlashCardModel } from '#/shared/models/flash-card.model';
-import type React from 'react';
-import { useCallback } from 'react';
+import useLongPress from '#/hooks/use-long-press.hook';
+import type { FlashCard } from '#/shared/models/flash-card.model';
+import { cn } from '#/shared/utils/cn.util';
+import { CheckBadgeIcon } from '@heroicons/react/24/solid';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import Card from '../ui/card/card.component';
 
 interface FlashCardProps {
-  flashCard: FlashCardModel;
-  reviseType: FlashCardTypesEnum;
-  onClick?: (_value: FlashCardModel) => void;
-  correct?: boolean;
-  clickedOnFlashCard?: boolean;
-  clickedOverall?: boolean;
+  flashCard: FlashCard;
+  size?: 'sm' | 'md' | 'lg';
+  isSelected?: boolean;
+  onSelect?: (flashCard: FlashCard) => void;
+  isInSelectionMode?: boolean;
+  flipBlocked?: boolean;
 }
 
-export default function FlashCardComponent(props: Readonly<FlashCardProps>) {
-  const getClickedCardStyles = useCallback(() => {
-    if (
-      props?.correct &&
-      props?.clickedOnFlashCard &&
-      props?.reviseType !== FlashCardTypesEnum.SHOW_ALL
-    ) {
-      return 'ring ring-green-400/60';
-    } else if (
-      !props?.correct &&
-      props.clickedOnFlashCard &&
-      props?.reviseType !== FlashCardTypesEnum.SHOW_ALL
-    ) {
-      return 'ring ring-red-400/60';
-    } else if (
-      props?.correct &&
-      props.clickedOverall &&
-      !props?.clickedOnFlashCard &&
-      props?.reviseType !== FlashCardTypesEnum.SHOW_ALL
-    ) {
-      return 'animate-shake ring ring-green-400/20';
-    } else {
-      return '';
-    }
-  }, [props]);
+export default function FlashCardComponent({
+  isSelected,
+  flashCard,
+  onSelect,
+  isInSelectionMode,
+  flipBlocked = false,
+  size = 'lg',
+  ...props
+}: Readonly<FlashCardProps>) {
+  const [isFlipped, setIsFlipped] = useState(false);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    switch (event.key) {
-      case ' ':
-      case 'Enter':
-        props?.onClick?.(props.flashCard);
-        break;
-      default:
-        break;
-    }
-  };
+  const [onStart, onEnd, onMove] = useLongPress<FlashCard>(
+    (flashcard) => onSelect && onSelect(flashcard),
+    () => {
+      if (isInSelectionMode) {
+        onSelect && onSelect(flashCard);
+      } else if (!flipBlocked) {
+        setIsFlipped(!isFlipped);
+      }
+    },
+  );
 
-  const handleCardClick = () => {
-    if (props?.onClick) {
-      props.onClick(props.flashCard);
+  useEffect(() => {
+    if (isInSelectionMode) {
+      setIsFlipped(false);
     }
-  };
+  }, [isInSelectionMode]);
 
   return (
-    <Card
-      onClick={handleCardClick}
-      onKeyDown={handleKeyDown}
-      tabIndex={0}
-      className={`z-10 h-full min-h-32 w-full max-w-80 flex-col ${getClickedCardStyles()}`}
+    <div
+      onMouseDown={() => onStart(flashCard)}
+      onMouseUp={onEnd}
+      onTouchStart={() => onStart(flashCard)}
+      onTouchEnd={onEnd}
+      onTouchMove={onMove}
     >
-      <h5
-        className={`text-default z-20 flex w-full items-center rounded-md sm:min-h-10 sm:items-start ${
-          props.reviseType === FlashCardTypesEnum.GUESS_DEFINITION
-            ? 'bg-gray-200 dark:bg-slate-800'
-            : 'bg-transparent'
-        }`}
+      <motion.div
+        animate={{ translateY: '0%', opacity: 100, zIndex: 21 }}
+        initial={{ translateY: '10%', opacity: 0, zIndex: -20 }}
+        exit={{
+          translateY: '-5%',
+          opacity: 0,
+          zIndex: -20,
+        }}
+        className='flex justify-center'
+        key={`${flashCard.frontUuid}:${isFlipped ? 'flipped' : 'unflipped'}`}
       >
-        {props.reviseType === FlashCardTypesEnum.GUESS_DEFINITION
-          ? ''
-          : props.flashCard?.word}
-      </h5>
+        <Card
+          // onKeyDown={handleKeyDown}
+          tabIndex={0}
+          className={cn([
+            'z-10 flex-col items-center p-4',
+            isSelected ? 'ring ring-green-400/60' : '',
+            size === 'sm' && 'h-56 w-44',
+            size === 'md' && 'h-72 w-64',
+            size === 'lg' && 'h-96 w-80',
+          ])}
+          {...props}
+        >
+          {(!isFlipped || isInSelectionMode) && (
+            <>
+              {isSelected && (
+                <CheckBadgeIcon className='absolute -right-4 -top-4 h-6 w-6 text-green-400' />
+              )}
 
-      <p
-        className={`text-default z-20 flex w-full min-w-72 items-center rounded-md text-sm sm:min-h-16 sm:items-start ${
-          props.reviseType === FlashCardTypesEnum.GUESS_NAME
-            ? 'bg-gray-200 dark:bg-slate-800'
-            : 'bg-transparent'
-        }`}
-      >
-        {props.reviseType === FlashCardTypesEnum.GUESS_NAME
-          ? ''
-          : props.flashCard?.definition}
-      </p>
-    </Card>
+              <h5
+                className={cn([
+                  'z-20 flex h-20 w-full items-center justify-center rounded-md text-center',
+                  size === 'sm' && 'text-xs',
+                  size === 'md' && 'text-sm',
+                  size === 'lg' && 'text-sm',
+                ])}
+              >
+                Q: {flashCard.question}
+              </h5>
+
+              <h2
+                className={cn([
+                  'z-20 flex h-full w-full justify-center rounded-md pt-16 text-center text-green-400',
+                  size === 'sm' && 'pt-6 text-2xl',
+                  size === 'md' && 'pt-10 text-3xl',
+                  size === 'lg' && 'pt-16 text-5xl',
+                ])}
+              >
+                {flashCard.questionAddition}
+              </h2>
+            </>
+          )}
+
+          {isFlipped && !isInSelectionMode && (
+            <p
+              className={cn([
+                'z-20 flex h-full w-full items-center justify-center rounded-md px-4 text-center text-gray-500 dark:text-slate-400',
+                size === 'sm' && 'text-xs',
+                size === 'md' && 'text-sm',
+                size === 'lg' && 'text-base',
+              ])}
+            >
+              {flashCard.answer}
+            </p>
+          )}
+        </Card>
+      </motion.div>
+    </div>
   );
 }

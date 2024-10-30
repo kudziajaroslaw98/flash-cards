@@ -13,20 +13,20 @@ type Story = StoryObj<typeof Dropdown>;
 
 export const DropdownStory: Story = {
   args: {
-    config: {
-      first: {
+    config: [
+      {
         label: 'First',
         value: 'first',
       },
-      second: {
+      {
         label: 'Second',
         value: 'second',
       },
-      third: {
+      {
         label: 'Third',
         value: 'third',
       },
-    },
+    ],
     onChange: action('onChange'),
   },
   decorators: [

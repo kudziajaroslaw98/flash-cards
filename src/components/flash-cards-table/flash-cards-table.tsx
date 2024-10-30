@@ -1,24 +1,25 @@
 'use client';
 
-import { PlusIcon, TrashIcon } from '@heroicons/react/24/solid';
+import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter.component';
-import EditableFlashCardRowComponent from '#/components/flash-cards-table/editable-flash-card-row.component';
 import { Button } from '#/components/ui/button/button.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
-import { FlashCardModel } from '#/shared/models/flash-card.model';
-import { UUID } from '#/shared/types/uuid.type';
+import { FlashCard } from '#/shared/models/flash-card.model';
 
+import { cn } from '#/shared/utils/cn.util';
 import {
-  addNewFlashCard,
+  addNewFlashCards,
   removeFlashCards,
-  updateFlashCard,
+  updateFlashCards,
 } from '#/store/reducers/flashcards.reducer';
 import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { statsSelectors } from '#/store/selectors/stats.selectors';
+import FlashCardComponent from '../flash-card/flash-card.component';
+import { NewFlashCardModal } from '../new-flash-card-modal/new-flash-card-modal.component';
 
 export default function FlashCardsTable() {
   const statistics = useAppSelector(statsSelectors.selectStats);
@@ -27,35 +28,43 @@ export default function FlashCardsTable() {
   ).sort((head, tail) => head.order - tail.order);
   const dispatch = useAppDispatch();
 
-  const [selected, setSelected] = useState<UUID[]>([]);
+  const [selected, setSelected] = useState<FlashCard[]>([]);
+  const [isInSelectionMode, setIsInSelectionMode] = useState(false);
+  const [isInEditMode, setIsInEditMode] = useState(false);
+  const [tileSize] = useState<'sm' | 'md' | 'lg'>('sm');
 
-  const isSelected = (flashCard: FlashCardModel) => {
-    return selected.includes(flashCard.frontUuid);
+  const isSelected = (flashCard: FlashCard) => {
+    return (
+      selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
+      -1
+    );
   };
 
-  const toggleSelected = (flashCard: FlashCardModel) => {
-    const isFlashCardSelected = selected.includes(flashCard.frontUuid);
+  const toggleSelected = (flashCard: FlashCard) => {
+    const isFlashCardSelected =
+      selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
+      -1;
 
     if (isFlashCardSelected) {
       setSelected((prev) =>
-        prev.filter((item) => flashCard.frontUuid !== item),
+        prev.filter((item) => flashCard.frontUuid !== item.frontUuid),
       );
     } else {
-      setSelected((prev) => [...prev, flashCard.frontUuid]);
+      setSelected((prev) => [...prev, flashCard]);
     }
   };
 
   const removeSelected = () => {
-    dispatch(removeFlashCards(selected));
+    dispatch(removeFlashCards(selected.map((item) => item.frontUuid)));
     setSelected([]);
   };
 
-  const addNewRecord = () => {
-    dispatch(addNewFlashCard());
+  const addNewRecord = (flashCards: Partial<FlashCard>[]) => {
+    dispatch(addNewFlashCards(flashCards));
 
     dispatch(
       updateStatistics({
-        updatedValue: statistics.createdFlashCards + 1,
+        updatedValue: statistics.createdFlashCards + flashCards.length,
         property: 'createdFlashCards',
       }),
     );
@@ -68,66 +77,79 @@ export default function FlashCardsTable() {
     }, 1);
   };
 
-  const wordChange = (flashCard: FlashCardModel, value: string) => {
-    dispatch(
-      updateFlashCard({ flashCard, updatedValue: value, property: 'word' }),
-    );
-  };
+  useEffect(() => {
+    if (selected.length > 0) {
+      setIsInSelectionMode(true);
+    } else {
+      setIsInSelectionMode(false);
+    }
+  }, [selected]);
 
-  const definitionChange = (flashCard: FlashCardModel, value: string) => {
-    dispatch(
-      updateFlashCard({
-        flashCard,
-        updatedValue: value,
-        property: 'definition',
-      }),
-    );
+  const editSelectedRecords = (editRecords: Partial<FlashCard>[]) => {
+    dispatch(updateFlashCards(editRecords));
   };
 
   return (
     <div className='flex w-full flex-col gap-6 py-8'>
       <FlashCardsCounterComponent count={flashCardsArray.length} />
-
       {flashCardsArray.length > 0 && (
-        <table className='flex h-auto w-full flex-col gap-1'>
-          <thead>
-            <tr className='flex w-full text-sm text-gray-500 dark:text-slate-300'>
-              <th className='min-w-12 pl-2 text-left'>Id</th>
-
-              <th className='flex min-w-44 flex-col pl-2 text-left md:flex-row'>
-                <span className=''>Word</span>
-                <span className='flex md:hidden'>Definition</span>
-              </th>
-
-              <th className='hidden w-full pl-2 text-left md:flex'>
-                Definition
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <AnimatePresence>
-              {flashCardsArray.map((flashCard, index) => (
-                <EditableFlashCardRowComponent
-                  key={flashCard.frontUuid}
+        <div
+          className={cn([
+            'grid w-full justify-center gap-4',
+            tileSize === 'sm' && 'grid-cols-[repeat(auto-fit,11rem)]',
+            tileSize === 'md' && 'grid-cols-[repeat(auto-fit,16rem)]',
+            tileSize === 'lg' && 'grid-cols-[repeat(auto-fit,20rem)]',
+          ])}
+        >
+          <AnimatePresence mode='popLayout'>
+            {flashCardsArray.map((flashCard) => (
+              <div key={flashCard.frontUuid}>
+                <FlashCardComponent
                   flashCard={flashCard}
-                  definitionChange={definitionChange}
-                  wordChange={wordChange}
-                  index={index}
-                  isSelected={isSelected}
-                  toggleSelected={toggleSelected}
-                ></EditableFlashCardRowComponent>
-              ))}
-            </AnimatePresence>
-          </tbody>
-        </table>
+                  size={tileSize}
+                  isSelected={isSelected(flashCard)}
+                  onSelect={() => toggleSelected(flashCard)}
+                  isInSelectionMode={isInSelectionMode}
+                />
+              </div>
+            ))}
+          </AnimatePresence>
+        </div>
       )}
 
       <div className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'>
-        <Button
-          onClick={addNewRecord}
-          icon={<PlusIcon className='h-4 w-4' />}
-          size={'icon'}
+        <NewFlashCardModal
+          handleNewFlashCard={addNewRecord}
+          handleEditFlashCard={editSelectedRecords}
+          selectedFlashCards={isInEditMode ? selected : []}
+          isInEditMode={isInEditMode}
+          trigger={
+            <Button
+              onClick={() => {
+                setIsInEditMode(false);
+              }}
+              icon={<PlusIcon className='h-4 w-4' />}
+              size={'icon'}
+            />
+          }
+        />
+
+        <NewFlashCardModal
+          handleNewFlashCard={addNewRecord}
+          handleEditFlashCard={editSelectedRecords}
+          selectedFlashCards={isInEditMode ? selected : []}
+          isInEditMode={isInEditMode}
+          trigger={
+            <Button
+              onClick={() => {
+                setIsInEditMode(true);
+              }}
+              icon={<PencilIcon className='h-4 w-4' />}
+              size={'icon'}
+              disabled={selected.length === 0}
+              variant={'secondary'}
+            />
+          }
         />
 
         {flashCardsArray.length > 0 && (

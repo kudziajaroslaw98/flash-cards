@@ -46,6 +46,21 @@ export default function ToastsComponent() {
     }
   };
 
+  const toastIcons = (toast: ToastModel) => {
+    switch (toast.type) {
+      case 'success':
+        return <CheckCircleIcon className='h-6 w-6' />;
+      case 'error':
+        return <XCircleIcon className='h-6 w-6' />;
+      case 'warning':
+        return <ExclamationCircleIcon className='h-6 w-6' />;
+      case 'async':
+        return <ArrowPathIcon className='h-6 w-6 animate-spin' />;
+      case 'info':
+        return <InformationCircleIcon className='h-6 w-6' />;
+    }
+  };
+
   return (
     <div className='absolute right-0 top-16 z-40 flex h-auto w-full flex-col gap-2 overflow-x-clip px-4 sm:right-4 sm:px-0 md:max-w-80'>
       <AnimatePresence>
@@ -65,23 +80,7 @@ export default function ToastsComponent() {
                 toast,
               )}`}
             >
-              {toast.type === 'success' && (
-                <CheckCircleIcon className='h-6 w-6' />
-              )}
-
-              {toast.type === 'error' && <XCircleIcon className='h-6 w-6' />}
-
-              {toast.type === 'warning' && (
-                <ExclamationCircleIcon className='h-6 w-6' />
-              )}
-
-              {toast.type === 'info' && (
-                <InformationCircleIcon className='h-6 w-6' />
-              )}
-
-              {toast.type === 'async' && (
-                <ArrowPathIcon className='h-6 w-6 animate-spin' />
-              )}
+              {toastIcons(toast)}
             </div>
 
             <div className='flex h-full w-full flex-col gap-2 px-4'>

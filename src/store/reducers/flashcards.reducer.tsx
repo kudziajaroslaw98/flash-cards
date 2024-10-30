@@ -1,9 +1,8 @@
-import { FlashCardModel } from '#/shared/models/flash-card.model';
+import { FlashCard } from '#/shared/models/flash-card.model';
 import type { FlashCards } from '#/shared/types/local-storage-flash-card.type';
 import type { UUID } from '#/shared/types/uuid.type';
 import typedInstanceFactory from '#/shared/utils/typed-instance-factory.util';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { v4 as uuid } from 'uuid';
 
 const initialState: FlashCards = {};
 
@@ -20,44 +19,49 @@ export const flashCardsSlice = createSlice({
       localStorage.setItem('flashcards', JSON.stringify(action.payload));
       return state;
     },
-    addNewFlashCard: (state) => {
-      const flashCardsClone = { ...state };
-      const newUuid = uuid() as UUID;
-      const newFlashCards = typedInstanceFactory(flashCardsClone, {
-        [newUuid]: {
-          frontUuid: newUuid,
-          word: 'new-word',
-          definition: 'new-definition',
-          order: Object.values(state).length,
-          weight: 0.5,
-        },
+    addNewFlashCards: (state, action: PayloadAction<Partial<FlashCard>[]>) => {
+      const mappedFlashCards = action.payload.map((flashCard, index) => ({
+        ...flashCard,
+        order: Object.values(state).length + (index + 1),
+        weight: 0.5,
+      }));
+
+      mappedFlashCards.forEach((flashCard) => {
+        if (flashCard?.frontUuid) {
+          typedInstanceFactory(state, {
+            [flashCard.frontUuid as UUID]: {
+              frontUuid: flashCard.frontUuid,
+              question: flashCard.question ?? '',
+              questionAddition: flashCard.questionAddition ?? '',
+              answer: flashCard.answer ?? '',
+              order: flashCard.order,
+              weight: flashCard.weight,
+            },
+          });
+        }
       });
 
-      localStorage.setItem('flashcards', JSON.stringify(newFlashCards));
-      state = newFlashCards;
+      localStorage.setItem('flashcards', JSON.stringify(state));
       return state;
     },
     removeFlashCards: (state, action: PayloadAction<UUID[]>) => {
-      const flashCardsClone = { ...state };
-
       action.payload.forEach((flashCardUuid) => {
-        delete flashCardsClone?.[flashCardUuid];
+        delete state?.[flashCardUuid];
       });
 
-      Object.values(flashCardsClone).forEach((flashCard, index) => {
+      Object.values(state).forEach((flashCard, index) => {
         flashCard.order = index;
       });
 
-      localStorage.setItem('flashcards', JSON.stringify(flashCardsClone));
-      state = flashCardsClone;
+      localStorage.setItem('flashcards', JSON.stringify(state));
       return state;
     },
     updateFlashCard: (
       state,
       action: PayloadAction<{
-        flashCard: FlashCardModel;
+        flashCard: FlashCard;
         updatedValue: unknown;
-        property?: keyof FlashCardModel;
+        property?: keyof FlashCard;
       }>,
     ) => {
       const flashCardsClone = { ...state };
@@ -69,11 +73,30 @@ export const flashCardsSlice = createSlice({
           [property]: updatedValue,
         };
       } else {
-        flashCardsClone[flashCard.frontUuid] = updatedValue as FlashCardModel;
+        flashCardsClone[flashCard.frontUuid] = updatedValue as FlashCard;
       }
 
       state = flashCardsClone;
       localStorage.setItem('flashcards', JSON.stringify(flashCardsClone));
+      return state;
+    },
+    updateFlashCards: (state, action: PayloadAction<Partial<FlashCard>[]>) => {
+      action.payload.forEach((flashCard) => {
+        if (flashCard?.frontUuid) {
+          typedInstanceFactory(state, {
+            [flashCard.frontUuid as UUID]: {
+              frontUuid: flashCard.frontUuid,
+              question: flashCard.question ?? '',
+              questionAddition: flashCard.questionAddition ?? '',
+              answer: flashCard.answer ?? '',
+              order: flashCard.order ?? 0,
+              weight: flashCard.weight ?? 0.5,
+            },
+          });
+        }
+      });
+
+      localStorage.setItem('flashcards', JSON.stringify(state));
       return state;
     },
   },
@@ -82,9 +105,10 @@ export const flashCardsSlice = createSlice({
 export const {
   setFlashCards,
   setFlashCardsAfterSync,
-  addNewFlashCard,
+  addNewFlashCards,
   removeFlashCards,
   updateFlashCard,
+  updateFlashCards,
 } = flashCardsSlice.actions;
 
 export const flashCardsReducer = flashCardsSlice.reducer;

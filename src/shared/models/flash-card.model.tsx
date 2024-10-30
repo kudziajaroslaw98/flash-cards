@@ -1,10 +1,14 @@
 import { UUID } from '#/shared/types/uuid.type';
 import { v4 } from 'uuid';
 
-export class FlashCardModel {
+export type FlashCard = {
+  [key: string]: unknown;
+} & FlashCardClass;
+class FlashCardClass {
   public frontUuid: UUID = v4() as UUID;
   public weight: number = 0.5;
-  public word!: string;
-  public definition!: string;
+  public question!: string;
+  public questionAddition!: string;
+  public answer!: string;
   public order!: number;
 }

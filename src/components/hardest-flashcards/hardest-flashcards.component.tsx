@@ -1,7 +1,6 @@
 'use client';
 
 import { useAppSelector } from '#/hooks/store-hooks.hook';
-import { FlashCardTypesEnum } from '#/shared/enums/flash-card-types.enum';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import FlashCardComponent from '../flash-card/flash-card.component';
 
@@ -21,7 +20,6 @@ export default function HardestFlashcardsComponent() {
             <FlashCardComponent
               key={flashCard.frontUuid}
               flashCard={flashCard}
-              reviseType={FlashCardTypesEnum.SHOW_ALL}
             />
           ))}
       </div>

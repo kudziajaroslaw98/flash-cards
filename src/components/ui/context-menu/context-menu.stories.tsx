@@ -41,7 +41,6 @@ export const ContextMenuStory: Story = {
       },
     ],
     name: 'context-menu',
-    open: false,
     contextPosition: 'bottom',
   },
 };

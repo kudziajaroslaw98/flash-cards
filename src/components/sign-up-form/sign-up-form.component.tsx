@@ -24,6 +24,7 @@ export default function SignUpFormComponent() {
         label: 'First Name',
         placeholder: 'John',
         required: true,
+        disabled: true,
       },
       lastName: {
         type: 'text',
@@ -31,6 +32,7 @@ export default function SignUpFormComponent() {
         label: 'Last Name',
         placeholder: 'Doe',
         required: true,
+        disabled: true,
       },
       email: {
         type: 'email',
@@ -38,18 +40,21 @@ export default function SignUpFormComponent() {
         label: 'Email',
         placeholder: 'example@email.com',
         required: true,
+        disabled: true,
       },
       password: {
         type: 'password',
         name: 'password',
         label: 'Password',
         required: true,
+        disabled: true,
       },
       confirmPassword: {
         type: 'password',
         name: 'confirmPassword',
         label: 'Confirm Password',
         required: true,
+        disabled: true,
       },
     },
     validation: signUpValidationScheme,
@@ -128,6 +133,7 @@ export default function SignUpFormComponent() {
             disabled={!formValid || isLoading}
             loading={isLoading}
             label='Sign up'
+            size={'full'}
           />
 
           <div className='flex flex-col items-center justify-center gap-1'>
