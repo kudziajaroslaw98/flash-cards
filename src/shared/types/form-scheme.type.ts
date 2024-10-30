@@ -7,17 +7,16 @@ type ZodSchemaFromBaseObject<T> =
   | ZodObject<Record<keyof T, ZodTypeAny>>
   | ZodEffects<ZodObject<Record<keyof T, ZodTypeAny>>>;
 
+export type InputType =
+  | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
+  | TextAreaProps
+  | DropdownProps<unknown>;
+
 export type FormScheme<
   T,
-  InputType extends
-    | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
-    | TextAreaProps
-    | DropdownProps<unknown> =
-    | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
-    | TextAreaProps
-    | DropdownProps<unknown>,
-  SchemeType extends Partial<Record<keyof T, InputType>> = Partial<
-    Record<keyof T, InputType>
+  Input extends InputType = InputType,
+  SchemeType extends Partial<Record<keyof T, Input>> = Partial<
+    Record<keyof T, Input>
   >,
 > = {
   validation: ZodSchemaFromBaseObject<SchemeType>;

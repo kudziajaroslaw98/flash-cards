@@ -29,7 +29,6 @@ export default function FlashCardsTable() {
   const dispatch = useAppDispatch();
 
   const [selected, setSelected] = useState<FlashCard[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
   const [isInEditMode, setIsInEditMode] = useState(false);
   const [tileSize] = useState<'sm' | 'md' | 'lg'>('sm');
@@ -93,45 +92,10 @@ export default function FlashCardsTable() {
   return (
     <div className='flex w-full flex-col gap-6 py-8'>
       <FlashCardsCounterComponent count={flashCardsArray.length} />
-
-      {/* {flashCardsArray.length > 0 && (
-        <table className='flex h-auto w-full flex-col gap-1'>
-          <thead>
-            <tr className='flex w-full text-sm text-gray-500 dark:text-slate-300'>
-              <th className='min-w-12 pl-2 text-left'>Id</th>
-
-              <th className='flex min-w-44 flex-col pl-2 text-left md:flex-row'>
-                <span className=''>Word</span>
-                <span className='flex md:hidden'>Definition</span>
-              </th>
-
-              <th className='hidden w-full pl-2 text-left md:flex'>
-                Definition
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <AnimatePresence>
-              {flashCardsArray.map((flashCard, index) => (
-                <EditableFlashCardRowComponent
-                  key={flashCard.frontUuid}
-                  flashCard={flashCard}
-                  index={index}
-                  isSelected={isSelected}
-                  toggleSelected={toggleSelected}
-                ></EditableFlashCardRowComponent>
-              ))}
-            </AnimatePresence>
-          </tbody>
-        </table>
-      )} */}
-
       {flashCardsArray.length > 0 && (
         <div
           className={cn([
             'grid w-full justify-center gap-4',
-            // 'm-[0 auto] inline-flex w-full flex-wrap gap-4',
             tileSize === 'sm' && 'grid-cols-[repeat(auto-fit,11rem)]',
             tileSize === 'md' && 'grid-cols-[repeat(auto-fit,16rem)]',
             tileSize === 'lg' && 'grid-cols-[repeat(auto-fit,20rem)]',
@@ -154,24 +118,38 @@ export default function FlashCardsTable() {
       )}
 
       <div className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'>
-        <Button
-          onClick={() => {
-            setIsModalOpen(true);
-            setIsInEditMode(false);
-          }}
-          icon={<PlusIcon className='h-4 w-4' />}
-          size={'icon'}
+        <NewFlashCardModal
+          handleNewFlashCard={addNewRecord}
+          handleEditFlashCard={editSelectedRecords}
+          selectedFlashCards={isInEditMode ? selected : []}
+          isInEditMode={isInEditMode}
+          trigger={
+            <Button
+              onClick={() => {
+                setIsInEditMode(false);
+              }}
+              icon={<PlusIcon className='h-4 w-4' />}
+              size={'icon'}
+            />
+          }
         />
 
-        <Button
-          onClick={() => {
-            setIsInEditMode(true);
-            setIsModalOpen(true);
-          }}
-          icon={<PencilIcon className='h-4 w-4' />}
-          size={'icon'}
-          disabled={selected.length === 0}
-          variant={'secondary'}
+        <NewFlashCardModal
+          handleNewFlashCard={addNewRecord}
+          handleEditFlashCard={editSelectedRecords}
+          selectedFlashCards={isInEditMode ? selected : []}
+          isInEditMode={isInEditMode}
+          trigger={
+            <Button
+              onClick={() => {
+                setIsInEditMode(true);
+              }}
+              icon={<PencilIcon className='h-4 w-4' />}
+              size={'icon'}
+              disabled={selected.length === 0}
+              variant={'secondary'}
+            />
+          }
         />
 
         {flashCardsArray.length > 0 && (
@@ -184,15 +162,6 @@ export default function FlashCardsTable() {
           />
         )}
       </div>
-
-      <NewFlashCardModal
-        isDialogOpen={isModalOpen}
-        setIsModalOpen={setIsModalOpen}
-        handleNewFlashCard={addNewRecord}
-        handleEditFlashCard={editSelectedRecords}
-        selectedFlashCards={isInEditMode ? selected : []}
-        isInEditMode={isInEditMode}
-      />
     </div>
   );
 }

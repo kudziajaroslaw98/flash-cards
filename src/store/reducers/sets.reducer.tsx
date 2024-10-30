@@ -1,6 +1,7 @@
 import { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import { Sets } from '#/shared/types/local-storage-sets.type';
 import { UUID } from '#/shared/types/uuid.type';
+import typedInstanceFactory from '#/shared/utils/typed-instance-factory.util';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: Sets = {};
@@ -18,17 +19,24 @@ export const setsSlice = createSlice({
       localStorage.setItem('sets', JSON.stringify(action.payload));
       return state;
     },
-    addNewSet: (state, action: PayloadAction<Partial<FlashCardSet>>) => {
-      const newSets = {
-        ...state,
-        [action.payload.frontUuid as string]: {
-          ...action.payload,
-          hardlink: action.payload.name?.replace(/ /g, '-').toLowerCase(),
-        },
-      };
+    addNewSets: (state, action: PayloadAction<Partial<FlashCardSet>[]>) => {
+      action.payload.forEach((set) => {
+        if (set?.frontUuid) {
+          typedInstanceFactory(state, {
+            [set.frontUuid as UUID]: {
+              frontUuid: set.frontUuid,
+              name: set.name ?? '',
+              description: set.description ?? '',
+              category: set.category ?? '',
+              isFavourite: set.isFavourite ?? false,
+              flashCards: [],
+              hardlink: set.name?.replace(/ /g, '-').toLowerCase() ?? '',
+            },
+          });
+        }
+      });
 
-      localStorage.setItem('sets', JSON.stringify(newSets));
-      state = newSets;
+      localStorage.setItem('sets', JSON.stringify(state));
       return state;
     },
     removeSets: (state, action: PayloadAction<UUID[]>) => {
@@ -39,19 +47,56 @@ export const setsSlice = createSlice({
       localStorage.setItem('sets', JSON.stringify(state));
       return state;
     },
-    updateSet: (state, action: PayloadAction<FlashCardSet>) => {
-      const flashCardsClone = {
-        ...state,
-        [action.payload.frontUuid]: action.payload,
-      };
-      state = flashCardsClone;
-      localStorage.setItem('sets', JSON.stringify(flashCardsClone));
+    updateSet: (state, action: PayloadAction<Partial<FlashCardSet>>) => {
+      const set = action.payload;
+
+      if (set?.frontUuid) {
+        typedInstanceFactory(state, {
+          [set.frontUuid as UUID]: {
+            frontUuid: set.frontUuid,
+            name: set.name ?? '',
+            description: set.description ?? '',
+            category: set.category ?? '',
+            isFavourite: set.isFavourite ?? false,
+            flashCards: set.flashCards ?? [],
+            hardlink: set.name?.replace(/ /g, '-').toLowerCase() ?? '',
+          },
+        });
+      }
+
+      localStorage.setItem('sets', JSON.stringify(state));
+      return state;
+    },
+    updateSets: (state, action: PayloadAction<Partial<FlashCardSet>[]>) => {
+      action.payload.forEach((set) => {
+        if (set?.frontUuid) {
+          typedInstanceFactory(state, {
+            [set.frontUuid as UUID]: {
+              frontUuid: set.frontUuid,
+              name: set.name ?? '',
+              description: set.description ?? '',
+              category: set.category ?? '',
+              isFavourite: set.isFavourite ?? false,
+              flashCards: set.flashCards ?? [],
+              hardlink: set.name?.replace(/ /g, '-').toLowerCase() ?? '',
+            },
+          });
+        }
+      });
+
+      localStorage.setItem('sets', JSON.stringify(state));
       return state;
     },
   },
 });
 
-export const { setSets, setSetsAfterSync, addNewSet, removeSets, updateSet } =
-  setsSlice.actions;
+export const {
+  setSets,
+  setSetsAfterSync,
+  addNewSets,
+  removeSets,
+  updateSet,
+  updateSets,
+} = setsSlice.actions;
 
 export const setsReducer = setsSlice.reducer;

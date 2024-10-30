@@ -13,7 +13,20 @@ export type InputValidation =
     };
 
 export interface InputComponentProps
-  extends InputHTMLAttributes<HTMLInputElement> {
+  extends Pick<
+    InputHTMLAttributes<HTMLInputElement>,
+    | 'className'
+    | 'required'
+    | 'placeholder'
+    | 'value'
+    | 'name'
+    | 'onChange'
+    | 'onBlur'
+    | 'onFocus'
+    | 'onInput'
+    | 'onKeyDown'
+    | 'tabIndex'
+  > {
   type: HTMLInputTypeAttribute;
   label?: string;
   for?: string;

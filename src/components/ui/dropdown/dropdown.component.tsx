@@ -80,6 +80,8 @@ export default function Dropdown<T>({
   onFocus,
   error = null,
   touched = false,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  type = 'dropdown',
   ...props
 }: Readonly<DropdownProps<T>>) {
   const [items, setItems] = useState<DictionaryValue<T>[]>([]);

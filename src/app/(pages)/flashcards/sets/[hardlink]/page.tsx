@@ -1,6 +1,7 @@
 'use client';
 import { AssignFlashCardsModal } from '#/components/assign-flash-cards-modal/assign-flash-cards-modal.component';
 import FlashCardComponent from '#/components/flash-card/flash-card.component';
+import { NewSetModal } from '#/components/new-set-modal/new-set-modal.component';
 import Badge from '#/components/ui/badge/badge.component';
 import { Button } from '#/components/ui/button/button.component';
 import ContextMenu, {
@@ -10,10 +11,11 @@ import LinkComponent from '#/components/ui/link/link.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import { FlashCard } from '#/shared/models/flash-card.model';
+import { DictionaryValue } from '#/shared/types/dictionary-value.type';
 import { FlashCards } from '#/shared/types/local-storage-flash-card.type';
 import { UUID } from '#/shared/types/uuid.type';
 import { cn } from '#/shared/utils/cn.util';
-import { updateSet } from '#/store/reducers/sets.reducer';
+import { removeSets, updateSet } from '#/store/reducers/sets.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { setsSelectors } from '#/store/selectors/sets.selectors';
 import {
@@ -25,13 +27,17 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/solid';
 import { AnimatePresence } from 'framer-motion';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function SetHardlinkPage() {
   const setHardLink = useParams()?.hardlink as string;
+  const router = useRouter();
 
   const sets = useAppSelector(setsSelectors.selectSetsArray);
+  const categories: DictionaryValue<string>[] = useAppSelector(
+    setsSelectors.selectCategoriesAsDictionary,
+  );
   const flashCardsArray: FlashCard[] = useAppSelector(
     flashCardSelectors.selectFlashCardsArray,
   );
@@ -39,10 +45,10 @@ export default function SetHardlinkPage() {
     flashCardSelectors.selectFlashCards,
   );
 
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [set, setSet] = useState<FlashCardSet>(
-    sets.filter((set) => set.hardlink === setHardLink)[0],
+    sets.filter((set) => set?.hardlink === setHardLink)[0],
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [capitalizedName] = useState<string>(
     setHardLink.replace(/-/g, ' ').charAt(0)?.toUpperCase() +
       setHardLink.replace(/-/g, ' ').slice(1),
@@ -52,10 +58,10 @@ export default function SetHardlinkPage() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    setSet(sets.filter((set) => set.hardlink === setHardLink)[0]);
+    setSet(sets.filter((set) => set?.hardlink === setHardLink)[0]);
   }, [sets, setHardLink]);
 
-  const handleSubmit = (flashCards: UUID[]) => {
+  const handleAssignCards = (flashCards: UUID[]) => {
     setSet((prev) => ({ ...prev, flashCards }));
     dispatch(
       updateSet({
@@ -65,16 +71,37 @@ export default function SetHardlinkPage() {
     );
   };
 
+  const handleEditSet = (set: Partial<FlashCardSet>[]) => {
+    if (set.length > 0) {
+      const hardlink = set[0].name?.replace(/ /g, '-').toLowerCase();
+      router.prefetch(`flashcards/sets/${hardlink}`);
+
+      dispatch(updateSet(set[0]));
+      setSet(set[0] as FlashCardSet);
+
+      router.push(`${hardlink}`);
+    }
+  };
+
+  const handleRemoveSet = () => {
+    if (set?.frontUuid) {
+      dispatch(removeSets([set?.frontUuid]));
+      router.push('/flashcards/sets');
+    }
+  };
+
   const contextMenuActions: ContextMenuItem[] = [
     {
       label: 'Edit set',
       icon: <PencilIcon className='h-6 w-6' />,
-      onClick: () => null,
+      onClick: () => {
+        setIsModalOpen(true);
+      },
     },
     {
       label: 'Delete set',
       icon: <TrashIcon className='h-6 w-6' />,
-      onClick: () => null,
+      onClick: handleRemoveSet,
     },
     {
       label: 'export set CSV',
@@ -176,24 +203,27 @@ export default function SetHardlinkPage() {
       </div>
 
       <div className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'>
-        <Button
-          label='Assign Cards'
-          size={'lg'}
-          variant={'primary'}
-          onClick={() => {
-            setIsModalOpen(true);
-          }}
+        <AssignFlashCardsModal
+          trigger={
+            <Button
+              label='Assign Cards'
+              size={'lg'}
+              variant={'primary'}
+            />
+          }
+          handleSubmit={handleAssignCards}
+          flashCards={flashCardsArray}
+          setCards={set?.flashCards ?? []}
+        />
+
+        <NewSetModal
+          handleEdit={handleEditSet}
+          selectedSets={set?.frontUuid ? [set] : []}
+          isInEditMode={true}
+          categories={categories}
+          open={isModalOpen}
         />
       </div>
-
-      {/*<div className='mt-8 grid grid-cols-[repeat(auto-fit,minmax(20rem,1fr))] gap-4'></div> */}
-      <AssignFlashCardsModal
-        setIsModalOpen={setIsModalOpen}
-        isModalOpen={isModalOpen}
-        handleSubmit={handleSubmit}
-        flashCards={flashCardsArray}
-        setCards={set?.flashCards ?? []}
-      />
     </div>
   );
 }

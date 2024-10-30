@@ -7,14 +7,26 @@ import Dropdown from '#/components/ui/dropdown/dropdown.component';
 import Input from '#/components/ui/input/input.component';
 import { ToggleButton } from '#/components/ui/toggle-button/toggle-button.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
+import useLongPress from '#/hooks/use-long-press.hook';
 import { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import { DictionaryValue } from '#/shared/types/dictionary-value.type';
-import { UUID } from '#/shared/types/uuid.type';
-import uuid from '#/shared/utils/uuid.util';
-import { addNewSet, updateSet } from '#/store/reducers/sets.reducer';
+import { cn } from '#/shared/utils/cn.util';
+import {
+  addNewSets,
+  removeSets,
+  updateSet,
+  updateSets,
+} from '#/store/reducers/sets.reducer';
 import { setsSelectors } from '#/store/selectors/sets.selectors';
 import { StarIcon as StarIconOutline } from '@heroicons/react/24/outline';
-import { MagnifyingGlassIcon, StarIcon } from '@heroicons/react/24/solid';
+import {
+  CheckBadgeIcon,
+  MagnifyingGlassIcon,
+  PencilIcon,
+  PlusIcon,
+  StarIcon,
+  TrashIcon,
+} from '@heroicons/react/24/solid';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -23,28 +35,25 @@ export default function SetsPage() {
   const [isFavourite, toggleFavourite] = useState(false);
   const [searchedText, setSearchedText] = useState('');
   const [searchedCategory, setSearchedCategory] = useState<string[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const sets = useAppSelector(setsSelectors.selectSetsArray);
-  const [filteredSets, setFilteredSets] = useState<FlashCardSet[]>([]);
   const categories: DictionaryValue<string>[] = useAppSelector(
     setsSelectors.selectCategoriesAsDictionary,
   );
+
+  const [filteredSets, setFilteredSets] = useState<FlashCardSet[]>([]);
+  const [selected, setSelected] = useState<FlashCardSet[]>([]);
+  const [isInSelectionMode, setIsInSelectionMode] = useState(false);
+  const [isInEditMode, setIsInEditMode] = useState(false);
+
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const handleNewSet = (set: Partial<FlashCardSet>) => {
-    const newUuid = uuid();
+  const handleNewSets = (sets: Partial<FlashCardSet>[]) => {
+    dispatch(addNewSets(sets));
+  };
 
-    const newSet: Partial<FlashCardSet> = {
-      ...set,
-      name: set.name ?? '',
-      description: set.description ?? '',
-      frontUuid: newUuid as UUID,
-      isFavourite: false,
-      flashCards: [],
-      category: set.category,
-    };
-    dispatch(addNewSet(newSet));
+  const handleEditSets = (sets: Partial<FlashCardSet>[]) => {
+    dispatch(updateSets(sets));
   };
 
   const handleFilterWithMultipleCryteria = () => {
@@ -77,13 +86,50 @@ export default function SetsPage() {
     setSearchedText(event.target.value);
   };
 
+  useEffect(() => {
+    handleFilterWithMultipleCryteria();
+  }, [searchedText, searchedCategory, isFavourite, sets]);
+
+  useEffect(() => {
+    if (selected.length > 0) {
+      setIsInSelectionMode(true);
+    } else {
+      setIsInSelectionMode(false);
+    }
+  }, [selected]);
+
   const handleSetToggleChange = (set: FlashCardSet) => {
     dispatch(updateSet({ ...set, isFavourite: !set.isFavourite }));
   };
 
-  useEffect(() => {
-    handleFilterWithMultipleCryteria();
-  }, [searchedText, searchedCategory, isFavourite, sets]);
+  const toggleSelected = (set: FlashCardSet) => {
+    const isFlashCardSelected =
+      selected.findIndex((item) => item.frontUuid === set.frontUuid) !== -1;
+
+    if (isFlashCardSelected) {
+      setSelected((prev) =>
+        prev.filter((item) => set.frontUuid !== item.frontUuid),
+      );
+    } else {
+      setSelected((prev) => [...prev, set]);
+    }
+  };
+
+  const removeSelected = () => {
+    dispatch(removeSets(selected.map((item) => item.frontUuid)));
+    setSelected([]);
+  };
+
+  const [onStart, onEnd, onMove] = useLongPress<FlashCardSet, FlashCardSet>(
+    (set) => toggleSelected(set),
+    (set) => {
+      if (isInSelectionMode) {
+        toggleSelected(set as FlashCardSet);
+      } else {
+        router.push(`/flashcards/sets/${set.hardlink}`);
+      }
+    },
+  );
 
   return (
     <div className='flex h-full w-full grow flex-col items-center md:pb-24'>
@@ -142,9 +188,20 @@ export default function SetsPage() {
             >
               <Card
                 key={set.frontUuid}
-                className='flex h-full flex-col justify-between gap-4 sm:min-h-44 sm:gap-4'
-                onClick={() => router.push(`/flashcards/sets/${set.hardlink}`)}
+                className={cn([
+                  'flex h-full flex-col justify-between gap-4 sm:min-h-44 sm:gap-4',
+                  selected.includes(set) ? 'ring ring-green-400/60' : '',
+                ])}
+                onMouseDown={() => onStart(set)}
+                onTouchStart={() => onStart(set)}
+                onMouseUp={(e) => onEnd(e, set)}
+                onTouchEnd={(e) => onEnd(e, set)}
+                onTouchMove={onMove}
               >
+                {selected.includes(set) && (
+                  <CheckBadgeIcon className='absolute -right-4 -top-4 h-6 w-6 text-green-400' />
+                )}
+
                 <div className='flex flex-col gap-4'>
                   <h5 className='text-base font-bold text-gray-800 dark:text-slate-200'>
                     {set.name}
@@ -178,17 +235,51 @@ export default function SetsPage() {
         </AnimatePresence>
       </div>
 
-      <div className='mt-8 grid grid-cols-[repeat(auto-fit,minmax(20rem,1fr))] gap-4'>
-        <Button
-          label='Create new set'
-          onClick={() => setIsDialogOpen(true)}
-        ></Button>
+      <div className='mt-8 flex flex-col gap-4 md:flex-row'>
+        <NewSetModal
+          trigger={
+            <Button
+              onClick={() => {
+                setIsInEditMode(false);
+              }}
+              icon={<PlusIcon className='h-4 w-4' />}
+              size={'icon'}
+            />
+          }
+          handleNew={handleNewSets}
+          handleEdit={handleEditSets}
+          selectedSets={[]}
+          isInEditMode={isInEditMode}
+          categories={categories}
+          multiple={true}
+        />
 
         <NewSetModal
-          setIsModalOpen={setIsDialogOpen}
-          isDialogOpen={isDialogOpen}
-          handleNewSet={handleNewSet}
+          trigger={
+            <Button
+              onClick={() => {
+                setIsInEditMode(true);
+              }}
+              icon={<PencilIcon className='h-4 w-4' />}
+              size={'icon'}
+              disabled={selected.length === 0}
+              variant={'secondary'}
+            />
+          }
+          handleNew={handleNewSets}
+          handleEdit={handleEditSets}
+          selectedSets={selected}
+          isInEditMode={isInEditMode}
           categories={categories}
+          multiple={true}
+        />
+
+        <Button
+          disabled={selected.length === 0}
+          onClick={removeSelected}
+          variant={'destructive'}
+          icon={<TrashIcon className='h-4 w-4' />}
+          size={'icon'}
         />
       </div>
     </div>

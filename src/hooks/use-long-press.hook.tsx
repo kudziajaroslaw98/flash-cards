@@ -1,10 +1,14 @@
 import { MouseEvent, TouchEvent, useCallback, useRef } from 'react';
 
-export default function useLongPress<T>(
+export default function useLongPress<T, K = unknown>(
   longPressCallback: (value: T) => void,
-  shortClickCallback: () => void = () => {},
+  shortClickCallback: (...params: K[]) => void = () => {},
   longPressThreshold = 300,
-): [(value: T) => void, (e: MouseEvent | TouchEvent) => void, () => void] {
+): [
+  (value: T) => void,
+  (e: MouseEvent | TouchEvent, ...params: K[]) => void,
+  () => void,
+] {
   const timerRef = useRef<number>(0);
   const clickLockRef = useRef<boolean>(false);
 
@@ -28,12 +32,12 @@ export default function useLongPress<T>(
   );
 
   const onEndLongPress = useCallback(
-    (e: MouseEvent | TouchEvent) => {
+    (e: MouseEvent | TouchEvent, ...params: K[]) => {
       e.preventDefault();
 
       if (timerRef.current) {
         if (!clickLockRef.current) {
-          shortClickCallback();
+          shortClickCallback(...params);
         }
         endTimer();
       }

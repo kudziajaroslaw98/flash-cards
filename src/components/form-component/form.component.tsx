@@ -208,6 +208,8 @@ export default function FormComponent<T>(props: {
       {Object.entries(props.scheme.inputs).map(([inputName, inputProps]) => {
         return (
           <span key={inputName}>
+            {/* @ts-expect-error We need to have possibility to edit only few attributes from object. Thats why we use Partial, but with it comes the error that the inputProps is unknown.*/}
+
             {isTextArea(inputProps) && (
               <TextArea
                 {...inputProps}
@@ -226,6 +228,8 @@ export default function FormComponent<T>(props: {
               ></TextArea>
             )}
 
+            {/* @ts-expect-error We need to have possibility to edit only few attributes from object. Thats why we use Partial, but with it comes the error that the inputProps is unknown.*/}
+
             {isDropdown(inputProps) && (
               <Dropdown
                 {...inputProps}
@@ -243,6 +247,8 @@ export default function FormComponent<T>(props: {
                 onBlur={handleOnBlur}
               ></Dropdown>
             )}
+
+            {/* @ts-expect-error We need to have possibility to edit only few attributes from object. Thats why we use Partial, but with it comes the error that the inputProps is unknown.*/}
 
             {isInput(inputProps) && (
               <Input

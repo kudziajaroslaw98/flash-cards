@@ -9,7 +9,18 @@ import {
 } from 'react';
 
 export interface TextAreaProps
-  extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+  extends Pick<
+    TextareaHTMLAttributes<HTMLTextAreaElement>,
+    | 'value'
+    | 'onChange'
+    | 'onInput'
+    | 'required'
+    | 'onBlur'
+    | 'onFocus'
+    | 'id'
+    | 'name'
+    | 'tabIndex'
+  > {
   type?: 'textarea';
   className: string;
   valid: boolean;
@@ -27,6 +38,8 @@ export default function TextArea({
   required,
   touched = false,
   error = null,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  type = 'textarea',
   ...props
 }: TextAreaProps) {
   const [value, setValue] = useState(props.value);
