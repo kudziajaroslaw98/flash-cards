@@ -16,13 +16,13 @@ const DropdownVariants = cva(
   {
     variants: {
       contextPosition: {
-        top: 'left-0 -top-2 data-[open=true]:z-20 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+        top: 'left-0 -top-2 data-[open=true]:z-30 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
         'top-right':
-          'right-0 -top-2 data-[open=true]:z-20 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+          'right-0 -top-2 data-[open=true]:z-30 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
         'top-left':
-          'left-0 -top-2 data-[open=true]:z-20 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+          'left-0 -top-2 data-[open=true]:z-30 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
         bottom:
-          'left-0 -bottom-2 data-[open=true]:z-20 data-[open=true]:animate-fade-in-to-bottom data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-top',
+          'left-0 -bottom-2 data-[open=true]:!z-30 data-[open=true]:animate-fade-in-to-bottom data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-top',
       },
     },
     defaultVariants: {
@@ -96,14 +96,15 @@ export default function Dropdown<T>({
   const [isInAddNewMode, setIsInAddNewMode] = useState(false);
   const [newItemValue, setNewItemValue] = useState('');
 
-  const dropdownWrapperRef = useRef<HTMLDivElement>(null);
+  const dropdownWrapperRef = useRef<HTMLLabelElement>(null);
 
   useOutsideAlerter(dropdownWrapperRef, () => {
-    setVisible(false);
-    setSearchValue('');
-
-    if (onBlur) {
-      onBlur();
+    if (visible) {
+      setVisible(false);
+      setSearchValue('');
+      if (onBlur) {
+        onBlur();
+      }
     }
   });
 
@@ -136,11 +137,11 @@ export default function Dropdown<T>({
     );
   }, [items, searchValue]);
 
-  const openDropdown = () => {
-    if (!visible) {
-      setVisible(true);
-      setSearchValue('');
-    }
+  const toggleDropdown = () => {
+    console.log('toggle');
+
+    setVisible((prev) => !prev);
+    setSearchValue('');
   };
 
   const changePickedItem = (pickedItem: DictionaryValue<T>) => {
@@ -173,6 +174,10 @@ export default function Dropdown<T>({
 
   const clearPicked = () => {
     setSelected([]);
+
+    if (multiple) {
+      onChange([]);
+    }
   };
 
   const handleSearchValueChange = (event: FormEvent<HTMLInputElement>) => {
@@ -219,8 +224,9 @@ export default function Dropdown<T>({
 
   return (
     <label
+      ref={dropdownWrapperRef}
       className={cn([
-        'group relative flex w-full max-w-md flex-col',
+        'group relative z-40 flex w-full max-w-md flex-col',
         controlLabel ? 'pt-2' : '',
         labelClassName ?? '',
       ])}
@@ -237,14 +243,13 @@ export default function Dropdown<T>({
         </span>
       )}
       <div
-        onClick={openDropdown}
         className='w-full'
-        ref={dropdownWrapperRef}
+        tabIndex={0}
       >
         <div
           className={cn([
             'group relative z-10 flex h-10 cursor-pointer items-center justify-center rounded-md border text-sm',
-            'px-4 transition ',
+            'transition ',
             selected.length > 0
               ? 'border-green-500 text-green-500'
               : 'border-gray-200  text-gray-500 dark:border-slate-800/40 ',
@@ -258,11 +263,13 @@ export default function Dropdown<T>({
               selectedCount={selected.length}
               label={selected[0]?.label ?? label}
               multipleLabel={multipleLabel}
+              onClick={toggleDropdown}
             />
           ) : (
             <DropdownLabel
               visible={visible}
               label={selected[0]?.label ?? label}
+              onClick={toggleDropdown}
             />
           )}
 

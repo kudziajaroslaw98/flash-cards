@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { FlashCard } from '#/shared/models/flash-card.model';
 import { UUID } from '#/shared/types/uuid.type';
@@ -29,6 +29,23 @@ export const NewFlashCardModal = ({
   const [flashCards, setFlashCards] =
     useState<Partial<FlashCard>[]>(selectedFlashCards);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const submitRef = useRef<HTMLButtonElement>(null);
+
+  const clearInitialValues = () => {
+    if (selectedFlashCards.length === 0) {
+      setFlashCards([
+        {
+          frontUuid: uuid() as UUID,
+          question: 'a',
+          questionAddition: 'b',
+          answer: 'c',
+        },
+      ]);
+    } else {
+      setFlashCards(selectedFlashCards);
+    }
+    setFormValue({});
+  };
 
   useEffect(() => {
     if (selectedFlashCards.length === 0) {
@@ -56,8 +73,7 @@ export const NewFlashCardModal = ({
   const handleDialogClose = () => {
     setIsModalOpen(false);
     setCurrentIndex(0);
-    setFormValue({});
-    setFlashCards(selectedFlashCards);
+    clearInitialValues();
   };
 
   const handleDialogSubmit = () => {
@@ -69,9 +85,8 @@ export const NewFlashCardModal = ({
       handleNewFlashCard(flashCards);
     }
 
-    setFormValue({});
+    clearInitialValues();
     setCurrentIndex(0);
-    setFlashCards(selectedFlashCards);
   };
 
   const handleRightButtonClick = () => {
@@ -108,18 +123,29 @@ export const NewFlashCardModal = ({
     }
   };
 
+  const handleTriggerClick = () => {
+    setIsModalOpen(true);
+  };
+
   return (
     <>
-      <div onClick={() => setIsModalOpen(true)}>{trigger}</div>
+      <div
+        className='w-full max-w-80 md:w-auto'
+        onClick={handleTriggerClick}
+      >
+        {trigger}
+      </div>
 
       <Dialog
         open={isModalOpen}
         onDialogClose={handleDialogClose}
+        onDialogSubmit={handleDialogSubmit}
         handleLeftButtonClick={handleLeftButtonClick}
         handleRightButtonClick={handleRightButtonClick}
         currentIndex={currentIndex}
         maxIndex={flashCards.length}
         isInEditMode={isInEditMode}
+        submitRef={submitRef}
         multiple
       >
         <Modal className='w-full'>
@@ -138,6 +164,7 @@ export const NewFlashCardModal = ({
 
           <Modal.Footer className='flex items-center justify-end gap-2 py-4'>
             <Button
+              ref={submitRef}
               label={selectedFlashCards.length > 0 ? 'Edit' : 'Create'}
               onClick={handleDialogSubmit}
               size={'sm'}

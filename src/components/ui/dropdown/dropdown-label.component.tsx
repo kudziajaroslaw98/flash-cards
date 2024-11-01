@@ -5,14 +5,19 @@ export default function DropdownLabel({
   label,
   multipleLabel,
   visible,
+  onClick,
 }: {
   selectedCount?: number;
   label: string;
   multipleLabel?: string;
   visible: boolean;
+  onClick: () => void;
 }) {
   return (
-    <label className='flex w-full cursor-pointer items-center justify-between gap-4'>
+    <label
+      onClick={onClick}
+      className='flex w-full cursor-pointer items-center justify-between gap-4 px-4'
+    >
       {selectedCount && selectedCount > 1 ? (
         <span className='flex gap-2 text-inherit'>
           <span>{selectedCount}</span>

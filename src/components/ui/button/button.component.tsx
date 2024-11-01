@@ -4,7 +4,7 @@ import { cva, VariantProps } from 'class-variance-authority';
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
 
 const buttonVariants = cva(
-  `inline-flex w-full max-w-80 items-center justify-center gap-2 rounded-md border transition active:scale-95 disabled:!border-gray-300 dark:disabled:!border-gray-800/40 disabled:!bg-transparent disabled:!text-gray-400 disabled:!opacity-80 dark:disabled:!bg-transparent ring-0 outline-0`,
+  `inline-flex w-full max-w-80 items-center justify-center gap-2 rounded-md border transition active:scale-95 disabled:!border-gray-300 dark:disabled:!border-gray-800/40 disabled:!bg-transparent disabled:!text-gray-400 disabled:!opacity-80 dark:disabled:!bg-transparent ring-0 outline-0 focus:ring ring-green-400/50`,
   {
     variants: {
       variant: {
@@ -77,6 +77,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn([
           buttonVariants({ variant, size, iconPosition, className }),
         ])}
+        tabIndex={disabled ? -1 : 0}
         {...props}
       >
         {loading && <ArrowPathIcon className={'h-4 w-4 animate-spin'} />}

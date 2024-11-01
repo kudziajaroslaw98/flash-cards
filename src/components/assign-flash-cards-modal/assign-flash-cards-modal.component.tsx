@@ -1,9 +1,9 @@
-import { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import { FlashCard } from '#/shared/models/flash-card.model';
-import { DictionaryValue } from '#/shared/types/dictionary-value.type';
-import { UUID } from '#/shared/types/uuid.type';
+import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
+import type { FlashCard } from '#/shared/models/flash-card.model';
+import type { DictionaryValue } from '#/shared/types/dictionary-value.type';
+import type { UUID } from '#/shared/types/uuid.type';
 import { assignFlashCardsScheme } from '#/shared/validation-schemes/assign-flash-cards-validation.scheme';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import FormComponent from '../form-component/form.component';
 import { Button } from '../ui/button/button.component';
 import Dialog from '../ui/dialog/dialog.component';
@@ -26,6 +26,9 @@ export const AssignFlashCardsModal = ({
   const [formValue, setFormValue] = useState<Partial<FlashCardSet>>({
     flashCards: [],
   });
+
+  const submitRef = useRef<HTMLButtonElement>(null);
+
   const getFormScheme = useMemo(
     () =>
       assignFlashCardsScheme(
@@ -50,13 +53,24 @@ export const AssignFlashCardsModal = ({
     setFormValue({ flashCards: [] });
   };
 
+  const handleTriggerClick = () => {
+    setIsModalOpen(true);
+  };
+
   return (
     <>
-      <div onClick={() => setIsModalOpen(true)}>{trigger}</div>
+      <div
+        className='w-full max-w-80 md:w-auto'
+        onClick={handleTriggerClick}
+      >
+        {trigger}
+      </div>
 
       <Dialog
         open={isModalOpen}
         onDialogClose={handleDialogClose}
+        onDialogSubmit={handleDialogSubmit}
+        submitRef={submitRef}
       >
         <Modal className='w-full max-w-96'>
           <Modal.Header>
@@ -74,6 +88,7 @@ export const AssignFlashCardsModal = ({
 
           <Modal.Footer className='flex items-center justify-end gap-2 py-4'>
             <Button
+              ref={submitRef}
               label='Assign'
               onClick={handleDialogSubmit}
               size={'sm'}

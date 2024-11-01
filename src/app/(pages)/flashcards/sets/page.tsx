@@ -1,6 +1,5 @@
 'use client';
-import { NewSetModal } from '#/components/new-set-modal/new-set-modal.component';
-import Badge from '#/components/ui/badge/badge.component';
+
 import { Button } from '#/components/ui/button/button.component';
 import Card from '#/components/ui/card/card.component';
 import Dropdown from '#/components/ui/dropdown/dropdown.component';
@@ -8,8 +7,8 @@ import Input from '#/components/ui/input/input.component';
 import { ToggleButton } from '#/components/ui/toggle-button/toggle-button.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import useLongPress from '#/hooks/use-long-press.hook';
-import { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import { DictionaryValue } from '#/shared/types/dictionary-value.type';
+import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
+import type { DictionaryValue } from '#/shared/types/dictionary-value.type';
 import { cn } from '#/shared/utils/cn.util';
 import {
   addNewSets,
@@ -27,9 +26,19 @@ import {
   StarIcon,
   TrashIcon,
 } from '@heroicons/react/24/solid';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
+import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+
+const NewSetModal = dynamic(() =>
+  import('#/components/new-set-modal/new-set-modal.component').then(
+    (x) => x.NewSetModal,
+  ),
+);
+
+const Badge = dynamic(() => import('#/components/ui/badge/badge.component'));
 
 export default function SetsPage() {
   const [isFavourite, toggleFavourite] = useState(false);
@@ -173,69 +182,82 @@ export default function SetsPage() {
         </div>
       </div>
 
-      <div className='mt-8 grid w-full grid-cols-[repeat(auto-fit,minmax(20rem,1fr))] gap-4 2xl:grid-cols-[repeat(3,minmax(20rem,1fr))]'>
+      <div className='mt-8 grid w-full grid-cols-[repeat(auto-fit,minmax(20rem,1fr))] gap-4 lg:grid-cols-[repeat(2,minmax(20rem,1fr))] 2xl:grid-cols-[repeat(3,minmax(20rem,1fr))]'>
         <AnimatePresence mode='popLayout'>
           {filteredSets.map((set) => (
-            <motion.div
+            <m.div
+              layout={'position'}
               key={set.frontUuid}
+              initial={{ translateY: '10%', opacity: 0, zIndex: -20 }}
+              animate={{
+                opacity: 1,
+                translateY: '0%',
+                zIndex: 20,
+              }}
               exit={{
-                y: '-5%',
-                height: 0,
-                marginTop: 0,
                 opacity: 0,
                 zIndex: -20,
+                translateY: '-10%',
               }}
             >
-              <Card
-                key={set.frontUuid}
-                className={cn([
-                  'flex h-full flex-col justify-between gap-4 sm:min-h-44 sm:gap-4',
-                  selected.includes(set) ? 'ring ring-green-400/60' : '',
-                ])}
-                onMouseDown={() => onStart(set)}
-                onTouchStart={() => onStart(set)}
-                onMouseUp={(e) => onEnd(e, set)}
-                onTouchEnd={(e) => onEnd(e, set)}
-                onTouchMove={onMove}
+              <Link
+                href={`/flashcards/sets/${set.hardlink}`}
+                prefetch
               >
-                {selected.includes(set) && (
-                  <CheckBadgeIcon className='absolute -right-4 -top-4 h-6 w-6 text-green-400' />
-                )}
+                <Card
+                  key={set.frontUuid}
+                  className={cn([
+                    'flex h-full flex-col justify-between gap-4 sm:min-h-44 sm:gap-4 ',
+                    selected.includes(set) ? 'ring ring-green-400/60' : '',
+                  ])}
+                  onMouseDown={() => onStart(set)}
+                  onTouchStart={() => onStart(set)}
+                  onMouseUp={(e) => onEnd(e, set)}
+                  onTouchEnd={(e) => onEnd(e, set)}
+                  onTouchMove={onMove}
+                >
+                  {selected.includes(set) && (
+                    <CheckBadgeIcon className='absolute -right-4 -top-4 h-6 w-6 text-green-400' />
+                  )}
 
-                <div className='flex flex-col gap-4'>
-                  <h5 className='text-base font-bold text-gray-800 dark:text-slate-200'>
-                    {set.name}
-                  </h5>
+                  <div className='flex flex-col gap-4'>
+                    <h5 className='text-base font-bold text-gray-800 dark:text-slate-200'>
+                      {set.name}
+                    </h5>
 
-                  <p className='text-sm text-gray-500 dark:text-slate-500'>
-                    {set.description}
-                  </p>
-                </div>
-
-                <div className='flex w-full items-center justify-between'>
-                  <div className='flex w-full items-center gap-2'>
-                    {set.category && <Badge>{set.category}</Badge>}
-                    <Badge>{`${set.flashCards.length} cards`}</Badge>
+                    <p className='text-sm text-gray-500 dark:text-slate-500'>
+                      {set.description}
+                    </p>
                   </div>
 
-                  <ToggleButton
-                    toggled={set.isFavourite}
-                    toggle={() => {
-                      handleSetToggleChange(set);
-                    }}
-                    activeIcon={<StarIcon className='h-4 w-4' />}
-                    inactiveIcon={<StarIconOutline className='h-4 w-4' />}
-                    size={'icon-sm'}
-                    toggleVariant='text'
-                  />
-                </div>
-              </Card>
-            </motion.div>
+                  <div className='flex w-full items-center justify-between'>
+                    <div className='flex w-full items-center gap-2'>
+                      {set.category && <Badge>{set.category}</Badge>}
+                      <Badge>{`${set.flashCards.length} cards`}</Badge>
+                    </div>
+
+                    <ToggleButton
+                      toggled={set.isFavourite}
+                      toggle={() => {
+                        handleSetToggleChange(set);
+                      }}
+                      activeIcon={<StarIcon className='h-4 w-4' />}
+                      inactiveIcon={<StarIconOutline className='h-4 w-4' />}
+                      size={'icon-sm'}
+                      toggleVariant='text'
+                    />
+                  </div>
+                </Card>
+              </Link>
+            </m.div>
           ))}
         </AnimatePresence>
       </div>
 
-      <div className='mt-8 flex flex-col gap-4 md:flex-row'>
+      <m.div
+        layout
+        className='mt-8 flex w-full flex-col items-center justify-center gap-4 md:flex-row'
+      >
         <NewSetModal
           trigger={
             <Button
@@ -281,7 +303,7 @@ export default function SetsPage() {
           icon={<TrashIcon className='h-4 w-4' />}
           size={'icon'}
         />
-      </div>
+      </m.div>
     </div>
   );
 }

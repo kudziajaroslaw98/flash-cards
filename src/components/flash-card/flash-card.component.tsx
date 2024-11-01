@@ -2,7 +2,7 @@ import useLongPress from '#/hooks/use-long-press.hook';
 import type { FlashCard } from '#/shared/models/flash-card.model';
 import { cn } from '#/shared/utils/cn.util';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import Card from '../ui/card/card.component';
 
@@ -51,7 +51,8 @@ export default function FlashCardComponent({
       onTouchEnd={onEnd}
       onTouchMove={onMove}
     >
-      <motion.div
+      <m.div
+        layout
         animate={{ translateY: '0%', opacity: 100, zIndex: 21 }}
         initial={{ translateY: '10%', opacity: 0, zIndex: -20 }}
         exit={{
@@ -117,7 +118,7 @@ export default function FlashCardComponent({
             </p>
           )}
         </Card>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

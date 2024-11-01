@@ -64,52 +64,59 @@ export default function ContextMenu({
   });
 
   const handleTriggerClick = () => {
-    setOpen(!open);
+    setOpen((prev) => !prev);
   };
 
   return (
     <div>
-      <div className='relative'>
+      <div
+        className='relative'
+        ref={contextMenuWrapperRef}
+      >
         <div onClick={handleTriggerClick}>{props.triggerComponent}</div>
 
-        <div
-          ref={contextMenuWrapperRef}
-          data-open={open}
-          className={cn([contextMenuVariants({ contextPosition }), className])}
-        >
-          <ul className='flex h-auto w-full flex-col items-center'>
-            {!!props.beforeMenuItems && (
-              <MenuItem
-                visible={!!props.beforeMenuItems}
-                className={props.beforeMenuClass}
-              >
-                {props.beforeMenuItems}
-              </MenuItem>
-            )}
+        {open && (
+          <div
+            data-open={open}
+            className={cn([
+              contextMenuVariants({ contextPosition }),
+              className,
+            ])}
+          >
+            <ul className='flex h-auto w-full flex-col items-center'>
+              {!!props.beforeMenuItems && (
+                <MenuItem
+                  visible={!!props.beforeMenuItems}
+                  className={props.beforeMenuClass}
+                >
+                  {props.beforeMenuItems}
+                </MenuItem>
+              )}
 
-            {props.menuItems.map((item) => (
-              <MenuItem
-                key={item.label}
-                active={item.active}
-                visible={true}
-                onClick={() => {
-                  item.onClick();
-                }}
-              >
-                {item.icon && item.icon} {item.label}
-              </MenuItem>
-            ))}
+              {props.menuItems.map((item) => (
+                <MenuItem
+                  key={item.label}
+                  active={item.active}
+                  visible={true}
+                  onClick={() => {
+                    item.onClick();
+                  }}
+                >
+                  {item.icon && item.icon} {item.label}
+                </MenuItem>
+              ))}
 
-            {!!props.afterMenuItems && (
-              <MenuItem
-                className={props.afterMenuClass}
-                visible={!!props.afterMenuItems}
-              >
-                {props.afterMenuItems}
-              </MenuItem>
-            )}
-          </ul>
-        </div>
+              {!!props.afterMenuItems && (
+                <MenuItem
+                  className={props.afterMenuClass}
+                  visible={!!props.afterMenuItems}
+                >
+                  {props.afterMenuItems}
+                </MenuItem>
+              )}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );

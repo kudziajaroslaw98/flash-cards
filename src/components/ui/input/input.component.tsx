@@ -68,7 +68,7 @@ function Input({
 
       <span
         className={cn([
-          'flex h-10 w-full items-center gap-4 rounded-md border border-gray-200 bg-gray-100 p-2 px-4 dark:border-slate-800/40 dark:bg-slate-900',
+          'flex h-10 w-full items-center gap-4 rounded-md border border-gray-200 bg-gray-100 p-2 px-4 transition-shadow has-[:focus]:ring has-[:focus]:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-900',
           touched && !valid ? '!border-red-400' : '',
           touched && valid ? '!border-green-400' : '',
         ])}
@@ -80,6 +80,7 @@ function Input({
         <input
           {...props}
           type={type}
+          tabIndex={props.tabIndex ?? 0}
           className={cn([
             label
               ? 'placeholder:text-gray-400 dark:placeholder:text-slate-700'

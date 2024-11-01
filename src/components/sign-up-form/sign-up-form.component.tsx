@@ -7,7 +7,7 @@ import { ApiResponse } from '#/shared/types/api/api-response.type';
 import { SignUpResponse } from '#/shared/types/api/sign-up-response.type';
 import { signUpValidationScheme } from '#/shared/validation-schemes/sign-up-validation.scheme';
 import { CheckBadgeIcon, RocketLaunchIcon } from '@heroicons/react/24/solid';
-import { AnimatePresence, motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '../ui/button/button.component';
@@ -101,9 +101,9 @@ export default function SignUpFormComponent() {
   };
 
   return (
-    <AnimatePresence mode='popLayout'>
+    <>
       {!requestSuccess ? (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
@@ -147,9 +147,9 @@ export default function SignUpFormComponent() {
               className={'text-green-400 underline'}
             ></LinkComponent>
           </div>
-        </motion.div>
+        </m.div>
       ) : (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
@@ -173,8 +173,8 @@ export default function SignUpFormComponent() {
               You just need to click on it to activate your account.
             </p>
           </div>
-        </motion.div>
+        </m.div>
       )}
-    </AnimatePresence>
+    </>
   );
 }

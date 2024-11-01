@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { PropsWithChildren, ReactNode } from 'react';
@@ -40,10 +40,10 @@ export default function LinkComponent({
       </p>
 
       {isPathActive && underline && (
-        <motion.span
+        <m.span
           layoutId='link-underline'
           className={` ${iconOnly ? '-bottom-1 left-[6px] h-1 w-2/3' : '-left-[11px] top-2 h-1/2 w-1'} absolute rounded bg-green-400 group-hover:bg-green-400`}
-        ></motion.span>
+        ></m.span>
       )}
     </Link>
   );

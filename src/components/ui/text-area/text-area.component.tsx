@@ -107,13 +107,14 @@ export default function TextArea({
           touched && !valid ? '!border-red-400' : '',
           touched && valid ? '!border-green-400' : '',
           'flex w-full items-center gap-4 rounded-md border border-gray-200 bg-gray-100 p-2 px-4 dark:border-slate-800/40 dark:bg-slate-900',
-          'h-10 resize-none text-sm outline-none ring-blue-400 transition-all focus:ring-1',
+          'h-10 resize-none text-sm outline-none ring-green-400/50 transition-all focus:ring',
           label
             ? 'placeholder:text-gray-400  dark:placeholder:text-slate-700'
             : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
           'text-gray-800 text-inherit dark:text-slate-200',
           className,
         ])}
+        tabIndex={props.tabIndex ?? 0}
         id={props.id}
         value={value}
         onInput={handleOnInput}

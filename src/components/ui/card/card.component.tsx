@@ -1,5 +1,5 @@
 import { cn } from '#/shared/utils/cn.util';
-import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { m, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { DetailedHTMLProps, HTMLAttributes, PropsWithChildren } from 'react';
 
 export interface CardProps
@@ -38,7 +38,7 @@ export default function Card({
       ])}
       {...props}
     >
-      <motion.div
+      <m.div
         className='pointer-events-none absolute inset-0 -z-10 flex opacity-0 transition-all group-hover:opacity-100 dark:hidden'
         style={{
           background: useMotionTemplate`radial-gradient(${
@@ -47,7 +47,7 @@ export default function Card({
         }}
       />
 
-      <motion.div
+      <m.div
         className='pointer-events-none absolute inset-0 -z-10 hidden opacity-0 transition-all group-hover:opacity-100 dark:flex'
         style={{
           background: useMotionTemplate`radial-gradient(${

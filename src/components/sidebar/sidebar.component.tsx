@@ -19,7 +19,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
-import HamburgerMenuComponent from '../hamburger-menu/hamburger-menu.component';
 import ThemeSwitchComponent from '../theme-switch/theme-switch.component';
 import AvatarComponent from '../ui/avatar/avatar.component';
 import { Button } from '../ui/button/button.component';
@@ -30,7 +29,6 @@ import NavigationItemComponent from '../ui/navigation/navigation-item.component'
 export default function SidebarComponent() {
   const [expanded, toggleExpand] = useState<boolean>(true);
   const [toggled, toggle] = useState(false);
-  const [isOpen, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
@@ -40,20 +38,6 @@ export default function SidebarComponent() {
 
   const iconSize = expanded ? 'size-4' : 'size-5';
   const groupIconSize = 'size-5';
-  const navigationItems: NavigationItem[] = [
-    {
-      type: 'item',
-      label: 'Learn',
-      href: APP_ROUTES.flashcards.learn,
-      icon: <AcademicCapIcon className={iconSize} />,
-    },
-    {
-      type: 'item',
-      label: 'Revise',
-      href: APP_ROUTES.flashcards.revise,
-      icon: <LanguageIcon className={iconSize} />,
-    },
-  ];
 
   const navigation: (NavigationItem | NavigationGroup)[] = [
     {
@@ -107,8 +91,8 @@ export default function SidebarComponent() {
           className={`flex items-center font-thin tracking-wider ${expanded && 'gap-4'}`}
         >
           <Image
-            width={expanded ? 24 : 32}
-            height={16}
+            width={24}
+            height={24}
             src={'/images/flash-cards-logo.svg'}
             alt={'Flash Cards Logo'}
           />
@@ -157,13 +141,10 @@ export default function SidebarComponent() {
           ))}
         </div>
 
-        <span className='md:hidden'>
-          <HamburgerMenuComponent navigationItems={navigationItems} />
-        </span>
-
         <div className='flex h-full w-full items-end justify-center'>
           <div className='flex flex-col items-center justify-center gap-8'>
             <ThemeSwitchComponent showLabel={expanded} />
+
             <div
               className='flex'
               ref={menuRef}
@@ -179,7 +160,6 @@ export default function SidebarComponent() {
                       avatarClass='size-12'
                       text={isLoggedIn ? `${firstName} ${lastName}` : 'Guest'}
                       onClick={() => {
-                        setOpen(!isOpen);
                         toggle(!toggled);
                       }}
                     ></AvatarComponent>
@@ -195,11 +175,9 @@ export default function SidebarComponent() {
                       onClick: () => {
                         if (isLoggedIn) {
                           logOut();
-                          setOpen(false);
                           toggle(!toggled);
                         } else {
                           router.push(APP_ROUTES.signIn);
-                          setOpen(false);
                           toggle(!toggled);
                         }
                       },

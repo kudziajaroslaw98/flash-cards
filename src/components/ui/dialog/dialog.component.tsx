@@ -5,12 +5,13 @@ import {
   ArrowRightIcon,
   PlusIcon,
 } from '@heroicons/react/24/solid';
-import { AnimatePresence, motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   DetailedHTMLProps,
   HTMLAttributes,
   PropsWithChildren,
   createContext,
+  useCallback,
   useRef,
 } from 'react';
 import { createPortal } from 'react-dom';
@@ -31,6 +32,8 @@ export interface DialogProps
   multiple?: boolean;
   handleLeftButtonClick?: () => void;
   handleRightButtonClick?: () => void;
+  onDialogSubmit?: () => void;
+  submitRef?: React.RefObject<HTMLButtonElement>;
 }
 
 export const DialogContext = createContext({
@@ -41,8 +44,10 @@ export const DialogContext = createContext({
 const Dialog = ({
   children,
   onDialogClose,
+  onDialogSubmit,
   handleLeftButtonClick,
   handleRightButtonClick,
+  submitRef,
   open = false,
   closeOnBackdropClick = false,
   isCloseButtonVisible = true,
@@ -59,9 +64,42 @@ const Dialog = ({
     }
   });
 
-  useKeyPress(['Escape'], onDialogClose);
-  useKeyPress(['ArrowRight'], () => handleRightButtonClick);
-  useKeyPress(['ArrowLeft'], () => handleLeftButtonClick);
+  const handleEnter = useCallback(
+    (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+
+      if (open && target === submitRef?.current && onDialogSubmit) {
+        e.preventDefault();
+        onDialogSubmit();
+      } else {
+        target.click();
+      }
+    },
+    [open, submitRef, onDialogSubmit],
+  );
+
+  const handleArrowRight = useCallback(() => {
+    if (open && handleRightButtonClick) {
+      handleRightButtonClick();
+    }
+  }, [open, handleRightButtonClick]);
+
+  const handleArrowLeft = useCallback(() => {
+    if (open && handleLeftButtonClick) {
+      handleLeftButtonClick();
+    }
+  }, [open, handleLeftButtonClick]);
+
+  const handleEscape = useCallback(() => {
+    if (open && onDialogClose) {
+      onDialogClose();
+    }
+  }, [open, onDialogClose]);
+
+  useKeyPress(['Escape'], handleEscape);
+  useKeyPress(['Enter'], handleEnter);
+  useKeyPress(['ArrowRight'], handleArrowRight);
+  useKeyPress(['ArrowLeft'], handleArrowLeft);
 
   const buttonLeft = (
     <Button
@@ -108,18 +146,16 @@ const Dialog = ({
                 <span className='hidden md:flex'>{multiple && buttonLeft}</span>
 
                 <div className='flex w-full max-w-96 flex-col items-center justify-center gap-4'>
-                  <AnimatePresence mode='popLayout'>
-                    <motion.div
-                      transition={{ duration: 0.3 }}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, translateY: -100 }}
-                      key={currentIndex + '1'}
-                      className='w-full'
-                    >
-                      {children}
-                    </motion.div>
-                  </AnimatePresence>
+                  <m.div
+                    transition={{ duration: 0.3 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, translateY: -100 }}
+                    key={currentIndex + '1'}
+                    className='w-full'
+                  >
+                    {children}
+                  </m.div>
 
                   <div className='flex w-full items-center gap-4 md:hidden'>
                     {buttonLeft}

@@ -1,9 +1,9 @@
 import { newSetFormScheme } from '#/shared/validation-schemes/new-set-validation.scheme';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import { DictionaryValue } from '#/shared/types/dictionary-value.type';
-import { UUID } from '#/shared/types/uuid.type';
+import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
+import type { DictionaryValue } from '#/shared/types/dictionary-value.type';
+import type { UUID } from '#/shared/types/uuid.type';
 import uuid from '#/shared/utils/uuid.util';
 import FormComponent from '../form-component/form.component';
 import { Button } from '../ui/button/button.component';
@@ -31,10 +31,27 @@ export const NewSetModal = ({
   isInEditMode = false,
   open = false,
 }: NewSetModalProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(open);
   const [formValue, setFormValue] = useState<Partial<FlashCardSet>>({});
   const [sets, setSets] = useState<Partial<FlashCardSet>[]>(selectedSets);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const submitRef = useRef<HTMLButtonElement>(null);
+
+  const clearInitialValues = () => {
+    if (selectedSets.length === 0) {
+      setSets([
+        {
+          frontUuid: uuid() as UUID,
+          name: 'a',
+          description: 'b',
+        },
+      ]);
+    } else {
+      setSets(selectedSets);
+    }
+    setFormValue({});
+  };
 
   useEffect(() => {
     if (selectedSets.length === 0) {
@@ -51,16 +68,16 @@ export const NewSetModal = ({
   }, [selectedSets]);
 
   useEffect(() => {
-    setIsModalOpen(open);
-  }, [open]);
-
-  useEffect(() => {
     setSets((prev) =>
       prev.map((item) =>
         item.frontUuid === formValue.frontUuid ? formValue : item,
       ),
     );
   }, [formValue]);
+
+  useEffect(() => {
+    setIsModalOpen(open);
+  }, [open]);
 
   const getFormScheme = useMemo(
     () => newSetFormScheme(categories),
@@ -70,8 +87,7 @@ export const NewSetModal = ({
   const handleDialogClose = () => {
     setIsModalOpen(false);
     setCurrentIndex(0);
-    setFormValue({});
-    setSets(selectedSets);
+    clearInitialValues();
   };
 
   const handleDialogSubmit = () => {
@@ -83,9 +99,8 @@ export const NewSetModal = ({
       handleNew && handleNew(sets);
     }
 
-    setFormValue({});
+    clearInitialValues();
     setCurrentIndex(0);
-    setSets(selectedSets);
   };
 
   const handleRightButtonClick = () => {
@@ -121,13 +136,25 @@ export const NewSetModal = ({
     }
   };
 
+  const handleTriggerClick = () => {
+    setIsModalOpen(true);
+  };
+
   return (
     <>
-      <div onClick={() => setIsModalOpen(true)}>{trigger}</div>
+      {trigger && (
+        <div
+          className='w-full max-w-80 md:w-auto'
+          onClick={handleTriggerClick}
+        >
+          {trigger}
+        </div>
+      )}
 
       <Dialog
         open={isModalOpen}
         onDialogClose={handleDialogClose}
+        onDialogSubmit={handleDialogSubmit}
         isInEditMode={isInEditMode}
         currentIndex={currentIndex}
         maxIndex={sets.length}
@@ -152,6 +179,7 @@ export const NewSetModal = ({
           </Modal.Body>
           <Modal.Footer className='flex items-center justify-end gap-2 py-4'>
             <Button
+              ref={submitRef}
               label={isInEditMode ? 'Update' : 'Create'}
               onClick={handleDialogSubmit}
               size={'sm'}

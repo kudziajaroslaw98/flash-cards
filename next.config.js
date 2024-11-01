@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const withPWA = require('@ducanh2912/next-pwa').default({
   dest: 'public',
   cacheOnFrontEndNav: true,
@@ -11,5 +12,18 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 });
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
-module.exports = withPWA(nextConfig);
+const nextConfig = {
+  reactStrictMode: true,
+  publicRuntimeConfig: {
+    dest: 'public',
+    cacheOnFrontEndNav: true,
+    aggressiveFrontEndNavCaching: true,
+    reloadOnOnline: true,
+    swcMinify: true,
+    disable: process.env.NODE_ENV === 'development',
+    workboxOptions: {
+      disableDevLogs: true,
+    },
+  },
+};
+module.exports = process.env.TURBO ? nextConfig : withPWA(nextConfig);

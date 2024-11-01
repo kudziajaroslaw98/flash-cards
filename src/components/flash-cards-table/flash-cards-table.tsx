@@ -1,13 +1,12 @@
 'use client';
 
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/solid';
-import { AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter.component';
 import { Button } from '#/components/ui/button/button.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
-import { FlashCard } from '#/shared/models/flash-card.model';
+import type { FlashCard } from '#/shared/models/flash-card.model';
 
 import { cn } from '#/shared/utils/cn.util';
 import {
@@ -18,8 +17,15 @@ import {
 import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { statsSelectors } from '#/store/selectors/stats.selectors';
+import { AnimatePresence, m } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import FlashCardComponent from '../flash-card/flash-card.component';
-import { NewFlashCardModal } from '../new-flash-card-modal/new-flash-card-modal.component';
+
+const NewFlashCardModal = dynamic(() =>
+  import(
+    '#/components/new-flash-card-modal/new-flash-card-modal.component'
+  ).then((x) => x.NewFlashCardModal),
+);
 
 export default function FlashCardsTable() {
   const statistics = useAppSelector(statsSelectors.selectStats);
@@ -117,7 +123,10 @@ export default function FlashCardsTable() {
         </div>
       )}
 
-      <div className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'>
+      <m.div
+        layout
+        className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'
+      >
         <NewFlashCardModal
           handleNewFlashCard={addNewRecord}
           handleEditFlashCard={editSelectedRecords}
@@ -161,7 +170,7 @@ export default function FlashCardsTable() {
             size={'icon'}
           />
         )}
-      </div>
+      </m.div>
     </div>
   );
 }

@@ -9,7 +9,7 @@ import {
   InformationCircleIcon,
   XCircleIcon,
 } from '@heroicons/react/24/solid';
-import { AnimatePresence, motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 export default function ToastsComponent() {
   const { toasts, close } = useToastContext();
@@ -63,32 +63,30 @@ export default function ToastsComponent() {
 
   return (
     <div className='absolute right-0 top-16 z-40 flex h-auto w-full flex-col gap-2 overflow-x-clip px-4 sm:right-4 sm:px-0 md:max-w-80'>
-      <AnimatePresence>
-        {toasts?.map((toast) => (
-          <motion.div
-            initial={{ opacity: 0, y: -5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            key={toast.uuid}
-            onClick={() => close(toast.uuid)}
-            className={`${ToastBodyClass(
+      {toasts?.map((toast) => (
+        <m.div
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          key={toast.uuid}
+          onClick={() => close(toast.uuid)}
+          className={`${ToastBodyClass(
+            toast,
+          )} flex w-full cursor-pointer items-center justify-center gap-2 rounded-md border bg-gray-50 p-2 transition-all duration-300 ease-in-out  dark:bg-slate-900`}
+        >
+          <div
+            className={`flex h-full w-8 items-center justify-center ${ToastTextClass(
               toast,
-            )} flex w-full cursor-pointer items-center justify-center gap-2 rounded-md border bg-gray-50 p-2 transition-all duration-300 ease-in-out  dark:bg-slate-900`}
+            )}`}
           >
-            <div
-              className={`flex h-full w-8 items-center justify-center ${ToastTextClass(
-                toast,
-              )}`}
-            >
-              {toastIcons(toast)}
-            </div>
+            {toastIcons(toast)}
+          </div>
 
-            <div className='flex h-full w-full flex-col gap-2 px-4'>
-              <span className={`${ToastTextClass(toast)}`}>{toast.title}</span>
-            </div>
-          </motion.div>
-        ))}
-      </AnimatePresence>
+          <div className='flex h-full w-full flex-col gap-2 px-4'>
+            <span className={`${ToastTextClass(toast)}`}>{toast.title}</span>
+          </div>
+        </m.div>
+      ))}
     </div>
   );
 }

@@ -10,7 +10,7 @@ import { ApiResponse } from '#/shared/types/api/api-response.type';
 import { SignInResponse } from '#/shared/types/api/sign-in-response.type';
 import { signInValidationScheme } from '#/shared/validation-schemes/sign-in-validation.scheme';
 import { FingerPrintIcon } from '@heroicons/react/24/solid';
-import { AnimatePresence, motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -75,51 +75,49 @@ export default function SignInComponent() {
   };
 
   return (
-    <AnimatePresence mode='popLayout'>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        className='relative flex w-full max-w-sm flex-col items-center justify-center gap-12 rounded p-8 sm:overflow-clip sm:border sm:border-gray-50 sm:bg-gray-100 sm:shadow-card-hovered dark:sm:border-slate-800 dark:sm:bg-slate-900'
-      >
-        <h4 className='flex items-center justify-center gap-2 text-3xl font-semibold text-green-400'>
-          <span>Sign in</span>
+    <m.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className='relative flex w-full max-w-sm flex-col items-center justify-center gap-12 rounded p-8 sm:overflow-clip sm:border sm:border-gray-50 sm:bg-gray-100 sm:shadow-card-hovered dark:sm:border-slate-800 dark:sm:bg-slate-900'
+    >
+      <h4 className='flex items-center justify-center gap-2 text-3xl font-semibold text-green-400'>
+        <span>Sign in</span>
 
-          <span className='absolute left-0 top-0 flex -translate-x-1/4 -translate-y-1/4 items-center justify-center opacity-10 dark:opacity-5'>
-            <FingerPrintIcon className={'h-80 w-80'} />
-          </span>
-        </h4>
+        <span className='absolute left-0 top-0 flex -translate-x-1/4 -translate-y-1/4 items-center justify-center opacity-10 dark:opacity-5'>
+          <FingerPrintIcon className={'h-80 w-80'} />
+        </span>
+      </h4>
 
-        <div className='flex w-full flex-col gap-2 pt-4'>
-          <FormComponent
-            scheme={formScheme}
-            formValid={requestSuccess}
-            formError={requestErrorMsg}
-            emitFormValid={setFormValid}
-            emitFormValue={setFormValue}
-          />
-        </div>
+      <div className='flex w-full flex-col gap-2 pt-4'>
+        <FormComponent
+          scheme={formScheme}
+          formValid={requestSuccess}
+          formError={requestErrorMsg}
+          emitFormValid={setFormValid}
+          emitFormValue={setFormValue}
+        />
+      </div>
 
-        <Button
-          onClick={handleSignIn}
-          disabled={!formValid}
-          loading={isLoading ?? false}
-          label='Sign in'
-          size={'full'}
-        ></Button>
+      <Button
+        onClick={handleSignIn}
+        disabled={!formValid}
+        loading={isLoading ?? false}
+        label='Sign in'
+        size={'full'}
+      ></Button>
 
-        <div className='flex flex-col items-center justify-center gap-1'>
-          <span className='text-gray-600 dark:text-slate-400'>
-            You don&apos;t have an account?
-          </span>
+      <div className='flex flex-col items-center justify-center gap-1'>
+        <span className='text-gray-600 dark:text-slate-400'>
+          You don&apos;t have an account?
+        </span>
 
-          <LinkComponent
-            label={'Click here'}
-            href={'sign-up'}
-            className={'text-green-400 underline'}
-          ></LinkComponent>
-        </div>
-      </motion.div>
-    </AnimatePresence>
+        <LinkComponent
+          label={'Click here'}
+          href={'sign-up'}
+          className={'text-green-400 underline'}
+        ></LinkComponent>
+      </div>
+    </m.div>
   );
 }

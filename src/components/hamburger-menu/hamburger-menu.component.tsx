@@ -7,7 +7,7 @@ import { ToggleButton } from '#/components/ui/toggle-button/toggle-button.compon
 import { useSessionContext } from '#/providers/session-provider.component';
 import { NavigationItem } from '#/shared/types/navigation-item.type';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import ThemeSwitchComponent from '../theme-switch/theme-switch.component';
@@ -42,25 +42,25 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
   }, []);
 
   const activeIcon = (
-    <motion.span
+    <m.span
       animate={{ rotate: '180deg' }}
       initial={{ rotate: '0deg' }}
       exit={{ rotate: '0deg', opacity: 0 }}
       className='text-inherit'
     >
       <XMarkIcon className='h-6 w-6' />
-    </motion.span>
+    </m.span>
   );
 
   const inactiveIcon = (
-    <motion.span
+    <m.span
       animate={{ rotate: '180deg' }}
       initial={{ rotate: '0deg' }}
       exit={{ rotate: '0deg', opacity: 0 }}
       className='text-inherit'
     >
       <Bars3Icon className='h-6 w-6' />
-    </motion.span>
+    </m.span>
   );
 
   return (

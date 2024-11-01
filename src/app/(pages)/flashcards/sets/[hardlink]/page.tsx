@@ -1,19 +1,16 @@
 'use client';
-import { AssignFlashCardsModal } from '#/components/assign-flash-cards-modal/assign-flash-cards-modal.component';
 import FlashCardComponent from '#/components/flash-card/flash-card.component';
-import { NewSetModal } from '#/components/new-set-modal/new-set-modal.component';
-import Badge from '#/components/ui/badge/badge.component';
 import { Button } from '#/components/ui/button/button.component';
 import ContextMenu, {
   ContextMenuItem,
 } from '#/components/ui/context-menu/context-menu.component';
 import LinkComponent from '#/components/ui/link/link.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
-import { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import { FlashCard } from '#/shared/models/flash-card.model';
-import { DictionaryValue } from '#/shared/types/dictionary-value.type';
-import { FlashCards } from '#/shared/types/local-storage-flash-card.type';
-import { UUID } from '#/shared/types/uuid.type';
+import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
+import type { FlashCard } from '#/shared/models/flash-card.model';
+import type { DictionaryValue } from '#/shared/types/dictionary-value.type';
+import type { FlashCards } from '#/shared/types/local-storage-flash-card.type';
+import type { UUID } from '#/shared/types/uuid.type';
 import { cn } from '#/shared/utils/cn.util';
 import { removeSets, updateSet } from '#/store/reducers/sets.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
@@ -26,9 +23,23 @@ import {
   PencilIcon,
   TrashIcon,
 } from '@heroicons/react/24/solid';
-import { AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+
+const NewSetModal = dynamic(() =>
+  import('#/components/new-set-modal/new-set-modal.component').then(
+    (x) => x.NewSetModal,
+  ),
+);
+
+const AssignFlashCardsModal = dynamic(() =>
+  import(
+    '#/components/assign-flash-cards-modal/assign-flash-cards-modal.component'
+  ).then((x) => x.AssignFlashCardsModal),
+);
+
+const Badge = dynamic(() => import('#/components/ui/badge/badge.component'));
 
 export default function SetHardlinkPage() {
   const setHardLink = useParams()?.hardlink as string;
@@ -115,6 +126,8 @@ export default function SetHardlinkPage() {
     },
   ];
 
+  console.log(isModalOpen);
+
   return (
     <div className='flex h-full w-full grow flex-col items-center gap-8 md:pb-24'>
       <div className='flex w-full flex-col justify-start gap-4'>
@@ -189,17 +202,15 @@ export default function SetHardlinkPage() {
           'grid-cols-[repeat(auto-fit,11rem)]',
         ])}
       >
-        <AnimatePresence mode='popLayout'>
-          {set?.flashCards &&
-            set?.flashCards.map((flashCard) => (
-              <div key={flashCard}>
-                <FlashCardComponent
-                  flashCard={flashCards?.[flashCard]}
-                  size={'sm'}
-                />
-              </div>
-            ))}
-        </AnimatePresence>
+        {set?.flashCards &&
+          set?.flashCards.map((flashCard) => (
+            <div key={flashCard}>
+              <FlashCardComponent
+                flashCard={flashCards?.[flashCard]}
+                size={'sm'}
+              />
+            </div>
+          ))}
       </div>
 
       <div className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'>
