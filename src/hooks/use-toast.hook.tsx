@@ -1,5 +1,4 @@
 import { UUID } from '#/shared/types/uuid.type';
-import { omit } from 'lodash';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { v4 } from 'uuid';
@@ -123,9 +122,10 @@ export default function useToast() {
     }
 
     setToast(
-      Object.values(internalToasts ?? []).map((toast) =>
-        omit(toast, ['dueTo']),
-      ),
+      Object.values(internalToasts ?? []).map((toast) => ({
+        ...toast,
+        dueTo: undefined,
+      })),
     );
 
     return () => {

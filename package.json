@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "set NODE_ENV=development&& next",
-    "dev-turbo": "set NODE_ENV=development&& set TURBO=true&& next --turbopack",
+    "dev-turbo": "set NODE_ENV=development&& set TURBO=true&& next --turbo",
     "build": "set NODE_ENV=production&& next build",
     "start": "set NODE_ENV=production&& next start -p 3001",
     "lint": "next lint",
@@ -25,8 +25,7 @@
     "eslint-plugin-react-compiler": "^0.0.0-experimental-c8b3f72-20240517",
     "framer-motion": "^11.11.11",
     "jsonwebtoken": "^9.0.2",
-    "lodash": "^4.17.21",
-    "next": "^15.0.2",
+    "next": "^14.2.16",
     "prettier-plugin-organize-attributes": "^1.0.0",
     "prettier-plugin-sort-imports": "^1.8.1",
     "react": "^18.2.0",
