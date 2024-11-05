@@ -23,7 +23,7 @@ export const flashCardsSlice = createSlice({
       const mappedFlashCards = action.payload.map((flashCard, index) => ({
         ...flashCard,
         order: Object.values(state).length + (index + 1),
-        weight: 0.5,
+        weight: 1.0,
       }));
 
       mappedFlashCards.forEach((flashCard) => {
@@ -90,7 +90,7 @@ export const flashCardsSlice = createSlice({
               questionAddition: flashCard.questionAddition ?? '',
               answer: flashCard.answer ?? '',
               order: flashCard.order ?? 0,
-              weight: flashCard.weight ?? 0.5,
+              weight: flashCard.weight ?? 1.0,
             },
           });
         }

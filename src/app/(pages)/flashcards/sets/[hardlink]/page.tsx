@@ -6,12 +6,15 @@ import ContextMenu, {
 } from '#/components/ui/context-menu/context-menu.component';
 import LinkComponent from '#/components/ui/link/link.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
+import useFetch from '#/hooks/use-fetch.hook';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import type { FlashCard } from '#/shared/models/flash-card.model';
 import type { DictionaryValue } from '#/shared/types/dictionary-value.type';
 import type { FlashCards } from '#/shared/types/local-storage-flash-card.type';
 import type { UUID } from '#/shared/types/uuid.type';
 import { cn } from '#/shared/utils/cn.util';
+import uuid from '#/shared/utils/uuid.util';
+import { addNewFlashCards } from '#/store/reducers/flashcards.reducer';
 import { removeSets, updateSet } from '#/store/reducers/sets.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { setsSelectors } from '#/store/selectors/sets.selectors';
@@ -21,6 +24,7 @@ import {
   ArrowUpTrayIcon,
   Cog8ToothIcon,
   PencilIcon,
+  SparklesIcon,
   TrashIcon,
 } from '@heroicons/react/24/solid';
 import dynamic from 'next/dynamic';
@@ -41,9 +45,11 @@ const AssignFlashCardsModal = dynamic(() =>
 
 const Badge = dynamic(() => import('#/components/ui/badge/badge.component'));
 
+// eslint-disable-next-line @next/next/no-async-client-component
 export default function SetHardlinkPage() {
   const setHardLink = useParams()?.hardlink as string;
   const router = useRouter();
+  const { fetch, isLoading } = useFetch();
 
   const sets = useAppSelector(setsSelectors.selectSetsArray);
   const categories: DictionaryValue<string>[] = useAppSelector(
@@ -126,7 +132,42 @@ export default function SetHardlinkPage() {
     },
   ];
 
-  console.log(isModalOpen);
+  const handleGenerateFlashCards = async () => {
+    const setFlashCards = flashCardsArray.filter((flashCard) =>
+      set?.flashCards?.includes(flashCard.frontUuid),
+    );
+
+    const flashCardsResponse: Record<'word' | 'definition', string>[] =
+      await fetch('/api/ai/set', {
+        method: 'POST',
+        body: JSON.stringify({
+          flashCards: setFlashCards ?? [],
+          setName: set?.name ?? '',
+        }),
+      });
+
+    const mappedFlashCards = flashCardsResponse.map((flashCard) => ({
+      question: 'What is the definition of word below?',
+      questionAddition: flashCard.word,
+      answer: flashCard.definition,
+      frontUuid: uuid(),
+    }));
+
+    console.log(flashCardsResponse);
+
+    if (flashCardsResponse.length > 0) {
+      dispatch(addNewFlashCards(mappedFlashCards));
+      dispatch(
+        updateSet({
+          ...set,
+          flashCards: [
+            ...set.flashCards,
+            ...mappedFlashCards.map((x) => x.frontUuid),
+          ],
+        }),
+      );
+    }
+  };
 
   return (
     <div className='flex h-full w-full grow flex-col items-center gap-8 md:pb-24'>
@@ -153,7 +194,7 @@ export default function SetHardlinkPage() {
               contextPosition='bottom'
               triggerComponent={
                 <Button
-                  icon={<Cog8ToothIcon className='h-6 w-6' />}
+                  icon={<Cog8ToothIcon className='h-4 w-4' />}
                   size={'icon'}
                   variant={'primary-outline'}
                 />
@@ -225,6 +266,15 @@ export default function SetHardlinkPage() {
           handleSubmit={handleAssignCards}
           flashCards={flashCardsArray}
           setCards={set?.flashCards ?? []}
+        />
+
+        <Button
+          disabled={true}
+          icon={<SparklesIcon className='h-4 w-4' />}
+          size={'icon'}
+          variant={'secondary-outline'}
+          onClick={handleGenerateFlashCards}
+          loading={isLoading}
         />
 
         <NewSetModal

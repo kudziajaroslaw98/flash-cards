@@ -296,7 +296,13 @@ export default function Dropdown<T>({
                   />
                 </div>
               )}
-              <div className={props.searchable || props.clearAll ? 'py-3' : ''}>
+              <div
+                className={
+                  props.searchable || props.clearAll
+                    ? 'max-h-80 overflow-y-auto py-3'
+                    : 'max-h-80 overflow-y-auto'
+                }
+              >
                 {isSearching &&
                   filteredItems?.map((item) => (
                     <DropdownItem<T>

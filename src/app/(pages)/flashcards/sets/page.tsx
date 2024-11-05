@@ -29,7 +29,6 @@ import {
 import { AnimatePresence, m } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const NewSetModal = dynamic(() =>
@@ -55,7 +54,6 @@ export default function SetsPage() {
   const [isInEditMode, setIsInEditMode] = useState(false);
 
   const dispatch = useAppDispatch();
-  const router = useRouter();
 
   const handleNewSets = (sets: Partial<FlashCardSet>[]) => {
     dispatch(addNewSets(sets));
@@ -134,8 +132,6 @@ export default function SetsPage() {
     (set) => {
       if (isInSelectionMode) {
         toggleSelected(set as FlashCardSet);
-      } else {
-        router.push(`/flashcards/sets/${set.hardlink}`);
       }
     },
   );
@@ -145,7 +141,7 @@ export default function SetsPage() {
       <div className='flex w-full flex-col justify-between gap-4 '>
         <h4 className='w-52 text-green-400'>Your Decks</h4>
 
-        <div className='flex w-full flex-col items-center justify-center gap-2 text-sm sm:flex-row sm:justify-end'>
+        <div className='flex w-full flex-col flex-wrap items-center justify-center gap-2 text-sm sm:flex-row sm:justify-end'>
           <span className='flex w-full justify-center sm:w-auto'>
             <Input
               type='text'
@@ -186,7 +182,6 @@ export default function SetsPage() {
         <AnimatePresence mode='popLayout'>
           {filteredSets.map((set) => (
             <m.div
-              layout={'position'}
               key={set.frontUuid}
               initial={{ translateY: '10%', opacity: 0, zIndex: -20 }}
               animate={{
@@ -210,8 +205,8 @@ export default function SetsPage() {
                     'flex h-full flex-col justify-between gap-4 sm:min-h-44 sm:gap-4 ',
                     selected.includes(set) ? 'ring ring-green-400/60' : '',
                   ])}
-                  onMouseDown={() => onStart(set)}
-                  onTouchStart={() => onStart(set)}
+                  onMouseDown={(e) => onStart(e, set)}
+                  onTouchStart={(e) => onStart(e, set)}
                   onMouseUp={(e) => onEnd(e, set)}
                   onTouchEnd={(e) => onEnd(e, set)}
                   onTouchMove={onMove}

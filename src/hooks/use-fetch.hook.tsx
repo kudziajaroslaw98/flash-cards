@@ -55,6 +55,8 @@ export default function useFetch(props?: UseFetchProps) {
       });
     }
 
+    console.log(data);
+
     return data;
   }
 

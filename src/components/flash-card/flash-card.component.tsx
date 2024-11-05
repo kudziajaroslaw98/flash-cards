@@ -45,14 +45,13 @@ export default function FlashCardComponent({
 
   return (
     <div
-      onMouseDown={() => onStart(flashCard)}
+      onMouseDown={(e) => onStart(e, flashCard)}
       onMouseUp={onEnd}
-      onTouchStart={() => onStart(flashCard)}
+      onTouchStart={(e) => onStart(e, flashCard)}
       onTouchEnd={onEnd}
       onTouchMove={onMove}
     >
       <m.div
-        layout
         animate={{ translateY: '0%', opacity: 100, zIndex: 21 }}
         initial={{ translateY: '10%', opacity: 0, zIndex: -20 }}
         exit={{
@@ -94,10 +93,10 @@ export default function FlashCardComponent({
 
               <h2
                 className={cn([
-                  'z-20 flex h-full w-full justify-center rounded-md pt-16 text-center text-green-400',
+                  'z-20 flex h-full w-full justify-center rounded-md pt-16 text-center text-green-400 ',
                   size === 'sm' && 'pt-6 text-2xl',
                   size === 'md' && 'pt-10 text-3xl',
-                  size === 'lg' && 'pt-16 text-5xl',
+                  size === 'lg' && 'pt-16 text-4xl',
                 ])}
               >
                 {flashCard.questionAddition}

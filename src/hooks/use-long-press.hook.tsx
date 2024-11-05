@@ -1,11 +1,13 @@
-import { MouseEvent, TouchEvent, useCallback, useRef } from 'react';
+import { isMouseEvent } from '#/shared/guards/is-mouse-event.guard';
+import type { MouseEvent, TouchEvent } from 'react';
+import { useCallback, useRef } from 'react';
 
 export default function useLongPress<T, K = unknown>(
   longPressCallback: (value: T) => void,
   shortClickCallback: (...params: K[]) => void = () => {},
   longPressThreshold = 300,
 ): [
-  (value: T) => void,
+  (e: MouseEvent | TouchEvent, value: T) => void,
   (e: MouseEvent | TouchEvent, ...params: K[]) => void,
   () => void,
 ] {
@@ -18,7 +20,10 @@ export default function useLongPress<T, K = unknown>(
   };
 
   const onStartLongPress = useCallback(
-    (value: T) => {
+    (e: MouseEvent | TouchEvent, value: T) => {
+      // @ts-expect-error typescript for some reason expect generic type
+      if (isMouseEvent(e) && e?.button !== 0) return;
+
       endTimer();
       clickLockRef.current = false;
 
@@ -33,6 +38,9 @@ export default function useLongPress<T, K = unknown>(
 
   const onEndLongPress = useCallback(
     (e: MouseEvent | TouchEvent, ...params: K[]) => {
+      // @ts-expect-error typescript for some reason expect generic type
+      if (isMouseEvent(e) && e?.button !== 0) return;
+
       e.preventDefault();
 
       if (timerRef.current) {

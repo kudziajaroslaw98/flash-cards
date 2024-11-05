@@ -8,7 +8,7 @@ interface ToggleButtonProps extends ButtonProps {
   activeIcon?: ReactNode;
   inactiveIcon?: ReactNode;
   toggled: boolean;
-  toggle: () => void;
+  toggle: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   toggleVariant?: 'outline' | 'text';
 }
 
@@ -42,7 +42,7 @@ export function ToggleButton({
   return (
     <Button
       onClick={(e) => {
-        toggle();
+        toggle(e);
         props?.onClick && props.onClick(e);
       }}
       icon={icon}

@@ -47,11 +47,7 @@ export default function FlashCardsTable() {
   };
 
   const toggleSelected = (flashCard: FlashCard) => {
-    const isFlashCardSelected =
-      selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
-      -1;
-
-    if (isFlashCardSelected) {
+    if (isSelected(flashCard)) {
       setSelected((prev) =>
         prev.filter((item) => flashCard.frontUuid !== item.frontUuid),
       );
