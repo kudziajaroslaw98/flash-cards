@@ -28,7 +28,7 @@ import {
 } from '@heroicons/react/24/solid';
 import { AnimatePresence, m } from 'framer-motion';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const NewSetModal = dynamic(() =>
@@ -40,6 +40,7 @@ const NewSetModal = dynamic(() =>
 const Badge = dynamic(() => import('#/components/ui/badge/badge.component'));
 
 export default function SetsPage() {
+  const router = useRouter();
   const [isFavourite, toggleFavourite] = useState(false);
   const [searchedText, setSearchedText] = useState('');
   const [searchedCategory, setSearchedCategory] = useState<string[]>([]);
@@ -132,6 +133,8 @@ export default function SetsPage() {
     (set) => {
       if (isInSelectionMode) {
         toggleSelected(set as FlashCardSet);
+      } else {
+        router.push(`/flashcards/sets/${set.hardlink}`);
       }
     },
   );
@@ -195,55 +198,50 @@ export default function SetsPage() {
                 translateY: '-10%',
               }}
             >
-              <Link
-                href={`/flashcards/sets/${set.hardlink}`}
-                prefetch
+              <Card
+                key={set.frontUuid}
+                className={cn([
+                  'flex h-full flex-col justify-between gap-4 sm:min-h-44 sm:gap-4',
+                  selected.includes(set) ? 'ring ring-green-400/60' : '',
+                ])}
+                onMouseDown={(e) => onStart(e, set)}
+                onTouchStart={(e) => onStart(e, set)}
+                onMouseUp={(e) => onEnd(e, set)}
+                onTouchEnd={(e) => onEnd(e, set)}
+                onTouchMove={onMove}
               >
-                <Card
-                  key={set.frontUuid}
-                  className={cn([
-                    'flex h-full flex-col justify-between gap-4 sm:min-h-44 sm:gap-4',
-                    selected.includes(set) ? 'ring ring-green-400/60' : '',
-                  ])}
-                  onMouseDown={(e) => onStart(e, set)}
-                  onTouchStart={(e) => onStart(e, set)}
-                  onMouseUp={(e) => onEnd(e, set)}
-                  onTouchEnd={(e) => onEnd(e, set)}
-                  onTouchMove={onMove}
-                >
-                  {selected.includes(set) && (
-                    <CheckBadgeIcon className='absolute -right-4 -top-4 h-6 w-6 text-green-400' />
-                  )}
+                {selected.includes(set) && (
+                  <CheckBadgeIcon className='absolute -right-4 -top-4 h-6 w-6 text-green-400' />
+                )}
 
-                  <div className='flex flex-col gap-4'>
-                    <h5 className='text-base font-bold text-gray-800 dark:text-slate-200'>
-                      {set.name}
-                    </h5>
+                <div className='flex flex-col gap-4'>
+                  <h5 className='text-base font-bold text-gray-800 dark:text-slate-200'>
+                    {set.name}
+                  </h5>
 
-                    <p className='text-sm text-gray-500 dark:text-slate-500'>
-                      {set.description}
-                    </p>
+                  <p className='text-sm text-gray-500 dark:text-slate-500'>
+                    {set.description}
+                  </p>
+                </div>
+
+                <div className='flex w-full items-center justify-between'>
+                  <div className='flex w-full items-center gap-2'>
+                    {set.category && <Badge>{set.category}</Badge>}
+                    <Badge>{`${set.flashCards.length} cards`}</Badge>
                   </div>
 
-                  <div className='flex w-full items-center justify-between'>
-                    <div className='flex w-full items-center gap-2'>
-                      {set.category && <Badge>{set.category}</Badge>}
-                      <Badge>{`${set.flashCards.length} cards`}</Badge>
-                    </div>
-
-                    <ToggleButton
-                      toggled={set.isFavourite}
-                      toggle={() => {
-                        handleSetToggleChange(set);
-                      }}
-                      activeIcon={<StarIcon className='h-4 w-4' />}
-                      inactiveIcon={<StarIconOutline className='h-4 w-4' />}
-                      size={'icon-sm'}
-                      toggleVariant='text'
-                    />
-                  </div>
-                </Card>
-              </Link>
+                  <ToggleButton
+                    toggled={set.isFavourite}
+                    toggle={() => {
+                      handleSetToggleChange(set);
+                    }}
+                    activeIcon={<StarIcon className='h-4 w-4' />}
+                    inactiveIcon={<StarIconOutline className='h-4 w-4' />}
+                    size={'icon-sm'}
+                    toggleVariant='text'
+                  />
+                </div>
+              </Card>
             </m.div>
           ))}
         </AnimatePresence>
