@@ -41,7 +41,7 @@ export default function HeaderComponent() {
   ];
 
   return (
-    <header className='fixed left-0 top-0 z-30 h-20 w-full bg-gray-50/75 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/75 md:hidden'>
+    <header className='fixed left-0 top-0 z-[90] h-20 w-full bg-gray-50/75 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/75 md:hidden'>
       <div className='mx-auto flex h-full max-w-5xl items-center justify-between'>
         <div className='flex items-center justify-center gap-4'>
           <Link

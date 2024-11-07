@@ -71,8 +71,6 @@ const Dialog = ({
       if (open && target === submitRef?.current && onDialogSubmit) {
         e.preventDefault();
         onDialogSubmit();
-      } else {
-        target.click();
       }
     },
     [open, submitRef, onDialogSubmit],
@@ -138,7 +136,7 @@ const Dialog = ({
           <DialogContext.Provider
             value={{ isCloseButtonVisible, onDialogClose }}
           >
-            <div className='fixed right-0 top-0 z-50 h-screen w-screen bg-black/75 backdrop-blur-sm'>
+            <div className='fixed right-0 top-0 z-[100] h-screen w-screen bg-black/75 backdrop-blur-sm'>
               <div
                 className='flex h-full w-full  items-center justify-center gap-4'
                 ref={ref}

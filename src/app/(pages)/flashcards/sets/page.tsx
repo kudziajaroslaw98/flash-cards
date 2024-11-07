@@ -202,7 +202,7 @@ export default function SetsPage() {
                 <Card
                   key={set.frontUuid}
                   className={cn([
-                    'flex h-full flex-col justify-between gap-4 sm:min-h-44 sm:gap-4 ',
+                    'flex h-full flex-col justify-between gap-4 sm:min-h-44 sm:gap-4',
                     selected.includes(set) ? 'ring ring-green-400/60' : '',
                   ])}
                   onMouseDown={(e) => onStart(e, set)}

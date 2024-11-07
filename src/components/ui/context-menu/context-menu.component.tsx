@@ -5,6 +5,7 @@ import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import { cn } from '#/shared/utils/cn.util';
 import { cva, VariantProps } from 'class-variance-authority';
 import {
+  useEffect,
   useRef,
   useState,
   type DetailedHTMLProps,
@@ -17,13 +18,13 @@ const contextMenuVariants = cva(
   {
     variants: {
       contextPosition: {
-        top: 'right-0 -top-2 data-[open=true]:z-20 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+        top: 'right-0 -top-2 data-[open=true]:z-50 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
         'top-right':
-          'right-0 -top-2 data-[open=true]:z-20 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+          'right-0 -top-2 data-[open=true]:z-50 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
         'top-left':
-          'left-0 -top-2 data-[open=true]:z-20 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+          'left-0 -top-2 data-[open=true]:z-50 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
         bottom:
-          'right-0 -bottom-2 data-[open=true]:z-20 data-[open=true]:animate-fade-in-to-bottom data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-top',
+          'right-0 -bottom-2 data-[open=true]:z-50 data-[open=true]:animate-fade-in-to-bottom data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-top',
       },
     },
     defaultVariants: {
@@ -49,15 +50,21 @@ interface ContextMenuProps
   afterMenuClass?: string;
   menuItems: ContextMenuItem[];
   name: string;
+  initialOpen?: boolean;
 }
 
 export default function ContextMenu({
   contextPosition,
   className,
+  initialOpen = false,
   ...props
 }: ContextMenuProps) {
   const contextMenuWrapperRef = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initialOpen);
+
+  useEffect(() => {
+    setOpen(initialOpen);
+  }, [initialOpen]);
 
   useOutsideAlerter(contextMenuWrapperRef, () => {
     open && setOpen(false);

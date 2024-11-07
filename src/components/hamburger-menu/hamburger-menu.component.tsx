@@ -70,6 +70,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
     >
       <ContextMenu
         name={'hamburger-menu'}
+        initialOpen={isOpen}
         afterMenuClass='py-4 justify-center'
         triggerComponent={
           <ToggleButton
@@ -106,7 +107,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
                   onClick={() => {
                     logOut();
                     setOpen(false);
-                    toggle(!toggled);
+                    toggle(false);
                   }}
                   color='red'
                   label='Log out'
@@ -123,7 +124,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
                 <LinkComponent
                   label={'You can do it here'}
                   onClick={() => {
-                    toggle(!toggled);
+                    toggle(false);
                     setOpen(false);
                   }}
                   href={'/sign-in'}
@@ -140,7 +141,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
           onClick: () => {
             router.push(item.href);
             setOpen(false);
-            toggle(!toggled);
+            toggle(false);
           },
         }))}
       ></ContextMenu>

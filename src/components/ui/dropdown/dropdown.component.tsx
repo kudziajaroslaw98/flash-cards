@@ -3,6 +3,7 @@
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import { DictionaryValue } from '#/shared/types/dictionary-value.type';
 import { cn } from '#/shared/utils/cn.util';
+import { isDifferent } from '#/shared/utils/is-different.util';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import { cva, VariantProps } from 'class-variance-authority';
 import { FormEvent, useEffect, useRef, useState } from 'react';
@@ -97,6 +98,7 @@ export default function Dropdown<T>({
   const [newItemValue, setNewItemValue] = useState('');
 
   const dropdownWrapperRef = useRef<HTMLLabelElement>(null);
+  const configRef = useRef<DictionaryValue<T>[] | null>(null);
 
   useOutsideAlerter(dropdownWrapperRef, () => {
     if (visible) {
@@ -109,8 +111,22 @@ export default function Dropdown<T>({
   });
 
   useEffect(() => {
-    if (config.length === 0) return;
+    console.log(configRef.current);
+    console.log(config, value);
+    console.log(
+      config.length === 0,
+      configRef.current !== null,
+      !isDifferent(config, configRef.current),
+    );
+
+    if (
+      config.length === 0 ||
+      (configRef.current !== null && !isDifferent(config, configRef.current))
+    )
+      return;
     const dropdownItems: DictionaryValue<T>[] = config;
+
+    configRef.current = config;
 
     setItems(config);
     setSelected(
@@ -137,14 +153,22 @@ export default function Dropdown<T>({
     );
   }, [items, searchValue]);
 
-  const toggleDropdown = () => {
-    console.log('toggle');
+  useEffect(() => {
+    if (searchValue !== '') {
+      setIsSearching(true);
+    } else {
+      setIsSearching(false);
+    }
+  }, [searchValue]);
 
+  const toggleDropdown = () => {
     setVisible((prev) => !prev);
     setSearchValue('');
   };
 
   const changePickedItem = (pickedItem: DictionaryValue<T>) => {
+    console.log('change picked');
+
     if (multiple) {
       const index = selected.findIndex(
         (item) => item.value === pickedItem.value,
@@ -173,6 +197,8 @@ export default function Dropdown<T>({
   };
 
   const clearPicked = () => {
+    console.log('clear picked');
+
     setSelected([]);
 
     if (multiple) {
@@ -182,15 +208,10 @@ export default function Dropdown<T>({
 
   const handleSearchValueChange = (event: FormEvent<HTMLInputElement>) => {
     setSearchValue(event.currentTarget?.value);
-
-    if (event.currentTarget?.value !== '') {
-      setIsSearching(true);
-    } else {
-      setIsSearching(false);
-    }
   };
 
   const handleClickOnDropdown = () => {
+    console.log('focus');
     if (onFocus) {
       onFocus();
     }
@@ -201,20 +222,23 @@ export default function Dropdown<T>({
   };
 
   const handleAddNewElement = () => {
+    console.log('add new');
+
     const newItem = {
       value: newItemValue,
       label: newItemValue,
     } as DictionaryValue<T>;
 
     setItems((prev) => [...prev, newItem]);
-    setSelected((prev) => [...prev, newItem]);
     setIsInAddNewMode(false);
     setNewItemValue('');
 
     if (multiple) {
+      setSelected((prev) => [...prev, newItem]);
       onChange([...selected, newItem].map((item) => item.value));
     } else {
       onChange(newItem.value);
+      setSelected([newItem]);
     }
   };
 
@@ -347,6 +371,9 @@ export default function Dropdown<T>({
                       for='new_element'
                       className='min-w-52 text-sm'
                       onInput={handleNewElementChange}
+                      onKeyDown={(event) =>
+                        event.key === 'Enter' && handleAddNewElement()
+                      }
                       tabIndex={0}
                     />
                   </div>
