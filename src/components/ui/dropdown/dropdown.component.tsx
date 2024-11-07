@@ -322,7 +322,7 @@ export default function Dropdown<T>({
               )}
               <div
                 className={
-                  props.searchable || props.clearAll
+                  (props.searchable || props.clearAll) && items?.length > 0
                     ? 'max-h-80 overflow-y-auto py-3'
                     : 'max-h-80 overflow-y-auto'
                 }
