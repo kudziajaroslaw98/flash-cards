@@ -5,6 +5,7 @@ import HeaderComponent from '#/components/header/header.component';
 import SidebarComponent from '#/components/sidebar/sidebar.component';
 import ClientSideProviders from '#/providers/client-side-providers.component';
 import dynamic from 'next/dynamic';
+import { cookies } from 'next/headers';
 import './globals.css';
 
 const ToastsComponent = dynamic(
@@ -29,15 +30,19 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const theme = cookieStore.get('theme')?.value;
+
   return (
     <html
       lang='en'
-      className={`${inter.variable} ${roboto_mono.variable} flex font-sans`}
+      className={`${inter.variable} ${roboto_mono.variable} flex font-sans ${theme ?? 'dark'}`}
+      suppressHydrationWarning
     >
       <body className='min-w-screen relative flex h-auto min-h-full w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950 md:pt-0'>
         <ClientSideProviders>

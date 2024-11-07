@@ -1,7 +1,13 @@
 'use client';
 
 import useLocalStorage from '#/hooks/use-local-storage.hook';
-import { createContext, PropsWithChildren, useContext, useEffect } from 'react';
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 export type ThemeContextType = {
   isDarkMode: boolean;
@@ -17,26 +23,44 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
   const { value, setToLocalStorage } = useLocalStorage('theme', {
     theme: 'dark',
   });
+  const [theme, setTheme] = useState('dark');
 
   const changeTheme = () => {
+    const newTheme = value.theme === 'dark' ? 'light' : 'dark';
+
+    fetch('/api/theme', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ theme: newTheme }),
+    });
+    setTheme(newTheme);
     setToLocalStorage({ theme: value.theme === 'dark' ? 'light' : 'dark' });
+
+    if (
+      newTheme === 'dark' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    ) {
+      document.querySelector('html')?.classList?.add('dark');
+    } else {
+      document.querySelector('html')?.classList?.remove('dark');
+    }
   };
 
   const isDarkMode = (): boolean => {
-    return value.theme === 'dark';
+    return theme === 'dark';
   };
 
   useEffect(() => {
-    if (
-      value.theme === 'dark' ||
-      (!('theme' in value) &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches)
-    ) {
-      document.querySelector('html')?.classList.add('dark');
-    } else {
-      document.querySelector('html')?.classList.remove('dark');
-    }
-  }, [value.theme]);
+    const serverSideTheme = document
+      .querySelector('html')
+      ?.classList.contains('dark')
+      ? 'dark'
+      : 'light';
+
+    setTheme(serverSideTheme);
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ changeTheme, isDarkMode: isDarkMode() }}>

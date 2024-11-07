@@ -111,14 +111,6 @@ export default function Dropdown<T>({
   });
 
   useEffect(() => {
-    console.log(configRef.current);
-    console.log(config, value);
-    console.log(
-      config.length === 0,
-      configRef.current !== null,
-      !isDifferent(config, configRef.current),
-    );
-
     if (
       config.length === 0 ||
       (configRef.current !== null && !isDifferent(config, configRef.current))
@@ -167,8 +159,6 @@ export default function Dropdown<T>({
   };
 
   const changePickedItem = (pickedItem: DictionaryValue<T>) => {
-    console.log('change picked');
-
     if (multiple) {
       const index = selected.findIndex(
         (item) => item.value === pickedItem.value,
@@ -197,8 +187,6 @@ export default function Dropdown<T>({
   };
 
   const clearPicked = () => {
-    console.log('clear picked');
-
     setSelected([]);
 
     if (multiple) {
@@ -211,7 +199,6 @@ export default function Dropdown<T>({
   };
 
   const handleClickOnDropdown = () => {
-    console.log('focus');
     if (onFocus) {
       onFocus();
     }
@@ -222,8 +209,6 @@ export default function Dropdown<T>({
   };
 
   const handleAddNewElement = () => {
-    console.log('add new');
-
     const newItem = {
       value: newItemValue,
       label: newItemValue,
