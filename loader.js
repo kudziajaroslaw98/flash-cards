@@ -6,7 +6,7 @@ export default function myImageLoader({ src, width, quality }) {
 
   const imageOptimizationApi = 'https://image-opt.finalphase.app:3000';
   // Your NextJS application URL
-  const baseUrl = 'https://flashcards.finalphase.app:3000';
+  const baseUrl = 'https://flashcards.finalphase.app';
 
   const fullSrc = `${baseUrl}${src}`;
 
