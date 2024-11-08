@@ -4,7 +4,7 @@ export default function myImageLoader({ src, width, quality }) {
   const isLocal = !src.startsWith('http');
   const query = new URLSearchParams();
 
-  const imageOptimizationApi = 'https://image-opt.finalphase.app';
+  const imageOptimizationApi = 'https://image-opt.finalphase.app/image';
   // Your NextJS application URL
   const baseUrl = 'https://flashcards.finalphase.app';
 
