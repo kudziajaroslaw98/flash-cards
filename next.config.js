@@ -11,6 +11,11 @@ const withPWA = require('@ducanh2912/next-pwa').default({
   },
 });
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -25,5 +30,11 @@ const nextConfig = {
       disableDevLogs: true,
     },
   },
+  images: {
+    loader: 'custom',
+    loaderFile: './loader.js',
+  },
 };
-module.exports = process.env.TURBO ? nextConfig : withPWA(nextConfig);
+module.exports = process.env.TURBO
+  ? nextConfig
+  : withBundleAnalyzer(withPWA(nextConfig));

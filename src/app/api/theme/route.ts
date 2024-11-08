@@ -3,8 +3,6 @@ import { cookies } from 'next/headers';
 export async function POST(req: Request) {
   const { theme } = await req.json();
 
-  console.log('theme', theme);
-
   if (theme && (theme === 'light' || theme === 'dark')) {
     const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year
     const cookieStore = await cookies();

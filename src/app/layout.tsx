@@ -44,7 +44,10 @@ export default async function RootLayout({
       className={`${inter.variable} ${roboto_mono.variable} flex font-sans ${theme ?? 'dark'}`}
       suppressHydrationWarning
     >
-      <body className='min-w-screen relative flex h-auto min-h-full w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950 md:pt-0'>
+      <body
+        suppressHydrationWarning
+        className='min-w-screen relative flex h-auto min-h-full w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950 md:pt-0'
+      >
         <ClientSideProviders>
           <ToastsComponent />
 
