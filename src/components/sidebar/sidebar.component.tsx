@@ -96,7 +96,6 @@ export default function SidebarComponent() {
             src={'/images/flash-cards-logo.svg'}
             alt={'Flash Cards Logo'}
             loading='eager'
-            unoptimized
           />
 
           <h5

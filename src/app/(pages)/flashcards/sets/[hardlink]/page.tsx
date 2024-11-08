@@ -176,7 +176,7 @@ export default function SetHardlinkPage() {
           <LinkComponent
             href='/flashcards/sets'
             icon={
-              <ArrowLeftIcon className='h-4 w-4 transition group-hover:translate-x-2' />
+              <ArrowLeftIcon className='h-4 w-4 transition group-hover:translate-x-2 group-active:translate-x-1' />
             }
             label='Back'
             className='group w-auto pb-4 text-green-400'

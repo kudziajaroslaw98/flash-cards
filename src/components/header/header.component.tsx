@@ -55,7 +55,6 @@ export default function HeaderComponent() {
                 src={'/images/flash-cards-logo.svg'}
                 alt={'Flash Cards Logo'}
                 loading='eager'
-                unoptimized
               />
             </span>
 
