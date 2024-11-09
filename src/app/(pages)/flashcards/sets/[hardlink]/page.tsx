@@ -65,7 +65,6 @@ export default function SetHardlinkPage() {
   const [set, setSet] = useState<FlashCardSet>(
     sets.filter((set) => set?.hardlink === setHardLink)[0],
   );
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [capitalizedName] = useState<string>(
     setHardLink.replace(/-/g, ' ').charAt(0)?.toUpperCase() +
       setHardLink.replace(/-/g, ' ').slice(1),

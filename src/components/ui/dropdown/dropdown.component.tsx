@@ -155,7 +155,7 @@ export default function Dropdown<T>({
   }, [searchValue]);
 
   const toggleDropdown = () => {
-    window.umami.track('Dropdown - Toggle', { name: name ?? label });
+    window.umami.track('Dropdown - Toggle', { name: props.name ?? label });
     setVisible((prev) => !prev);
     setSearchValue('');
   };

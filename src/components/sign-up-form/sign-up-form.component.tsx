@@ -3,8 +3,8 @@
 import FormComponent from '#/components/form-component/form.component';
 import useFetch from '#/hooks/use-fetch.hook';
 import { ApiRoutes } from '#/shared/enums/api-routes.enum';
-import { ApiResponse } from '#/shared/types/api/api-response.type';
-import { SignUpResponse } from '#/shared/types/api/sign-up-response.type';
+import { ApiResponse } from '#/shared/types/api-response.type';
+import { SignUpResponse } from '#/shared/types/sign-up-response.type';
 import { signUpValidationScheme } from '#/shared/validation-schemes/sign-up-validation.scheme';
 import { CheckBadgeIcon, RocketLaunchIcon } from '@heroicons/react/24/solid';
 import { m } from 'framer-motion';
