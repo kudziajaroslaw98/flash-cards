@@ -57,10 +57,12 @@ export default function SetsPage() {
   const dispatch = useAppDispatch();
 
   const handleNewSets = (sets: Partial<FlashCardSet>[]) => {
+    window.umami.track('Add sets', { count: sets.length });
     dispatch(addNewSets(sets));
   };
 
   const handleEditSets = (sets: Partial<FlashCardSet>[]) => {
+    window.umami.track('Edit sets', { count: sets.length });
     dispatch(updateSets(sets));
   };
 
@@ -91,7 +93,13 @@ export default function SetsPage() {
   const handleSearchedTextChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    window.umami.track('Search sets');
     setSearchedText(event.target.value);
+  };
+
+  const handleSearchCategoryChange = (category: string[]) => {
+    window.umami.track('Search sets by category');
+    setSearchedCategory(category);
   };
 
   useEffect(() => {
@@ -107,10 +115,12 @@ export default function SetsPage() {
   }, [selected]);
 
   const handleSetToggleChange = (set: FlashCardSet) => {
+    window.umami.track('Toggle set favourite');
     dispatch(updateSet({ ...set, isFavourite: !set.isFavourite }));
   };
 
   const toggleSelected = (set: FlashCardSet) => {
+    window.umami.track('Set toggle selected');
     const isFlashCardSelected =
       selected.findIndex((item) => item.frontUuid === set.frontUuid) !== -1;
 
@@ -124,16 +134,22 @@ export default function SetsPage() {
   };
 
   const removeSelected = () => {
+    window.umami.track('Remove sets', { count: selected.length });
     dispatch(removeSets(selected.map((item) => item.frontUuid)));
     setSelected([]);
   };
 
   const [onStart, onEnd, onMove] = useLongPress<FlashCardSet, FlashCardSet>(
-    (set) => toggleSelected(set),
+    (set) => {
+      window.umami.track('Set long pressed');
+      toggleSelected(set);
+    },
     (set) => {
       if (isInSelectionMode) {
+        window.umami.track('Set short pressed - toggle selected');
         toggleSelected(set as FlashCardSet);
       } else {
+        window.umami.track('Set short pressed - open set');
         router.push(`/flashcards/sets/${set.hardlink}`);
       }
     },
@@ -161,7 +177,7 @@ export default function SetsPage() {
           <span className='flex w-full flex-col items-center justify-center gap-2 sm:w-auto sm:flex-row'>
             <Dropdown
               config={categories}
-              onChange={setSearchedCategory}
+              onChange={handleSearchCategoryChange}
               multiple
               multipleLabel='Categories'
               label='Category'
@@ -172,7 +188,10 @@ export default function SetsPage() {
 
             <ToggleButton
               toggled={isFavourite}
-              toggle={() => toggleFavourite(!isFavourite)}
+              toggle={() => {
+                window.umami.track('Toggle favourite');
+                toggleFavourite(!isFavourite);
+              }}
               activeIcon={<StarIcon className='h-4 w-4' />}
               inactiveIcon={<StarIconOutline className='h-4 w-4' />}
               size={'icon'}
@@ -255,6 +274,7 @@ export default function SetsPage() {
           trigger={
             <Button
               onClick={() => {
+                window.umami.track('Add set clicked');
                 setIsInEditMode(false);
               }}
               icon={<PlusIcon className='h-4 w-4' />}
@@ -273,6 +293,7 @@ export default function SetsPage() {
           trigger={
             <Button
               onClick={() => {
+                window.umami.track('Edit set clicked');
                 setIsInEditMode(true);
               }}
               icon={<PencilIcon className='h-4 w-4' />}

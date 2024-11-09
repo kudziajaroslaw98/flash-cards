@@ -79,6 +79,7 @@ export default function SetHardlinkPage() {
   }, [sets, setHardLink]);
 
   const handleAssignCards = (flashCards: UUID[]) => {
+    window.umami.track('Flash card assigned to set');
     setSet((prev) => ({ ...prev, flashCards }));
     dispatch(
       updateSet({
@@ -89,6 +90,7 @@ export default function SetHardlinkPage() {
   };
 
   const handleEditSet = (set: Partial<FlashCardSet>[]) => {
+    window.umami.track('Edit set', { count: set.length });
     if (set.length > 0) {
       const hardlink = set[0].name?.replace(/ /g, '-').toLowerCase();
       router.prefetch(`flashcards/sets/${hardlink}`);
@@ -101,6 +103,7 @@ export default function SetHardlinkPage() {
   };
 
   const handleRemoveSet = () => {
+    window.umami.track('Delete set');
     if (set?.frontUuid) {
       dispatch(removeSets([set?.frontUuid]));
       router.push('/flashcards/sets');
@@ -109,13 +112,6 @@ export default function SetHardlinkPage() {
 
   const contextMenuActions: ContextMenuItem[] = [
     {
-      label: 'Edit set',
-      icon: <PencilIcon className='h-6 w-6' />,
-      onClick: () => {
-        setIsModalOpen(true);
-      },
-    },
-    {
       label: 'Delete set',
       icon: <TrashIcon className='h-6 w-6' />,
       onClick: handleRemoveSet,
@@ -123,16 +119,21 @@ export default function SetHardlinkPage() {
     {
       label: 'export set CSV',
       icon: <ArrowDownTrayIcon className='h-6 w-6' />,
-      onClick: () => null,
+      onClick: () => {
+        window.umami.track('Export set CSV');
+      },
     },
     {
       label: 'Import set CSV',
       icon: <ArrowUpTrayIcon className='h-6 w-6' />,
-      onClick: () => null,
+      onClick: () => {
+        window.umami.track('Import set CSV');
+      },
     },
   ];
 
   const handleGenerateFlashCards = async () => {
+    window.umami.track('Generate flash cards');
     const setFlashCards = flashCardsArray.filter((flashCard) =>
       set?.flashCards?.includes(flashCard.frontUuid),
     );
@@ -152,8 +153,6 @@ export default function SetHardlinkPage() {
       answer: flashCard.definition,
       frontUuid: uuid(),
     }));
-
-    console.log(flashCardsResponse);
 
     if (flashCardsResponse.length > 0) {
       dispatch(addNewFlashCards(mappedFlashCards));
@@ -197,6 +196,7 @@ export default function SetHardlinkPage() {
                   icon={<Cog8ToothIcon className='h-4 w-4' />}
                   size={'icon'}
                   variant={'primary-outline'}
+                  onClick={window.umami.track('Set options clicked')}
                 />
               }
               menuItems={contextMenuActions}
@@ -268,6 +268,20 @@ export default function SetHardlinkPage() {
           setCards={set?.flashCards ?? []}
         />
 
+        <NewSetModal
+          handleEdit={handleEditSet}
+          selectedSets={set?.frontUuid ? [set] : []}
+          isInEditMode={true}
+          categories={categories}
+          trigger={
+            <Button
+              icon={<PencilIcon className='h-4 w-4' />}
+              size={'icon'}
+              variant={'secondary'}
+            />
+          }
+        />
+
         <Button
           disabled={true}
           icon={<SparklesIcon className='h-4 w-4' />}
@@ -275,14 +289,6 @@ export default function SetHardlinkPage() {
           variant={'secondary-outline'}
           onClick={handleGenerateFlashCards}
           loading={isLoading}
-        />
-
-        <NewSetModal
-          handleEdit={handleEditSet}
-          selectedSets={set?.frontUuid ? [set] : []}
-          isInEditMode={true}
-          categories={categories}
-          open={isModalOpen}
         />
       </div>
     </div>

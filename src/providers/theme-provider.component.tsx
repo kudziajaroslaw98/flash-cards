@@ -46,6 +46,8 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
     } else {
       document.querySelector('html')?.classList?.remove('dark');
     }
+
+    window.umami.track('Theme changed', { theme: newTheme });
   };
 
   const isDarkMode = (): boolean => {

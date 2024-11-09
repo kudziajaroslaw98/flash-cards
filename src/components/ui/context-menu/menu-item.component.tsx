@@ -16,13 +16,16 @@ export default function MenuItem(props: PropsWithChildren<MenuItemProps>) {
     children,
     onClick: handleItemClick,
   } = props;
+
+  const handleClick = () => {
+    if (handleItemClick) {
+      window.umami.track('Click context menu item');
+      handleItemClick();
+    }
+  };
   return (
     <li
-      onClick={() => {
-        if (handleItemClick) {
-          handleItemClick();
-        }
-      }}
+      onClick={handleClick}
       className={`
         ${visible ? 'flex' : 'hidden'}
         ${active ? 'border-l-2 border-l-green-400' : ''}

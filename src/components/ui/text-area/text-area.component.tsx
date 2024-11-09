@@ -84,6 +84,20 @@ export default function TextArea({
     }
   };
 
+  const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+    window.umami.track('Focus input', { name: props.name });
+    if (props.onFocus) {
+      props.onFocus(e);
+    }
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+    window.umami.track('Blur input', { name: props.name });
+    if (props.onBlur) {
+      props.onBlur(e);
+    }
+  };
+
   return (
     <label
       className={`group relative flex w-full flex-col ${label ? 'pt-2' : ''} ${className ?? ''}`}
@@ -118,6 +132,8 @@ export default function TextArea({
         id={props.id}
         value={value}
         onInput={handleOnInput}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
       ></textarea>
 
       <span

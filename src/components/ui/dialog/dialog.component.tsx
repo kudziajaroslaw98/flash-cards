@@ -59,6 +59,7 @@ const Dialog = ({
   const ref = useRef<HTMLDivElement>(null);
 
   useOutsideAlerter(ref, () => {
+    window.umami.track('Dialog - backdrop clicked');
     if (onDialogClose && closeOnBackdropClick) {
       onDialogClose();
     }
@@ -66,6 +67,8 @@ const Dialog = ({
 
   const handleEnter = useCallback(
     (e: KeyboardEvent) => {
+      window.umami.track('Dialog - enter clicked');
+
       const target = e.target as HTMLElement;
 
       if (open && target === submitRef?.current && onDialogSubmit) {
@@ -77,18 +80,22 @@ const Dialog = ({
   );
 
   const handleArrowRight = useCallback(() => {
+    window.umami.track('Dialog - arrow right clicked');
     if (open && handleRightButtonClick) {
       handleRightButtonClick();
     }
   }, [open, handleRightButtonClick]);
 
   const handleArrowLeft = useCallback(() => {
+    window.umami.track('Dialog - arrow left clicked');
     if (open && handleLeftButtonClick) {
       handleLeftButtonClick();
     }
   }, [open, handleLeftButtonClick]);
 
   const handleEscape = useCallback(() => {
+    window.umami.track('Dialog - escape clicked');
+
     if (open && onDialogClose) {
       onDialogClose();
     }

@@ -49,6 +49,16 @@ function Input({
   icon,
   ...props
 }: InputComponentProps) {
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    window.umami.track('Focus input', { name: props.name });
+    if (props.onFocus) props.onFocus(e);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    window.umami.track('Blur input', { name: props.name });
+    if (props.onBlur) props.onBlur(e);
+  };
+
   return (
     <label
       className={`group relative flex w-full max-w-md flex-col ${label ? 'pt-2' : ''} ${className ?? ''}`}
@@ -88,6 +98,8 @@ function Input({
             'peer w-full bg-gray-100 text-sm text-gray-800',
             ' text-inherit outline-none transition-all dark:bg-slate-900 dark:text-slate-200 ',
           ])}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
       </span>
 

@@ -67,10 +67,16 @@ export default function ContextMenu({
   }, [initialOpen]);
 
   useOutsideAlerter(contextMenuWrapperRef, () => {
-    open && setOpen(false);
+    if (open) {
+      setOpen(false);
+      window.umami.track('Close context menu on click outside', {
+        name: props.name,
+      });
+    }
   });
 
   const handleTriggerClick = () => {
+    window.umami.track('Toggle context menu', { name: props.name });
     setOpen((prev) => !prev);
   };
 

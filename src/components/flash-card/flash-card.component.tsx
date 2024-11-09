@@ -27,11 +27,19 @@ export default function FlashCardComponent({
   const [isFlipped, setIsFlipped] = useState(false);
 
   const [onStart, onEnd, onMove] = useLongPress<FlashCard>(
-    (flashcard) => onSelect && onSelect(flashcard),
+    (flashcard) => {
+      window.umami.track('Flash card long pressed');
+      if (onSelect) {
+        onSelect && onSelect(flashcard);
+      }
+    },
     () => {
+      window.umami.track('Flash card short pressed');
       if (isInSelectionMode) {
+        window.umami.track('Flash card selected');
         onSelect && onSelect(flashCard);
       } else if (!flipBlocked) {
+        window.umami.track('Flash card flipped');
         setIsFlipped(!isFlipped);
       }
     },

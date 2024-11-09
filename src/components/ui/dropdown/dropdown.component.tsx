@@ -101,6 +101,7 @@ export default function Dropdown<T>({
   const configRef = useRef<DictionaryValue<T>[] | null>(null);
 
   useOutsideAlerter(dropdownWrapperRef, () => {
+    window.umami.track('Dropdown - Click outside');
     if (visible) {
       setVisible(false);
       setSearchValue('');
@@ -154,11 +155,15 @@ export default function Dropdown<T>({
   }, [searchValue]);
 
   const toggleDropdown = () => {
+    window.umami.track('Dropdown - Toggle', { name: name ?? label });
     setVisible((prev) => !prev);
     setSearchValue('');
   };
 
   const changePickedItem = (pickedItem: DictionaryValue<T>) => {
+    window.umami.track('Dropdown - Select item', {
+      name: pickedItem.label,
+    });
     if (multiple) {
       const index = selected.findIndex(
         (item) => item.value === pickedItem.value,
@@ -186,7 +191,8 @@ export default function Dropdown<T>({
     }
   };
 
-  const clearPicked = () => {
+  const clearPicked = (key?: string) => {
+    window.umami.track('Dropdown - Clear picked', { key: key ?? 'btnClick' });
     setSelected([]);
 
     if (multiple) {
@@ -204,11 +210,18 @@ export default function Dropdown<T>({
     }
   };
 
-  const handleToggleAddNew = () => {
+  const handleToggleAddNew = (key?: string, type?: 'Cancel') => {
+    window.umami.track('Dropdown - add new clicked', {
+      key: key ?? 'btnClick',
+      type: type ?? 'add',
+    });
     setIsInAddNewMode((prev) => !prev);
   };
 
-  const handleAddNewElement = () => {
+  const handleAddNewElement = (key?: string) => {
+    window.umami.track('Dropdown - new element added', {
+      key: key ?? 'btnClick',
+    });
     const newItem = {
       value: newItemValue,
       label: newItemValue,
@@ -336,9 +349,9 @@ export default function Dropdown<T>({
               {props.addNew && !isInAddNewMode && (
                 <div
                   className='hover:text-green-40 flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-100 px-4 py-2 text-gray-500 transition hover:text-green-400  dark:border-slate-800/40 dark:bg-slate-900'
-                  onClick={handleToggleAddNew}
+                  onClick={() => handleToggleAddNew()}
                   onKeyDown={(event) =>
-                    event.key === 'Enter' && handleToggleAddNew()
+                    event.key === 'Enter' && handleToggleAddNew('Enter')
                   }
                   tabIndex={0}
                 >
@@ -357,7 +370,7 @@ export default function Dropdown<T>({
                       className='min-w-52 text-sm'
                       onInput={handleNewElementChange}
                       onKeyDown={(event) =>
-                        event.key === 'Enter' && handleAddNewElement()
+                        event.key === 'Enter' && handleAddNewElement('Enter')
                       }
                       tabIndex={0}
                     />
@@ -366,7 +379,11 @@ export default function Dropdown<T>({
                   <div className='flex h-11 w-full cursor-pointer items-center justify-center gap-2 border-t bg-gray-100 px-4 py-6 text-gray-500 transition hover:text-green-400 dark:border-slate-800/40  dark:bg-slate-900'>
                     <Button
                       label='Cancel'
-                      onClick={handleToggleAddNew}
+                      onClick={() => handleToggleAddNew()}
+                      onKeyDown={(event) =>
+                        event.key === 'Enter' &&
+                        handleToggleAddNew('Enter', 'Cancel')
+                      }
                       variant={'destructive-outline'}
                       size={'sm'}
                       className='!w-full'
@@ -374,7 +391,10 @@ export default function Dropdown<T>({
 
                     <Button
                       label='Add'
-                      onClick={handleAddNewElement}
+                      onClick={() => handleAddNewElement()}
+                      onKeyDown={(event) =>
+                        event.key === 'Enter' && handleAddNewElement('Enter')
+                      }
                       variant={'primary'}
                       size={'sm'}
                       className='!w-full'
@@ -386,8 +406,10 @@ export default function Dropdown<T>({
               {props.clearAll && (
                 <div
                   className='flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-100 px-4 py-2 text-gray-500 transition hover:text-green-400  dark:border-slate-800/40 dark:bg-slate-900'
-                  onClick={clearPicked}
-                  onKeyDown={(event) => event.key === 'Enter' && clearPicked()}
+                  onClick={() => clearPicked()}
+                  onKeyDown={(event) =>
+                    event.key === 'Enter' && clearPicked('Enter')
+                  }
                   tabIndex={0}
                 >
                   Clear All

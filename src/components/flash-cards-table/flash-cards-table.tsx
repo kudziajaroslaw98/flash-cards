@@ -57,11 +57,13 @@ export default function FlashCardsTable() {
   };
 
   const removeSelected = () => {
+    window.umami.track('Remove flash cards', { count: selected.length });
     dispatch(removeFlashCards(selected.map((item) => item.frontUuid)));
     setSelected([]);
   };
 
   const addNewRecord = (flashCards: Partial<FlashCard>[]) => {
+    window.umami.track('Add flash cards', { count: flashCards.length });
     dispatch(addNewFlashCards(flashCards));
 
     dispatch(
@@ -88,7 +90,18 @@ export default function FlashCardsTable() {
   }, [selected]);
 
   const editSelectedRecords = (editRecords: Partial<FlashCard>[]) => {
+    window.umami.track('Edit flash cards', { count: editRecords.length });
     dispatch(updateFlashCards(editRecords));
+  };
+
+  const handleEditButtonClick = () => {
+    window.umami.track('Edit flashcards clicked');
+    setIsInEditMode(true);
+  };
+
+  const handleAddButtonClick = () => {
+    window.umami.track('Add flashcards clicked');
+    setIsInEditMode(false);
   };
 
   return (
@@ -130,9 +143,7 @@ export default function FlashCardsTable() {
           isInEditMode={isInEditMode}
           trigger={
             <Button
-              onClick={() => {
-                setIsInEditMode(false);
-              }}
+              onClick={handleAddButtonClick}
               icon={<PlusIcon className='h-4 w-4' />}
               size={'icon'}
             />
@@ -146,9 +157,7 @@ export default function FlashCardsTable() {
           isInEditMode={isInEditMode}
           trigger={
             <Button
-              onClick={() => {
-                setIsInEditMode(true);
-              }}
+              onClick={handleEditButtonClick}
               icon={<PencilIcon className='h-4 w-4' />}
               size={'icon'}
               disabled={selected.length === 0}

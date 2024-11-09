@@ -45,7 +45,13 @@ export default function FlashCardReviseComponent() {
     return revisedCard === comparisonItem;
   };
 
-  const changeClicked = (flashCard: FlashCard) => {
+  const changeClicked = (flashCard: FlashCard, key?: string) => {
+    if (key) {
+      window.umami.track('Answer clicked', { key });
+    } else {
+      window.umami.track('Answer clicked', { key: null });
+    }
+
     if (clicked) {
       return;
     }
@@ -88,11 +94,18 @@ export default function FlashCardReviseComponent() {
   };
 
   const reshuffleFlashCards = () => {
+    window.umami.track('Reshuffle flash cards', { key: null });
+
     setClickedCard(undefined);
     setRevisedCard(undefined);
     setClicked(false);
 
     reshuffle();
+  };
+
+  const reshuffleFlashCardsWithKey = (key: string) => {
+    window.umami.track('Reshuffle flash cards', { key });
+    reshuffleFlashCards();
   };
 
   useEffect(() => {
@@ -102,11 +115,12 @@ export default function FlashCardReviseComponent() {
     setRevisedCard(randomCards[getRandomRangedNumber(0, randomMax)]);
   }, [randomCards]);
 
-  useKeyPress(['r', 'ArrowRight'], reshuffleFlashCards);
-  useKeyPress(['1'], () => changeClicked(randomCards[0]));
-  useKeyPress(['2'], () => changeClicked(randomCards[1]));
-  useKeyPress(['3'], () => changeClicked(randomCards[2]));
-  useKeyPress(['4'], () => changeClicked(randomCards[3]));
+  useKeyPress(['r'], () => reshuffleFlashCardsWithKey('r'));
+  useKeyPress(['ArrowRight'], () => reshuffleFlashCardsWithKey('ArrowRight'));
+  useKeyPress(['1'], () => changeClicked(randomCards[0], '1'));
+  useKeyPress(['2'], () => changeClicked(randomCards[1], '2'));
+  useKeyPress(['3'], () => changeClicked(randomCards[2], '3'));
+  useKeyPress(['4'], () => changeClicked(randomCards[3], '4'));
 
   return flashCardsArray.length > 0 ? (
     <div className='flex h-full w-full flex-col justify-stretch'>

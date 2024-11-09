@@ -17,6 +17,7 @@ export default function DropdownItem<T>({
     switch (event.key) {
       case ' ':
       case 'Enter':
+        window.umami.track('Select dropdown item', { key: event.key });
         changePickedItem(item);
         break;
       default:

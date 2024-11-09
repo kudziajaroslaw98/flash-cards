@@ -71,12 +71,14 @@ export const NewFlashCardModal = ({
   }, [formValue]);
 
   const handleDialogClose = () => {
+    window.umami.track('Flash card dialog - closed', { isInEditMode });
     setIsModalOpen(false);
     setCurrentIndex(0);
     clearInitialValues();
   };
 
   const handleDialogSubmit = () => {
+    window.umami.track('Flash card dialog - submitted', { isInEditMode });
     setIsModalOpen(false);
 
     if (isInEditMode) {
@@ -90,6 +92,7 @@ export const NewFlashCardModal = ({
   };
 
   const handleRightButtonClick = () => {
+    window.umami.track('Flash card dialog - right button clicked');
     if (currentIndex < flashCards.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
@@ -113,6 +116,7 @@ export const NewFlashCardModal = ({
   };
 
   const handleLeftButtonClick = () => {
+    window.umami.track('Flash card dialog - left button clicked');
     if (currentIndex > 0) {
       setFlashCards((prev) =>
         prev.map((item) =>

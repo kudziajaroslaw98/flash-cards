@@ -28,10 +28,15 @@ export default function LinkComponent({
   const pathName = usePathname();
   const isPathActive = pathName.includes(href);
 
+  const handleClick = () => {
+    window.umami.track('Click link', { href });
+    if (onClick) onClick();
+  };
+
   return (
     <Link
       href={href}
-      onClick={onClick}
+      onClick={handleClick}
       className={`group relative flex items-center justify-center underline-offset-2 transition-all hover:text-green-500 ${className} ${isPathActive && 'text-green-400'} `}
     >
       <p className={`flex items-center ${iconOnly ? '' : 'gap-4'}`}>
