@@ -8,7 +8,6 @@ export default function CSPostHogProvider({ children }: PropsWithChildren) {
     posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
       api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
       person_profiles: 'always', // or 'always' to create profiles for anonymous users as well
-      capture_pageleave: true,
       capture_pageview: false,
     });
   }, []);
