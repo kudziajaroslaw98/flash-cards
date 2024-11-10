@@ -6,6 +6,7 @@ import {
   PlusIcon,
 } from '@heroicons/react/24/solid';
 import { m } from 'framer-motion';
+import posthog from 'posthog-js';
 import {
   DetailedHTMLProps,
   HTMLAttributes,
@@ -59,7 +60,7 @@ const Dialog = ({
   const ref = useRef<HTMLDivElement>(null);
 
   useOutsideAlerter(ref, () => {
-    window.umami.track('Dialog - backdrop clicked');
+    posthog.capture('Dialog - backdrop clicked');
     if (onDialogClose && closeOnBackdropClick) {
       onDialogClose();
     }
@@ -67,7 +68,7 @@ const Dialog = ({
 
   const handleEnter = useCallback(
     (e: KeyboardEvent) => {
-      window.umami.track('Dialog - enter clicked');
+      posthog.capture('Dialog - enter clicked');
 
       const target = e.target as HTMLElement;
 
@@ -80,21 +81,21 @@ const Dialog = ({
   );
 
   const handleArrowRight = useCallback(() => {
-    window.umami.track('Dialog - arrow right clicked');
+    posthog.capture('Dialog - arrow right clicked');
     if (open && handleRightButtonClick) {
       handleRightButtonClick();
     }
   }, [open, handleRightButtonClick]);
 
   const handleArrowLeft = useCallback(() => {
-    window.umami.track('Dialog - arrow left clicked');
+    posthog.capture('Dialog - arrow left clicked');
     if (open && handleLeftButtonClick) {
       handleLeftButtonClick();
     }
   }, [open, handleLeftButtonClick]);
 
   const handleEscape = useCallback(() => {
-    window.umami.track('Dialog - escape clicked');
+    posthog.capture('Dialog - escape clicked');
 
     if (open && onDialogClose) {
       onDialogClose();

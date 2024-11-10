@@ -29,6 +29,7 @@ import {
 } from '@heroicons/react/24/solid';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
+import posthog from 'posthog-js';
 import { useEffect, useState } from 'react';
 
 const NewSetModal = dynamic(() =>
@@ -78,7 +79,7 @@ export default function SetHardlinkPage() {
   }, [sets, setHardLink]);
 
   const handleAssignCards = (flashCards: UUID[]) => {
-    window.umami.track('Flash card assigned to set');
+    posthog.capture('Flash card assigned to set');
     setSet((prev) => ({ ...prev, flashCards }));
     dispatch(
       updateSet({
@@ -89,7 +90,7 @@ export default function SetHardlinkPage() {
   };
 
   const handleEditSet = (set: Partial<FlashCardSet>[]) => {
-    window.umami.track('Edit set', { count: set.length });
+    posthog.capture('Edit set', { count: set.length });
     if (set.length > 0) {
       const hardlink = set[0].name?.replace(/ /g, '-').toLowerCase();
       router.prefetch(`flashcards/sets/${hardlink}`);
@@ -102,7 +103,7 @@ export default function SetHardlinkPage() {
   };
 
   const handleRemoveSet = () => {
-    window.umami.track('Delete set');
+    posthog.capture('Delete set');
     if (set?.frontUuid) {
       dispatch(removeSets([set?.frontUuid]));
       router.push('/flashcards/sets');
@@ -119,20 +120,20 @@ export default function SetHardlinkPage() {
       label: 'export set CSV',
       icon: <ArrowDownTrayIcon className='h-6 w-6' />,
       onClick: () => {
-        window.umami.track('Export set CSV');
+        posthog.capture('Export set CSV');
       },
     },
     {
       label: 'Import set CSV',
       icon: <ArrowUpTrayIcon className='h-6 w-6' />,
       onClick: () => {
-        window.umami.track('Import set CSV');
+        posthog.capture('Import set CSV');
       },
     },
   ];
 
   const handleGenerateFlashCards = async () => {
-    window.umami.track('Generate flash cards');
+    posthog.capture('Generate flash cards');
     const setFlashCards = flashCardsArray.filter((flashCard) =>
       set?.flashCards?.includes(flashCard.frontUuid),
     );
@@ -195,7 +196,7 @@ export default function SetHardlinkPage() {
                   icon={<Cog8ToothIcon className='h-4 w-4' />}
                   size={'icon'}
                   variant={'primary-outline'}
-                  onClick={window.umami.track('Set options clicked')}
+                  onClick={() => posthog.capture('Set options clicked')}
                 />
               }
               menuItems={contextMenuActions}

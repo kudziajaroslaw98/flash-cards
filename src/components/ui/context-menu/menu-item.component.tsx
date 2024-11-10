@@ -1,4 +1,5 @@
 import { ContextMenuItem } from '#/components/ui/context-menu/context-menu.component';
+import posthog from 'posthog-js';
 import type { PropsWithChildren } from 'react';
 
 interface MenuItemProps {
@@ -19,7 +20,7 @@ export default function MenuItem(props: PropsWithChildren<MenuItemProps>) {
 
   const handleClick = () => {
     if (handleItemClick) {
-      window.umami.track('Click context menu item');
+      posthog.capture('Click context menu item');
       handleItemClick();
     }
   };

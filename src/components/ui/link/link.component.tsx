@@ -3,6 +3,7 @@
 import { m } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import posthog from 'posthog-js';
 import type { PropsWithChildren, ReactNode } from 'react';
 
 export interface LinkProps {
@@ -29,7 +30,7 @@ export default function LinkComponent({
   const isPathActive = pathName.includes(href);
 
   const handleClick = () => {
-    window.umami.track('Click link', { href });
+    posthog.capture('Click link', { href });
     if (onClick) onClick();
   };
 

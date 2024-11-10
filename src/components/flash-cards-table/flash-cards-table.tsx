@@ -19,6 +19,7 @@ import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { statsSelectors } from '#/store/selectors/stats.selectors';
 import { AnimatePresence, m } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import posthog from 'posthog-js';
 import FlashCardComponent from '../flash-card/flash-card.component';
 
 const NewFlashCardModal = dynamic(() =>
@@ -57,13 +58,13 @@ export default function FlashCardsTable() {
   };
 
   const removeSelected = () => {
-    window.umami.track('Remove flash cards', { count: selected.length });
+    posthog.capture('Remove flash cards', { count: selected.length });
     dispatch(removeFlashCards(selected.map((item) => item.frontUuid)));
     setSelected([]);
   };
 
   const addNewRecord = (flashCards: Partial<FlashCard>[]) => {
-    window.umami.track('Add flash cards', { count: flashCards.length });
+    posthog.capture('Add flash cards', { count: flashCards.length });
     dispatch(addNewFlashCards(flashCards));
 
     dispatch(
@@ -90,17 +91,17 @@ export default function FlashCardsTable() {
   }, [selected]);
 
   const editSelectedRecords = (editRecords: Partial<FlashCard>[]) => {
-    window.umami.track('Edit flash cards', { count: editRecords.length });
+    posthog.capture('Edit flash cards', { count: editRecords.length });
     dispatch(updateFlashCards(editRecords));
   };
 
   const handleEditButtonClick = () => {
-    window.umami.track('Edit flashcards clicked');
+    posthog.capture('Edit flashcards clicked');
     setIsInEditMode(true);
   };
 
   const handleAddButtonClick = () => {
-    window.umami.track('Add flashcards clicked');
+    posthog.capture('Add flashcards clicked');
     setIsInEditMode(false);
   };
 

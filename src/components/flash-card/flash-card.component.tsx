@@ -3,6 +3,7 @@ import type { FlashCard } from '#/shared/models/flash-card.model';
 import { cn } from '#/shared/utils/cn.util';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 import { m } from 'framer-motion';
+import posthog from 'posthog-js';
 import { useEffect, useState } from 'react';
 import Card from '../ui/card/card.component';
 
@@ -28,18 +29,18 @@ export default function FlashCardComponent({
 
   const [onStart, onEnd, onMove] = useLongPress<FlashCard>(
     (flashcard) => {
-      window.umami.track('Flash card long pressed');
+      posthog.capture('Flash card long pressed');
       if (onSelect) {
         onSelect && onSelect(flashcard);
       }
     },
     () => {
-      window.umami.track('Flash card short pressed');
+      posthog.capture('Flash card short pressed');
       if (isInSelectionMode) {
-        window.umami.track('Flash card selected');
+        posthog.capture('Flash card selected');
         onSelect && onSelect(flashCard);
       } else if (!flipBlocked) {
-        window.umami.track('Flash card flipped');
+        posthog.capture('Flash card flipped');
         setIsFlipped(!isFlipped);
       }
     },

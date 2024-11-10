@@ -4,6 +4,7 @@ import { FlashCard } from '#/shared/models/flash-card.model';
 import { UUID } from '#/shared/types/uuid.type';
 import uuid from '#/shared/utils/uuid.util';
 import { newFlashCardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';
+import posthog from 'posthog-js';
 import FormComponent from '../form-component/form.component';
 import { Button } from '../ui/button/button.component';
 import Dialog from '../ui/dialog/dialog.component';
@@ -71,14 +72,14 @@ export const NewFlashCardModal = ({
   }, [formValue]);
 
   const handleDialogClose = () => {
-    window.umami.track('Flash card dialog - closed', { isInEditMode });
+    posthog.capture('Flash card dialog - closed', { isInEditMode });
     setIsModalOpen(false);
     setCurrentIndex(0);
     clearInitialValues();
   };
 
   const handleDialogSubmit = () => {
-    window.umami.track('Flash card dialog - submitted', { isInEditMode });
+    posthog.capture('Flash card dialog - submitted', { isInEditMode });
     setIsModalOpen(false);
 
     if (isInEditMode) {
@@ -92,7 +93,7 @@ export const NewFlashCardModal = ({
   };
 
   const handleRightButtonClick = () => {
-    window.umami.track('Flash card dialog - right button clicked');
+    posthog.capture('Flash card dialog - right button clicked');
     if (currentIndex < flashCards.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
@@ -116,7 +117,7 @@ export const NewFlashCardModal = ({
   };
 
   const handleLeftButtonClick = () => {
-    window.umami.track('Flash card dialog - left button clicked');
+    posthog.capture('Flash card dialog - left button clicked');
     if (currentIndex > 0) {
       setFlashCards((prev) =>
         prev.map((item) =>

@@ -17,6 +17,7 @@ import { updateFlashCard } from '#/store/reducers/flashcards.reducer';
 import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { statsSelectors } from '#/store/selectors/stats.selectors';
+import posthog from 'posthog-js';
 import FlashCardComponent from '../flash-card/flash-card.component';
 import LinkComponent from '../ui/link/link.component';
 
@@ -47,9 +48,9 @@ export default function FlashCardReviseComponent() {
 
   const changeClicked = (flashCard: FlashCard, key?: string) => {
     if (key) {
-      window.umami.track('Answer clicked', { key });
+      posthog.capture('Answer clicked', { key });
     } else {
-      window.umami.track('Answer clicked', { key: null });
+      posthog.capture('Answer clicked', { key: null });
     }
 
     if (clicked) {
@@ -94,7 +95,7 @@ export default function FlashCardReviseComponent() {
   };
 
   const reshuffleFlashCards = () => {
-    window.umami.track('Reshuffle flash cards', { key: null });
+    posthog.capture('Reshuffle flash cards', { key: null });
 
     setClickedCard(undefined);
     setRevisedCard(undefined);
@@ -104,7 +105,7 @@ export default function FlashCardReviseComponent() {
   };
 
   const reshuffleFlashCardsWithKey = (key: string) => {
-    window.umami.track('Reshuffle flash cards', { key });
+    posthog.capture('Reshuffle flash cards', { key });
     reshuffleFlashCards();
   };
 
