@@ -58,12 +58,12 @@ export default function SetsPage() {
   const dispatch = useAppDispatch();
 
   const handleNewSets = (sets: Partial<FlashCardSet>[]) => {
-    posthog.capture('Add sets', { count: sets.length });
+    posthog.capture('add_sets', { count: sets.length });
     dispatch(addNewSets(sets));
   };
 
   const handleEditSets = (sets: Partial<FlashCardSet>[]) => {
-    posthog.capture('Edit sets', { count: sets.length });
+    posthog.capture('edit_sets', { count: sets.length });
     dispatch(updateSets(sets));
   };
 
