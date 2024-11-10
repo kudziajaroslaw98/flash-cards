@@ -11,6 +11,16 @@ import './globals.css';
 
 const ToastsComponent = dynamic(
   () => import('#/components/toasts/toasts.component'),
+  {
+    ssr: false,
+  },
+);
+
+const PostHogPageView = dynamic(
+  () => import('#/components/posthog-page-view/posthog-page-view.component'),
+  {
+    ssr: false,
+  },
 );
 
 const inter = Inter({
@@ -50,6 +60,7 @@ export default async function RootLayout({
           suppressHydrationWarning
           className='min-w-screen relative flex h-auto min-h-full w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950 md:pt-0'
         >
+          <PostHogPageView />
           <ClientSideProviders>
             <ToastsComponent />
 
