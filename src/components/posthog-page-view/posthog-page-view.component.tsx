@@ -16,4 +16,6 @@ export default function PostHogPageView() {
     posthog.capture('$pageview');
     setPrevPathname(pathname);
   }, [pathname, prevPathname]);
+
+  return null;
 }
