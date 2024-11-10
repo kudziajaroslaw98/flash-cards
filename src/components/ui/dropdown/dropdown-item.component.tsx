@@ -1,5 +1,4 @@
 import { DictionaryValue } from '#/shared/types/dictionary-value.type';
-import { posthog } from 'posthog-js';
 
 export default function DropdownItem<T>({
   item,
@@ -18,7 +17,7 @@ export default function DropdownItem<T>({
     switch (event.key) {
       case ' ':
       case 'Enter':
-        posthog.capture('Select dropdown item', { key: event.key });
+        window.umami.track('Select dropdown item', { key: event.key });
         changePickedItem(item);
         break;
       default:

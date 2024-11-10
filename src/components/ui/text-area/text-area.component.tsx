@@ -1,6 +1,5 @@
 import useDebounce from '#/hooks/use-debounce.hook';
 import { cn } from '#/shared/utils/cn.util';
-import posthog from 'posthog-js';
 import {
   FormEvent,
   TextareaHTMLAttributes,
@@ -86,14 +85,14 @@ export default function TextArea({
   };
 
   const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-    posthog.capture('Focus input', { name: props.name });
+    window.umami.track('Focus input', { name: props.name });
     if (props.onFocus) {
       props.onFocus(e);
     }
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-    posthog.capture('Blur input', { name: props.name });
+    window.umami.track('Blur input', { name: props.name });
     if (props.onBlur) {
       props.onBlur(e);
     }

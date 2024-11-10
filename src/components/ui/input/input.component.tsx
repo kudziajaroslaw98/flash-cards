@@ -1,7 +1,6 @@
 'use client';
 
 import { cn } from '#/shared/utils/cn.util';
-import posthog from 'posthog-js';
 import type { HTMLInputTypeAttribute, InputHTMLAttributes } from 'react';
 
 export type InputValidation =
@@ -51,12 +50,12 @@ function Input({
   ...props
 }: InputComponentProps) {
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    posthog.capture('Focus input', { name: props.name });
+    window.umami.track('Focus input', { name: props.name });
     if (props.onFocus) props.onFocus(e);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    posthog.capture('Blur input', { name: props.name });
+    window.umami.track('Blur input', { name: props.name });
     if (props.onBlur) props.onBlur(e);
   };
 

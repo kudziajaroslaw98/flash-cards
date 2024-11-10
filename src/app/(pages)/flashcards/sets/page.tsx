@@ -29,7 +29,6 @@ import {
 import { AnimatePresence, m } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import posthog from 'posthog-js';
 import { useEffect, useState } from 'react';
 
 const NewSetModal = dynamic(() =>
@@ -58,12 +57,12 @@ export default function SetsPage() {
   const dispatch = useAppDispatch();
 
   const handleNewSets = (sets: Partial<FlashCardSet>[]) => {
-    posthog.capture('add_sets', { count: sets.length });
+    window.umami.track('add_sets', { count: sets.length });
     dispatch(addNewSets(sets));
   };
 
   const handleEditSets = (sets: Partial<FlashCardSet>[]) => {
-    posthog.capture('edit_sets', { count: sets.length });
+    window.umami.track('edit_sets', { count: sets.length });
     dispatch(updateSets(sets));
   };
 
@@ -94,12 +93,12 @@ export default function SetsPage() {
   const handleSearchedTextChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    posthog.capture('Search sets');
+    window.umami.track('Search sets');
     setSearchedText(event.target.value);
   };
 
   const handleSearchCategoryChange = (category: string[]) => {
-    posthog.capture('Search sets by category');
+    window.umami.track('Search sets by category');
     setSearchedCategory(category);
   };
 
@@ -116,12 +115,12 @@ export default function SetsPage() {
   }, [selected]);
 
   const handleSetToggleChange = (set: FlashCardSet) => {
-    posthog.capture('Toggle set favourite');
+    window.umami.track('Toggle set favourite');
     dispatch(updateSet({ ...set, isFavourite: !set.isFavourite }));
   };
 
   const toggleSelected = (set: FlashCardSet) => {
-    posthog.capture('Set toggle selected');
+    window.umami.track('Set toggle selected');
     const isFlashCardSelected =
       selected.findIndex((item) => item.frontUuid === set.frontUuid) !== -1;
 
@@ -135,22 +134,22 @@ export default function SetsPage() {
   };
 
   const removeSelected = () => {
-    posthog.capture('Remove sets', { count: selected.length });
+    window.umami.track('Remove sets', { count: selected.length });
     dispatch(removeSets(selected.map((item) => item.frontUuid)));
     setSelected([]);
   };
 
   const [onStart, onEnd, onMove] = useLongPress<FlashCardSet, FlashCardSet>(
     (set) => {
-      posthog.capture('Set long pressed');
+      window.umami.track('Set long pressed');
       toggleSelected(set);
     },
     (set) => {
       if (isInSelectionMode) {
-        posthog.capture('Set short pressed - toggle selected');
+        window.umami.track('Set short pressed - toggle selected');
         toggleSelected(set as FlashCardSet);
       } else {
-        posthog.capture('Set short pressed - open set');
+        window.umami.track('Set short pressed - open set');
         router.push(`/flashcards/sets/${set.hardlink}`);
       }
     },
@@ -190,7 +189,7 @@ export default function SetsPage() {
             <ToggleButton
               toggled={isFavourite}
               toggle={() => {
-                posthog.capture('Toggle favourite');
+                window.umami.track('Toggle favourite');
                 toggleFavourite(!isFavourite);
               }}
               activeIcon={<StarIcon className='h-4 w-4' />}
@@ -275,7 +274,7 @@ export default function SetsPage() {
           trigger={
             <Button
               onClick={() => {
-                posthog.capture('Add set clicked');
+                window.umami.track('Add set clicked');
                 setIsInEditMode(false);
               }}
               icon={<PlusIcon className='h-4 w-4' />}
@@ -294,7 +293,7 @@ export default function SetsPage() {
           trigger={
             <Button
               onClick={() => {
-                posthog.capture('Edit set clicked');
+                window.umami.track('Edit set clicked');
                 setIsInEditMode(true);
               }}
               icon={<PencilIcon className='h-4 w-4' />}

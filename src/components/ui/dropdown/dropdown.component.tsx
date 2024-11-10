@@ -6,7 +6,6 @@ import { cn } from '#/shared/utils/cn.util';
 import { isDifferent } from '#/shared/utils/is-different.util';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import { cva, VariantProps } from 'class-variance-authority';
-import posthog from 'posthog-js';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Button } from '../button/button.component';
 import Input from '../input/input.component';
@@ -102,7 +101,7 @@ export default function Dropdown<T>({
   const configRef = useRef<DictionaryValue<T>[] | null>(null);
 
   useOutsideAlerter(dropdownWrapperRef, () => {
-    posthog.capture('Dropdown - Click outside');
+    window.umami.track('Dropdown - Click outside');
     if (visible) {
       setVisible(false);
       setSearchValue('');
@@ -156,13 +155,13 @@ export default function Dropdown<T>({
   }, [searchValue]);
 
   const toggleDropdown = () => {
-    posthog.capture('Dropdown - Toggle', { name: props.name ?? label });
+    window.umami.track('Dropdown - Toggle', { name: props.name ?? label });
     setVisible((prev) => !prev);
     setSearchValue('');
   };
 
   const changePickedItem = (pickedItem: DictionaryValue<T>) => {
-    posthog.capture('Dropdown - Select item', {
+    window.umami.track('Dropdown - Select item', {
       name: pickedItem.label,
     });
     if (multiple) {
@@ -193,7 +192,7 @@ export default function Dropdown<T>({
   };
 
   const clearPicked = (key?: string) => {
-    posthog.capture('Dropdown - Clear picked', { key: key ?? 'btnClick' });
+    window.umami.track('Dropdown - Clear picked', { key: key ?? 'btnClick' });
     setSelected([]);
 
     if (multiple) {
@@ -212,7 +211,7 @@ export default function Dropdown<T>({
   };
 
   const handleToggleAddNew = (key?: string, type?: 'Cancel') => {
-    posthog.capture('Dropdown - add new clicked', {
+    window.umami.track('Dropdown - add new clicked', {
       key: key ?? 'btnClick',
       type: type ?? 'add',
     });
@@ -220,7 +219,7 @@ export default function Dropdown<T>({
   };
 
   const handleAddNewElement = (key?: string) => {
-    posthog.capture('Dropdown - new element added', {
+    window.umami.track('Dropdown - new element added', {
       key: key ?? 'btnClick',
     });
     const newItem = {

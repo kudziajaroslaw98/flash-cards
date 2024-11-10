@@ -31,7 +31,6 @@
     "jsonwebtoken": "^9.0.2",
     "next": "^14.2.16",
     "ollama-ai-provider": "^0.16.0",
-    "posthog-js": "^1.181.0",
     "prettier-plugin-organize-attributes": "^1.0.0",
     "prettier-plugin-sort-imports": "^1.8.1",
     "react": "^18.2.0",

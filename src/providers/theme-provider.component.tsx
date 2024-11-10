@@ -1,7 +1,6 @@
 'use client';
 
 import useLocalStorage from '#/hooks/use-local-storage.hook';
-import posthog from 'posthog-js';
 import {
   createContext,
   PropsWithChildren,
@@ -48,7 +47,7 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
       document.querySelector('html')?.classList?.remove('dark');
     }
 
-    posthog.capture('Theme changed', { theme: newTheme });
+    window.umami.track('Theme changed', { theme: newTheme });
   };
 
   const isDarkMode = (): boolean => {

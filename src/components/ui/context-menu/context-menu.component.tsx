@@ -4,7 +4,6 @@ import MenuItem from '#/components/ui/context-menu/menu-item.component';
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import { cn } from '#/shared/utils/cn.util';
 import { cva, VariantProps } from 'class-variance-authority';
-import posthog from 'posthog-js';
 import {
   useEffect,
   useRef,
@@ -70,14 +69,14 @@ export default function ContextMenu({
   useOutsideAlerter(contextMenuWrapperRef, () => {
     if (open) {
       setOpen(false);
-      posthog.capture('Close context menu on click outside', {
+      window.umami.track('Close context menu on click outside', {
         name: props.name,
       });
     }
   });
 
   const handleTriggerClick = () => {
-    posthog.capture('Toggle context menu', { name: props.name });
+    window.umami.track('Toggle context menu', { name: props.name });
     setOpen((prev) => !prev);
   };
 
