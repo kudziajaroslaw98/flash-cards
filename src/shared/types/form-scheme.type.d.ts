@@ -1,6 +1,6 @@
-import type { DropdownProps } from '#/components/ui/dropdown/dropdown.component';
-import type { InputComponentProps } from '#/components/ui/input/input.component';
-import type { TextAreaProps } from '#/components/ui/text-area/text-area.component';
+import type { DropdownProps } from '#/components/_ui/dropdown/dropdown';
+import type { InputComponentProps } from '#/components/_ui/input/input';
+import type { TextAreaProps } from '#/components/_ui/text-area/text-area';
 import type { ZodEffects, ZodObject, ZodTypeAny } from 'zod';
 
 type ZodSchemaFromBaseObject<T> =

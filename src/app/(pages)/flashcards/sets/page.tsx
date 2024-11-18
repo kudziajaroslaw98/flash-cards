@@ -1,10 +1,10 @@
 'use client';
 
-import { Button } from '#/components/ui/button/button.component';
-import Card from '#/components/ui/card/card.component';
-import Dropdown from '#/components/ui/dropdown/dropdown.component';
-import Input from '#/components/ui/input/input.component';
-import { ToggleButton } from '#/components/ui/toggle-button/toggle-button.component';
+import { Button } from '#/components/_ui/button/button';
+import Card from '#/components/_ui/card/card';
+import Dropdown from '#/components/_ui/dropdown/dropdown';
+import Input from '#/components/_ui/input/input';
+import { ToggleButton } from '#/components/_ui/toggle-button/toggle-button';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import useLongPress from '#/hooks/use-long-press.hook';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
@@ -32,12 +32,10 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const NewSetModal = dynamic(() =>
-  import('#/components/new-set-modal/new-set-modal.component').then(
-    (x) => x.NewSetModal,
-  ),
+  import('#/components/new-set-modal/new-set-modal').then((x) => x.NewSetModal),
 );
 
-const Badge = dynamic(() => import('#/components/ui/badge/badge.component'));
+const Badge = dynamic(() => import('#/components/_ui/badge/badge'));
 
 export default function SetsPage() {
   const router = useRouter();

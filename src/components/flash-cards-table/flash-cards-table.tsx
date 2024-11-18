@@ -3,8 +3,8 @@
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 
-import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter.component';
-import { Button } from '#/components/ui/button/button.component';
+import { Button } from '#/components/_ui/button/button';
+import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import type { FlashCard } from '#/shared/models/flash-card.model';
 
@@ -19,12 +19,13 @@ import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { statsSelectors } from '#/store/selectors/stats.selectors';
 import { AnimatePresence, m } from 'framer-motion';
 import dynamic from 'next/dynamic';
-import FlashCardComponent from '../flash-card/flash-card.component';
+import { AlertDialog } from '../_ui/alert-dialog/alert-dialog';
+import FlashCardComponent from '../flash-card/flash-card';
 
 const NewFlashCardModal = dynamic(() =>
-  import(
-    '#/components/new-flash-card-modal/new-flash-card-modal.component'
-  ).then((x) => x.NewFlashCardModal),
+  import('#/components/new-flash-card-modal/new-flash-card-modal').then(
+    (x) => x.NewFlashCardModal,
+  ),
 );
 
 export default function FlashCardsTable() {
@@ -167,12 +168,21 @@ export default function FlashCardsTable() {
         />
 
         {flashCardsArray.length > 0 && (
-          <Button
-            disabled={selected.length === 0}
-            onClick={removeSelected}
-            variant={'destructive'}
-            icon={<TrashIcon className='h-4 w-4' />}
-            size={'icon'}
+          <AlertDialog
+            onCancel={() => {
+              window.umami.track('Cancel remove flash cards');
+            }}
+            headerText='Are you absolutely sure?'
+            bodyText='This action cannot be undone. This will permanently delete your flash cards.'
+            trigger={
+              <Button
+                disabled={selected.length === 0}
+                variant={'destructive'}
+                icon={<TrashIcon className='h-4 w-4' />}
+                size={'icon'}
+              />
+            }
+            onAccept={removeSelected}
           />
         )}
       </m.div>

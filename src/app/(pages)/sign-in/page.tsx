@@ -1,4 +1,4 @@
-import SignInComponent from '#/components/sign-in-form/sign-in-form.component';
+import SignInComponent from '#/components/sign-in-form/sign-in-form';
 
 export default async function SignInPage() {
   return (

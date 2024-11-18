@@ -1,5 +1,5 @@
-import HardestFlashcardsComponent from '#/components/hardest-flashcards/hardest-flashcards.component';
-import StatsListComponent from '#/components/stats-list/stats-list.component';
+import HardestFlashcardsComponent from '#/components/hardest-flashcards/hardest-flashcards';
+import StatsListComponent from '#/components/stats-list/stats-list';
 
 export default function DashboardPage() {
   return (

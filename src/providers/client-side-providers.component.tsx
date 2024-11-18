@@ -8,7 +8,10 @@ import SyncSessionProvider from './sync-session-provider.component';
 import ThemeProvider from './theme-provider.component';
 import ToastProvider from './toast-provider.component';
 
-export default function ClientSideProviders(props: PropsWithChildren) {
+/*************  ✨ Codeium Command ⭐  *************/
+/******  6a6c67f3-50b7-450e-900a-60b805540f40  *******/ export default function ClientSideProviders(
+  props: PropsWithChildren,
+) {
   return (
     <LazyMotion
       features={domMax}

@@ -1,19 +1,15 @@
 import type { Metadata } from 'next';
 import { Inter, Roboto_Mono } from 'next/font/google';
 
-import HeaderComponent from '#/components/header/header.component';
-import SidebarComponent from '#/components/sidebar/sidebar.component';
+import HeaderComponent from '#/components/header/header';
+import SidebarComponent from '#/components/sidebar/sidebar';
 import ClientSideProviders from '#/providers/client-side-providers.component';
 import dynamic from 'next/dynamic';
-import { cookies } from 'next/headers';
 import './globals.css';
 
-const ToastsComponent = dynamic(
-  () => import('#/components/toasts/toasts.component'),
-  {
-    ssr: false,
-  },
-);
+const ToastsComponent = dynamic(() => import('#/components/toasts/toasts'), {
+  ssr: false,
+});
 
 const inter = Inter({
   subsets: ['latin'],
@@ -33,18 +29,15 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const theme = cookieStore.get('theme')?.value;
-
   return (
     <html
       lang='en'
-      className={`${inter.variable} ${roboto_mono.variable} flex font-sans ${theme ?? 'dark'}`}
+      className={`${inter.variable} ${roboto_mono.variable} flex font-sans`}
       suppressHydrationWarning
     >
       <head>

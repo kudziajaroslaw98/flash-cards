@@ -1,10 +1,10 @@
 'use client';
-import FlashCardComponent from '#/components/flash-card/flash-card.component';
-import { Button } from '#/components/ui/button/button.component';
+import { Button } from '#/components/_ui/button/button';
 import ContextMenu, {
   ContextMenuItem,
-} from '#/components/ui/context-menu/context-menu.component';
-import LinkComponent from '#/components/ui/link/link.component';
+} from '#/components/_ui/context-menu/context-menu';
+import LinkComponent from '#/components/_ui/link/link';
+import FlashCardComponent from '#/components/flash-card/flash-card';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import useFetch from '#/hooks/use-fetch.hook';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
@@ -32,18 +32,16 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const NewSetModal = dynamic(() =>
-  import('#/components/new-set-modal/new-set-modal.component').then(
-    (x) => x.NewSetModal,
-  ),
+  import('#/components/new-set-modal/new-set-modal').then((x) => x.NewSetModal),
 );
 
 const AssignFlashCardsModal = dynamic(() =>
-  import(
-    '#/components/assign-flash-cards-modal/assign-flash-cards-modal.component'
-  ).then((x) => x.AssignFlashCardsModal),
+  import('#/components/assign-flash-cards-modal/assign-flash-cards-modal').then(
+    (x) => x.AssignFlashCardsModal,
+  ),
 );
 
-const Badge = dynamic(() => import('#/components/ui/badge/badge.component'));
+const Badge = dynamic(() => import('#/components/_ui/badge/badge'));
 
 // eslint-disable-next-line @next/next/no-async-client-component
 export default function SetHardlinkPage() {
