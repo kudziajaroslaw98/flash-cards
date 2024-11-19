@@ -1,4 +1,4 @@
-import FlashCardReviseComponent from '#/components/flash-card-revise/flash-card-revise.component';
+import FlashCardReviseComponent from '#/components/flash-card-revise/flash-card-revise';
 
 export default function RevisePage() {
   return (

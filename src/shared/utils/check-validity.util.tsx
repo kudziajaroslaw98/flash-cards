@@ -1,4 +1,4 @@
-import { InputValidation } from '#/components/ui/input/input.component';
+import { InputValidation } from '#/components/_ui/input/input';
 import type { Dispatch, SetStateAction } from 'react';
 import { z } from 'zod';
 
