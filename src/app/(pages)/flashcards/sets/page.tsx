@@ -1,5 +1,6 @@
 'use client';
 
+import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
 import { Button } from '#/components/_ui/button/button';
 import Card from '#/components/_ui/card/card';
 import Dropdown from '#/components/_ui/dropdown/dropdown';
@@ -153,6 +154,8 @@ export default function SetsPage() {
     },
   );
 
+  console.log(categories);
+
   return (
     <div className='flex h-full w-full grow flex-col items-center md:pb-24'>
       <div className='flex w-full flex-col justify-between gap-4 '>
@@ -284,7 +287,6 @@ export default function SetsPage() {
           selectedSets={[]}
           isInEditMode={isInEditMode}
           categories={categories}
-          multiple={true}
         />
 
         <NewSetModal
@@ -305,15 +307,23 @@ export default function SetsPage() {
           selectedSets={selected}
           isInEditMode={isInEditMode}
           categories={categories}
-          multiple={true}
         />
 
-        <Button
-          disabled={selected.length === 0}
-          onClick={removeSelected}
-          variant={'destructive'}
-          icon={<TrashIcon className='h-4 w-4' />}
-          size={'icon'}
+        <AlertDialog
+          onCancel={() => {
+            window.umami.track('Cancel remove set');
+          }}
+          headerText='Are you absolutely sure?'
+          bodyText='This action cannot be undone. This will permanently delete your set.'
+          trigger={
+            <Button
+              disabled={selected.length === 0}
+              variant={'destructive'}
+              icon={<TrashIcon className='h-4 w-4' />}
+              size={'icon'}
+            />
+          }
+          onAccept={removeSelected}
         />
       </m.div>
     </div>

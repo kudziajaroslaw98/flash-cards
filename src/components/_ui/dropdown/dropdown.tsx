@@ -99,6 +99,7 @@ export default function Dropdown<T>({
 
   const dropdownWrapperRef = useRef<HTMLLabelElement>(null);
   const configRef = useRef<DictionaryValue<T>[] | null>(null);
+  const valueRef = useRef<T | T[] | null | undefined>(null);
 
   useOutsideAlerter(dropdownWrapperRef, () => {
     window.umami.track('Dropdown - Click outside');
@@ -113,15 +114,18 @@ export default function Dropdown<T>({
 
   useEffect(() => {
     if (
-      value === undefined ||
       config.length === 0 ||
-      (configRef.current !== null && !isDifferent(config, configRef.current))
+      (configRef.current !== null &&
+        !isDifferent(config, configRef.current) &&
+        valueRef.current !== null &&
+        !isDifferent(value, valueRef.current))
     ) {
       return;
     }
     const dropdownItems: DictionaryValue<T>[] = config;
 
     configRef.current = config;
+    valueRef.current = value ?? null;
 
     setItems(config);
     setSelected(
