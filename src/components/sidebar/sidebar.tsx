@@ -87,7 +87,7 @@ export default function SidebarComponent() {
         className={`relative flex items-center justify-center border-b border-gray-200 p-4 dark:border-slate-900`}
       >
         <Link
-          href={'/dashboard'}
+          href={'/'}
           className={`flex items-center font-thin tracking-wider ${expanded && 'gap-4'}`}
         >
           <Image

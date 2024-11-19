@@ -45,7 +45,7 @@ export default function HeaderComponent() {
       <div className='mx-auto flex h-full max-w-5xl items-center justify-between'>
         <div className='flex items-center justify-center gap-4'>
           <Link
-            href={'/dashboard'}
+            href={'/'}
             className='flex items-center justify-center gap-2 text-xl font-thin tracking-wider'
           >
             <span>
