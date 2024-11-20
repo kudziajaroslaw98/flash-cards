@@ -1,7 +1,7 @@
 {
-  "name": "FlashCards",
+  "name": "Flash Cards - Learning Words Made Easy",
   "short_name": "flash-cards",
-  "description": "Learning words made easy",
+  "description": "Flash Cards by Jarosław Kudzia is the perfect tool for mastering vocabulary and learning words effortlessly.",
   "theme_color": "#020617",
   "background_color": "#020617",
   "start_url": "/flashcards/learn",
@@ -32,7 +32,7 @@
   "shortcuts": [
     {
       "name": "New flashcard",
-      "url": "/learn",
+      "url": "/flashcards/learn",
       "icons": [
         {
           "src": "/new-flashcard.png",
@@ -43,7 +43,7 @@
     },
     {
       "name": "Revise flashcards",
-      "url": "/revise",
+      "url": "/flashcards/revise",
       "icons": [
         {
           "src": "/revise-flashcards.png",

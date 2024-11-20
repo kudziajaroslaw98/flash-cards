@@ -3,7 +3,7 @@
 import { Button } from '#/components/_ui/button/button';
 import ContextMenu from '#/components/_ui/context-menu/context-menu';
 import LinkComponent from '#/components/_ui/link/link';
-import { ToggleButton } from '#/components/_ui/toggle-button/toggle-button';
+import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { NavigationItem } from '#/shared/types/navigation-item.type';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';

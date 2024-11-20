@@ -1,6 +1,6 @@
 import { MinusIcon, PlusIcon } from '@heroicons/react/24/solid';
 import type { Meta, StoryObj } from '@storybook/react';
-import { ToggleButton } from './toggle-button';
+import ToggleButton from './toggle-button';
 
 const meta: Meta<typeof ToggleButton> = {
   component: ToggleButton,

@@ -5,7 +5,7 @@ import { Button } from '#/components/_ui/button/button';
 import Card from '#/components/_ui/card/card';
 import Dropdown from '#/components/_ui/dropdown/dropdown';
 import Input from '#/components/_ui/input/input';
-import { ToggleButton } from '#/components/_ui/toggle-button/toggle-button';
+import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import useLongPress from '#/hooks/use-long-press.hook';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
@@ -30,7 +30,7 @@ import {
 import { AnimatePresence, m } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const NewSetModal = dynamic(() =>
   import('#/components/new-set-modal/new-set-modal').then((x) => x.NewSetModal),
@@ -52,6 +52,8 @@ export default function SetsPage() {
   const [selected, setSelected] = useState<FlashCardSet[]>([]);
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
   const [isInEditMode, setIsInEditMode] = useState(false);
+
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   const dispatch = useAppDispatch();
 
@@ -143,18 +145,21 @@ export default function SetsPage() {
       window.umami.track('Set long pressed');
       toggleSelected(set);
     },
-    (set) => {
+    (set, e) => {
       if (isInSelectionMode) {
         window.umami.track('Set short pressed - toggle selected');
-        toggleSelected(set as FlashCardSet);
+        toggleSelected(set.at(0) as FlashCardSet);
       } else {
         window.umami.track('Set short pressed - open set');
-        router.push(`/flashcards/sets/${set.hardlink}`);
+
+        if (toggleRef.current?.contains(e.target as Node)) {
+          handleSetToggleChange(set.at(0) as FlashCardSet);
+        } else {
+          router.push(`/flashcards/sets/${set.at(0)?.hardlink}`);
+        }
       }
     },
   );
-
-  console.log(categories);
 
   return (
     <div className='flex h-full w-full grow flex-col items-center md:pb-24'>
@@ -226,8 +231,8 @@ export default function SetsPage() {
                 ])}
                 onMouseDown={(e) => onStart(e, set)}
                 onTouchStart={(e) => onStart(e, set)}
-                onMouseUp={(e) => onEnd(e, set)}
-                onTouchEnd={(e) => onEnd(e, set)}
+                onMouseUp={(e) => onEnd(e, [set])}
+                onTouchEnd={(e) => onEnd(e, [set])}
                 onTouchMove={onMove}
               >
                 {selected.includes(set) && (
@@ -251,6 +256,7 @@ export default function SetsPage() {
                   </div>
 
                   <ToggleButton
+                    ref={toggleRef}
                     toggled={set.isFavourite}
                     toggle={() => {
                       handleSetToggleChange(set);
