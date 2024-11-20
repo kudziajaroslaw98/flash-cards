@@ -25,8 +25,15 @@ const selectCategoriesAsDictionary = createSelector([setsState], (setsLS) => {
   return categoriesArray;
 });
 
+const selectSetsAsDictionary = createSelector([setsState], (setsLS) => {
+  const sets = Object.values(setsLS);
+
+  return sets.map((set) => ({ value: set.frontUuid, label: set.name }));
+});
+
 export const setsSelectors = {
   selectSetsArray,
   selectSets: setsState,
+  selectSetsAsDictionary,
   selectCategoriesAsDictionary,
 };

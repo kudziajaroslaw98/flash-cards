@@ -16,28 +16,37 @@ import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util'
 import { updateFlashCard } from '#/store/reducers/flashcards.reducer';
 import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
+import { setsSelectors } from '#/store/selectors/sets.selectors';
 import { statsSelectors } from '#/store/selectors/stats.selectors';
+import Card from '../_ui/card/card';
+import Dropdown from '../_ui/dropdown/dropdown';
 import LinkComponent from '../_ui/link/link';
 import FlashCardComponent from '../flash-card/flash-card';
 
 export default function FlashCardReviseComponent() {
+  const defaultSet = { value: 'default', label: 'All flash cards' };
+
   const [revisedCard, setRevisedCard] = useState<FlashCard>();
+  const [revisedSet, setRevisedSet] = useState<string>(defaultSet.value);
   const [clickedCard, setClickedCard] = useState<FlashCard>();
   const [clicked, setClicked] = useState(false);
 
   const flashCardsArray = useAppSelector(
     flashCardSelectors.selectFlashCardsArray,
   );
+
+  const sets = useAppSelector(setsSelectors.selectSetsArray);
+  const setsDictionary = useAppSelector(setsSelectors.selectSetsAsDictionary);
+
   const statistics = useAppSelector(statsSelectors.selectStats);
 
   const dispatch = useAppDispatch();
 
-  const { pickedItems: randomCards, reshuffle } =
-    useRandomArrayItems<FlashCard>(
-      flashCardsArray,
-      flashCardsArray.map((item) => item.weight),
-      4,
-    );
+  const {
+    pickedItems: randomCards,
+    reshuffle,
+    setNewArray,
+  } = useRandomArrayItems<FlashCard>(flashCardsArray, 4);
 
   const isCorrect = (flashCard?: FlashCard) => {
     const comparisonItem = flashCard ?? clickedCard;
@@ -108,12 +117,37 @@ export default function FlashCardReviseComponent() {
     reshuffleFlashCards();
   };
 
+  const changeRevisedSet = (value: string) => {
+    window.umami.track('Change revised set', { value });
+    setClicked(false);
+    setRevisedSet(value);
+  };
+
   useEffect(() => {
     const isFullRevise = randomCards.length === 4;
     const randomMax = isFullRevise ? 3 : randomCards.length - 1;
 
     setRevisedCard(randomCards[getRandomRangedNumber(0, randomMax)]);
   }, [randomCards]);
+
+  useEffect(() => {
+    if (clicked) return;
+
+    if (revisedSet === defaultSet.value) {
+      setNewArray(flashCardsArray);
+    } else {
+      const setFlashcardsIds = sets.filter(
+        (set) => set.frontUuid === revisedSet,
+      )[0].flashCards;
+      const setFlashCards = flashCardsArray.filter((flashcard) =>
+        setFlashcardsIds.includes(flashcard.frontUuid),
+      );
+
+      setNewArray(setFlashCards);
+    }
+
+    reshuffle();
+  }, [revisedSet, flashCardsArray]);
 
   useKeyPress(['r'], () => reshuffleFlashCardsWithKey('r'));
   useKeyPress(['ArrowRight'], () => reshuffleFlashCardsWithKey('ArrowRight'));
@@ -140,12 +174,14 @@ export default function FlashCardReviseComponent() {
           </div>
 
           <div>
-            {revisedCard && (
+            {revisedCard ? (
               <FlashCardComponent
                 key={revisedCard.frontUuid}
                 flashCard={revisedCard}
                 flipBlocked={!clicked}
               />
+            ) : (
+              <Card className='h-96 w-80' />
             )}
           </div>
         </div>
@@ -177,13 +213,22 @@ export default function FlashCardReviseComponent() {
         </div>
       </div>
 
-      <div className='fixed bottom-0 right-0 z-40 flex h-16 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 px-2 backdrop-blur-md dark:bg-slate-950/10 sm:sticky sm:bottom-8'>
+      <div className='fixed bottom-0 right-0 z-40 flex h-36 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 px-2 backdrop-blur-md dark:bg-slate-950/10 sm:sticky sm:bottom-8'>
         <Button
           label={'Reshuffle'}
           icon={<ArrowPathIcon className='h-4 w-4' />}
           iconPosition={'right'}
           onClick={reshuffleFlashCards}
           size={'xlg'}
+          className='!w-full !max-w-xs'
+        />
+
+        <Dropdown
+          config={[defaultSet, ...setsDictionary]}
+          onChange={changeRevisedSet}
+          value={defaultSet.value}
+          contextPosition={'top'}
+          labelClassName='max-w-xs'
         />
       </div>
     </div>

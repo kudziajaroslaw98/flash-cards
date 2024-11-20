@@ -107,10 +107,6 @@ export const metadata: Metadata = {
     },
   },
   applicationName: 'Flash Cards - Learning Words Made Easy',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-  },
   alternates: {
     canonical: 'https://flashcards.finalphase.app',
   },
