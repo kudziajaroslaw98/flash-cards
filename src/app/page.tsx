@@ -1,18 +1,29 @@
-import { EnvelopeIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { cn } from '#/shared/utils/cn.util';
+import { CheckIcon, EnvelopeIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
 export default async function Home() {
   const roadMapPoints = [
-    'Dark/Light mode - It`s still under development',
-    'Revise flash cards using a spaced repetition algorithm',
-    'Revise set flash cards (now revise work on all flash cards)',
-    'Organize flash cards into decks',
-    'Community Section with shared decks',
-    'Daily word suggestion',
-    'Generating descriptions to words with AI',
-    'Generating new words for deck based on words that are already in it',
-    'Live updates (WebSockets)',
-    'Importing flash cards from CSV file',
-    'Synchronize your flash cards across all devices',
+    { done: false, label: 'Dark/Light mode - It`s still under development' },
+    {
+      done: false,
+      label: 'Revise flash cards using a spaced repetition algorithm',
+    },
+    {
+      done: true,
+      label: 'Revise set flash cards (now revise work on all flash cards)',
+    },
+    { done: true, label: 'Organize flash cards into decks' },
+    { done: false, label: 'Community Section with shared decks' },
+    { done: false, label: 'Daily word suggestion' },
+    { done: false, label: 'Generating descriptions to words with AI' },
+    {
+      done: false,
+      label:
+        'Generating new words for deck based on words that are already in it',
+    },
+    { done: false, label: 'Live updates (WebSockets)' },
+    { done: false, label: 'Importing flash cards from CSV file' },
+    { done: false, label: 'Synchronize your flash cards across all devices' },
   ];
 
   return (
@@ -63,8 +74,15 @@ export default async function Home() {
               key={`point-${index}`}
               className='flex items-center gap-2'
             >
-              <span className='flex min-h-4 min-w-4 rounded-md bg-gray-300'></span>
-              <span>{point}</span>
+              <span
+                className={cn([
+                  point.done ? 'bg-green-500' : 'bg-gray-300',
+                  'flex min-h-4 min-w-4 rounded-md',
+                ])}
+              >
+                {point.done && <CheckIcon className='size-4 text-gray-200' />}
+              </span>
+              <span>{point.label}</span>
             </span>
           ))}
         </span>

@@ -7,22 +7,26 @@ import getRandomRangedFloat from '#/shared/utils/get-random-ranged-float';
 export interface UseRandomArrayItemsOutput<T> {
   pickedItems: T[];
   reshuffle: () => void;
+  setNewArray: (array: T[]) => void;
 }
 
-export default function useRandomArrayItems<T>(
-  array: T[],
-  weightsArray: number[],
+export default function useRandomArrayItems<T extends { weight: number }>(
+  initialArray: T[],
   itemsCount: number,
 ): UseRandomArrayItemsOutput<T> {
+  const weightsArrayRef = useRef<number[]>(
+    initialArray.map((item) => item.weight).sort(),
+  );
+  const arrayRef = useRef<T[]>(initialArray);
   const [pickedItems, setPickedItems] = useState<T[]>([]);
   const currentArrayLength = useRef(0);
 
   const reshuffle = useCallback(() => {
     const pickedItemsTmp: T[] = [];
-    const summedWeights = addUpNumberArray(weightsArray);
+    const summedWeights = addUpNumberArray(weightsArrayRef.current);
 
-    if (array.length <= itemsCount) {
-      pickedItemsTmp.push(...array);
+    if (arrayRef.current.length <= itemsCount) {
+      pickedItemsTmp.push(...arrayRef.current);
     } else {
       for (let i = 0; i <= itemsCount - 1; i++) {
         let item = null;
@@ -35,28 +39,33 @@ export default function useRandomArrayItems<T>(
               summedWeights[summedWeights.length - 1],
             ),
           );
-          item = array[index];
+          item = arrayRef.current[index];
         } while (!item || pickedItemsTmp.includes(item) || item === null);
 
         pickedItemsTmp.push(item);
       }
     }
 
-    currentArrayLength.current = array.length;
+    currentArrayLength.current = arrayRef.current.length;
     setPickedItems(pickedItemsTmp);
-  }, [array, itemsCount, weightsArray]);
+  }, [itemsCount]);
+
+  const setNewArray = (array: T[]) => {
+    arrayRef.current = array;
+    weightsArrayRef.current = array.map((item) => item.weight).sort();
+  };
 
   useEffect(() => {
     if (
       pickedItems.length === itemsCount ||
-      array.length === 0 ||
-      array.length === currentArrayLength.current
+      arrayRef.current.length === 0 ||
+      arrayRef.current.length === currentArrayLength.current
     ) {
       return;
     }
 
     reshuffle();
-  }, [array, itemsCount, pickedItems, reshuffle]);
+  }, [itemsCount, pickedItems, reshuffle]);
 
-  return { pickedItems, reshuffle };
+  return { pickedItems, reshuffle, setNewArray };
 }
