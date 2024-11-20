@@ -3,12 +3,15 @@ import type { MouseEvent, TouchEvent } from 'react';
 import { useCallback, useRef } from 'react';
 
 export default function useLongPress<T, K = unknown>(
-  longPressCallback: (value: T) => void,
-  shortClickCallback: (...params: K[]) => void = () => {},
+  longPressCallback: (value: T, e: MouseEvent | TouchEvent) => void,
+  shortClickCallback: (
+    value: K[],
+    e: MouseEvent | TouchEvent,
+  ) => void = () => {},
   longPressThreshold = 300,
 ): [
   (e: MouseEvent | TouchEvent, value: T) => void,
-  (e: MouseEvent | TouchEvent, ...params: K[]) => void,
+  (e: MouseEvent | TouchEvent, value?: K[]) => void,
   () => void,
 ] {
   const timerRef = useRef<number>(0);
@@ -29,7 +32,7 @@ export default function useLongPress<T, K = unknown>(
 
       timerRef.current = window.setTimeout(() => {
         clickLockRef.current = true;
-        longPressCallback(value);
+        longPressCallback(value, e);
         endTimer();
       }, longPressThreshold);
     },
@@ -37,7 +40,7 @@ export default function useLongPress<T, K = unknown>(
   );
 
   const onEndLongPress = useCallback(
-    (e: MouseEvent | TouchEvent, ...params: K[]) => {
+    (e: MouseEvent | TouchEvent, params?: K[]) => {
       // @ts-expect-error typescript for some reason expect generic type
       if (isMouseEvent(e) && e?.button !== 0) return;
 
@@ -45,7 +48,11 @@ export default function useLongPress<T, K = unknown>(
 
       if (timerRef.current) {
         if (!clickLockRef.current) {
-          shortClickCallback(...params);
+          if (params) {
+            shortClickCallback([...params], e);
+          } else {
+            shortClickCallback([], e);
+          }
         }
         endTimer();
       }

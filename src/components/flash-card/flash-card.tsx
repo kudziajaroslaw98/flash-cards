@@ -71,7 +71,6 @@ export default function FlashCardComponent({
         key={`${flashCard.frontUuid}:${isFlipped ? 'flipped' : 'unflipped'}`}
       >
         <Card
-          // onKeyDown={handleKeyDown}
           tabIndex={0}
           className={cn([
             'z-10 flex-col items-center p-4',

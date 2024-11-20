@@ -14,7 +14,7 @@ export default function DropdownLabel({
   onClick: () => void;
 }) {
   return (
-    <label
+    <span
       onClick={onClick}
       className='flex w-full cursor-pointer items-center justify-between gap-4 px-4'
     >
@@ -32,6 +32,6 @@ export default function DropdownLabel({
           className={`h-4 w-4 transition ${visible ? 'rotate-180' : ''}`}
         />
       </span>
-    </label>
+    </span>
   );
 }

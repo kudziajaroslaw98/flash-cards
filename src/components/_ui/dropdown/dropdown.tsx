@@ -97,7 +97,7 @@ export default function Dropdown<T>({
   const [isInAddNewMode, setIsInAddNewMode] = useState(false);
   const [newItemValue, setNewItemValue] = useState('');
 
-  const dropdownWrapperRef = useRef<HTMLLabelElement>(null);
+  const dropdownWrapperRef = useRef<HTMLDivElement>(null);
   const configRef = useRef<DictionaryValue<T>[] | null>(null);
   const valueRef = useRef<T | T[] | null | undefined>(null);
 
@@ -251,7 +251,7 @@ export default function Dropdown<T>({
   };
 
   return (
-    <label
+    <div
       ref={dropdownWrapperRef}
       className={cn([
         'group relative z-40 flex w-full max-w-md flex-col',
@@ -316,7 +316,7 @@ export default function Dropdown<T>({
                     value={searchValue}
                     valid={true}
                     placeholder={`Search in ${multipleLabel ?? label}...`}
-                    for='search'
+                    name='search'
                     icon={<MagnifyingGlassIcon className='h-4 w-4' />}
                     className='min-w-52 text-sm'
                     onInput={handleSearchValueChange}
@@ -433,6 +433,6 @@ export default function Dropdown<T>({
       >
         {error}
       </span>
-    </label>
+    </div>
   );
 }
