@@ -5,6 +5,7 @@ import HeaderComponent from '#/components/header/header';
 import SidebarComponent from '#/components/sidebar/sidebar';
 import ClientSideProviders from '#/providers/client-side-providers.component';
 import dynamic from 'next/dynamic';
+import { cookies } from 'next/headers';
 import './globals.css';
 
 const ToastsComponent = dynamic(() => import('#/components/toasts/toasts'), {
@@ -118,10 +119,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const theme = cookies().get('theme')?.value;
+
   return (
     <html
       lang='en'
-      className={`${inter.variable} ${roboto_mono.variable} flex font-sans`}
+      className={`${inter.variable} ${roboto_mono.variable} flex font-sans ${theme}`}
       suppressHydrationWarning
     >
       <head>
@@ -133,17 +136,19 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className='min-w-screen relative flex h-auto min-h-full w-full grow flex-col bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950 md:pt-0'
+        className='min-w-screen relative flex h-auto min-h-full w-full grow flex-col'
       >
         <ClientSideProviders>
-          <ToastsComponent />
+          <div className='flex h-auto min-h-full w-full flex-col  bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950 md:pt-0'>
+            <ToastsComponent />
 
-          <div className='mx-auto flex h-auto min-h-full w-full max-w-7xl gap-12 p-4 xl:gap-12'>
-            <HeaderComponent />
-            <SidebarComponent />
-            <main className='relative flex h-auto min-h-full w-full flex-col md:pt-24'>
-              {children}
-            </main>
+            <div className='mx-auto flex h-auto min-h-full w-full max-w-7xl gap-12 p-4 xl:gap-12'>
+              <HeaderComponent />
+              <SidebarComponent />
+              <main className='relative flex h-auto min-h-full w-full flex-col md:pt-24'>
+                {children}
+              </main>
+            </div>
           </div>
         </ClientSideProviders>
       </body>

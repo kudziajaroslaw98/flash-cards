@@ -3,10 +3,15 @@ import { CheckIcon, EnvelopeIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
 export default async function Home() {
   const roadMapPoints = [
-    { done: false, label: 'Dark/Light mode - It`s still under development' },
+    { done: true, label: 'Dark/Light mode' },
+    {
+      done: true,
+      label: 'Revise flash cards using simple spaced repetition algorithm',
+    },
     {
       done: false,
-      label: 'Revise flash cards using a spaced repetition algorithm',
+      label:
+        'Revise flash cards using more sophisticated spaced repetition algorithm',
     },
     {
       done: true,
@@ -47,6 +52,15 @@ export default async function Home() {
             learn. It&apos;s simple to use and easy to understand. The app is
             filled with default data to let you start playing with it right
             away.
+          </span>
+
+          <span>
+            <b className='font-bold text-gray-900 dark:text-slate-50'>
+              We use analytics to collect information about the usage of the
+              app. We don&apos;t collect any personal information.
+            </b>{' '}
+            We use cookies to improve the user experience. Thank you for
+            understanding.
           </span>
 
           <span>

@@ -55,7 +55,7 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
   };
 
   useEffect(() => {
-    const serverSideTheme = document
+    const serverSideTheme = window.document
       .querySelector('html')
       ?.classList.contains('dark')
       ? 'dark'

@@ -20,24 +20,24 @@
 - [x] User-friendly interface
 - [x] Responsive design for mobile and desktop
 - [x] Dark Mode
-- [x] Logging in
-- [x] Synchronize your flashcards across all devices
 - [x] Simple repetition algorithm
 - [x] Offline Mode
-- [x] Intergating Local Storage and Supabase postgres Database.
+- [x] Organize flashcards into decks
+- [x] Get custom domain name
 
 ## Road Map
 
+- [ ] Logging in
 - [ ] Review flashcards using a spaced repetition algorithm
-- [ ] Organize flashcards into decks
 - [ ] Community Section with shared decks
 - [ ] Daily word suggestion
 - [ ] Generating descriptions to words with AI
 - [ ] Generating new words for deck based on words that are already in it
 - [ ] Live updates (WebSockets)
-- [ ] Get custom domain name
 - [ ] Add Storybook
 - [ ] Importing flashcards from csv file
+- [ ] Synchronize your flashcards across all devices
+- [ ] Intergating Local Storage and Supabase postgres Database.
 
 ## Tech Stack
 
