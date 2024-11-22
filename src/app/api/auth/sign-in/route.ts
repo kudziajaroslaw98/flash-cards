@@ -1,13 +1,11 @@
 import { ApiResponse } from '#/shared/types/api-response.type';
 import { SignInResponse } from '#/shared/types/sign-in-response.type';
 import checkValidity from '#/shared/utils/check-validity.util';
+import { createClient } from '#/shared/utils/supabase/server';
 import { signInValidationScheme } from '#/shared/validation-schemes/sign-in-validation.scheme';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const cookieStore = cookies();
 
   let response: ApiResponse<SignInResponse>;
   const validityCheck = checkValidity(body, signInValidationScheme);
@@ -21,9 +19,7 @@ export async function POST(request: Request) {
     return Response.json(response);
   }
 
-  const supabase = createRouteHandlerClient({
-    cookies: () => cookieStore,
-  });
+  const supabase = await createClient();
   const data = await supabase.auth.signInWithPassword({
     email: body.email,
     password: body.password,

@@ -7,4 +7,5 @@ export const APP_ROUTES = {
   },
   signIn: '/sign-in',
   signUp: '/sign-up',
+  settings: '/settings',
 } as const;

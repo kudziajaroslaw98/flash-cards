@@ -1,9 +1,5 @@
 'use client';
 
-import MenuItem from '#/components/_ui/context-menu/menu-item';
-import useOutsideAlerter from '#/hooks/use-click-outside.hook';
-import { cn } from '#/shared/utils/cn.util';
-import { cva, VariantProps } from 'class-variance-authority';
 import {
   useEffect,
   useRef,
@@ -12,6 +8,10 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from 'react';
+import MenuItem from '#/components/_ui/context-menu/menu-item';
+import useOutsideAlerter from '#/hooks/use-click-outside.hook';
+import { cva, VariantProps } from 'class-variance-authority';
+import { cn } from '#/shared/utils/cn.util';
 
 const contextMenuVariants = cva(
   `absolute w-64 overflow-clip rounded border border-gray-200 dark:border-slate-800 md:w-52`,
@@ -38,6 +38,7 @@ export interface ContextMenuItem {
   icon?: ReactNode;
   onClick: () => void;
   active?: boolean;
+  visible?: boolean;
 }
 
 interface ContextMenuProps
@@ -110,7 +111,7 @@ export default function ContextMenu({
                 <MenuItem
                   key={item.label}
                   active={item.active}
-                  visible={true}
+                  visible={item.visible}
                   onClick={() => {
                     item.onClick();
                   }}

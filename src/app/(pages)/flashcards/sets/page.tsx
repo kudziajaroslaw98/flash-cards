@@ -1,24 +1,5 @@
 'use client';
 
-import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
-import { Button } from '#/components/_ui/button/button';
-import Card from '#/components/_ui/card/card';
-import Dropdown from '#/components/_ui/dropdown/dropdown';
-import Input from '#/components/_ui/input/input';
-import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
-import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
-import useLongPress from '#/hooks/use-long-press.hook';
-import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import type { DictionaryValue } from '#/shared/types/dictionary-value.type';
-import { cn } from '#/shared/utils/cn.util';
-import {
-  addNewSets,
-  removeSets,
-  updateSet,
-  updateSets,
-} from '#/store/reducers/sets.reducer';
-import { setsSelectors } from '#/store/selectors/sets.selectors';
-import { StarIcon as StarIconOutline } from '@heroicons/react/24/outline';
 import {
   CheckBadgeIcon,
   MagnifyingGlassIcon,
@@ -27,10 +8,29 @@ import {
   StarIcon,
   TrashIcon,
 } from '@heroicons/react/24/solid';
-import { AnimatePresence, m } from 'framer-motion';
-import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
+import {
+  addNewSets,
+  removeSets,
+  updateSet,
+  updateSets,
+} from '#/store/reducers/sets.reducer';
+import type { DictionaryValue } from '#/shared/types/dictionary-value.type';
+import { StarIcon as StarIconOutline } from '@heroicons/react/24/outline';
+import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
+import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
+import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
+import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
+import { setsSelectors } from '#/store/selectors/sets.selectors';
+import Dropdown from '#/components/_ui/dropdown/dropdown';
+import { Button } from '#/components/_ui/button/button';
+import useLongPress from '#/hooks/use-long-press.hook';
 import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, m } from 'framer-motion';
+import Input from '#/components/_ui/input/input';
+import Card from '#/components/_ui/card/card';
+import { cn } from '#/shared/utils/cn.util';
+import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 
 const NewSetModal = dynamic(() =>
   import('#/components/new-set-modal/new-set-modal').then((x) => x.NewSetModal),
@@ -226,7 +226,7 @@ export default function SetsPage() {
               <Card
                 key={set.frontUuid}
                 className={cn([
-                  'flex h-full flex-col justify-between gap-4 sm:min-h-44 sm:gap-4',
+                  'flex h-full cursor-pointer flex-col justify-between gap-4 sm:min-h-44 sm:gap-4',
                   selected.includes(set) ? 'ring ring-green-400/60' : '',
                 ])}
                 onMouseDown={(e) => onStart(e, set)}

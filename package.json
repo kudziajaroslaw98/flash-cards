@@ -7,7 +7,7 @@
     "dev-turbo": "set NODE_ENV=development&& set TURBO=true&& next --turbo",
     "build": "set NODE_ENV=production&& next build",
     "analyze": "set NODE_ENV=production&& cross-env ANALYZE=true next build",
-    "start": "set NODE_ENV=production&& next start -p 3001",
+    "start": "set NODE_ENV=production&& next start",
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -17,7 +17,7 @@
     "@heroicons/react": "^2.2.0",
     "@next/bundle-analyzer": "^15.0.3",
     "@reduxjs/toolkit": "^2.3.0",
-    "@supabase/auth-helpers-nextjs": "^0.8.7",
+    "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.46.1",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",

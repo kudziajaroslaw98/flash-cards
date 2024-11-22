@@ -2,12 +2,9 @@ import { FlashCard } from '#/shared/models/flash-card.model';
 import { ApiSyncResponse } from '#/shared/types/api-sync-response.type';
 import { StatsModel } from '#/shared/types/stats.type';
 import checkValidity from '#/shared/utils/check-validity.util';
+import { createClient } from '#/shared/utils/supabase/server';
 import { syncBodyValidationScheme } from '#/shared/validation-schemes/sync-body-validation.scheme';
-import {
-  SupabaseClient,
-  createRouteHandlerClient,
-} from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 type requestBody = {
   flashcards: FlashCard[];
@@ -142,7 +139,6 @@ export async function POST(request: Request) {
 
   try {
     const body: requestBody = await request.json();
-    const cookieStore = cookies();
 
     validateBody(body);
 
@@ -153,9 +149,7 @@ export async function POST(request: Request) {
       lastSyncAt: newLastSyncAt,
     };
 
-    const supabase = createRouteHandlerClient({
-      cookies: () => cookieStore,
-    });
+    const supabase = await createClient();
 
     const userUuid = await getUserUuid(supabase);
 

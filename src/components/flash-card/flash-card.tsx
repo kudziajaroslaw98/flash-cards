@@ -1,10 +1,10 @@
-import useLongPress from '#/hooks/use-long-press.hook';
 import type { FlashCard } from '#/shared/models/flash-card.model';
-import { cn } from '#/shared/utils/cn.util';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
-import { m } from 'framer-motion';
+import useLongPress from '#/hooks/use-long-press.hook';
+import { cn } from '#/shared/utils/cn.util';
 import { useEffect, useState } from 'react';
 import Card from '../_ui/card/card';
+import { m } from 'framer-motion';
 
 interface FlashCardProps {
   flashCard: FlashCard;
@@ -73,7 +73,7 @@ export default function FlashCardComponent({
         <Card
           tabIndex={0}
           className={cn([
-            'z-10 flex-col items-center p-4',
+            'z-10 cursor-pointer flex-col items-center p-4',
             isSelected ? 'ring ring-green-400/60' : '',
             size === 'sm' && 'h-56 w-44',
             size === 'md' && 'h-72 w-64',

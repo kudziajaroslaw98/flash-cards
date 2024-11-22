@@ -1,5 +1,5 @@
-import { cn } from '#/shared/utils/cn.util';
 import { CheckIcon, EnvelopeIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { cn } from '#/shared/utils/cn.util';
 
 export default async function Home() {
   const roadMapPoints = [
@@ -16,6 +16,11 @@ export default async function Home() {
     {
       done: false,
       label: 'Accounts',
+    },
+    {
+      done: false,
+      label:
+        'Improve the user experience with floating buttons (mobile/desktop)',
     },
     {
       done: true,
