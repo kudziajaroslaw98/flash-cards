@@ -1,29 +1,68 @@
 'use client';
 
-import { Button } from '#/components/_ui/button/button';
-import ContextMenu from '#/components/_ui/context-menu/context-menu';
-import LinkComponent from '#/components/_ui/link/link';
-import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
+import {
+  AcademicCapIcon,
+  Bars3Icon,
+  Cog8ToothIcon,
+  HomeIcon,
+  LanguageIcon,
+  RectangleStackIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/solid';
 import { useSessionContext } from '#/providers/session-provider.component';
+import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
+import ContextMenu from '#/components/_ui/context-menu/context-menu';
 import { NavigationItem } from '#/shared/types/navigation-item.type';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
-import { m } from 'framer-motion';
+import ThemeSwitchComponent from '../theme-switch/theme-switch';
+import { APP_ROUTES } from '#/shared/defaults/app.routes';
 import { usePathname, useRouter } from 'next/navigation';
+import { Button } from '#/components/_ui/button/button';
+import LinkComponent from '#/components/_ui/link/link';
 import { useEffect, useRef, useState } from 'react';
 import AvatarComponent from '../_ui/avatar/avatar';
-import ThemeSwitchComponent from '../theme-switch/theme-switch';
+import { m } from 'framer-motion';
 
-interface HamburgerMenuProps {
-  navigationItems: NavigationItem[];
-}
-
-export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
+export default function HamburgerMenuComponent() {
+  const { isLoggedIn, session, logOut } = useSessionContext();
   const [toggled, toggle] = useState(false);
   const [isOpen, setOpen] = useState(false);
-  const { isLoggedIn, session, logOut } = useSessionContext();
   const menuRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const pathName = usePathname();
+
+  const navigationItems: NavigationItem[] = [
+    {
+      type: 'item',
+      label: 'Dashboard',
+      href: APP_ROUTES.dashboard,
+      icon: <HomeIcon className='size-4' />,
+    },
+    {
+      type: 'item',
+      label: 'Settings',
+      href: APP_ROUTES.settings,
+      icon: <Cog8ToothIcon className='size-4' />,
+      visible: isLoggedIn,
+    },
+    {
+      type: 'item',
+      label: 'Sets',
+      href: APP_ROUTES.flashcards.sets,
+      icon: <RectangleStackIcon className='size-4' />,
+    },
+    {
+      type: 'item',
+      label: 'Learn',
+      href: APP_ROUTES.flashcards.learn,
+      icon: <AcademicCapIcon className='size-4' />,
+    },
+    {
+      type: 'item',
+      label: 'Revise',
+      href: APP_ROUTES.flashcards.revise,
+      icon: <LanguageIcon className='size-4' />,
+    },
+  ];
 
   useEffect(() => {
     const handler = (event: MouseEvent) => {
@@ -93,7 +132,7 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
               <div className='flex flex-col gap-3'>
                 <div className='flex w-full flex-col items-center justify-center gap-2'>
                   <AvatarComponent
-                    avatarClass='h-12 w-12'
+                    className='h-12 w-12'
                     text={`${session?.user?.user_metadata?.firstName} ${session?.user?.user_metadata?.lastName}`}
                   />
 
@@ -134,10 +173,11 @@ export default function HamburgerMenuComponent(props: HamburgerMenuProps) {
             )}
           </div>
         }
-        menuItems={props.navigationItems.map((item) => ({
+        menuItems={navigationItems.map((item) => ({
           label: item.label,
           icon: item.icon,
           active: item.href === pathName,
+          visible: item.visible,
           onClick: () => {
             router.push(item.href);
             setOpen(false);

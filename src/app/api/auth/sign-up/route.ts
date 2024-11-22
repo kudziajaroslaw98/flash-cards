@@ -1,14 +1,12 @@
 import { ApiResponse } from '#/shared/types/api-response.type';
 import { SignUpResponse } from '#/shared/types/sign-up-response.type';
 import checkValidity from '#/shared/utils/check-validity.util';
+import { createClient } from '#/shared/utils/supabase/server';
 import { signUpValidationScheme } from '#/shared/validation-schemes/sign-up-validation.scheme';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   let response: ApiResponse<SignUpResponse>;
 
-  const cookieStore = cookies();
   const body = await request.json();
 
   const validityCheck = checkValidity(body, signUpValidationScheme);
@@ -27,9 +25,7 @@ export async function POST(request: Request) {
   const capitalisedLastName =
     body.lastName.charAt(0).toUpperCase() + body.lastName.slice(1);
 
-  const supabase = createRouteHandlerClient({
-    cookies: () => cookieStore,
-  });
+  const supabase = await createClient();
   const data = await supabase.auth.signUp({
     email: body.email,
     password: body.password,

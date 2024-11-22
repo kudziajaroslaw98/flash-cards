@@ -7,4 +7,5 @@ export type NavigationGroup = {
   label?: string;
   items: NavigationItem[];
   divider?: true;
+  visible?: boolean;
 };

@@ -1,9 +1,5 @@
 'use client';
 
-import { useSessionContext } from '#/providers/session-provider.component';
-import { APP_ROUTES } from '#/shared/defaults/app.routes';
-import { NavigationGroup } from '#/shared/types/navigation-group.type';
-import { NavigationItem } from '#/shared/types/navigation-item.type';
 import {
   AcademicCapIcon,
   ArrowLeftIcon,
@@ -11,20 +7,25 @@ import {
   ArrowRightIcon,
   ArrowRightStartOnRectangleIcon,
   BoltIcon,
+  Cog8ToothIcon,
   LanguageIcon,
   RectangleStackIcon,
   Squares2X2Icon,
 } from '@heroicons/react/24/solid';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
-import AvatarComponent from '../_ui/avatar/avatar';
-import { Button } from '../_ui/button/button';
-import ContextMenu from '../_ui/context-menu/context-menu';
+import { useSessionContext } from '#/providers/session-provider.component';
 import NavigationGroupComponent from '../_ui/navigation/navigation-group';
 import NavigationItemComponent from '../_ui/navigation/navigation-item';
+import { NavigationGroup } from '#/shared/types/navigation-group.type';
+import { NavigationItem } from '#/shared/types/navigation-item.type';
 import ThemeSwitchComponent from '../theme-switch/theme-switch';
+import ContextMenu from '../_ui/context-menu/context-menu';
+import { APP_ROUTES } from '#/shared/defaults/app.routes';
+import AvatarComponent from '../_ui/avatar/avatar';
+import { Button } from '../_ui/button/button';
+import { useRouter } from 'next/navigation';
+import { useRef, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function SidebarComponent() {
   const [expanded, toggleExpand] = useState<boolean>(true);
@@ -129,6 +130,7 @@ export default function SidebarComponent() {
                 <NavigationItemComponent
                   item={section}
                   expanded={expanded}
+                  visible={section.visible}
                 />
               )}
 
@@ -158,7 +160,7 @@ export default function SidebarComponent() {
                   contextPosition={'top-left'}
                   triggerComponent={
                     <AvatarComponent
-                      avatarClass='size-12'
+                      className='size-12'
                       text={isLoggedIn ? `${firstName} ${lastName}` : 'Guest'}
                       onClick={() => {
                         toggle(!toggled);
@@ -182,6 +184,15 @@ export default function SidebarComponent() {
                           toggle(!toggled);
                         }
                       },
+                    },
+                    {
+                      label: 'Settings',
+                      icon: <Cog8ToothIcon className='size-6' />,
+                      onClick: () => {
+                        router.push(APP_ROUTES.settings);
+                        toggle(!toggled);
+                      },
+                      visible: isLoggedIn,
                     },
                   ]}
                 ></ContextMenu>

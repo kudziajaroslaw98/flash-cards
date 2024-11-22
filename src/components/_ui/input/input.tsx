@@ -1,7 +1,7 @@
 'use client';
 
-import { cn } from '#/shared/utils/cn.util';
 import type { HTMLInputTypeAttribute, InputHTMLAttributes } from 'react';
+import { cn } from '#/shared/utils/cn.util';
 
 export type InputValidation =
   | {
@@ -96,7 +96,7 @@ function Input({
               ? 'placeholder:text-gray-400 dark:placeholder:text-slate-700'
               : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
             'peer w-full bg-gray-100 text-sm text-gray-800',
-            ' text-inherit outline-none transition-all dark:bg-slate-900 dark:text-slate-200 ',
+            'text-inherit outline-none transition-all dark:bg-slate-900 dark:text-slate-200',
           ])}
           onFocus={handleFocus}
           onBlur={handleBlur}

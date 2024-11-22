@@ -22,13 +22,11 @@ export default function SignInComponent() {
         name: 'email',
         label: 'Email',
         placeholder: 'example@email.com',
-        disabled: true,
       },
       password: {
         type: 'password',
         name: 'password',
         label: 'Password',
-        disabled: true,
       },
     },
     validation: signInValidationScheme,
@@ -90,12 +88,15 @@ export default function SignInComponent() {
       </h4>
 
       <div className='flex w-full flex-col gap-2 pt-4'>
-        <FormComponent
+        <FormComponent<Record<keyof typeof formScheme.inputs, string>>
           scheme={formScheme}
           formValid={requestSuccess}
           formError={requestErrorMsg}
           emitFormValid={setFormValid}
           emitFormValue={setFormValue}
+          initialValues={
+            formValue as Record<keyof typeof formScheme.inputs, string>
+          }
         />
       </div>
 
