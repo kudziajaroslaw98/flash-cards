@@ -1,6 +1,5 @@
 import { useThemeContext } from '#/providers/theme-provider.component';
 import { MoonIcon, SunIcon } from '@heroicons/react/24/solid';
-import { cn } from '#/shared/utils/cn.util';
 import Switch from '../_ui/switch/switch';
 
 interface ThemeSwitchProps {
