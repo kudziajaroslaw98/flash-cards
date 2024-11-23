@@ -38,6 +38,26 @@ const NewSetModal = dynamic(() =>
 
 const Badge = dynamic(() => import('#/components/_ui/badge/badge'));
 
+// TODO: add metadata and move content of the page to correct client component
+// export const metadata: Metadata = {
+//   authors: [
+//     { name: 'Final Phase', url: 'https://finalphase.app' },
+//     { name: 'Jarosław Kudzia', url: 'https://github.com/kudziajaroslaw98' },
+//   ],
+//   creator: 'Jarosław Kudzia',
+//   title: 'Flash Card Sets - Organize Your Learning',
+//   description:
+//     'Create, manage, and study your flash card sets. Organize your learning materials efficiently.',
+//   keywords: [
+//     'flash card sets',
+//     'study sets',
+//     'flashcard collections',
+//     'learning materials',
+//     'vocabulary sets',
+//     'organize flashcards',
+//   ],
+// };
+
 export default function SetsPage() {
   const router = useRouter();
   const [isFavourite, toggleFavourite] = useState(false);

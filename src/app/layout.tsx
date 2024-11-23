@@ -100,13 +100,6 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
   },
   applicationName: 'Flash Cards - Learning Words Made Easy',
   alternates: {
@@ -128,13 +121,13 @@ export default function RootLayout({
       className={`${inter.variable} ${roboto_mono.variable} flex font-sans ${theme}`}
       suppressHydrationWarning
     >
-        <head>
-          <Script
-            src={`/xs.js`}
-            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID!}
-            strategy="lazyOnload"
-          />
-        </head>
+      <head>
+        <Script
+          src={`/xs.js`}
+          data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID!}
+          strategy='lazyOnload'
+        />
+      </head>
       <body
         suppressHydrationWarning
         className='min-w-screen relative flex h-auto min-h-full w-full grow flex-col'

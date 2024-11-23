@@ -7,8 +7,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 1,
-      },
-        {
+    },
+    {
       url: 'https://flashcards.finalphase.app/flashcards/learn',
       lastModified: new Date(),
       changeFrequency: 'weekly',
@@ -31,8 +31,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.6,  
-      },
-                  {
+    },
+    {
       url: 'https://flashcards.finalphase.app/sign-up',
       lastModified: new Date(),
       changeFrequency: 'weekly',
