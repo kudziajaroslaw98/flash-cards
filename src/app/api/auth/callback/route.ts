@@ -1,29 +1,11 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '#/shared/utils/supabase/server'
-import { redirect } from 'next/navigation';
+// The client you created from the Server-Side Auth instructions
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const provider = searchParams.get('provider');
-  const supabase = await createClient();
-
-  if (provider === 'google') {
-    return;
-  } else if (provider === 'github') {
-    const { data } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/api/auth/callback`,
-      },
-    });
-
-    console.log(data)
-
-    if (data.url) {
-      redirect(data.url)
-    }
-  }
+  // if "next" is in param, use it as the redirect URL
 
   console.log(origin)
   console.log(searchParams)
@@ -31,6 +13,7 @@ export async function GET(request: Request) {
 
 
   if (code) {
+    const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     console.log(error)
@@ -40,6 +23,7 @@ export async function GET(request: Request) {
     }
   }
 
+  // return the user to an error page with instructions
   return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/auth/auth-code-error`)
 }
 

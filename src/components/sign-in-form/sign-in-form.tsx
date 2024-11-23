@@ -2,6 +2,7 @@
 
 import { signInValidationScheme } from '#/shared/validation-schemes/sign-in-validation.scheme';
 import type { SignInResponse } from '#/types//sign-in-response.type';
+import { createClient } from '#/shared/utils/supabase/client';
 import type { ApiResponse } from '#/types//api-response.type';
 import FormComponent from '#/components/form-component/form';
 import { FingerPrintIcon } from '@heroicons/react/24/solid';
@@ -39,6 +40,7 @@ export default function SignInComponent() {
     Partial<Record<keyof typeof formScheme.inputs, string>>
   >({});
   const { fetch, isLoading } = useFetch();
+  const supabase = createClient();
 
   const router = useRouter();
 
@@ -73,11 +75,21 @@ export default function SignInComponent() {
   };
 
   const handleOAuthGoogle = async () => {
-    await fetch(`${ApiRoutes.CALLBACK}?provider=google`, { method: 'GET' });
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${ApiRoutes.CALLBACK}`,
+      },
+    });
   };
 
   const handleOAuthGithub = async () => {
-    await fetch(`${ApiRoutes.CALLBACK}?provider=github`, { method: 'GET' });
+    await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: `${ApiRoutes.CALLBACK}`,
+      },
+    });
   };
 
   return (
