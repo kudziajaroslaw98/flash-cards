@@ -1,9 +1,9 @@
 'use client';
 
+import type { PropsWithChildren, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import { m } from 'framer-motion';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import type { PropsWithChildren, ReactNode } from 'react';
 
 export interface LinkProps {
   href: string;

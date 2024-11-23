@@ -1,9 +1,10 @@
 'use client';
 
+import { ChevronRightIcon, PaintBrushIcon } from '@heroicons/react/24/solid';
 import { useSessionContext } from '#/providers/session-provider.component';
+import ThemeSwitchComponent from '#/components/theme-switch/theme-switch';
 import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
 import AvatarComponent from '#/components/_ui/avatar/avatar';
-import { ChevronRightIcon } from '@heroicons/react/24/solid';
 import { Button } from '#/components/_ui/button/button';
 import React, { useState, useEffect } from 'react';
 import { z } from 'zod';
@@ -33,7 +34,6 @@ export default function SettingsPage() {
       email: email,
       data: metadata,
     };
-    console.log(updateUserBody);
 
     const validation = z.object({
       data: z.object({
@@ -44,8 +44,6 @@ export default function SettingsPage() {
     });
 
     const result = validation.safeParse(updateUserBody);
-
-    console.log(result);
 
     if (result.success) {
       updateUser(updateUserBody);
@@ -68,9 +66,9 @@ export default function SettingsPage() {
               imageAlt='User avatar'
             />
 
-            <b>
+            <span className='text-lg font-semibold text-gray-700 dark:text-slate-200'>
               {user?.user_metadata?.firstName} {user?.user_metadata?.lastName}
-            </b>
+            </span>
 
             <span className='text-sm text-gray-500'>{user?.email}</span>
           </div>
@@ -86,8 +84,25 @@ export default function SettingsPage() {
       </div>
 
       <div className='w-full max-w-sm'>
-        <span className='text-sm font-semibold text-gray-400'>Content</span>
-        <section className='flex flex-col gap-4'></section>
+        <span className='text-sm font-semibold text-gray-700 dark:text-slate-200'>
+          Preferences
+        </span>
+
+        <section className='flex flex-col gap-4 rounded-md border border-gray-200 p-2 pt-2 dark:border-slate-800'>
+          <div className='flex justify-between gap-2 rounded-md'>
+            <div className='flex items-center gap-2'>
+              <div className='flex size-8 items-center justify-center rounded-md bg-gray-200 text-gray-700 dark:bg-slate-900 dark:text-slate-200'>
+                <PaintBrushIcon className='size-4' />
+              </div>
+
+              <span className='text-sm font-semibold text-gray-700 dark:text-slate-200'>
+                Theme
+              </span>
+            </div>
+
+            <ThemeSwitchComponent showLabel={true} />
+          </div>
+        </section>
       </div>
 
       <div className='w-full max-w-sm'>
@@ -96,19 +111,20 @@ export default function SettingsPage() {
           <p className='flex flex-col gap-2 text-gray-600'>
             <span className='text-sm font-semibold text-red-500'>Warning</span>
 
-            <span className='text-sm'>
+            <span className='text-sm text-gray-700 dark:text-slate-200'>
               Deleting your account will permanently{' '}
               <span className='font-bold text-red-500'>remove all</span> your
               data.
             </span>
           </p>
+
           <AlertDialog
             headerText='Delete Account'
             bodyText='Are you sure you want to delete your account? This action cannot be undone.'
             trigger={
               <button
                 disabled={isDeleting}
-                className={`rounded-lg bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700 focus:border-red-500 focus:outline-none focus:ring ${
+                className={`rounded-lg bg-red-500 px-4 py-2 font-bold text-gray-50 hover:bg-red-700 focus:border-red-500 focus:outline-none focus:ring ${
                   isDeleting ? 'cursor-not-allowed opacity-50' : ''
                 }`}
               >
