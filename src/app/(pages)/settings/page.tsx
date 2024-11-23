@@ -12,7 +12,7 @@ import AvatarComponent from '#/components/_ui/avatar/avatar';
 import { Button } from '#/components/_ui/button/button';
 import Switch from '#/components/_ui/switch/switch';
 import React, { useState, useEffect } from 'react';
-import { set, z } from 'zod';
+import { z } from 'zod';
 
 export default function SettingsPage() {
   const { user, updateUser, deleteUser } = useSessionContext();
