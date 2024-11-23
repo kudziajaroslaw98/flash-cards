@@ -146,13 +146,13 @@ export default function SidebarComponent() {
 
         <div className='flex h-full w-full items-end justify-center'>
           <div className='flex flex-col items-center justify-center gap-8'>
-            <ThemeSwitchComponent showLabel={expanded} />
+            {!isLoggedIn && <ThemeSwitchComponent showLabel={expanded} />}
 
             <div
               className='flex'
               ref={menuRef}
             >
-              <div className='flex items-center justify-center gap-2'>
+              <div className='flex items-center justify-center gap-4'>
                 <ContextMenu
                   className='-left-4'
                   name={'avatar-context'}
@@ -160,7 +160,7 @@ export default function SidebarComponent() {
                   contextPosition={'top-left'}
                   triggerComponent={
                     <AvatarComponent
-                      className='size-12'
+                      className='size-10'
                       text={isLoggedIn ? `${firstName} ${lastName}` : 'Guest'}
                       onClick={() => {
                         toggle(!toggled);
@@ -200,7 +200,7 @@ export default function SidebarComponent() {
                 <div
                   className={`w-full max-w-32 flex-col ${expanded ? 'flex' : 'hidden'}`}
                 >
-                  <span className='flex overflow-hidden text-ellipsis font-extrabold text-slate-800 dark:text-gray-100'>
+                  <span className='line-clamp-1  overflow-hidden text-ellipsis font-extrabold text-slate-800 dark:text-gray-100'>
                     {isLoggedIn ? `${firstName} ${lastName}` : 'Guest'}
                   </span>
 

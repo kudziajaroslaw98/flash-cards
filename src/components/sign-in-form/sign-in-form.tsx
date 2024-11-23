@@ -2,6 +2,7 @@
 
 import { signInValidationScheme } from '#/shared/validation-schemes/sign-in-validation.scheme';
 import type { SignInResponse } from '#/types//sign-in-response.type';
+import { createClient } from '#/shared/utils/supabase/client';
 import type { ApiResponse } from '#/types//api-response.type';
 import FormComponent from '#/components/form-component/form';
 import { FingerPrintIcon } from '@heroicons/react/24/solid';
@@ -39,6 +40,7 @@ export default function SignInComponent() {
     Partial<Record<keyof typeof formScheme.inputs, string>>
   >({});
   const { fetch, isLoading } = useFetch();
+  const supabase = createClient();
 
   const router = useRouter();
 
@@ -72,6 +74,34 @@ export default function SignInComponent() {
     router.refresh();
   };
 
+  const handleOAuthGoogle = async () => {
+    let { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}${ApiRoutes.CALLBACK}`,
+      },
+    });
+    if (!error) {
+      router.push(
+        `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}${APP_ROUTES.flashcards.learn}`,
+      );
+    }
+  };
+
+  const handleOAuthGithub = async () => {
+    let { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}${ApiRoutes.CALLBACK}`,
+      },
+    });
+    if (!error) {
+      router.push(
+        `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}${APP_ROUTES.flashcards.learn}`,
+      );
+    }
+  };
+
   return (
     <m.div
       initial={{ opacity: 0, y: 20 }}
@@ -100,13 +130,31 @@ export default function SignInComponent() {
         />
       </div>
 
-      <Button
-        onClick={handleSignIn}
-        disabled={!formValid}
-        loading={isLoading ?? false}
-        label='Sign in'
-        size={'full'}
-      ></Button>
+      <div className='flex w-full flex-col gap-2'>
+        <Button
+          onClick={handleSignIn}
+          disabled={!formValid}
+          loading={isLoading ?? false}
+          label='Sign in'
+          size={'full'}
+        ></Button>
+
+        <Button
+          onClick={handleOAuthGithub}
+          disabled={isLoading ?? false}
+          loading={isLoading ?? false}
+          label='Sign in with Github'
+          size={'full'}
+        ></Button>
+
+        <Button
+          onClick={handleOAuthGoogle}
+          disabled={isLoading ?? false}
+          loading={isLoading ?? false}
+          label='Sign in with Google'
+          size={'full'}
+        ></Button>
+      </div>
 
       <div className='flex flex-col items-center justify-center gap-1'>
         <span className='text-gray-600 dark:text-slate-400'>

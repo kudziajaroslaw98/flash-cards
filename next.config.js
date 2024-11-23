@@ -31,7 +31,6 @@ const nextConfig = {
       },
     ]
   },
-  skipTrailingSlashRedirect: true,
   publicRuntimeConfig: {
     dest: 'public',
     cacheOnFrontEndNav: true,
