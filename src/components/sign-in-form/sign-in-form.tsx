@@ -77,12 +77,18 @@ export default function SignInComponent() {
   const handleOAuthGoogle = async () => {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
+      options: {
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/api/auth/callback`,
+      },
     });
   };
 
   const handleOAuthGithub = async () => {
     await supabase.auth.signInWithOAuth({
       provider: 'github',
+      options: {
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/api/auth/callback`,
+      },
     });
   };
 
