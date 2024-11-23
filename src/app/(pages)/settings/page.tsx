@@ -1,13 +1,18 @@
 'use client';
 
-import { ChevronRightIcon, PaintBrushIcon } from '@heroicons/react/24/solid';
+import {
+  BellIcon,
+  ChevronRightIcon,
+  PaintBrushIcon,
+} from '@heroicons/react/24/solid';
 import { useSessionContext } from '#/providers/session-provider.component';
 import ThemeSwitchComponent from '#/components/theme-switch/theme-switch';
 import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
 import AvatarComponent from '#/components/_ui/avatar/avatar';
 import { Button } from '#/components/_ui/button/button';
+import Switch from '#/components/_ui/switch/switch';
 import React, { useState, useEffect } from 'react';
-import { z } from 'zod';
+import { set, z } from 'zod';
 
 export default function SettingsPage() {
   const { user, updateUser, deleteUser } = useSessionContext();
@@ -15,6 +20,7 @@ export default function SettingsPage() {
   const [lastName, setLastName] = useState(user?.user_metadata?.lastName);
   const [email, setEmail] = useState(user?.email);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [notificationEnabled, setNotificationEnabled] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -54,6 +60,20 @@ export default function SettingsPage() {
     setIsDeleting(true);
     deleteUser();
   };
+
+  const handleNotificationChange = async () => {
+    await Notification.requestPermission().then((result) => {
+      if (result === 'granted') {
+        setNotificationEnabled(true);
+      } else if (result === 'denied') {
+        setNotificationEnabled(false);
+      }
+    });
+  };
+
+  useEffect(() => {
+    handleNotificationChange();
+  }, []);
 
   return (
     <div className='flex w-full flex-col items-center gap-4'>
@@ -101,6 +121,23 @@ export default function SettingsPage() {
             </div>
 
             <ThemeSwitchComponent showLabel={true} />
+          </div>
+
+          <div className='flex justify-between gap-2 rounded-md'>
+            <div className='flex items-center gap-2'>
+              <div className='flex size-8 items-center justify-center rounded-md bg-gray-200 text-gray-700 dark:bg-slate-900 dark:text-slate-200'>
+                <BellIcon className='size-4' />
+              </div>
+
+              <span className='text-sm font-semibold text-gray-700 dark:text-slate-200'>
+                Notifications
+              </span>
+            </div>
+            <Switch
+              showLabel={false}
+              onClick={handleNotificationChange}
+              value={notificationEnabled}
+            />
           </div>
         </section>
       </div>

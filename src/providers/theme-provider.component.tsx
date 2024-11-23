@@ -1,21 +1,24 @@
 'use client';
 
-import useLocalStorage from '#/hooks/use-local-storage.hook';
 import {
   createContext,
   PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
   useState,
 } from 'react';
+import useLocalStorage from '#/hooks/use-local-storage.hook';
 
 export type ThemeContextType = {
   isDarkMode: boolean;
+  isLightMode: boolean;
   changeTheme: () => void;
 };
 
 export const ThemeContext = createContext<ThemeContextType>({
   isDarkMode: false,
+  isLightMode: true,
   changeTheme: () => null,
 });
 
@@ -50,9 +53,13 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
     window.umami.track('Theme changed', { theme: newTheme });
   };
 
-  const isDarkMode = (): boolean => {
+  const isDarkMode = useCallback((): boolean => {
     return theme === 'dark';
-  };
+  }, [theme]);
+
+  const isLightMode = useCallback((): boolean => {
+    return theme === 'light';
+  }, [theme]);
 
   useEffect(() => {
     const serverSideTheme = window.document
@@ -65,7 +72,13 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
   }, []);
 
   return (
-    <ThemeContext.Provider value={{ changeTheme, isDarkMode: isDarkMode() }}>
+    <ThemeContext.Provider
+      value={{
+        changeTheme,
+        isDarkMode: isDarkMode(),
+        isLightMode: isLightMode(),
+      }}
+    >
       {props.children}
     </ThemeContext.Provider>
   );

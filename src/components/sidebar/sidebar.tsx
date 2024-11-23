@@ -146,7 +146,7 @@ export default function SidebarComponent() {
 
         <div className='flex h-full w-full items-end justify-center'>
           <div className='flex flex-col items-center justify-center gap-8'>
-            <ThemeSwitchComponent showLabel={expanded} />
+            {!isLoggedIn && <ThemeSwitchComponent showLabel={expanded} />}
 
             <div
               className='flex'

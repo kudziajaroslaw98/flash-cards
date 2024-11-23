@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from 'react';
+import { cn } from '#/shared/utils/cn.util';
 
 type SwitchProps =
   | {
@@ -25,13 +26,17 @@ export default function Switch(props: PropsWithChildren<SwitchProps>) {
         checked={props.value}
         className='peer sr-only'
       />
-      <div className='relative h-6 w-11 rounded-full bg-gray-200 dark:bg-slate-700'>
+      <div
+        className={cn([
+          'relative h-6 w-10 rounded-full bg-gray-200 dark:bg-slate-900',
+        ])}
+      >
         <div
-          className={`absolute start-[2px] top-[2px] flex h-5 w-5 items-center justify-center rounded-full bg-green-400 text-gray-50 transition content-[""] ${
-            props.value
-              ? 'translate-x-full border-white bg-green-800 dark:bg-green-500'
-              : ''
-          }`}
+          className={cn([
+            'absolute start-[2px] top-[2px] flex h-5 w-5 items-center justify-center rounded-full bg-gray-500 text-gray-50 transition content-[""] dark:bg-slate-700',
+            props.value &&
+              'translate-x-[16px] border-white bg-green-500 dark:bg-green-500',
+          ])}
         >
           {props.children}
         </div>
