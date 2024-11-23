@@ -1,11 +1,12 @@
-import type { Metadata } from 'next';
 import { Inter, Roboto_Mono } from 'next/font/google';
+import type { Metadata } from 'next';
 
-import HeaderComponent from '#/components/header/header';
-import SidebarComponent from '#/components/sidebar/sidebar';
 import ClientSideProviders from '#/providers/client-side-providers.component';
-import dynamic from 'next/dynamic';
+import SidebarComponent from '#/components/sidebar/sidebar';
+import HeaderComponent from '#/components/header/header';
 import { cookies } from 'next/headers';
+import dynamic from 'next/dynamic';
+import Script from 'next/script';
 import './globals.css';
 
 const ToastsComponent = dynamic(() => import('#/components/toasts/toasts'), {
@@ -127,13 +128,13 @@ export default function RootLayout({
       className={`${inter.variable} ${roboto_mono.variable} flex font-sans ${theme}`}
       suppressHydrationWarning
     >
-      <head>
-        <script
-          defer
-          src='https://umami.finalphase.app/script.js'
-          data-website-id='cd63e4f9-b7a9-4748-ad09-660a7ffa7984'
-        ></script>
-      </head>
+        <head>
+          <Script
+            src={`/xs.js`}
+            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID!}
+            strategy="lazyOnload"
+          />
+        </head>
       <body
         suppressHydrationWarning
         className='min-w-screen relative flex h-auto min-h-full w-full grow flex-col'

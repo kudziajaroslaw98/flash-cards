@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { Button } from '../button/button';
 import { Dialog, type DialogProps } from '../dialog/dialog';
+import { Button } from '../button/button';
 import Modal from '../modal/modal';
+import { useState } from 'react';
 
 export type AlertDialogProps = {
   trigger: React.ReactNode;
@@ -38,19 +38,24 @@ export const AlertDialog = ({
       open={open}
       setOpen={setOpen}
     >
-      <Modal className='w-full max-w-xl'>
-        <Modal.Header borderVisible={false}>{headerText}</Modal.Header>
+      <Modal className='w-full max-w-sm'>
+        <Modal.Header
+          variant='alert'
+          borderVisible={false}
+        >
+          {headerText}
+        </Modal.Header>
 
         <Modal.Body
           borderVisible={false}
-          className='flex flex-col'
+          variant='alert'
         >
           {bodyText}
         </Modal.Body>
 
         <Modal.Footer
           borderVisible={false}
-          className='flex items-center justify-end gap-2'
+          variant='alert'
         >
           <Button
             onClick={handleCancel}

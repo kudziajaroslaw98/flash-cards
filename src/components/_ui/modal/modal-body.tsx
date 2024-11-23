@@ -1,23 +1,21 @@
-import { cn } from '#/shared/utils/cn.util';
 import { ReactNode } from 'react';
+import { cn } from '#/shared/utils/cn.util';
+import { modalBodyVariants } from './modal.variants';
+import { VariantProps } from 'class-variance-authority';
+
+interface ModalBodyProps extends VariantProps<typeof modalBodyVariants> {
+  children: ReactNode;
+  className?: string;
+}
 
 export const ModalBody = ({
   children,
   className,
-  borderVisible = true,
-}: {
-  children: ReactNode;
-  className?: string;
-  borderVisible?: boolean;
-}) => {
+  variant,
+  borderVisible,
+}: ModalBodyProps) => {
   return (
-    <div
-      className={cn([
-        'flex w-full flex-col text-sm text-slate-500',
-        borderVisible ? 'px-6 py-6' : 'px-6 py-2',
-        className,
-      ])}
-    >
+    <div className={cn(modalBodyVariants({ variant, borderVisible, className }))}>
       {children}
     </div>
   );

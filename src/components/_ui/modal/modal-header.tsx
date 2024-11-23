@@ -1,29 +1,26 @@
 import { DialogContext } from '#/providers/dialog.providers';
-import { cn } from '#/shared/utils/cn.util';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { ReactNode, useContext } from 'react';
+import { cn } from '#/shared/utils/cn.util';
 import { Button } from '../button/button';
+import { modalHeaderVariants } from './modal.variants';
+import { VariantProps } from 'class-variance-authority';
+
+interface ModalHeaderProps extends VariantProps<typeof modalHeaderVariants> {
+  children: ReactNode;
+  className?: string;
+}
 
 export const ModalHeader = ({
   children,
   className,
-  borderVisible = true,
-}: {
-  children: ReactNode;
-  className?: string;
-  borderVisible?: boolean;
-}) => {
+  variant,
+  borderVisible,
+}: ModalHeaderProps) => {
   const { isCloseButtonVisible, onDialogClose } = useContext(DialogContext);
 
   return (
-    <div
-      className={cn([
-        'text-lg font-bold',
-        'flex w-full items-center justify-between border-gray-200 dark:border-slate-800',
-        borderVisible ? 'border-b px-6 py-4' : 'px-6 py-4 pt-8',
-        className,
-      ])}
-    >
+    <div className={cn(modalHeaderVariants({ variant, borderVisible, className }))}>
       {children}
 
       {isCloseButtonVisible && (

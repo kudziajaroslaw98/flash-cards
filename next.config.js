@@ -19,6 +19,19 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  async rewrites() {
+    return [
+      {
+        source: `/xs.js`,
+        destination: `${process.env.NEXT_PUBLIC_UMAMI_SRC}`
+      },
+      {
+        source: `/api/send`,
+        destination: `${process.env.NEXT_PUBLIC_UMAMI_API}`
+      },
+    ]
+  },
+  skipTrailingSlashRedirect: true,
   publicRuntimeConfig: {
     dest: 'public',
     cacheOnFrontEndNav: true,

@@ -3,9 +3,9 @@
 import { useSessionContext } from '#/providers/session-provider.component';
 import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
 import AvatarComponent from '#/components/_ui/avatar/avatar';
+import { ChevronRightIcon } from '@heroicons/react/24/solid';
+import { Button } from '#/components/_ui/button/button';
 import React, { useState, useEffect } from 'react';
-import Input from '#/components/_ui/input/input';
-import Card from '#/components/_ui/card/card';
 import { z } from 'zod';
 
 export default function SettingsPage() {
@@ -55,93 +55,50 @@ export default function SettingsPage() {
   const handleDeleteUser = () => {
     setIsDeleting(true);
     deleteUser();
-    //     try {
-    //       const { data, error } = await supabase
-    //         .from('users')
-    //         .delete({ id: user.id });
-    //       if (error) {
-    //         console.error(error);
-    //       } else {
-    //         deleteUser();
-    //       }
-    //     } catch (error) {
-    //       console.error(error);
-    //       setIsDeleting(false);
-    //     }
   };
 
   return (
     <div className='flex w-full flex-col items-center gap-4'>
-      <h1 className='mb-4 text-3xl font-bold'>Account Settings</h1>
-
-      <Card
-        motion={false}
-        className='w-full max-w-sm'
-      >
-        <section className='flex flex-col gap-4'>
-          <h2 className='text-2xl font-bold'>Account Information</h2>
-
-          <div className='flex w-full justify-center'>
+      <div className='w-full max-w-sm'>
+        <section className='flex flex-col items-center gap-4'>
+          <div className='flex w-full flex-col items-center justify-center gap-2'>
             <AvatarComponent
-              className='size-24'
-              text={`${firstName} ${lastName}`}
+              className='size-16'
+              text={`${user?.user_metadata?.firstName} ${user?.user_metadata?.lastName}`}
+              imageAlt='User avatar'
             />
+
+            <b>
+              {user?.user_metadata?.firstName} {user?.user_metadata?.lastName}
+            </b>
+
+            <span className='text-sm text-gray-500'>{user?.email}</span>
           </div>
 
-          <p className='text-gray-600'>
-            <b>Email:</b> {email}
-          </p>
-
-          <p className='text-gray-600'>
-            <b>First Name:</b> {firstName}
-          </p>
-
-          <p className='text-gray-600'>
-            <b>Last Name:</b> {lastName}
-          </p>
-        </section>
-      </Card>
-
-      <Card
-        motion={false}
-        className='w-full max-w-sm'
-      >
-        <section className='mb-8 flex flex-col gap-4'>
-          <h2 className='mb-2 text-2xl font-bold'>Edit Metadata</h2>
-          <Input
-            label='First Name'
-            type='text'
-            value={firstName}
-            valid={true}
-            onChange={(e) => setFirstName(e.target.value)}
+          <Button
+            label='Edit Profile'
+            icon={<ChevronRightIcon className='size-4' />}
+            iconPosition='right'
+            size={'sm'}
           />
-          <Input
-            label='Last Name'
-            type='text'
-            value={lastName}
-            valid={true}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-
-          <button
-            onClick={handleUpdateProfile}
-            className='rounded-lg bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:border-blue-500 focus:outline-none focus:ring'
-          >
-            Save Changes
-          </button>
         </section>
-      </Card>
+      </div>
 
-      <Card
-        motion={false}
-        className='w-full max-w-sm'
-      >
-        <section className='flex flex-col gap-8'>
-          <h2 className='text-2xl font-bold'>Delete Account</h2>
+      <div className='w-full max-w-sm'>
+        <span className='text-sm font-semibold text-gray-400'>Content</span>
+        <section className='flex flex-col gap-4'></section>
+      </div>
+
+      <div className='w-full max-w-sm'>
+        <span className='text-sm font-semibold text-red-500'>Danger Zone</span>
+        <section className='flex flex-col gap-4 rounded-md border border-red-500 p-4'>
           <p className='flex flex-col gap-2 text-gray-600'>
-            <span className='text-xl font-bold text-red-500'>Warning!</span>
-            <span>
-              Deleting your account will permanently remove all your data.
+            <span className='text-sm font-semibold text-red-500'>Warning</span>
+
+            <span className='text-sm'>
+              Deleting your account will permanently{' '}
+              <span className='font-bold text-red-500'>remove all</span> your
+              data.
             </span>
           </p>
           <AlertDialog
@@ -161,7 +118,7 @@ export default function SettingsPage() {
             onCancel={() => setIsDeleting(false)}
           ></AlertDialog>
         </section>
-      </Card>
+      </div>
     </div>
   );
 }
