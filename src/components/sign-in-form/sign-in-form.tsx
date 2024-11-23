@@ -75,31 +75,15 @@ export default function SignInComponent() {
   };
 
   const handleOAuthGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}${ApiRoutes.CALLBACK}`,
-      },
     });
-    if (!error) {
-      router.push(
-        `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}${APP_ROUTES.flashcards.learn}`,
-      );
-    }
   };
 
   const handleOAuthGithub = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    await supabase.auth.signInWithOAuth({
       provider: 'github',
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}${ApiRoutes.CALLBACK}`,
-      },
     });
-    if (!error) {
-      router.push(
-        `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}${APP_ROUTES.flashcards.learn}`,
-      );
-    }
   };
 
   return (
