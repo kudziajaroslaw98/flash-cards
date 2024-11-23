@@ -9,8 +9,8 @@ import {
   useState,
 } from 'react';
 import type { Session, User, UserAttributes } from '@supabase/supabase-js';
-import type { ApiResponse } from '#/shared/types/api-response.type';
 import { createClient } from '#/shared/utils/supabase/client';
+import type { ApiResponse } from '#/types//api-response.type';
 import { usePathname, useRouter } from 'next/navigation';
 import useFetch from '#/hooks/use-fetch.hook';
 

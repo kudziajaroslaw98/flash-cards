@@ -1,8 +1,8 @@
-import { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import { Sets } from '#/shared/types/local-storage-sets.type';
-import { UUID } from '#/shared/types/uuid.type';
 import typedInstanceFactory from '#/shared/utils/typed-instance-factory.util';
+import { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Sets } from '#/types//local-storage-sets.type';
+import { UUID } from '#/types//uuid.type';
 
 const initialState: Sets = {};
 

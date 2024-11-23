@@ -22,9 +22,9 @@ export default function HeaderComponent() {
               />
             </span>
 
-            <h5 className='bg-gradient-to-r from-green-600 to-green-400  bg-clip-text text-2xl font-black uppercase tracking-tighter text-transparent transition-all'>
+            <h1 className='bg-gradient-to-r from-green-600 to-green-400  bg-clip-text text-2xl font-black uppercase tracking-tighter text-transparent transition-all'>
               FLASHCARDS
-            </h5>
+            </h1>
           </Link>
 
           <span className='hidden items-center gap-1 text-gray-500 dark:text-slate-300 lg:flex'>

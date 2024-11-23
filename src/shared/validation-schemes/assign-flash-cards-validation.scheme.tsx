@@ -1,8 +1,8 @@
-import { z } from 'zod';
+import { DictionaryValue } from '#/types/dictionary-value.type';
 import { FlashCardSet } from '../models/flash-card-set.model';
-import { DictionaryValue } from '../types/dictionary-value.type';
-import { FormScheme } from '../types/form-scheme.type';
-import { UUID } from '../types/uuid.type';
+import { FormScheme } from '#/types/form-scheme.type';
+import { UUID } from '#/types/uuid.type';
+import { z } from 'zod';
 
 export const assignFlashCardsValidationScheme = z.object({
   flashCards: z.array(z.string().uuid()),

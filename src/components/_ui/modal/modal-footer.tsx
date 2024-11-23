@@ -1,23 +1,21 @@
-import { cn } from '#/shared/utils/cn.util';
 import { ReactNode } from 'react';
+import { cn } from '#/shared/utils/cn.util';
+import { modalFooterVariants } from './modal.variants';
+import { VariantProps } from 'class-variance-authority';
+
+interface ModalFooterProps extends VariantProps<typeof modalFooterVariants> {
+  children: ReactNode;
+  className?: string;
+}
 
 export const ModalFooter = ({
   children,
   className,
-  borderVisible = true,
-}: {
-  children: ReactNode;
-  className?: string;
-  borderVisible?: boolean;
-}) => {
+  variant,
+  borderVisible,
+}: ModalFooterProps) => {
   return (
-    <div
-      className={cn([
-        'w-full border-gray-200 dark:border-slate-800',
-        borderVisible ? 'border-t px-6 py-4' : 'px-6 py-4 pb-8',
-        className,
-      ])}
-    >
+    <div className={cn(modalFooterVariants({ variant, borderVisible, className }))}>
       {children}
     </div>
   );

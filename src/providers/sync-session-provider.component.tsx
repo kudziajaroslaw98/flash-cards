@@ -1,20 +1,5 @@
 'use client';
 
-import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
-import useInterval from '#/hooks/use-interval.hook';
-import useLocalStorage from '#/hooks/use-local-storage.hook';
-import { DEFAULT_STATS } from '#/shared/defaults/stats.default';
-import { FlashCards } from '#/shared/types/local-storage-flash-card.type';
-import {
-  Metadata,
-  MetadataModel,
-} from '#/shared/types/local-storage-metadata.type';
-import { Sets } from '#/shared/types/local-storage-sets.type';
-import { setFlashCards } from '#/store/reducers/flashcards.reducer';
-import { setSets } from '#/store/reducers/sets.reducer';
-import { setStats } from '#/store/reducers/stats.reducer';
-import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
-import { statsSelectors } from '#/store/selectors/stats.selectors';
 import {
   PropsWithChildren,
   createContext,
@@ -22,7 +7,19 @@ import {
   useEffect,
   useRef,
 } from 'react';
+import { Metadata, MetadataModel } from '#/types//local-storage-metadata.type';
+import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
+import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
+import { FlashCards } from '#/types//local-storage-flash-card.type';
+import { setFlashCards } from '#/store/reducers/flashcards.reducer';
+import { statsSelectors } from '#/store/selectors/stats.selectors';
 import { useSessionContext } from './session-provider.component';
+import { DEFAULT_STATS } from '#/shared/defaults/stats.default';
+import useLocalStorage from '#/hooks/use-local-storage.hook';
+import { setStats } from '#/store/reducers/stats.reducer';
+import { Sets } from '#/types//local-storage-sets.type';
+import { setSets } from '#/store/reducers/sets.reducer';
+import useInterval from '#/hooks/use-interval.hook';
 
 export type SyncSessionContextType = {
   sync: () => void;

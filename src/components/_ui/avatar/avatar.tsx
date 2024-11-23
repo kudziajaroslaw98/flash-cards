@@ -1,16 +1,53 @@
+'use client';
+
+import useLocalStorage from '#/hooks/use-local-storage.hook';
+import { botttsNeutral } from '@dicebear/collection';
+import { createAvatar } from '@dicebear/core';
 import { cn } from '#/shared/utils/cn.util';
+import { useEffect, useRef } from 'react';
+import Image from 'next/image';
 
 interface AvatarProps {
   className?: string;
   text?: string;
+  imageSrc?: string;
+  imageAlt?: string;
   onClick?: () => void;
 }
+
+const generateHash = (text?: string): string => {
+  if (!text) {
+    return Math.random().toString(36);
+  }
+
+  // Use text to create a consistent hash
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    const char = text.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash).toString(36);
+};
 
 export default function AvatarComponent({
   className,
   text,
+  imageSrc,
+  imageAlt,
   onClick,
 }: AvatarProps) {
+  const avatarRef = useRef<string>('');
+  const { value: seed } = useLocalStorage('seed', {
+    seed: generateHash(),
+  });
+
+  useEffect(() => {
+    avatarRef.current = createAvatar(botttsNeutral, {
+      seed: seed.seed,
+    }).toDataUri();
+  }, [seed]);
+
   const firstLetters = text
     ?.split(' ')
     .slice(0, 2)
@@ -20,11 +57,22 @@ export default function AvatarComponent({
     <button
       onClick={() => onClick && onClick()}
       className={cn([
-        'flex cursor-pointer items-center justify-center rounded-full bg-gray-200 text-sm font-semibold text-slate-800 active:focus:scale-95 dark:bg-slate-800 dark:text-gray-100',
+        'relative flex cursor-pointer items-center justify-center overflow-hidden rounded-full bg-gray-200 text-sm font-semibold text-slate-800 active:focus:scale-95 dark:bg-slate-800 dark:text-gray-100',
         className,
       ])}
     >
-      {firstLetters}
+      {(imageSrc ?? avatarRef.current) ? (
+        <Image
+          src={imageSrc ?? avatarRef.current}
+          alt={imageAlt || 'User avatar'}
+          className='h-full w-full object-cover'
+          fill
+        />
+      ) : (
+        <span className='text-sm font-semibold text-slate-800 dark:text-gray-100'>
+          {firstLetters}
+        </span>
+      )}
     </button>
   );
 }

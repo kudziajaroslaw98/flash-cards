@@ -1,13 +1,13 @@
-import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import type { FlashCard } from '#/shared/models/flash-card.model';
-import type { DictionaryValue } from '#/shared/types/dictionary-value.type';
-import type { UUID } from '#/shared/types/uuid.type';
 import { assignFlashCardsScheme } from '#/shared/validation-schemes/assign-flash-cards-validation.scheme';
+import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
+import type { DictionaryValue } from '#/types//dictionary-value.type';
+import type { FlashCard } from '#/shared/models/flash-card.model';
 import React, { useMemo, useRef, useState } from 'react';
+import FormComponent from '../form-component/form';
+import type { UUID } from '#/types//uuid.type';
 import { Button } from '../_ui/button/button';
 import { Dialog } from '../_ui/dialog/dialog';
 import Modal from '../_ui/modal/modal';
-import FormComponent from '../form-component/form';
 
 interface AssignFlashCardsModalProps {
   handleSubmit: (value: Array<UUID>) => void;

@@ -1,6 +1,6 @@
-import { z } from 'zod';
 import type { FlashCard } from '../models/flash-card.model';
-import type { FormScheme } from '../types/form-scheme.type';
+import type { FormScheme } from '#/types/form-scheme.type';
+import { z } from 'zod';
 
 export const newFlashCardValidationScheme = z.object({
   question: z.string().min(1, 'Question is required'),

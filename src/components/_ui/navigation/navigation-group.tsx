@@ -1,4 +1,4 @@
-import { NavigationGroup } from '#/shared/types/navigation-group.type';
+import { NavigationGroup } from '#/types//navigation-group.type';
 import LinkComponent from '../link/link';
 
 export interface NavigationGroupProps {

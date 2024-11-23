@@ -1,4 +1,4 @@
-import { DictionaryValue } from '#/shared/types/dictionary-value.type';
+import { DictionaryValue } from '#/types//dictionary-value.type';
 
 export default function DropdownItem<T>({
   item,

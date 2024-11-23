@@ -14,12 +14,12 @@ import {
   updateSet,
   updateSets,
 } from '#/store/reducers/sets.reducer';
-import type { DictionaryValue } from '#/shared/types/dictionary-value.type';
 import { StarIcon as StarIconOutline } from '@heroicons/react/24/outline';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
+import type { DictionaryValue } from '#/types//dictionary-value.type';
 import { setsSelectors } from '#/store/selectors/sets.selectors';
 import Dropdown from '#/components/_ui/dropdown/dropdown';
 import { Button } from '#/components/_ui/button/button';

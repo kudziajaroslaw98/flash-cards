@@ -1,4 +1,4 @@
-import { UUID } from '#/shared/types/uuid.type';
+import { UUID } from '#/types//uuid.type';
 import { v4 } from 'uuid';
 
 export type FlashCard = {

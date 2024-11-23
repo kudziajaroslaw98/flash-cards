@@ -1,4 +1,4 @@
-import { ApiResponse } from '../types/api-response.type';
+import { ApiResponse } from '#/types/api-response.type';
 
 export default function isApiResponse(
   // Type 'unknown' can't be used here. We want to check whether type is ApiResponse without narrowing type.

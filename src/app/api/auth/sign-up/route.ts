@@ -1,5 +1,5 @@
-import { ApiResponse } from '#/shared/types/api-response.type';
-import { SignUpResponse } from '#/shared/types/sign-up-response.type';
+import { ApiResponse } from '#/types//api-response.type';
+import { SignUpResponse } from '#/types//sign-up-response.type';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { createClient } from '#/shared/utils/supabase/server';
 import { signUpValidationScheme } from '#/shared/validation-schemes/sign-up-validation.scheme';
