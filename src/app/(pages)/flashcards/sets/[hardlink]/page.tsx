@@ -1,23 +1,4 @@
 'use client';
-import { Button } from '#/components/_ui/button/button';
-import ContextMenu, {
-  ContextMenuItem,
-} from '#/components/_ui/context-menu/context-menu';
-import LinkComponent from '#/components/_ui/link/link';
-import FlashCardComponent from '#/components/flash-card/flash-card';
-import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
-import useFetch from '#/hooks/use-fetch.hook';
-import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import type { FlashCard } from '#/shared/models/flash-card.model';
-import type { DictionaryValue } from '#/shared/types/dictionary-value.type';
-import type { FlashCards } from '#/shared/types/local-storage-flash-card.type';
-import type { UUID } from '#/shared/types/uuid.type';
-import { cn } from '#/shared/utils/cn.util';
-import uuid from '#/shared/utils/uuid.util';
-import { addNewFlashCards } from '#/store/reducers/flashcards.reducer';
-import { removeSets, updateSet } from '#/store/reducers/sets.reducer';
-import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
-import { setsSelectors } from '#/store/selectors/sets.selectors';
 import {
   ArrowDownTrayIcon,
   ArrowLeftIcon,
@@ -27,9 +8,28 @@ import {
   SparklesIcon,
   TrashIcon,
 } from '@heroicons/react/24/solid';
-import dynamic from 'next/dynamic';
+import ContextMenu, {
+  ContextMenuItem,
+} from '#/components/_ui/context-menu/context-menu';
+import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
+import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
+import type { FlashCards } from '#/types//local-storage-flash-card.type';
+import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
+import { addNewFlashCards } from '#/store/reducers/flashcards.reducer';
+import type { DictionaryValue } from '#/types//dictionary-value.type';
+import { removeSets, updateSet } from '#/store/reducers/sets.reducer';
+import FlashCardComponent from '#/components/flash-card/flash-card';
+import type { FlashCard } from '#/shared/models/flash-card.model';
+import { setsSelectors } from '#/store/selectors/sets.selectors';
+import { Button } from '#/components/_ui/button/button';
+import LinkComponent from '#/components/_ui/link/link';
 import { useParams, useRouter } from 'next/navigation';
+import type { UUID } from '#/types//uuid.type';
+import useFetch from '#/hooks/use-fetch.hook';
+import uuid from '#/shared/utils/uuid.util';
+import { cn } from '#/shared/utils/cn.util';
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 
 const NewSetModal = dynamic(() =>
   import('#/components/new-set-modal/new-set-modal').then((x) => x.NewSetModal),

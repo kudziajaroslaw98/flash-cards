@@ -1,17 +1,17 @@
 'use client';
 
-import FormComponent from '#/components/form-component/form';
-import useFetch from '#/hooks/use-fetch.hook';
-import { ApiRoutes } from '#/shared/enums/api-routes.enum';
-import { ApiResponse } from '#/shared/types/api-response.type';
-import { SignUpResponse } from '#/shared/types/sign-up-response.type';
 import { signUpValidationScheme } from '#/shared/validation-schemes/sign-up-validation.scheme';
 import { CheckBadgeIcon, RocketLaunchIcon } from '@heroicons/react/24/solid';
-import { m } from 'framer-motion';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { SignUpResponse } from '#/types//sign-up-response.type';
+import FormComponent from '#/components/form-component/form';
+import { ApiRoutes } from '#/shared/enums/api-routes.enum';
+import { ApiResponse } from '#/types//api-response.type';
+import useFetch from '#/hooks/use-fetch.hook';
 import { Button } from '../_ui/button/button';
 import LinkComponent from '../_ui/link/link';
+import { useRouter } from 'next/navigation';
+import { m } from 'framer-motion';
+import { useState } from 'react';
 
 export default function SignUpFormComponent() {
   const router = useRouter();

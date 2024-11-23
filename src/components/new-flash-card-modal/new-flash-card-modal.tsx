@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { FlashCard } from '#/shared/models/flash-card.model';
-import { UUID } from '#/shared/types/uuid.type';
-import uuid from '#/shared/utils/uuid.util';
 import { newFlashCardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';
-import { Button } from '../_ui/button/button';
-import Modal from '../_ui/modal/modal';
 import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
+import { FlashCard } from '#/shared/models/flash-card.model';
 import FormComponent from '../form-component/form';
+import { Button } from '../_ui/button/button';
+import uuid from '#/shared/utils/uuid.util';
+import { UUID } from '#/types//uuid.type';
+import Modal from '../_ui/modal/modal';
 
 interface NewFlashCardModalProps {
   handleNewFlashCard: (flashCard: Partial<FlashCard>[]) => void;

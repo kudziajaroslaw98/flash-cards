@@ -1,4 +1,4 @@
-import { NavigationItem } from '#/shared/types/navigation-item.type';
+import { NavigationItem } from '#/types//navigation-item.type';
 import LinkComponent from '../link/link';
 
 export interface NavigationItemProps {

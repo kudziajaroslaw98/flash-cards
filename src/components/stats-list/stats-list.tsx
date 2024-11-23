@@ -1,9 +1,9 @@
 'use client';
 
-import CardComponent from '#/components/_ui/card/card';
-import { useAppSelector } from '#/hooks/store-hooks.hook';
-import { Stats } from '#/shared/types/local-storage-stats.type';
 import { statsSelectors } from '#/store/selectors/stats.selectors';
+import { Stats } from '#/types//local-storage-stats.type';
+import { useAppSelector } from '#/hooks/store-hooks.hook';
+import CardComponent from '#/components/_ui/card/card';
 
 export default function StatsListComponent() {
   const statistics = useAppSelector(statsSelectors.selectStats);

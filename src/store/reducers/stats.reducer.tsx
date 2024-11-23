@@ -1,6 +1,6 @@
 import { DEFAULT_STATS } from '#/shared/defaults/stats.default';
-import { Stats } from '#/shared/types/local-storage-stats.type';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { Stats } from '#/types//local-storage-stats.type';
 
 const initialState: Stats = DEFAULT_STATS;
 

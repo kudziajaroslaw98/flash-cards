@@ -1,16 +1,16 @@
 'use client';
 
-import useOutsideAlerter from '#/hooks/use-click-outside.hook';
-import { DictionaryValue } from '#/shared/types/dictionary-value.type';
-import { cn } from '#/shared/utils/cn.util';
-import { isDifferent } from '#/shared/utils/is-different.util';
+import { DictionaryValue } from '#/types//dictionary-value.type';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
-import { cva, VariantProps } from 'class-variance-authority';
+import { isDifferent } from '#/shared/utils/is-different.util';
+import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import { FormEvent, useEffect, useRef, useState } from 'react';
+import { cva, VariantProps } from 'class-variance-authority';
+import DropdownLabel from './dropdown-label';
+import { cn } from '#/shared/utils/cn.util';
+import DropdownItem from './dropdown-item';
 import { Button } from '../button/button';
 import Input from '../input/input';
-import DropdownItem from './dropdown-item';
-import DropdownLabel from './dropdown-label';
 
 const DropdownVariants = cva(
   `absolute flex-col overflow-clip rounded-md border dark:border-slate-800/40 dark:bg-slate-800 flex w-full min-w-fit bg-gray-50/95 backdrop-blur-lg`,

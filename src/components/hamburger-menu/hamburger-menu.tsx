@@ -12,8 +12,8 @@ import {
 import { useSessionContext } from '#/providers/session-provider.component';
 import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
 import ContextMenu from '#/components/_ui/context-menu/context-menu';
-import { NavigationItem } from '#/shared/types/navigation-item.type';
 import ThemeSwitchComponent from '../theme-switch/theme-switch';
+import { NavigationItem } from '#/types//navigation-item.type';
 import { APP_ROUTES } from '#/shared/defaults/app.routes';
 import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '#/components/_ui/button/button';

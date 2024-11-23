@@ -15,9 +15,9 @@ import {
 import { useSessionContext } from '#/providers/session-provider.component';
 import NavigationGroupComponent from '../_ui/navigation/navigation-group';
 import NavigationItemComponent from '../_ui/navigation/navigation-item';
-import { NavigationGroup } from '#/shared/types/navigation-group.type';
-import { NavigationItem } from '#/shared/types/navigation-item.type';
+import { NavigationGroup } from '#/types//navigation-group.type';
 import ThemeSwitchComponent from '../theme-switch/theme-switch';
+import { NavigationItem } from '#/types//navigation-item.type';
 import ContextMenu from '../_ui/context-menu/context-menu';
 import { APP_ROUTES } from '#/shared/defaults/app.routes';
 import AvatarComponent from '../_ui/avatar/avatar';

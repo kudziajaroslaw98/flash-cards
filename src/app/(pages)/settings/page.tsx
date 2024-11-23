@@ -77,6 +77,7 @@ export default function SettingsPage() {
 
           <Button
             label='Edit Profile'
+            onClick={() => handleUpdateProfile()}
             icon={<ChevronRightIcon className='size-4' />}
             iconPosition='right'
             size={'sm'}

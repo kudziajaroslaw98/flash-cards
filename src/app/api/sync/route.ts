@@ -1,6 +1,6 @@
 import { FlashCard } from '#/shared/models/flash-card.model';
-import { ApiSyncResponse } from '#/shared/types/api-sync-response.type';
-import { StatsModel } from '#/shared/types/stats.type';
+import { ApiSyncResponse } from '#/types//api-sync-response.type';
+import { StatsModel } from '#/types//stats.type';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { createClient } from '#/shared/utils/supabase/server';
 import { syncBodyValidationScheme } from '#/shared/validation-schemes/sync-body-validation.scheme';

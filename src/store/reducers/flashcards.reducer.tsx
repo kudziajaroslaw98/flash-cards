@@ -1,8 +1,8 @@
-import { FlashCard } from '#/shared/models/flash-card.model';
-import type { FlashCards } from '#/shared/types/local-storage-flash-card.type';
-import type { UUID } from '#/shared/types/uuid.type';
 import typedInstanceFactory from '#/shared/utils/typed-instance-factory.util';
+import type { FlashCards } from '#/types//local-storage-flash-card.type';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { FlashCard } from '#/shared/models/flash-card.model';
+import type { UUID } from '#/types//uuid.type';
 
 const initialState: FlashCards = {};
 
