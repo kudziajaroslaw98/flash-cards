@@ -99,11 +99,11 @@ export default function SidebarComponent() {
             loading='eager'
           />
 
-          <h1
+          <span
             className={`overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-xl font-black uppercase tracking-tighter text-transparent transition-all ${expanded ? 'max-w-full' : 'hidden max-w-0'}`}
           >
             FlashCards
-          </h1>
+          </span>
         </Link>
 
         <Button
