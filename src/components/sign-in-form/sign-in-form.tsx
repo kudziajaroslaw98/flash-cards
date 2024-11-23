@@ -73,15 +73,11 @@ export default function SignInComponent() {
   };
 
   const handleOAuthGoogle = async () => {
-    await fetch(ApiRoutes.CALLBACK, {
-      body: JSON.stringify({ provider: 'google' }),
-    });
+    await fetch(`${ApiRoutes.CALLBACK}?provider=google`, { method: 'GET' });
   };
 
   const handleOAuthGithub = async () => {
-    await fetch(ApiRoutes.CALLBACK, {
-      body: JSON.stringify({ provider: 'github' }),
-    });
+    await fetch(`${ApiRoutes.CALLBACK}?provider=github`, { method: 'GET' });
   };
 
   return (
