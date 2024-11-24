@@ -10,6 +10,7 @@ import {
   SparklesIcon,
   TrashIcon,
 } from '@heroicons/react/24/solid';
+import { AssignFlashCardsModal } from '#/components/assign-flash-cards-modal/assign-flash-cards-modal';
 import ContextMenu, {
   ContextMenuItem,
 } from '#/components/_ui/context-menu/context-menu';
@@ -39,12 +40,6 @@ import dynamic from 'next/dynamic';
 
 const NewSetModal = dynamic(() =>
   import('#/components/new-set-modal/new-set-modal').then((x) => x.NewSetModal),
-);
-
-const AssignFlashCardsModal = dynamic(() =>
-  import('#/components/assign-flash-cards-modal/assign-flash-cards-modal').then(
-    (x) => x.AssignFlashCardsModal,
-  ),
 );
 
 const Badge = dynamic(() => import('#/components/_ui/badge/badge'));

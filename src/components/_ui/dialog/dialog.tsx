@@ -1,13 +1,13 @@
-import { Trigger } from '#/components/_shared/trigger';
-import useOutsideAlerter from '#/hooks/use-click-outside.hook';
-import useKeyPress from '#/hooks/use-key-press.hook';
-import DialogProvider from '#/providers/dialog.providers';
 import React, {
   createContext,
   PropsWithChildren,
   useCallback,
   useRef,
 } from 'react';
+import useOutsideAlerter from '#/hooks/use-click-outside.hook';
+import DialogProvider from '#/providers/dialog.providers';
+import { Trigger } from '#/components/_shared/trigger';
+import useKeyPress from '#/hooks/use-key-press.hook';
 import { createPortal } from 'react-dom';
 
 export const DialogContext = createContext({
@@ -83,7 +83,6 @@ export const Dialog = ({
             isCloseButtonVisible={isCloseButtonVisible}
             onDialogClose={onDialogClose}
           >
-            {props.children},
             <div className='fixed right-0 top-0 z-[100] h-screen w-screen bg-black/75 backdrop-blur-sm'>
               <div
                 className='flex h-full w-full  items-center justify-center gap-4'
