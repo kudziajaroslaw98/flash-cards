@@ -62,14 +62,16 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
   }, [theme]);
 
   useEffect(() => {
-    const serverSideTheme = window.document
-      .querySelector('html')
-      ?.classList.contains('dark')
-      ? 'dark'
-      : 'light';
-
-    setTheme(serverSideTheme);
-  }, []);
+    if (
+      value.theme === 'dark' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    ) {
+      document.querySelector('html')?.classList?.add('dark');
+    } else {
+      document.querySelector('html')?.classList?.remove('dark');
+    }
+    setTheme(value.theme);
+  }, [value.theme]);
 
   return (
     <ThemeContext.Provider

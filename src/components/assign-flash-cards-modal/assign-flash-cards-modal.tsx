@@ -65,9 +65,12 @@ export const AssignFlashCardsModal = ({
         submitRef={submitRef}
       >
         <Modal className='w-full max-w-96'>
-          <Modal.Header>Assign flash cards</Modal.Header>
+          <Modal.Header variant='form'>Assign flash cards</Modal.Header>
 
-          <Modal.Body className='flex flex-col items-center justify-center pb-8 pt-4'>
+          <Modal.Body
+            variant='form'
+            className='flex flex-col items-center justify-center pb-8 pt-4'
+          >
             <FormComponent<Pick<FlashCardSet, 'flashCards'>>
               className='w-full max-w-80'
               scheme={getFormScheme}
@@ -76,7 +79,10 @@ export const AssignFlashCardsModal = ({
             />
           </Modal.Body>
 
-          <Modal.Footer className='flex items-center justify-end gap-2 py-4'>
+          <Modal.Footer
+            variant='form'
+            className='flex items-center justify-end gap-2 py-4'
+          >
             <Button
               ref={submitRef}
               label='Assign'

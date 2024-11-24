@@ -149,8 +149,11 @@ export const NewSetModal = ({
         handleRightButtonClick={handleRightButtonClick}
       >
         <Modal className='w-full'>
-          <Modal.Header>Create new set</Modal.Header>
-          <Modal.Body className='flex flex-col items-center justify-center pb-8 pt-4'>
+          <Modal.Header variant={'form'}>Create new set</Modal.Header>
+          <Modal.Body
+            variant={'form'}
+            className='flex flex-col items-center justify-center pb-8 pt-4'
+          >
             <FormComponent<
               | Pick<FlashCardSet, 'name' | 'description' | 'category'>
               | Partial<FlashCardSet>
@@ -161,7 +164,10 @@ export const NewSetModal = ({
               initialValues={sets[currentIndex]}
             />
           </Modal.Body>
-          <Modal.Footer className='flex items-center justify-end gap-2 py-4'>
+          <Modal.Footer
+            variant={'form'}
+            className='flex items-center justify-end gap-2 py-4'
+          >
             <Button
               ref={submitRef}
               label={isInEditMode ? 'Update' : 'Create'}

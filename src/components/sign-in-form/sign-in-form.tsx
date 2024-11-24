@@ -12,6 +12,7 @@ export default function SignInComponent() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleOAuthGoogle = async () => {
+    window.umami.track('Sign in with Google');
     setIsLoading(true);
     await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -19,6 +20,7 @@ export default function SignInComponent() {
   };
 
   const handleOAuthGithub = async () => {
+    window.umami.track('Sign in with Github');
     setIsLoading(true);
     await supabase.auth.signInWithOAuth({
       provider: 'github',

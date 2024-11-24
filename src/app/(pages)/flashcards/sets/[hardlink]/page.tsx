@@ -4,14 +4,18 @@ import {
   ArrowLeftIcon,
   ArrowUpTrayIcon,
   Cog8ToothIcon,
+  DocumentCheckIcon,
   PencilIcon,
+  PlusIcon,
   SparklesIcon,
   TrashIcon,
 } from '@heroicons/react/24/solid';
 import ContextMenu, {
   ContextMenuItem,
 } from '#/components/_ui/context-menu/context-menu';
+import { NewFlashCardModal } from '#/components/new-flash-card-modal/new-flash-card-modal';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
+import { useSessionContext } from '#/providers/session-provider.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import type { FlashCards } from '#/types//local-storage-flash-card.type';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
@@ -19,7 +23,9 @@ import { addNewFlashCards } from '#/store/reducers/flashcards.reducer';
 import type { DictionaryValue } from '#/types//dictionary-value.type';
 import { removeSets, updateSet } from '#/store/reducers/sets.reducer';
 import FlashCardComponent from '#/components/flash-card/flash-card';
+import { statsSelectors } from '#/store/selectors/stats.selectors';
 import type { FlashCard } from '#/shared/models/flash-card.model';
+import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { setsSelectors } from '#/store/selectors/sets.selectors';
 import { Button } from '#/components/_ui/button/button';
 import LinkComponent from '#/components/_ui/link/link';
@@ -48,8 +54,10 @@ export default function SetHardlinkPage() {
   const setHardLink = useParams()?.hardlink as string;
   const router = useRouter();
   const { fetch, isLoading } = useFetch();
+  const { isLoggedIn } = useSessionContext();
 
   const sets = useAppSelector(setsSelectors.selectSetsArray);
+  const statistics = useAppSelector(statsSelectors.selectStats);
   const categories: DictionaryValue<string>[] = useAppSelector(
     setsSelectors.selectCategoriesAsDictionary,
   );
@@ -131,6 +139,8 @@ export default function SetHardlinkPage() {
 
   const handleGenerateFlashCards = async () => {
     window.umami.track('Generate flash cards');
+    if (!isLoggedIn) return;
+
     const setFlashCards = flashCardsArray.filter((flashCard) =>
       set?.flashCards?.includes(flashCard.frontUuid),
     );
@@ -162,6 +172,42 @@ export default function SetHardlinkPage() {
           ],
         }),
       );
+    }
+  };
+
+  const handleNewFlashCards = (
+    newFlashCards: Omit<FlashCard, 'weight' | 'order'>[],
+  ) => {
+    window.umami.track('Add flash cards');
+
+    if (newFlashCards.length > 0) {
+      const flashcardUuids = newFlashCards.map(
+        (flashcard) => flashcard.frontUuid,
+      );
+
+      window.umami.track('Add flash cards', { count: flashCards.length });
+      dispatch(addNewFlashCards(newFlashCards));
+
+      dispatch(
+        updateStatistics({
+          updatedValue: statistics.createdFlashCards + newFlashCards.length,
+          property: 'createdFlashCards',
+        }),
+      );
+
+      dispatch(
+        updateSet({
+          ...set,
+          flashCards: [...set.flashCards, ...flashcardUuids],
+        }),
+      );
+
+      setTimeout(() => {
+        window.document.body.scrollIntoView({
+          block: 'end',
+          behavior: 'smooth',
+        });
+      }, 1);
     }
   };
 
@@ -252,11 +298,24 @@ export default function SetHardlinkPage() {
       </div>
 
       <div className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'>
+        <NewFlashCardModal
+          trigger={
+            <Button
+              icon={<PlusIcon className='size-4' />}
+              size={'icon'}
+              variant={'primary'}
+            />
+          }
+          handleNewFlashCard={handleNewFlashCards}
+          selectedFlashCards={[]}
+          handleEditFlashCard={() => {}}
+        />
+
         <AssignFlashCardsModal
           trigger={
             <Button
-              label='Assign Cards'
-              size={'lg'}
+              icon={<DocumentCheckIcon className='size-4' />}
+              size={'icon'}
               variant={'primary'}
             />
           }
@@ -272,7 +331,7 @@ export default function SetHardlinkPage() {
           categories={categories}
           trigger={
             <Button
-              icon={<PencilIcon className='h-4 w-4' />}
+              icon={<PencilIcon className='size-4' />}
               size={'icon'}
               variant={'secondary'}
             />
@@ -280,8 +339,8 @@ export default function SetHardlinkPage() {
         />
 
         <Button
-          disabled={true}
-          icon={<SparklesIcon className='h-4 w-4' />}
+          disabled={!isLoggedIn}
+          icon={<SparklesIcon className='size-4' />}
           size={'icon'}
           variant={'secondary-outline'}
           onClick={handleGenerateFlashCards}

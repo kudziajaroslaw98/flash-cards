@@ -39,7 +39,7 @@ export const modalBodyVariants = cva(
     },
     defaultVariants: {
       variant: 'default',
-      borderVisible: true
+      borderVisible: false
     }
   }
 );

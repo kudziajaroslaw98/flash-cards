@@ -4,7 +4,6 @@ import type { Metadata } from 'next';
 import ClientSideProviders from '#/providers/client-side-providers.component';
 import SidebarComponent from '#/components/sidebar/sidebar';
 import HeaderComponent from '#/components/header/header';
-import { cookies } from 'next/headers';
 import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import './globals.css';
@@ -113,12 +112,10 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const theme = cookies().get('theme')?.value;
-
   return (
     <html
       lang='en'
-      className={`${inter.variable} ${roboto_mono.variable} flex font-sans ${theme}`}
+      className={`${inter.variable} ${roboto_mono.variable} dark flex font-sans`}
       suppressHydrationWarning
     >
       <head>

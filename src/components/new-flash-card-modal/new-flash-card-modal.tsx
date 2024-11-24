@@ -10,7 +10,9 @@ import { UUID } from '#/types//uuid.type';
 import Modal from '../_ui/modal/modal';
 
 interface NewFlashCardModalProps {
-  handleNewFlashCard: (flashCard: Partial<FlashCard>[]) => void;
+  handleNewFlashCard: (
+    flashCard: Omit<FlashCard, 'weight' | 'order'>[],
+  ) => void;
   handleEditFlashCard: (editRecords: Partial<FlashCard>[]) => void;
   selectedFlashCards: FlashCard[];
   isInEditMode?: boolean;
@@ -27,7 +29,7 @@ export const NewFlashCardModal = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formValue, setFormValue] = useState<Partial<FlashCard>>({});
   const [flashCards, setFlashCards] =
-    useState<Partial<FlashCard>[]>(selectedFlashCards);
+    useState<Omit<FlashCard, 'weight' | 'order'>[]>(selectedFlashCards);
   const [currentIndex, setCurrentIndex] = useState(0);
   const submitRef = useRef<HTMLButtonElement>(null);
 
@@ -65,7 +67,9 @@ export const NewFlashCardModal = ({
   useEffect(() => {
     setFlashCards((prev) =>
       prev.map((item) =>
-        item.frontUuid === formValue.frontUuid ? formValue : item,
+        item.frontUuid === formValue.frontUuid
+          ? (formValue as Omit<FlashCard, 'weight' | 'order'>)
+          : (item as Omit<FlashCard, 'weight' | 'order'>),
       ),
     );
   }, [formValue]);
@@ -106,7 +110,9 @@ export const NewFlashCardModal = ({
 
         setFlashCards((prev) => [
           ...prev.map((item) =>
-            item.frontUuid === formValue.frontUuid ? formValue : item,
+            item.frontUuid === formValue.frontUuid
+              ? (formValue as Omit<FlashCard, 'weight' | 'order'>)
+              : (item as Omit<FlashCard, 'weight' | 'order'>),
           ),
           newFlashCard,
         ]);
@@ -120,7 +126,9 @@ export const NewFlashCardModal = ({
     if (currentIndex > 0) {
       setFlashCards((prev) =>
         prev.map((item) =>
-          item.frontUuid === formValue.frontUuid ? formValue : item,
+          item.frontUuid === formValue.frontUuid
+            ? (formValue as Omit<FlashCard, 'weight' | 'order'>)
+            : (item as Omit<FlashCard, 'weight' | 'order'>),
         ),
       );
       setCurrentIndex((prev) => prev - 1);
@@ -143,10 +151,13 @@ export const NewFlashCardModal = ({
         submitRef={submitRef}
       >
         <Modal className='w-full'>
-          <Modal.Header>Create new flash card</Modal.Header>
+          <Modal.Header variant={'form'}>Create new flash card</Modal.Header>
 
-          <Modal.Body className='flex flex-col items-center justify-center'>
-            <FormComponent<FlashCard | Partial<FlashCard>>
+          <Modal.Body
+            variant={'form'}
+            className='flex flex-col items-center justify-center'
+          >
+            <FormComponent<FlashCard | Omit<FlashCard, 'weight' | 'order'>>
               className='w-full max-w-80'
               scheme={newFlashCardScheme}
               emitFormValue={setFormValue}
@@ -154,7 +165,10 @@ export const NewFlashCardModal = ({
             />
           </Modal.Body>
 
-          <Modal.Footer className='flex items-center justify-end gap-2'>
+          <Modal.Footer
+            variant={'form'}
+            className='flex items-center justify-end gap-2'
+          >
             <Button
               ref={submitRef}
               label={selectedFlashCards.length > 0 ? 'Edit' : 'Create'}
