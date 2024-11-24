@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
 
   const result = await generateObject({
-    model: openai('gpt-3.5-turbo'),
+    model: openai('gpt-3.5-turbo-0125'),
     output: 'array',
     schema: z.object({
       word: z.string(),

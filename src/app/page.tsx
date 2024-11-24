@@ -35,7 +35,7 @@ export default async function Home() {
     { done: false, label: 'Daily word suggestion' },
     { done: false, label: 'Generating descriptions to words with AI' },
     {
-      done: false,
+      done: true,
       label:
         'Generating new words for deck based on words that are already in it',
     },
