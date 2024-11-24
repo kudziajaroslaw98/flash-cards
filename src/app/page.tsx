@@ -14,8 +14,12 @@ export default async function Home() {
         'Revise flash cards using more sophisticated spaced repetition algorithm',
     },
     {
-      done: false,
+      done: true,
       label: 'Accounts',
+    },
+    {
+      done: true,
+      label: 'OAuth login with Google, GitHub',
     },
     {
       done: false,

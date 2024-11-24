@@ -160,6 +160,8 @@ export default function SidebarComponent() {
                   triggerComponent={
                     <AvatarComponent
                       className='size-10'
+                      imageAlt='User Avatar'
+                      imageSrc={session?.user?.user_metadata?.avatar_url}
                       onClick={() => {
                         toggle(!toggled);
                       }}

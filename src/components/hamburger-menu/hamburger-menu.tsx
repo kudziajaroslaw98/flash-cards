@@ -131,7 +131,11 @@ export default function HamburgerMenuComponent() {
             {isLoggedIn && (
               <div className='flex flex-col gap-3'>
                 <div className='flex w-full flex-col items-center justify-center gap-2'>
-                  <AvatarComponent className='h-12 w-12' />
+                  <AvatarComponent
+                    className='h-12 w-12'
+                    imageAlt='User avatar'
+                    imageSrc={user?.user_metadata?.avatar_url}
+                  />
 
                   <span className='text-inherit'>
                     {user?.user_metadata?.name}

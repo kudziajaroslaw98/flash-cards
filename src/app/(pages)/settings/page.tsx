@@ -83,6 +83,7 @@ export default function SettingsPage() {
             <AvatarComponent
               className='size-16'
               imageAlt='User avatar'
+              imageSrc={user?.user_metadata?.avatar_url}
             />
 
             <span className='text-lg font-semibold text-gray-700 dark:text-slate-200'>
