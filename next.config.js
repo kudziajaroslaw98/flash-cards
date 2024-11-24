@@ -42,10 +42,6 @@ const nextConfig = {
       disableDevLogs: true,
     },
   },
-  images: {
-    loader: 'custom',
-    loaderFile: './loader.js',
-  },
 };
 module.exports = process.env.TURBO
   ? nextConfig

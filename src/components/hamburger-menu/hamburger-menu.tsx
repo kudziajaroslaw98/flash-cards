@@ -23,7 +23,7 @@ import AvatarComponent from '../_ui/avatar/avatar';
 import { m } from 'framer-motion';
 
 export default function HamburgerMenuComponent() {
-  const { isLoggedIn, session, logOut } = useSessionContext();
+  const { isLoggedIn, user, logOut } = useSessionContext();
   const [toggled, toggle] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -131,14 +131,10 @@ export default function HamburgerMenuComponent() {
             {isLoggedIn && (
               <div className='flex flex-col gap-3'>
                 <div className='flex w-full flex-col items-center justify-center gap-2'>
-                  <AvatarComponent
-                    className='h-12 w-12'
-                    text={`${session?.user?.user_metadata?.firstName} ${session?.user?.user_metadata?.lastName}`}
-                  />
+                  <AvatarComponent className='h-12 w-12' />
 
                   <span className='text-inherit'>
-                    {session?.user?.user_metadata?.firstName}{' '}
-                    {session?.user?.user_metadata?.lastName}
+                    {user?.user_metadata?.name}
                   </span>
                 </div>
 
