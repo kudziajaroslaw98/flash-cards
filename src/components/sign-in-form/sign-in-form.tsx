@@ -78,7 +78,7 @@ export default function SignInComponent() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}${ApiRoutes.CALLBACK}`,
+        redirectTo: `https://supabase.finalphase.app/auth/v1/callback`,
       },
     });
   };
@@ -87,7 +87,7 @@ export default function SignInComponent() {
     await supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}${ApiRoutes.CALLBACK}`,
+        redirectTo: `https://supabase.finalphase.app/auth/v1/callback`,
       },
     });
   };
