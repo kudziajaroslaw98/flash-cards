@@ -77,18 +77,12 @@ export default function SignInComponent() {
   const handleOAuthGoogle = async () => {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: `https://supabase.finalphase.app/auth/v1/callback`,
-      },
     });
   };
 
   const handleOAuthGithub = async () => {
     await supabase.auth.signInWithOAuth({
       provider: 'github',
-      options: {
-        redirectTo: `https://supabase.finalphase.app/auth/v1/callback`,
-      },
     });
   };
 
