@@ -7,7 +7,7 @@
     "dev-turbo": "set NODE_ENV=development&& set TURBO=true&& next --turbo",
     "build": "set NODE_ENV=production&& next build",
     "analyze": "set NODE_ENV=production&& cross-env ANALYZE=true next build",
-    "start": "set NODE_ENV=production&& next start",
+    "start": "set NODE_ENV=production&& next start -p 3001",
     "index-now": "set INDEXNOW_KEY=7c7e93cfd8554316a50b4530557c9b54 set INDEXNOW_HOST=flashcards.finalphase.app npx indexnow-submitter submit-sitemap https://flashcards.finalphase.app/sitemap.xml",
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
