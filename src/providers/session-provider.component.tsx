@@ -43,6 +43,7 @@ export default function SessionProvider(props: Readonly<PropsWithChildren>) {
   const logOut = async () => {
     await supabase.auth.signOut();
     setSession(null);
+    setUser(null);
     router.refresh();
   };
 

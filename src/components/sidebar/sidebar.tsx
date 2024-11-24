@@ -34,8 +34,7 @@ export default function SidebarComponent() {
   const router = useRouter();
 
   const { isLoggedIn, session, logOut } = useSessionContext();
-  const firstName = session?.user?.user_metadata?.firstName;
-  const lastName = session?.user?.user_metadata?.lastName;
+  const name = session?.user?.user_metadata?.name;
 
   const iconSize = expanded ? 'size-4' : 'size-5';
   const groupIconSize = 'size-5';
@@ -161,7 +160,6 @@ export default function SidebarComponent() {
                   triggerComponent={
                     <AvatarComponent
                       className='size-10'
-                      text={isLoggedIn ? `${firstName} ${lastName}` : 'Guest'}
                       onClick={() => {
                         toggle(!toggled);
                       }}
@@ -201,9 +199,7 @@ export default function SidebarComponent() {
                   className={`w-full max-w-32 flex-col ${expanded ? 'flex' : 'hidden'}`}
                 >
                   <span className='line-clamp-1  overflow-hidden text-ellipsis font-extrabold text-slate-800 dark:text-gray-100'>
-                    {isLoggedIn
-                      ? `${firstName ?? ''} ${lastName ?? ''}`
-                      : 'Guest'}
+                    {isLoggedIn ? `${name}` : 'Guest'}
                   </span>
 
                   <span className='w-full overflow-hidden text-ellipsis text-xs text-gray-400 dark:text-slate-500'>

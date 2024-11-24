@@ -82,12 +82,11 @@ export default function SettingsPage() {
           <div className='flex w-full flex-col items-center justify-center gap-2'>
             <AvatarComponent
               className='size-16'
-              text={`${user?.user_metadata?.firstName} ${user?.user_metadata?.lastName}`}
               imageAlt='User avatar'
             />
 
             <span className='text-lg font-semibold text-gray-700 dark:text-slate-200'>
-              {user?.user_metadata?.firstName} {user?.user_metadata?.lastName}
+              {user?.user_metadata?.name}
             </span>
 
             <span className='text-sm text-gray-500'>{user?.email}</span>
@@ -95,6 +94,7 @@ export default function SettingsPage() {
 
           <Button
             label='Edit Profile'
+            disabled
             onClick={() => handleUpdateProfile()}
             icon={<ChevronRightIcon className='size-4' />}
             iconPosition='right'
