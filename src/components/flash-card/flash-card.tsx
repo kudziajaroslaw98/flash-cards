@@ -30,14 +30,16 @@ export default function FlashCardComponent({
     (flashcard) => {
       window.umami.track('Flash card long pressed');
       if (onSelect) {
-        onSelect && onSelect(flashcard);
+        onSelect(flashcard);
       }
     },
     () => {
       window.umami.track('Flash card short pressed');
       if (isInSelectionMode) {
         window.umami.track('Flash card selected');
-        onSelect && onSelect(flashCard);
+        if (onSelect) {
+          onSelect(flashCard);
+        }
       } else if (!flipBlocked) {
         window.umami.track('Flash card flipped');
         setIsFlipped(!isFlipped);

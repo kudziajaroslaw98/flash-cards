@@ -5,7 +5,7 @@ import {
   createContext,
   useCallback,
   useEffect,
-  useRef,
+  useState,
 } from 'react';
 import { Metadata, MetadataModel } from '#/types//local-storage-metadata.type';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
@@ -155,7 +155,7 @@ export default function SyncSessionProvider(
 
   const { isLoggedIn } = useSessionContext();
 
-  const initialRender = useRef<boolean>(true);
+  const [initialRender, setInitialRender] = useState(true);
   const MIN_IN_MS = 60_000;
   const DEFAULT_SYNC_INTERVAL_IN_MS = MIN_IN_MS * 1;
 
@@ -208,17 +208,20 @@ export default function SyncSessionProvider(
     // }
   }, [isLoggedIn, flashcards, stats, themeLS, metadata]);
 
-  useInterval(
-    () => {
-      syncWithDB();
-      initialRender.current = false;
-    },
-    isLoggedIn
-      ? initialRender.current
-        ? 0
-        : DEFAULT_SYNC_INTERVAL_IN_MS
-      : null,
-  );
+  const getInterval = () => {
+    if (isLoggedIn) {
+      if (initialRender) {
+        return 0;
+      }
+      return DEFAULT_SYNC_INTERVAL_IN_MS;
+    }
+    return null;
+  };
+
+  useInterval(() => {
+    syncWithDB();
+    setInitialRender(false);
+  }, getInterval());
 
   useEffect(() => {
     if (Object.values(flashCardsLS).length === 0) return;

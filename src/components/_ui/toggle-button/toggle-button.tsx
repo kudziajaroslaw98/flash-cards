@@ -45,7 +45,9 @@ const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonProps>(
         ref={ref}
         onClick={(e) => {
           toggle(e);
-          props?.onClick && props.onClick(e);
+          if (props?.onClick) {
+            props.onClick(e);
+          }
         }}
         icon={icon}
         variant={getVariantType()}

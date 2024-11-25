@@ -113,12 +113,10 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const theme = cookies().get('theme')?.value;
-
   return (
     <html
       lang='en'
-      className={`${inter.variable} ${roboto_mono.variable} flex font-sans ${theme}`}
+      className={`${inter.variable} ${roboto_mono.variable} flex font-sans`}
       suppressHydrationWarning
     >
       <head>
