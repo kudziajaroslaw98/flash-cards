@@ -3,24 +3,25 @@
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 
-import { Button } from '#/components/_ui/button/button';
 import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import type { FlashCard } from '#/shared/models/flash-card.model';
+import { Button } from '#/components/_ui/button/button';
 
-import { cn } from '#/shared/utils/cn.util';
 import {
   addNewFlashCards,
   removeFlashCards,
   updateFlashCards,
 } from '#/store/reducers/flashcards.reducer';
-import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
+import { FloatingButtons } from '../floating-buttons/floating-buttons';
 import { statsSelectors } from '#/store/selectors/stats.selectors';
-import { AnimatePresence, m } from 'framer-motion';
-import dynamic from 'next/dynamic';
+import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { AlertDialog } from '../_ui/alert-dialog/alert-dialog';
 import FlashCardComponent from '../flash-card/flash-card';
+import { AnimatePresence, m } from 'framer-motion';
+import { cn } from '#/shared/utils/cn.util';
+import dynamic from 'next/dynamic';
 
 const NewFlashCardModal = dynamic(() =>
   import('#/components/new-flash-card-modal/new-flash-card-modal').then(
@@ -108,84 +109,84 @@ export default function FlashCardsTable() {
   return (
     <div className='flex w-full flex-col gap-6 py-8'>
       <FlashCardsCounterComponent count={flashCardsArray.length} />
-      {flashCardsArray.length > 0 && (
-        <div
-          className={cn([
-            'grid w-full justify-center gap-4',
-            tileSize === 'sm' && 'grid-cols-[repeat(auto-fit,11rem)]',
-            tileSize === 'md' && 'grid-cols-[repeat(auto-fit,16rem)]',
-            tileSize === 'lg' && 'grid-cols-[repeat(auto-fit,20rem)]',
-          ])}
-        >
-          <AnimatePresence mode='popLayout'>
-            {flashCardsArray.map((flashCard) => (
-              <div key={flashCard.frontUuid}>
-                <FlashCardComponent
-                  flashCard={flashCard}
-                  size={tileSize}
-                  isSelected={isSelected(flashCard)}
-                  onSelect={() => toggleSelected(flashCard)}
-                  isInSelectionMode={isInSelectionMode}
-                />
-              </div>
-            ))}
-          </AnimatePresence>
-        </div>
-      )}
 
-      <m.div
-        layout
-        className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'
-      >
-        <NewFlashCardModal
-          handleNewFlashCard={addNewRecord}
-          handleEditFlashCard={editSelectedRecords}
-          selectedFlashCards={isInEditMode ? selected : []}
-          isInEditMode={isInEditMode}
-          trigger={
-            <Button
-              onClick={handleAddButtonClick}
-              icon={<PlusIcon className='h-4 w-4' />}
-              size={'icon'}
-            />
-          }
-        />
-
-        <NewFlashCardModal
-          handleNewFlashCard={addNewRecord}
-          handleEditFlashCard={editSelectedRecords}
-          selectedFlashCards={isInEditMode ? selected : []}
-          isInEditMode={isInEditMode}
-          trigger={
-            <Button
-              onClick={handleEditButtonClick}
-              icon={<PencilIcon className='h-4 w-4' />}
-              size={'icon'}
-              disabled={selected.length === 0}
-              variant={'secondary'}
-            />
-          }
-        />
-
+      <div className='relative flex h-full w-full flex-col'>
         {flashCardsArray.length > 0 && (
-          <AlertDialog
-            onCancel={() => {
-              window.umami.track('Cancel remove flash cards');
-            }}
-            headerText='Are you absolutely sure?'
-            bodyText='This action cannot be undone. This will permanently delete your flash cards.'
+          <div
+            className={cn([
+              'grid w-full justify-center gap-4',
+              tileSize === 'sm' && 'grid-cols-[repeat(auto-fit,11rem)]',
+              tileSize === 'md' && 'grid-cols-[repeat(auto-fit,16rem)]',
+              tileSize === 'lg' && 'grid-cols-[repeat(auto-fit,20rem)]',
+            ])}
+          >
+            <AnimatePresence mode='popLayout'>
+              {flashCardsArray.map((flashCard) => (
+                <div key={flashCard.frontUuid}>
+                  <FlashCardComponent
+                    flashCard={flashCard}
+                    size={tileSize}
+                    isSelected={isSelected(flashCard)}
+                    onSelect={() => toggleSelected(flashCard)}
+                    isInSelectionMode={isInSelectionMode}
+                  />
+                </div>
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
+
+        <FloatingButtons>
+          <NewFlashCardModal
+            handleNewFlashCard={addNewRecord}
+            handleEditFlashCard={editSelectedRecords}
+            selectedFlashCards={isInEditMode ? selected : []}
+            isInEditMode={isInEditMode}
             trigger={
               <Button
-                disabled={selected.length === 0}
-                variant={'destructive'}
-                icon={<TrashIcon className='h-4 w-4' />}
-                size={'icon'}
+                onClick={handleAddButtonClick}
+                icon={<PlusIcon className='h-4 w-4' />}
+                size={'icon-square'}
               />
             }
-            onAccept={removeSelected}
           />
-        )}
-      </m.div>
+
+          <NewFlashCardModal
+            handleNewFlashCard={addNewRecord}
+            handleEditFlashCard={editSelectedRecords}
+            selectedFlashCards={isInEditMode ? selected : []}
+            isInEditMode={isInEditMode}
+            trigger={
+              <Button
+                onClick={handleEditButtonClick}
+                icon={<PencilIcon className='h-4 w-4' />}
+                size={'icon-square'}
+                disabled={selected.length === 0}
+                variant={'secondary'}
+              />
+            }
+          />
+
+          {flashCardsArray.length > 0 && (
+            <AlertDialog
+              onCancel={() => {
+                window.umami.track('Cancel remove flash cards');
+              }}
+              headerText='Are you absolutely sure?'
+              bodyText='This action cannot be undone. This will permanently delete your flash cards.'
+              trigger={
+                <Button
+                  disabled={selected.length === 0}
+                  variant={'destructive'}
+                  icon={<TrashIcon className='h-4 w-4' />}
+                  size={'icon-square'}
+                />
+              }
+              onAccept={removeSelected}
+            />
+          )}
+        </FloatingButtons>
+      </div>
     </div>
   );
 }
