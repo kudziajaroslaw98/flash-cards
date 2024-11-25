@@ -11,7 +11,8 @@
     "index-now": "set INDEXNOW_KEY=7c7e93cfd8554316a50b4530557c9b54 set INDEXNOW_HOST=flashcards.finalphase.app npx indexnow-submitter submit-sitemap https://flashcards.finalphase.app/sitemap.xml",
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.4",
@@ -49,6 +50,7 @@
     "eslint-config-next": "14.0.4",
     "eslint-plugin-react-compiler": "^19.0.0-beta-df7b47d-20241124",
     "eslint-plugin-storybook": "^0.8.0",
+    "husky": "^8.0.0",
     "indexnow-submitter": "^1.3.1",
     "postcss": "^8.4.49",
     "prettier": "^3.3.3",
