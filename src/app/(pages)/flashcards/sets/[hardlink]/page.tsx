@@ -15,6 +15,7 @@ import ContextMenu, {
   ContextMenuItem,
 } from '#/components/_ui/context-menu/context-menu';
 import { NewFlashCardModal } from '#/components/new-flash-card-modal/new-flash-card-modal';
+import { FloatingButtons } from '#/components/floating-buttons/floating-buttons';
 import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
@@ -276,71 +277,77 @@ export default function SetHardlinkPage() {
 
       <div
         className={cn([
-          'grid w-full justify-center gap-4 md:justify-start',
-          // 'm-[0 auto] inline-flex w-full flex-wrap gap-4',
-          'grid-cols-[repeat(auto-fit,11rem)]',
+          'flex w-full flex-col justify-center gap-4 md:justify-start',
         ])}
       >
-        {set?.flashCards &&
-          set?.flashCards.map((flashCard) => (
-            <div key={flashCard}>
-              <FlashCardComponent
-                flashCard={flashCards?.[flashCard]}
-                size={'sm'}
+        <div
+          className={cn([
+            'grid w-full justify-center gap-4 md:justify-start',
+            // 'm-[0 auto] inline-flex w-full flex-wrap gap-4',
+            'grid-cols-[repeat(auto-fit,11rem)]',
+          ])}
+        >
+          {set?.flashCards &&
+            set?.flashCards.map((flashCard) => (
+              <div key={flashCard}>
+                <FlashCardComponent
+                  flashCard={flashCards?.[flashCard]}
+                  size={'sm'}
+                />
+              </div>
+            ))}
+        </div>
+
+        <FloatingButtons>
+          <NewFlashCardModal
+            trigger={
+              <Button
+                icon={<PlusIcon className='size-4' />}
+                size={'icon-square'}
+                variant={'primary'}
               />
-            </div>
-          ))}
-      </div>
+            }
+            handleNewFlashCard={handleNewFlashCards}
+            selectedFlashCards={[]}
+            handleEditFlashCard={() => {}}
+          />
 
-      <div className='flex w-full flex-col items-center justify-center gap-4 md:flex-row'>
-        <NewFlashCardModal
-          trigger={
-            <Button
-              icon={<PlusIcon className='size-4' />}
-              size={'icon'}
-              variant={'primary'}
-            />
-          }
-          handleNewFlashCard={handleNewFlashCards}
-          selectedFlashCards={[]}
-          handleEditFlashCard={() => {}}
-        />
+          <AssignFlashCardsModal
+            trigger={
+              <Button
+                icon={<DocumentCheckIcon className='size-4' />}
+                size={'icon-square'}
+                variant={'primary'}
+              />
+            }
+            handleSubmit={handleAssignCards}
+            flashCards={flashCardsArray}
+            setCards={set?.flashCards ?? []}
+          />
 
-        <AssignFlashCardsModal
-          trigger={
-            <Button
-              icon={<DocumentCheckIcon className='size-4' />}
-              size={'icon'}
-              variant={'primary'}
-            />
-          }
-          handleSubmit={handleAssignCards}
-          flashCards={flashCardsArray}
-          setCards={set?.flashCards ?? []}
-        />
+          <NewSetModal
+            handleEdit={handleEditSet}
+            selectedSets={set?.frontUuid ? [set] : []}
+            isInEditMode={true}
+            categories={categories}
+            trigger={
+              <Button
+                icon={<PencilIcon className='size-4' />}
+                size={'icon-square'}
+                variant={'secondary'}
+              />
+            }
+          />
 
-        <NewSetModal
-          handleEdit={handleEditSet}
-          selectedSets={set?.frontUuid ? [set] : []}
-          isInEditMode={true}
-          categories={categories}
-          trigger={
-            <Button
-              icon={<PencilIcon className='size-4' />}
-              size={'icon'}
-              variant={'secondary'}
-            />
-          }
-        />
-
-        <Button
-          disabled={!isLoggedIn}
-          icon={<SparklesIcon className='size-4' />}
-          size={'icon'}
-          variant={'secondary-outline'}
-          onClick={handleGenerateFlashCards}
-          loading={isLoading}
-        />
+          <Button
+            disabled={!isLoggedIn}
+            icon={<SparklesIcon className='size-4' />}
+            size={'icon-square'}
+            variant={'secondary-outline'}
+            onClick={handleGenerateFlashCards}
+            loading={isLoading}
+          />
+        </FloatingButtons>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
-import { cn } from '#/shared/utils/cn.util';
-import { ArrowPathIcon } from '@heroicons/react/24/solid';
-import { cva, VariantProps } from 'class-variance-authority';
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
+import { cva, VariantProps } from 'class-variance-authority';
+import { ArrowPathIcon } from '@heroicons/react/24/solid';
+import { cn } from '#/shared/utils/cn.util';
 
 const buttonVariants = cva(
   `inline-flex w-full max-w-80 items-center text-sm justify-center gap-2 rounded-md border transition active:scale-95 disabled:!border-gray-300 dark:disabled:!border-gray-800/40 disabled:!bg-transparent disabled:!text-gray-400 disabled:!opacity-80 dark:disabled:!bg-transparent ring-0 outline-0 focus:ring ring-green-400/50`,
@@ -40,6 +40,7 @@ const buttonVariants = cva(
         lg: 'h-10 px-8 md:w-auto',
         xlg: 'h-10 px-14 md:w-auto',
         icon: 'h-10 min-w-10 md:w-10',
+        'icon-square': 'h-10 w-10',
         'icon-sm': 'size-7',
         'icon-xs': 'size-5',
         full: 'w-full h-10 !max-w-auto',

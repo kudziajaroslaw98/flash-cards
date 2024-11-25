@@ -162,8 +162,9 @@ export default function FormComponent<T>(props: {
 
     setInputsErrors(errors);
     setInputsValidity(valids);
-    props.emitFormValid &&
+    if (props.emitFormValid) {
       props.emitFormValid(Object.values(valids).every((item) => item));
+    }
   };
 
   const handleOnInput = (

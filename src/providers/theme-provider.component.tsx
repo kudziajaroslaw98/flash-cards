@@ -41,10 +41,7 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
     setTheme(newTheme);
     setToLocalStorage({ theme: value.theme === 'dark' ? 'light' : 'dark' });
 
-    if (
-      newTheme === 'dark' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-    ) {
+    if (newTheme === 'dark') {
       document.querySelector('html')?.classList?.add('dark');
     } else {
       document.querySelector('html')?.classList?.remove('dark');
@@ -62,10 +59,7 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
   }, [theme]);
 
   useEffect(() => {
-    if (
-      value.theme === 'dark' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-    ) {
+    if (value.theme === 'dark') {
       document.querySelector('html')?.classList?.add('dark');
     } else {
       document.querySelector('html')?.classList?.remove('dark');

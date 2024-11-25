@@ -91,10 +91,10 @@ export const NewSetModal = ({
   const handleDialogSubmit = () => {
     setIsModalOpen(false);
 
-    if (isInEditMode) {
-      handleEdit && handleEdit(sets);
-    } else {
-      handleNew && handleNew(sets);
+    if (isInEditMode && handleEdit) {
+      handleEdit(sets);
+    } else if (handleNew) {
+      handleNew(sets);
     }
 
     clearInitialValues();

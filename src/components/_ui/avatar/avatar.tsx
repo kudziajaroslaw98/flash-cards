@@ -4,7 +4,7 @@ import useLocalStorage from '#/hooks/use-local-storage.hook';
 import { botttsNeutral } from '@dicebear/collection';
 import { createAvatar } from '@dicebear/core';
 import { cn } from '#/shared/utils/cn.util';
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
 interface AvatarProps {
@@ -37,15 +37,17 @@ export default function AvatarComponent({
   imageAlt,
   onClick,
 }: AvatarProps) {
-  const avatarRef = useRef<string>('');
+  const [avatar, setAvatar] = useState('');
   const { value: seed } = useLocalStorage('seed', {
     seed: generateHash(),
   });
 
   useEffect(() => {
-    avatarRef.current = createAvatar(botttsNeutral, {
-      seed: seed.seed,
-    }).toDataUri();
+    setAvatar(
+      createAvatar(botttsNeutral, {
+        seed: seed.seed,
+      }).toDataUri(),
+    );
   }, [seed]);
 
   const firstLetters = text
@@ -61,9 +63,9 @@ export default function AvatarComponent({
         className,
       ])}
     >
-      {(imageSrc ?? avatarRef.current) ? (
+      {(imageSrc ?? avatar) ? (
         <Image
-          src={imageSrc ?? avatarRef.current}
+          src={imageSrc ?? avatar}
           alt={imageAlt || 'User avatar'}
           className='h-full w-full object-cover'
           fill

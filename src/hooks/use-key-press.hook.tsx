@@ -21,10 +21,15 @@ const useKeyPress = (
 
   useEffect(() => {
     const targetNode = node ?? document;
-    targetNode && targetNode.addEventListener('keydown', handleKeyPress);
+    if (targetNode) {
+      targetNode.addEventListener('keydown', handleKeyPress);
+    }
 
-    return () =>
-      targetNode && targetNode.removeEventListener('keydown', handleKeyPress);
+    return () => {
+      if (targetNode) {
+        targetNode.removeEventListener('keydown', handleKeyPress);
+      }
+    };
   }, [handleKeyPress, node]);
 };
 

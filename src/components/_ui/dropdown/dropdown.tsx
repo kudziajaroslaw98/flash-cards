@@ -102,8 +102,8 @@ export default function Dropdown<T>({
   const valueRef = useRef<T | T[] | null | undefined>(null);
 
   useOutsideAlerter(dropdownWrapperRef, () => {
-    window.umami.track('Dropdown - Click outside');
     if (visible) {
+      window.umami.track('Dropdown - Click outside');
       setVisible(false);
       setSearchValue('');
       if (onBlur) {
