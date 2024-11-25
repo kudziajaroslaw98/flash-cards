@@ -19,7 +19,7 @@ import { statsSelectors } from '#/store/selectors/stats.selectors';
 import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { AlertDialog } from '../_ui/alert-dialog/alert-dialog';
 import FlashCardComponent from '../flash-card/flash-card';
-import { AnimatePresence, m } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { cn } from '#/shared/utils/cn.util';
 import dynamic from 'next/dynamic';
 
