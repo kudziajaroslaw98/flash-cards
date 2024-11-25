@@ -10,10 +10,10 @@ export interface UseLocalStorageOutput<T, K extends Record<string, T>> {
 
 export default function useLocalStorage<T, K extends Record<string, T>>(
   key: string,
-  defaultValue: K,
+  defaultValue?: K,
   sortStrategy?: (_head: T, _tail: T) => number,
 ): UseLocalStorageOutput<T, K> {
-  const [json, setJSON] = useState<K>(defaultValue);
+  const [json, setJSON] = useState<K | undefined>(defaultValue || undefined);
   const [array, setArray] = useState<T[]>([]);
 
   const setToLocalStorage = (value: K) => {
@@ -39,14 +39,17 @@ export default function useLocalStorage<T, K extends Record<string, T>>(
   }, []);
 
   useEffect(() => {
+    if (!defaultValue) return;
+    const validJson = json as K;
+
     if (sortStrategy) {
       setArray(
-        Object.values(json).sort((head, tail) => sortStrategy(head, tail)),
+        Object.values(validJson).sort((head, tail) => sortStrategy(head, tail)),
       );
     } else {
-      setArray(Object.values(json));
+      setArray(Object.values(validJson));
     }
   }, [json]);
 
-  return { value: json, arrayOfValues: array, setToLocalStorage };
+  return { value: json as K, arrayOfValues: array, setToLocalStorage };
 }

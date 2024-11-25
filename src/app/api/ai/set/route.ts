@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const prompt = `Generate 4 meaningful flash cards that will fit a set with name: ${setName} and cannot be duplicated with those: 
+  const prompt = `Generate 8 meaningful flash cards that will fit a set with name: ${setName} and cannot be duplicated with those: 
       ${flashcards.map(
     (flashcard: FlashCard) => `${flashcard.questionAddition.trim()}`,
   )}. output needs to be in JSON format and object with following fields: word, definition.`;

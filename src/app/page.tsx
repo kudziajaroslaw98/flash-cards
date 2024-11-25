@@ -27,6 +27,10 @@ export default async function Home() {
         'Improve the user experience with floating buttons (mobile/desktop)',
     },
     {
+      done: false,
+      label: 'Move react useContext to redux',
+    },
+    {
       done: true,
       label: 'Revise set flash cards (now revise work on all flash cards)',
     },
