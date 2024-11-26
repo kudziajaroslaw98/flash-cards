@@ -22,7 +22,7 @@ export default async function Home() {
       label: 'OAuth login with Google, GitHub',
     },
     {
-      done: false,
+      done: true,
       label:
         'Improve the user experience with floating buttons (mobile/desktop)',
     },
@@ -37,7 +37,7 @@ export default async function Home() {
     { done: true, label: 'Organize flash cards into decks' },
     { done: false, label: 'Community Section with shared decks' },
     { done: false, label: 'Daily word suggestion' },
-    { done: false, label: 'Generating descriptions to words with AI' },
+    { done: true, label: 'Generating descriptions to words with AI' },
     {
       done: true,
       label:

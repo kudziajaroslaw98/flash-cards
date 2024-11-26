@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { newFlashCardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';
+import { useSessionContext } from '#/providers/session-provider.component';
 import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
 import { FlashCard } from '#/shared/models/flash-card.model';
 import FormComponent from '../form-component/form';
 import { Button } from '../_ui/button/button';
 import uuid from '#/shared/utils/uuid.util';
 import { UUID } from '#/types//uuid.type';
+import { useCompletion } from 'ai/react';
 import Modal from '../_ui/modal/modal';
 
 interface NewFlashCardModalProps {
@@ -31,16 +33,20 @@ export const NewFlashCardModal = ({
   const [flashCards, setFlashCards] =
     useState<Omit<FlashCard, 'weight' | 'order'>[]>(selectedFlashCards);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { isLoggedIn } = useSessionContext();
   const submitRef = useRef<HTMLButtonElement>(null);
+  const { completion, complete } = useCompletion({
+    api: '/api/ai/flashcard/answer/generate',
+  });
 
   const clearInitialValues = () => {
     if (selectedFlashCards.length === 0) {
       setFlashCards([
         {
           frontUuid: uuid() as UUID,
-          question: 'a',
-          questionAddition: 'b',
-          answer: 'c',
+          question: 'What is the definition of word below?',
+          questionAddition: '',
+          answer: '',
         },
       ]);
     } else {
@@ -54,9 +60,9 @@ export const NewFlashCardModal = ({
       setFlashCards([
         {
           frontUuid: uuid() as UUID,
-          question: 'a',
-          questionAddition: 'b',
-          answer: 'c',
+          question: 'What is the definition of word below?',
+          questionAddition: '',
+          answer: '',
         },
       ]);
     } else {
@@ -73,6 +79,13 @@ export const NewFlashCardModal = ({
       ),
     );
   }, [formValue]);
+
+  useEffect(() => {
+    setFormValue((prev) => ({
+      ...prev,
+      answer: completion,
+    }));
+  }, [completion]);
 
   const handleDialogClose = () => {
     window.umami.track('Flash card dialog - closed', { isInEditMode });
@@ -103,9 +116,9 @@ export const NewFlashCardModal = ({
       if (!isInEditMode) {
         const newFlashCard = {
           frontUuid: uuid() as UUID,
-          question: 'a' + flashCards.length,
-          questionAddition: 'b' + flashCards.length,
-          answer: 'c' + flashCards.length,
+          question: 'What is the definition of word below?',
+          questionAddition: '',
+          answer: '',
         };
 
         setFlashCards((prev) => [
@@ -135,6 +148,23 @@ export const NewFlashCardModal = ({
     }
   };
 
+  const handleGenerate = useCallback(async () => {
+    if (
+      formValue.questionAddition !== undefined &&
+      formValue.questionAddition !== '' &&
+      isLoggedIn
+    ) {
+      await complete(
+        `generate description to: '${formValue.questionAddition}'`,
+      );
+    }
+  }, [formValue, complete, isLoggedIn]);
+
+  const getFormScheme = useMemo(
+    () => newFlashCardScheme(handleGenerate),
+    [handleGenerate],
+  );
+
   return (
     <>
       <MultiDialog
@@ -159,7 +189,7 @@ export const NewFlashCardModal = ({
           >
             <FormComponent<FlashCard | Omit<FlashCard, 'weight' | 'order'>>
               className='w-full max-w-80'
-              scheme={newFlashCardScheme}
+              scheme={getFormScheme}
               emitFormValue={setFormValue}
               initialValues={flashCards[currentIndex]}
             />

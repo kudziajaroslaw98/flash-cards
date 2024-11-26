@@ -1,13 +1,13 @@
 'use client';
 
-import { store } from '#/store/redux.store';
-import { domMax, LazyMotion } from 'framer-motion';
-import type { PropsWithChildren } from 'react';
-import { Provider } from 'react-redux';
-import SessionProvider from './session-provider.component';
 import SyncSessionProvider from './sync-session-provider.component';
+import SessionProvider from './session-provider.component';
 import ThemeProvider from './theme-provider.component';
 import ToastProvider from './toast-provider.component';
+import { domMax, LazyMotion } from 'framer-motion';
+import type { PropsWithChildren } from 'react';
+import { store } from '#/store/redux.store';
+import { Provider } from 'react-redux';
 
 export default function ClientSideProviders(props: PropsWithChildren) {
   return (

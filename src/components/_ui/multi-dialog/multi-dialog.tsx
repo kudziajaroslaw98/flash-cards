@@ -1,16 +1,16 @@
-import { Trigger } from '#/components/_shared/trigger';
-import useOutsideAlerter from '#/hooks/use-click-outside.hook';
-import useKeyPress from '#/hooks/use-key-press.hook';
-import DialogProvider from '#/providers/dialog.providers';
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
   PlusIcon,
 } from '@heroicons/react/24/solid';
-import * as m from 'framer-motion/m';
 import { useCallback, useMemo, useRef, type PropsWithChildren } from 'react';
-import { createPortal } from 'react-dom';
+import useOutsideAlerter from '#/hooks/use-click-outside.hook';
+import DialogProvider from '#/providers/dialog.providers';
+import { Trigger } from '#/components/_shared/trigger';
+import useKeyPress from '#/hooks/use-key-press.hook';
 import { Button } from '../button/button';
+import { createPortal } from 'react-dom';
+import * as m from 'framer-motion/m';
 
 export type MultiDialogProps = {
   open: boolean;

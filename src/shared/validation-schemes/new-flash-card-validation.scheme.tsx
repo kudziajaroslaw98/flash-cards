@@ -11,9 +11,9 @@ export const newFlashCardValidationScheme = z.object({
     .max(255, 'Answer is too long'),
 });
 
-export const newFlashCardScheme: FormScheme<
-  Pick<FlashCard, 'question' | 'questionAddition' | 'answer'>
-> = {
+export const newFlashCardScheme = (
+  handleGenerate: () => void,
+): FormScheme<Pick<FlashCard, 'question' | 'questionAddition' | 'answer'>> => ({
   inputs: {
     question: {
       type: 'text',
@@ -32,7 +32,8 @@ export const newFlashCardScheme: FormScheme<
       name: 'answer',
       label: 'Answer',
       placeholder: 'Military valor and skill.',
+      handleGenerate: handleGenerate,
     },
   },
   validation: newFlashCardValidationScheme,
-};
+});

@@ -1,7 +1,5 @@
 'use client';
 
-import { ToastModel } from '#/hooks/use-toast.hook';
-import { useToastContext } from '#/providers/toast-provider.component';
 import {
   ArrowPathIcon,
   CheckCircleIcon,
@@ -9,6 +7,8 @@ import {
   InformationCircleIcon,
   XCircleIcon,
 } from '@heroicons/react/24/solid';
+import { useToastContext } from '#/providers/toast-provider.component';
+import { ToastModel } from '#/hooks/use-toast.hook';
 import { m } from 'framer-motion';
 
 export default function ToastsComponent() {
