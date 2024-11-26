@@ -1,5 +1,3 @@
-import useDebounce from '#/hooks/use-debounce.hook';
-import { cn } from '#/shared/utils/cn.util';
 import {
   FormEvent,
   TextareaHTMLAttributes,
@@ -7,20 +5,12 @@ import {
   useRef,
   useState,
 } from 'react';
+import { SparklesIcon } from '@heroicons/react/24/solid';
+import useDebounce from '#/hooks/use-debounce.hook';
+import { cn } from '#/shared/utils/cn.util';
+import { Button } from '../button/button';
 
-export interface TextAreaProps
-  extends Pick<
-    TextareaHTMLAttributes<HTMLTextAreaElement>,
-    | 'value'
-    | 'onChange'
-    | 'onInput'
-    | 'required'
-    | 'onBlur'
-    | 'onFocus'
-    | 'id'
-    | 'name'
-    | 'tabIndex'
-  > {
+export type TextAreaProps = {
   type?: 'textarea';
   className: string;
   valid: boolean;
@@ -28,7 +18,19 @@ export interface TextAreaProps
   label?: string;
   touched?: boolean;
   error?: string | null;
-}
+  handleGenerate?: () => void;
+} & Pick<
+  TextareaHTMLAttributes<HTMLTextAreaElement>,
+  | 'value'
+  | 'onChange'
+  | 'onInput'
+  | 'required'
+  | 'onBlur'
+  | 'onFocus'
+  | 'id'
+  | 'name'
+  | 'tabIndex'
+>;
 
 export default function TextArea({
   for: forProp,
@@ -40,6 +42,7 @@ export default function TextArea({
   error = null,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   type = 'textarea',
+  handleGenerate,
   ...props
 }: TextAreaProps) {
   const [value, setValue] = useState(props.value);
@@ -98,6 +101,13 @@ export default function TextArea({
     }
   };
 
+  const generate = () => {
+    window.umami.track('Generate text clicked', { name: props.name });
+    if (handleGenerate) {
+      handleGenerate();
+    }
+  };
+
   return (
     <label
       className={`group relative flex w-full flex-col ${label ? 'pt-2' : ''} ${className ?? ''}`}
@@ -114,27 +124,40 @@ export default function TextArea({
           {`${label}${required ? '*' : ''}`}
         </span>
       )}
-      <textarea
-        {...props}
-        ref={textAreaRef}
-        className={cn([
-          touched && !valid ? '!border-red-400' : '',
-          touched && valid ? '!border-green-400' : '',
-          'flex w-full items-center gap-4 rounded-md border border-gray-200 bg-gray-100 p-2 px-4 dark:border-slate-800/40 dark:bg-slate-900',
-          'h-10 resize-none text-sm outline-none ring-green-400/50 transition-all focus:ring',
-          label
-            ? 'placeholder:text-gray-400  dark:placeholder:text-slate-700'
-            : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
-          'text-gray-800 text-inherit dark:text-slate-200',
-          className,
-        ])}
-        tabIndex={props.tabIndex ?? 0}
-        id={props.id}
-        value={value}
-        onInput={handleOnInput}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-      ></textarea>
+      <span className='relative'>
+        <textarea
+          {...props}
+          ref={textAreaRef}
+          className={cn([
+            touched && !valid ? '!border-red-400' : '',
+            touched && valid ? '!border-green-400' : '',
+            'relative flex w-full items-center gap-4 rounded-md border border-gray-200 bg-gray-100 p-2 px-4 dark:border-slate-800/40 dark:bg-slate-900',
+            'h-10 resize-none text-sm outline-none ring-green-400/50 transition-all focus:ring',
+            label
+              ? 'placeholder:text-gray-400  dark:placeholder:text-slate-700'
+              : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+            'text-gray-800 text-inherit dark:text-slate-200',
+            className,
+          ])}
+          tabIndex={props.tabIndex ?? 0}
+          id={props.id}
+          value={value}
+          onInput={handleOnInput}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+        ></textarea>
+
+        {handleGenerate && (
+          <Button
+            type='button'
+            variant={'secondary'}
+            size={'icon-xs'}
+            className='absolute right-[10px] top-[10px] z-40'
+            onClick={generate}
+            icon={<SparklesIcon className='size-3' />}
+          />
+        )}
+      </span>
 
       <span
         className={`${

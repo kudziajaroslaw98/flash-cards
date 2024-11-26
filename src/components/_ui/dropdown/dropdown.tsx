@@ -332,9 +332,9 @@ export default function Dropdown<T>({
                 }
               >
                 {isSearching &&
-                  filteredItems?.map((item) => (
+                  filteredItems?.map((item, index) => (
                     <DropdownItem<T>
-                      key={`dropdown_item_${item.label}`}
+                      key={`dropdown_item_${item.label}_${index}`}
                       item={item}
                       selected={selected}
                       changePickedItem={changePickedItem}
@@ -342,9 +342,9 @@ export default function Dropdown<T>({
                     />
                   ))}
                 {!isSearching &&
-                  items?.map((item) => (
+                  items?.map((item, index) => (
                     <DropdownItem<T>
-                      key={`dropdown_item_${item.label}`}
+                      key={`dropdown_item_${item.label}_${index}`}
                       item={item}
                       selected={selected}
                       changePickedItem={changePickedItem}

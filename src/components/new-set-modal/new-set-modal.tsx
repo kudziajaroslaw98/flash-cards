@@ -1,6 +1,7 @@
 import { newSetFormScheme } from '#/shared/validation-schemes/new-set-validation.scheme';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useSessionContext } from '#/providers/session-provider.component';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import type { DictionaryValue } from '#/types//dictionary-value.type';
 import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
@@ -8,6 +9,7 @@ import FormComponent from '../form-component/form';
 import type { UUID } from '#/types//uuid.type';
 import { Button } from '../_ui/button/button';
 import uuid from '#/shared/utils/uuid.util';
+import { useCompletion } from 'ai/react';
 import Modal from '../_ui/modal/modal';
 
 interface NewSetModalProps {
@@ -33,6 +35,11 @@ export const NewSetModal = ({
   const [formValue, setFormValue] = useState<Partial<FlashCardSet>>({});
   const [sets, setSets] = useState<Partial<FlashCardSet>[]>(selectedSets);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { isLoggedIn } = useSessionContext();
+
+  const { completion, complete } = useCompletion({
+    api: '/api/ai/set/description/generate',
+  });
 
   const submitRef = useRef<HTMLButtonElement>(null);
 
@@ -41,8 +48,8 @@ export const NewSetModal = ({
       setSets([
         {
           frontUuid: uuid() as UUID,
-          name: 'a',
-          description: 'b',
+          name: '',
+          description: '',
         },
       ]);
     } else {
@@ -56,8 +63,8 @@ export const NewSetModal = ({
       setSets([
         {
           frontUuid: uuid() as UUID,
-          name: 'a',
-          description: 'b',
+          name: '',
+          description: '',
         },
       ]);
     } else {
@@ -77,10 +84,12 @@ export const NewSetModal = ({
     setIsModalOpen(open);
   }, [open]);
 
-  const getFormScheme = useMemo(
-    () => newSetFormScheme(categories),
-    [categories],
-  );
+  useEffect(() => {
+    setFormValue((prev) => ({
+      ...prev,
+      description: completion,
+    }));
+  }, [completion]);
 
   const handleDialogClose = () => {
     setIsModalOpen(false);
@@ -108,8 +117,8 @@ export const NewSetModal = ({
       if (!isInEditMode) {
         const newSet: Partial<FlashCardSet> = {
           frontUuid: uuid() as UUID,
-          name: 'a' + sets.length,
-          description: 'b' + sets.length,
+          name: '',
+          description: '',
         };
 
         setSets((prev) => [
@@ -133,6 +142,17 @@ export const NewSetModal = ({
       setCurrentIndex((prev) => prev - 1);
     }
   };
+
+  const handleGenerate = useCallback(async () => {
+    if (formValue.name !== undefined && formValue.name !== '' && isLoggedIn) {
+      await complete(`generate description to: '${formValue.name}'`);
+    }
+  }, [formValue, complete, isLoggedIn]);
+
+  const getFormScheme = useMemo(
+    () => newSetFormScheme(categories, handleGenerate),
+    [categories, handleGenerate],
+  );
 
   return (
     <>

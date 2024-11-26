@@ -1,5 +1,5 @@
 {
-  "name": "react_edu",
+  "name": "flashcards - learning words made easy",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -22,17 +22,12 @@
     "@reduxjs/toolkit": "^2.3.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.46.1",
-    "ai": "^3.4.32",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.1.1",
-    "cross-env": "^7.0.3",
+    "ai": "^4.0.0",
     "framer-motion": "^11.11.17",
-    "jsonwebtoken": "^9.0.2",
     "next": "^14.2.18",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-redux": "^9.1.2",
-    "tailwind-merge": "^2.5.4",
     "uuid": "^9.0.1",
     "zod": "^3.23.8"
   },
@@ -46,6 +41,8 @@
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",
     "autoprefixer": "^10.4.20",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.0.4",
     "eslint-plugin-react-compiler": "^19.0.0-beta-df7b47d-20241124",
@@ -58,6 +55,7 @@
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-sort-imports": "^1.8.6",
     "prettier-plugin-tailwindcss": "^0.5.14",
+    "tailwind-merge": "^2.5.5",
     "tailwindcss": "^3.4.15",
     "typescript": "^5.6.3"
   }
