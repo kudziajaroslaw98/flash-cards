@@ -29,6 +29,7 @@ import { statsSelectors } from '#/store/selectors/stats.selectors';
 import type { FlashCard } from '#/shared/models/flash-card.model';
 import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { setsSelectors } from '#/store/selectors/sets.selectors';
+import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { Button } from '#/components/_ui/button/button';
 import LinkComponent from '#/components/_ui/link/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -142,7 +143,7 @@ export default function SetHardlinkPage() {
     );
 
     const flashCardsResponse: Record<'word' | 'definition', string>[] =
-      await fetch('/api/ai/set', {
+      await fetch(API_ROUTES.SET_FLASHCARDS, {
         method: 'POST',
         body: JSON.stringify({
           flashCards: setFlashCards ?? [],

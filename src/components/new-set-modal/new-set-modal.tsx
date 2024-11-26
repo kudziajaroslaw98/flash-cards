@@ -5,6 +5,7 @@ import { useSessionContext } from '#/providers/session-provider.component';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import type { DictionaryValue } from '#/types//dictionary-value.type';
 import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
+import { API_ROUTES } from '#/shared/defaults/api-routes';
 import FormComponent from '../form-component/form';
 import type { UUID } from '#/types//uuid.type';
 import { Button } from '../_ui/button/button';
@@ -38,7 +39,7 @@ export const NewSetModal = ({
   const { isLoggedIn } = useSessionContext();
 
   const { completion, complete } = useCompletion({
-    api: '/api/ai/set/description/generate',
+    api: API_ROUTES.SET_DESCRIPTION,
   });
 
   const submitRef = useRef<HTMLButtonElement>(null);

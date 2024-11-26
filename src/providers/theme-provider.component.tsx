@@ -9,6 +9,7 @@ import {
   useState,
 } from 'react';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
+import { API_ROUTES } from '#/shared/defaults/api-routes';
 
 export type ThemeContextType = {
   isDarkMode: boolean;
@@ -31,7 +32,7 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
   const changeTheme = () => {
     const newTheme = value.theme === 'dark' ? 'light' : 'dark';
 
-    fetch('/api/theme', {
+    fetch(API_ROUTES.THEME, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

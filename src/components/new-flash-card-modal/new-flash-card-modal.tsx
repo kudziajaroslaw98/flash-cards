@@ -4,6 +4,7 @@ import { newFlashCardScheme } from '#/shared/validation-schemes/new-flash-card-v
 import { useSessionContext } from '#/providers/session-provider.component';
 import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
 import { FlashCard } from '#/shared/models/flash-card.model';
+import { API_ROUTES } from '#/shared/defaults/api-routes';
 import FormComponent from '../form-component/form';
 import { Button } from '../_ui/button/button';
 import uuid from '#/shared/utils/uuid.util';
@@ -36,7 +37,7 @@ export const NewFlashCardModal = ({
   const { isLoggedIn } = useSessionContext();
   const submitRef = useRef<HTMLButtonElement>(null);
   const { completion, complete } = useCompletion({
-    api: '/api/ai/flashcard/answer/generate',
+    api: API_ROUTES.ANSWER_GENERATE,
   });
 
   const clearInitialValues = () => {

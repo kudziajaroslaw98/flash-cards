@@ -176,7 +176,7 @@ export default function SyncSessionProvider(
     //   lastSyncAt: metadata.lastSyncAt,
     // });
 
-    // const responsePromise = fetch<ApiResponse<ApiSyncResponse>>('/api/sync', {
+    // const responsePromise = fetch<ApiResponse<ApiSyncResponse>>('ApiRoutes.SYNC', {
     //   method: 'POST',
     //   body: fetchBody,
     // });

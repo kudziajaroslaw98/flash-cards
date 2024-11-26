@@ -11,6 +11,7 @@ import {
 import type { Session, User, UserAttributes } from '@supabase/supabase-js';
 import { createClient } from '#/shared/utils/supabase/client';
 import type { ApiResponse } from '#/types//api-response.type';
+import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { usePathname, useRouter } from 'next/navigation';
 import useFetch from '#/hooks/use-fetch.hook';
 
@@ -64,10 +65,9 @@ export default function SessionProvider(props: Readonly<PropsWithChildren>) {
   };
 
   const deleteUser = async () => {
-    const response: ApiResponse<unknown> = await fetch(
-      '/api/auth/user/delete',
-      { method: 'GET' },
-    );
+    const response: ApiResponse<unknown> = await fetch(API_ROUTES.USER_DELETE, {
+      method: 'GET',
+    });
 
     if (response.success) {
       await supabase.auth.signOut();
