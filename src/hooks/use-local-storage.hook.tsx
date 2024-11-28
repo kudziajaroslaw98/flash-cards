@@ -6,6 +6,7 @@ export interface UseLocalStorageOutput<T, K extends Record<string, T>> {
   value: K;
   arrayOfValues: T[];
   setToLocalStorage: (_value: K) => void;
+  initiated: boolean;
 }
 
 type useLocalStorageProp<T, K extends Record<string, T>> = {
@@ -25,6 +26,7 @@ export default function useLocalStorage<T, K extends Record<string, T>>({
 }: useLocalStorageProp<T, K>): UseLocalStorageOutput<T, K> {
   const [json, setJSON] = useState<K | undefined>(defaultValue || undefined);
   const [array, setArray] = useState<T[]>([]);
+  const [initiated, setInitiated] = useState(false);
 
   const setToLocalStorage = (value: K) => {
     window.localStorage.setItem(key, JSON.stringify(value));
@@ -56,7 +58,9 @@ export default function useLocalStorage<T, K extends Record<string, T>>({
     let array = [] as T[];
 
     if (sortStrategy) {
-      array = Object.values(validJson).sort((head, tail) => sortStrategy(head, tail));
+      array = Object.values(validJson).sort((head, tail) =>
+        sortStrategy(head, tail),
+      );
     } else {
       array = Object.values(validJson);
     }
@@ -65,7 +69,14 @@ export default function useLocalStorage<T, K extends Record<string, T>>({
     if (setArrayValue) {
       setArrayValue(array);
     }
+
+    setInitiated(true);
   }, [json]);
 
-  return { value: json as K, arrayOfValues: array, setToLocalStorage };
+  return {
+    value: json as K,
+    arrayOfValues: array,
+    setToLocalStorage,
+    initiated,
+  };
 }

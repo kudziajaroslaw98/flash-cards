@@ -12,8 +12,8 @@ import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import type { DictionaryValue } from '#/types/dictionary-value.type';
 import type { FlashCard } from '#/shared/models/flash-card.model';
 import { DEFAULT_STATS } from '#/shared/defaults/stats.default';
-import type { Stats } from '#/types/local-storage-stats.type';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
+import type { Stats } from '#/types/stats.type';
 import uuid from '#/shared/utils/uuid.util';
 
 export type AppContextType = {
@@ -78,6 +78,11 @@ export default function AppProvider(props: PropsWithChildren) {
     key: 'sets',
     defaultValue: SETS_LOCAL_STORAGE_INIT,
     setArrayValue: setSetsArray,
+  });
+  const { initiated: statsInitiated } = useLocalStorage({
+    key: 'stats',
+    defaultValue: DEFAULT_STATS,
+    setValue: setStats,
   });
 
   /////////////////
@@ -345,6 +350,35 @@ export default function AppProvider(props: PropsWithChildren) {
     setCategories(selectCategoriesAsDictionary);
     setSetsDictionary(setsDictionary);
   }, [setsArray, migrateSets]);
+
+  useEffect(() => {
+    if (!statsInitiated) return;
+
+    if (stats.lastSyncAt) {
+      console.log('here');
+      const now = new Date();
+      const lastSyncAt = new Date(stats.lastSyncAt);
+
+      const dayNow = now.getDate();
+      const dayLastSyncAt = lastSyncAt.getDate();
+
+      const isNewDay = dayNow !== dayLastSyncAt;
+
+      setStats((prev) => ({
+        ...prev,
+        lastSyncAt: new Date(),
+        streak: isNewDay ? prev.streak + 1 : prev.streak,
+      }));
+      localStorage.setItem('stats', JSON.stringify(stats));
+    } else {
+      setStats((prev) => ({
+        ...prev,
+        lastSyncAt: new Date(),
+        streak: 1,
+      }));
+      localStorage.setItem('stats', JSON.stringify(stats));
+    }
+  }, [statsInitiated]);
 
   return (
     <AppContext.Provider

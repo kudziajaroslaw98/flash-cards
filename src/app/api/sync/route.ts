@@ -1,14 +1,14 @@
-import { FlashCard } from '#/shared/models/flash-card.model';
+import { syncBodyValidationScheme } from '#/shared/validation-schemes/sync-body-validation.scheme';
 import { ApiSyncResponse } from '#/types//api-sync-response.type';
-import { StatsModel } from '#/types//stats.type';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { createClient } from '#/shared/utils/supabase/server';
-import { syncBodyValidationScheme } from '#/shared/validation-schemes/sync-body-validation.scheme';
+import { FlashCard } from '#/shared/models/flash-card.model';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Stats } from '#/types/stats.type';
 
 type requestBody = {
   flashcards: FlashCard[];
-  stats: StatsModel;
+  stats: Stats;
   theme: 'light' | 'dark';
   lastSyncAt: Date | null;
 };
