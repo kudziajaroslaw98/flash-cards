@@ -27,8 +27,8 @@ export default async function Home() {
         'Improve the user experience with floating buttons (mobile/desktop)',
     },
     {
-      done: false,
-      label: 'Move react useContext to redux',
+      done: true,
+      label: 'Drop redux in favor of useContext',
     },
     {
       done: true,
