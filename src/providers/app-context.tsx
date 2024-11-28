@@ -1,5 +1,6 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -284,11 +285,37 @@ export default function AppProvider(props: PropsWithChildren) {
     localStorage.setItem('stats', JSON.stringify(updatedStats));
     setStats(updatedStats);
   };
+
+  /////////////////
+  // MIGRATION
+  /////////////////
+
+  const migrateSets = useCallback(() => {
+    setSetsArray((prev) =>
+      prev.map((set) => ({
+        ...set,
+        flashCards: flashCardsArray.filter((flashCard) =>
+          set.flashCards.includes(flashCard.frontUuid as unknown as FlashCard),
+        ),
+      })),
+    );
+  }, [flashCardsArray]);
+
   /////////////////
   // MUTATIONS
   /////////////////
 
   useEffect(() => {
+    if (
+      setsArray.some(
+        (set) =>
+          set.flashCards.length > 0 &&
+          set.flashCards.at(0)?.frontUuid === undefined,
+      )
+    ) {
+      migrateSets();
+    }
+
     const categoriesTmp = new Set<string>();
     const setsDictionary: DictionaryValue<string>[] = setsArray.map((item) => ({
       label: item.name,
@@ -310,7 +337,7 @@ export default function AppProvider(props: PropsWithChildren) {
 
     setCategories(selectCategoriesAsDictionary);
     setSetsDictionary(setsDictionary);
-  }, [setsArray]);
+  }, [setsArray, migrateSets]);
 
   return (
     <AppContext.Provider
