@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  createContext,
-  PropsWithChildren,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { createContext, PropsWithChildren, useCallback, useContext, useEffect, useState } from 'react';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 
@@ -24,8 +17,11 @@ export const ThemeContext = createContext<ThemeContextType>({
 });
 
 export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
-  const { value, setToLocalStorage } = useLocalStorage('theme', {
-    theme: 'dark',
+  const { value, setToLocalStorage } = useLocalStorage({
+    key: 'theme',
+    defaultValue: {
+      theme: 'dark',
+    },
   });
   const [theme, setTheme] = useState('dark');
 

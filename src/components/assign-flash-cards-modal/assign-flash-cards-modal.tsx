@@ -1,18 +1,16 @@
 import { assignFlashCardsScheme } from '#/shared/validation-schemes/assign-flash-cards-validation.scheme';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import type { DictionaryValue } from '#/types//dictionary-value.type';
 import type { FlashCard } from '#/shared/models/flash-card.model';
 import React, { useMemo, useRef, useState } from 'react';
 import FormComponent from '../form-component/form';
-import type { UUID } from '#/types//uuid.type';
 import { Button } from '../_ui/button/button';
 import { Dialog } from '../_ui/dialog/dialog';
 import Modal from '../_ui/modal/modal';
 
 interface AssignFlashCardsModalProps {
-  handleSubmit: (value: Array<UUID>) => void;
-  flashCards: Array<FlashCard>;
-  setCards: Array<UUID>;
+  handleSubmit: (value: FlashCard[]) => void;
+  flashCards: FlashCard[];
+  setCards: FlashCard[];
   trigger: React.ReactNode;
 }
 
@@ -28,17 +26,17 @@ export const AssignFlashCardsModal = ({
   });
 
   const submitRef = useRef<HTMLButtonElement>(null);
-  const initialValue = useMemo(() => ({ flashCards: setCards }), [setCards]);
+  const initialValue = useMemo(() => ({ flashCards: [...setCards] }), [setCards]);
 
   const getFormScheme = useMemo(
     () =>
       assignFlashCardsScheme(
-        flashCards?.map((flashCard: FlashCard) => {
+        flashCards?.map((flashCard) => {
           return {
             label: flashCard?.questionAddition,
-            value: flashCard?.frontUuid,
-          } as DictionaryValue<UUID>;
-        }, setCards),
+            value: flashCard,
+          };
+        }),
       ),
     [flashCards, setCards],
   );
@@ -50,6 +48,7 @@ export const AssignFlashCardsModal = ({
 
   const handleDialogSubmit = () => {
     setIsModalOpen(false);
+
     handleSubmit(formValue?.flashCards ?? []);
     setFormValue({ flashCards: [] });
   };

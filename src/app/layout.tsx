@@ -128,7 +128,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className='min-w-screen relative flex h-auto min-h-full w-full grow flex-col'
+        className='min-w-screen relative flex h-auto min-h-screen w-full grow flex-col'
       >
         <ClientSideProviders>
           <div className='flex h-auto min-h-full w-full flex-col  bg-gradient-to-b from-gray-50 to-gray-200 pt-20 dark:from-slate-900 dark:to-slate-950 md:pt-0'>

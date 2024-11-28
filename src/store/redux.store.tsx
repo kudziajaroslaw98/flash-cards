@@ -1,11 +1,9 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { flashCardsReducer } from './reducers/flashcards.reducer';
-import { setsReducer } from './reducers/sets.reducer';
 import { statsReducer } from './reducers/stats.reducer';
+import { setsReducer } from './reducers/sets.reducer';
+import { configureStore } from '@reduxjs/toolkit';
 
 export const store = configureStore({
   reducer: {
-    flashCards: flashCardsReducer,
     stats: statsReducer,
     sets: setsReducer,
   },

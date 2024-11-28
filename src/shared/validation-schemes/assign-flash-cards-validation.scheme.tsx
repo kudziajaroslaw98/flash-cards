@@ -1,7 +1,7 @@
 import { DictionaryValue } from '#/types/dictionary-value.type';
 import { FlashCardSet } from '../models/flash-card-set.model';
+import type { FlashCard } from '../models/flash-card.model';
 import { FormScheme } from '#/types/form-scheme.type';
-import { UUID } from '#/types/uuid.type';
 import { z } from 'zod';
 
 export const assignFlashCardsValidationScheme = z.object({
@@ -9,7 +9,7 @@ export const assignFlashCardsValidationScheme = z.object({
 });
 
 export const assignFlashCardsScheme = (
-  config: DictionaryValue<UUID>[] = [],
+  config: DictionaryValue<FlashCard>[] = [],
 ): FormScheme<Pick<FlashCardSet, 'flashCards'>> => ({
   inputs: {
     flashCards: {

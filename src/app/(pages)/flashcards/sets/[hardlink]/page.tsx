@@ -11,17 +11,12 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/solid';
 import { AssignFlashCardsModal } from '#/components/assign-flash-cards-modal/assign-flash-cards-modal';
-import ContextMenu, {
-  ContextMenuItem,
-} from '#/components/_ui/context-menu/context-menu';
 import { NewFlashCardModal } from '#/components/new-flash-card-modal/new-flash-card-modal';
+import ContextMenu, { ContextMenuItem } from '#/components/_ui/context-menu/context-menu';
 import { FloatingButtons } from '#/components/floating-buttons/floating-buttons';
-import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
-import type { FlashCards } from '#/types//local-storage-flash-card.type';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import { addNewFlashCards } from '#/store/reducers/flashcards.reducer';
 import type { DictionaryValue } from '#/types//dictionary-value.type';
 import { removeSets, updateSet } from '#/store/reducers/sets.reducer';
 import FlashCardComponent from '#/components/flash-card/flash-card';
@@ -31,18 +26,15 @@ import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { setsSelectors } from '#/store/selectors/sets.selectors';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { Button } from '#/components/_ui/button/button';
+import { useAppContext } from '#/providers/app-context';
 import LinkComponent from '#/components/_ui/link/link';
 import { useParams, useRouter } from 'next/navigation';
-import type { UUID } from '#/types//uuid.type';
 import useFetch from '#/hooks/use-fetch.hook';
-import uuid from '#/shared/utils/uuid.util';
 import { cn } from '#/shared/utils/cn.util';
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 
-const NewSetModal = dynamic(() =>
-  import('#/components/new-set-modal/new-set-modal').then((x) => x.NewSetModal),
-);
+const NewSetModal = dynamic(() => import('#/components/new-set-modal/new-set-modal').then((x) => x.NewSetModal));
 
 const Badge = dynamic(() => import('#/components/_ui/badge/badge'));
 
@@ -52,25 +44,15 @@ export default function SetHardlinkPage() {
   const router = useRouter();
   const { fetch, isLoading } = useFetch();
   const { isLoggedIn } = useSessionContext();
+  const { flashcards, addFlashCards } = useAppContext();
 
   const sets = useAppSelector(setsSelectors.selectSetsArray);
   const statistics = useAppSelector(statsSelectors.selectStats);
-  const categories: DictionaryValue<string>[] = useAppSelector(
-    setsSelectors.selectCategoriesAsDictionary,
-  );
-  const flashCardsArray: FlashCard[] = useAppSelector(
-    flashCardSelectors.selectFlashCardsArray,
-  );
-  const flashCards: FlashCards = useAppSelector(
-    flashCardSelectors.selectFlashCards,
-  );
+  const categories: DictionaryValue<string>[] = useAppSelector(setsSelectors.selectCategoriesAsDictionary);
 
-  const [set, setSet] = useState<FlashCardSet>(
-    sets.filter((set) => set?.hardlink === setHardLink)[0],
-  );
+  const [set, setSet] = useState<FlashCardSet>(sets.filter((set) => set?.hardlink === setHardLink)[0]);
   const [capitalizedName] = useState<string>(
-    setHardLink.replace(/-/g, ' ').charAt(0)?.toUpperCase() +
-      setHardLink.replace(/-/g, ' ').slice(1),
+    setHardLink.replace(/-/g, ' ').charAt(0)?.toUpperCase() + setHardLink.replace(/-/g, ' ').slice(1),
   );
   const [accuracy] = useState<number>(0);
 
@@ -80,9 +62,12 @@ export default function SetHardlinkPage() {
     setSet(sets.filter((set) => set?.hardlink === setHardLink)[0]);
   }, [sets, setHardLink]);
 
-  const handleAssignCards = (flashCards: UUID[]) => {
+  const handleAssignCards = (flashCards: FlashCard[]) => {
     window.umami.track('Flash card assigned to set');
-    setSet((prev) => ({ ...prev, flashCards }));
+    setSet((prev) => ({
+      ...prev,
+      flashCards,
+    }));
     dispatch(
       updateSet({
         ...set,
@@ -138,52 +123,48 @@ export default function SetHardlinkPage() {
     window.umami.track('Generate flash cards');
     if (!isLoggedIn) return;
 
-    const setFlashCards = flashCardsArray.filter((flashCard) =>
-      set?.flashCards?.includes(flashCard.frontUuid),
-    );
+    const setFlashCards = flashcards.filter((flashCard) => set?.flashCards?.includes(flashCard));
 
-    const flashCardsResponse: Record<'word' | 'definition', string>[] =
-      await fetch(API_ROUTES.SET_FLASHCARDS, {
-        method: 'POST',
-        body: JSON.stringify({
-          flashCards: setFlashCards ?? [],
-          setName: set?.name ?? '',
-        }),
-      });
+    const flashCardsResponse: Record<'word' | 'definition', string>[] = await fetch(API_ROUTES.SET_FLASHCARDS, {
+      method: 'POST',
+      body: JSON.stringify({
+        flashCards: setFlashCards ?? [],
+        setName: set?.name ?? '',
+      }),
+    });
 
-    const mappedFlashCards = flashCardsResponse.map((flashCard) => ({
+    const mappedFlashCards = flashCardsResponse.map((flashCard, index) => ({
       question: 'What is the definition of word below?',
       questionAddition: flashCard.word,
       answer: flashCard.definition,
-      frontUuid: uuid(),
+      frontUuid: crypto.randomUUID(),
+      weight: 1.0,
+      order: flashcards.length + index + 1,
     }));
 
     if (flashCardsResponse.length > 0) {
-      dispatch(addNewFlashCards(mappedFlashCards));
+      addFlashCards(mappedFlashCards);
       dispatch(
         updateSet({
           ...set,
-          flashCards: [
-            ...set.flashCards,
-            ...mappedFlashCards.map((x) => x.frontUuid),
-          ],
+          flashCards: [...set.flashCards, ...mappedFlashCards],
         }),
       );
     }
   };
 
-  const handleNewFlashCards = (
-    newFlashCards: Omit<FlashCard, 'weight' | 'order'>[],
-  ) => {
+  const handleNewFlashCards = (newFlashCards: Omit<FlashCard, 'weight' | 'order'>[]) => {
     window.umami.track('Add flash cards');
 
     if (newFlashCards.length > 0) {
-      const flashcardUuids = newFlashCards.map(
-        (flashcard) => flashcard.frontUuid,
-      );
+      const flashcardUuids = newFlashCards.map((flashcard, index) => ({
+        ...flashcard,
+        weight: 1.0,
+        order: flashcards.length + index + 1,
+      }));
 
-      window.umami.track('Add flash cards', { count: flashCards.length });
-      dispatch(addNewFlashCards(newFlashCards));
+      window.umami.track('Add flash cards', { count: newFlashCards.length });
+      addFlashCards(newFlashCards);
 
       dispatch(
         updateStatistics({
@@ -214,9 +195,7 @@ export default function SetHardlinkPage() {
         <div className='flex w-full items-center justify-start gap-4'>
           <LinkComponent
             href='/flashcards/sets'
-            icon={
-              <ArrowLeftIcon className='h-4 w-4 transition group-hover:translate-x-2 group-active:translate-x-1' />
-            }
+            icon={<ArrowLeftIcon className='h-4 w-4 transition group-hover:translate-x-2 group-active:translate-x-1' />}
             label='Back'
             className='group w-auto pb-4 text-green-400'
             underline={false}
@@ -224,9 +203,7 @@ export default function SetHardlinkPage() {
         </div>
 
         <div className='flex justify-between'>
-          <h4 className='line-clamp-2 flex w-full max-w-md items-center gap-4 text-green-400'>
-            {capitalizedName}
-          </h4>
+          <h4 className='line-clamp-2 flex w-full max-w-md items-center gap-4 text-green-400'>{capitalizedName}</h4>
 
           <div className='flex gap-4'>
             <ContextMenu
@@ -276,11 +253,7 @@ export default function SetHardlinkPage() {
         </div>
       )}
 
-      <div
-        className={cn([
-          'flex w-full flex-col justify-center gap-4 md:justify-start',
-        ])}
-      >
+      <div className={cn(['flex w-full flex-col justify-center gap-4 md:justify-start'])}>
         <div
           className={cn([
             'grid w-full justify-center gap-4 md:justify-start',
@@ -290,9 +263,9 @@ export default function SetHardlinkPage() {
         >
           {set?.flashCards &&
             set?.flashCards.map((flashCard) => (
-              <div key={flashCard}>
+              <div key={flashCard.frontUuid}>
                 <FlashCardComponent
-                  flashCard={flashCards?.[flashCard]}
+                  flashCard={flashCard}
                   size={'sm'}
                 />
               </div>
@@ -322,7 +295,7 @@ export default function SetHardlinkPage() {
               />
             }
             handleSubmit={handleAssignCards}
-            flashCards={flashCardsArray}
+            flashCards={flashcards}
             setCards={set?.flashCards ?? []}
           />
 
