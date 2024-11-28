@@ -1,9 +1,15 @@
 import { FLASHCARDS_LOCAL_STORAGE_INIT } from '#/shared/defaults/flashcards-local-storage-init';
+import {
+  createContext,
+  useContext,
+  useState,
+  type PropsWithChildren,
+} from 'react';
 import { SETS_LOCAL_STORAGE_INIT } from '#/shared/defaults/sets-local-storage-init';
-import { createContext, useContext, useState, type PropsWithChildren } from 'react';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import type { FlashCard } from '#/shared/models/flash-card.model';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
+import uuid from '#/shared/utils/uuid.util';
 
 export type AppContextType = {
   flashcards: FlashCard[];
@@ -42,7 +48,11 @@ export default function AppProvider(props: PropsWithChildren) {
     defaultValue: FLASHCARDS_LOCAL_STORAGE_INIT,
     setArrayValue: setFlashCardsArray,
   });
-  useLocalStorage({ key: 'sets', defaultValue: SETS_LOCAL_STORAGE_INIT, setArrayValue: setSetsArray });
+  useLocalStorage({
+    key: 'sets',
+    defaultValue: SETS_LOCAL_STORAGE_INIT,
+    setArrayValue: setSetsArray,
+  });
 
   /////////////////
   // FLASHCARDS MANAGEMENT
@@ -63,7 +73,7 @@ export default function AppProvider(props: PropsWithChildren) {
     const flashcardSize = flashCardsArray.length;
 
     const mappedFlashCards: FlashCard[] = flashcards.map((flashCard, index) => {
-      const flashCardUuid = flashCard.frontUuid ?? crypto.randomUUID();
+      const flashCardUuid = flashCard.frontUuid ?? uuid();
       return {
         frontUuid: flashCardUuid,
         question: flashCard.question ?? '',
@@ -85,7 +95,9 @@ export default function AppProvider(props: PropsWithChildren) {
 
   const removeFlashCards = (flashcards: FlashCard[]) => {
     const flashcardsObject: Record<string, FlashCard> = {};
-    const filteredFlashcards = flashCardsArray.filter((item: FlashCard) => !flashcards.includes(item));
+    const filteredFlashcards = flashCardsArray.filter(
+      (item: FlashCard) => !flashcards.includes(item),
+    );
 
     filteredFlashcards.forEach((item: FlashCard) => {
       flashcardsObject[item.frontUuid] = item;
@@ -97,17 +109,22 @@ export default function AppProvider(props: PropsWithChildren) {
 
   const updateFlashCards = (flashcards: Partial<FlashCard>[]) => {
     const flashcardsObject: Record<string, FlashCard> = {};
-    const mappedFlashCards: FlashCard[] = flashcards.map((flashCard, index) => ({
-      frontUuid: flashCard.frontUuid ?? crypto.randomUUID(),
-      order: flashCard.order ?? index + 1,
-      weight: flashCard.weight ?? 1.0,
-      questionAddition: flashCard.questionAddition ?? '',
-      question: flashCard.question ?? '',
-      answer: flashCard.answer ?? '',
-    }));
+    const mappedFlashCards: FlashCard[] = flashcards.map(
+      (flashCard, index) => ({
+        frontUuid: flashCard.frontUuid ?? uuid(),
+        order: flashCard.order ?? index + 1,
+        weight: flashCard.weight ?? 1.0,
+        questionAddition: flashCard.questionAddition ?? '',
+        question: flashCard.question ?? '',
+        answer: flashCard.answer ?? '',
+      }),
+    );
 
     const updatedFlashcards = flashCardsArray.map((flashCard) => {
-      const updatedFlashcard = mappedFlashCards.find((item) => item.frontUuid === flashCard.frontUuid) ?? flashCard;
+      const updatedFlashcard =
+        mappedFlashCards.find(
+          (item) => item.frontUuid === flashCard.frontUuid,
+        ) ?? flashCard;
 
       flashcardsObject[flashCard.frontUuid] = updatedFlashcard;
       return updatedFlashcard;
@@ -120,7 +137,7 @@ export default function AppProvider(props: PropsWithChildren) {
   const updateFlashCard = (flashcard: Partial<FlashCard>) => {
     const flashcardsObject: Record<string, FlashCard> = {};
     const updatedFlashcard = {
-      frontUuid: flashcard.frontUuid ?? crypto.randomUUID(),
+      frontUuid: flashcard.frontUuid ?? uuid(),
       order: flashcard.order ?? flashCardsArray.length + 1,
       weight: flashcard.weight ?? 1.0,
       questionAddition: flashcard.questionAddition ?? '',

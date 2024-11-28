@@ -8,7 +8,6 @@ import { API_ROUTES } from '#/shared/defaults/api-routes';
 import FormComponent from '../form-component/form';
 import { Button } from '../_ui/button/button';
 import uuid from '#/shared/utils/uuid.util';
-import { UUID } from '#/types//uuid.type';
 import { useCompletion } from 'ai/react';
 import Modal from '../_ui/modal/modal';
 
@@ -44,7 +43,7 @@ export const NewFlashCardModal = ({
     if (selectedFlashCards.length === 0) {
       setFlashCards([
         {
-          frontUuid: uuid() as UUID,
+          frontUuid: uuid(),
           question: 'What is the definition of word below?',
           questionAddition: '',
           answer: '',
@@ -60,7 +59,7 @@ export const NewFlashCardModal = ({
     if (selectedFlashCards.length === 0) {
       setFlashCards([
         {
-          frontUuid: uuid() as UUID,
+          frontUuid: uuid(),
           question: 'What is the definition of word below?',
           questionAddition: '',
           answer: '',
@@ -116,7 +115,7 @@ export const NewFlashCardModal = ({
     } else {
       if (!isInEditMode) {
         const newFlashCard = {
-          frontUuid: uuid() as UUID,
+          frontUuid: uuid(),
           question: 'What is the definition of word below?',
           questionAddition: '',
           answer: '',

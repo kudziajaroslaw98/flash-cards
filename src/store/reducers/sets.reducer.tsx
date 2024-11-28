@@ -1,9 +1,7 @@
-import typedInstanceFactory from '#/shared/utils/typed-instance-factory.util';
 import { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import typedObjectAssign from '#/shared/utils/typed-instance-factory.util';
 import { Sets } from '#/types//local-storage-sets.type';
-import { UUID } from '#/types//uuid.type';
-
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 const initialState: Sets = {};
 
 export const setsSlice = createSlice({
@@ -22,8 +20,8 @@ export const setsSlice = createSlice({
     addNewSets: (state, action: PayloadAction<Partial<FlashCardSet>[]>) => {
       action.payload.forEach((set) => {
         if (set?.frontUuid) {
-          typedInstanceFactory(state, {
-            [set.frontUuid as UUID]: {
+          typedObjectAssign(state, {
+            [set.frontUuid]: {
               frontUuid: set.frontUuid,
               name: set.name ?? '',
               description: set.description ?? '',
@@ -39,7 +37,7 @@ export const setsSlice = createSlice({
       localStorage.setItem('sets', JSON.stringify(state));
       return state;
     },
-    removeSets: (state, action: PayloadAction<UUID[]>) => {
+    removeSets: (state, action: PayloadAction<string[]>) => {
       action.payload.forEach((setUuid) => {
         delete state?.[setUuid];
       });
@@ -51,8 +49,8 @@ export const setsSlice = createSlice({
       const set = action.payload;
 
       if (set?.frontUuid) {
-        typedInstanceFactory(state, {
-          [set.frontUuid as UUID]: {
+        typedObjectAssign(state, {
+          [set.frontUuid]: {
             frontUuid: set.frontUuid,
             name: set.name ?? '',
             description: set.description ?? '',
@@ -70,8 +68,8 @@ export const setsSlice = createSlice({
     updateSets: (state, action: PayloadAction<Partial<FlashCardSet>[]>) => {
       action.payload.forEach((set) => {
         if (set?.frontUuid) {
-          typedInstanceFactory(state, {
-            [set.frontUuid as UUID]: {
+          typedObjectAssign(state, {
+            [set.frontUuid]: {
               frontUuid: set.frontUuid,
               name: set.name ?? '',
               description: set.description ?? '',
