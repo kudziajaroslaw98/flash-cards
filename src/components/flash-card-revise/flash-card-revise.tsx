@@ -1,15 +1,14 @@
 'use client';
 
-import { ArrowPathIcon, ArrowTurnLeftDownIcon } from '@heroicons/react/24/solid';
+import {
+  ArrowPathIcon,
+  ArrowTurnLeftDownIcon,
+} from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 
 import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
-import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
-import { statsSelectors } from '#/store/selectors/stats.selectors';
 import type { FlashCard } from '#/shared/models/flash-card.model';
-import { updateStatistics } from '#/store/reducers/stats.reducer';
-import { setsSelectors } from '#/store/selectors/sets.selectors';
 import FlashCardComponent from '../flash-card/flash-card';
 import { Button } from '#/components/_ui/button/button';
 import { useAppContext } from '#/providers/app-context';
@@ -27,16 +26,20 @@ export default function FlashCardReviseComponent() {
   const [clickedCard, setClickedCard] = useState<FlashCard>();
   const [clicked, setClicked] = useState(false);
 
-  const { flashcards, updateFlashCard } = useAppContext();
+  const {
+    sets,
+    setsDictionary,
+    flashcards,
+    updateFlashCard,
+    stats,
+    updateStats,
+  } = useAppContext();
 
-  const sets = useAppSelector(setsSelectors.selectSetsArray);
-  const setsDictionary = useAppSelector(setsSelectors.selectSetsAsDictionary);
-
-  const statistics = useAppSelector(statsSelectors.selectStats);
-
-  const dispatch = useAppDispatch();
-
-  const { pickedItems: randomCards, reshuffle, setNewArray } = useRandomArrayItems<FlashCard>(flashcards, 4);
+  const {
+    pickedItems: randomCards,
+    reshuffle,
+    setNewArray,
+  } = useRandomArrayItems<FlashCard>(flashcards, 4);
 
   const isCorrect = (flashCard?: FlashCard) => {
     const comparisonItem = flashCard ?? clickedCard;
@@ -56,7 +59,7 @@ export default function FlashCardReviseComponent() {
     }
 
     const correct = isCorrect(flashCard);
-    const clonedStats = { ...statistics };
+    const clonedStats = { ...stats };
 
     clonedStats.answers += 1;
 
@@ -77,9 +80,11 @@ export default function FlashCardReviseComponent() {
       });
     }
 
-    clonedStats.accuracy = parseFloat((clonedStats.correctAnswers / clonedStats.answers).toFixed(2));
+    clonedStats.accuracy = parseFloat(
+      (clonedStats.correctAnswers / clonedStats.answers).toFixed(2),
+    );
 
-    dispatch(updateStatistics({ updatedValue: clonedStats }));
+    updateStats({ ...clonedStats });
     setClickedCard(flashCard);
     setClicked(true);
   };
@@ -118,7 +123,9 @@ export default function FlashCardReviseComponent() {
     if (revisedSet === defaultSet.value) {
       setNewArray(flashcards);
     } else {
-      const setFlashCards = sets.filter((set) => set.frontUuid === revisedSet)[0].flashCards;
+      const setFlashCards = sets.filter(
+        (set) => set.frontUuid === revisedSet,
+      )[0].flashCards;
 
       setNewArray(setFlashCards);
     }
@@ -145,7 +152,9 @@ export default function FlashCardReviseComponent() {
           >
             <ArrowTurnLeftDownIcon className='size-5 text-green-400' />
 
-            <span className='w-32 text-xs italic text-gray-600 dark:text-slate-500'>Click on the card to flip it</span>
+            <span className='w-32 text-xs italic text-gray-600 dark:text-slate-500'>
+              Click on the card to flip it
+            </span>
           </div>
 
           <div>
@@ -180,7 +189,9 @@ export default function FlashCardReviseComponent() {
                 {index + 1}
               </span>
 
-              <span className='flex w-[280px] text-sm text-gray-800 dark:text-slate-400'>{flashCard.answer}</span>
+              <span className='flex w-[280px] text-sm text-gray-800 dark:text-slate-400'>
+                {flashCard.answer}
+              </span>
             </div>
           ))}
         </div>
@@ -207,7 +218,9 @@ export default function FlashCardReviseComponent() {
     </div>
   ) : (
     <div className='flex h-full w-full flex-col items-center justify-center gap-4 text-xl'>
-      <h3 className='text-gray-500 dark:text-slate-200'>You dont have any flashcards yet.</h3>
+      <h3 className='text-gray-500 dark:text-slate-200'>
+        You dont have any flashcards yet.
+      </h3>
 
       <LinkComponent
         href='/flashcards/learn'

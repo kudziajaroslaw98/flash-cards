@@ -11,21 +11,15 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/solid';
 import { AssignFlashCardsModal } from '#/components/assign-flash-cards-modal/assign-flash-cards-modal';
-import { NewFlashCardModal } from '#/components/new-flash-card-modal/new-flash-card-modal';
 import ContextMenu, {
   ContextMenuItem,
 } from '#/components/_ui/context-menu/context-menu';
+import { NewFlashCardModal } from '#/components/new-flash-card-modal/new-flash-card-modal';
 import { FloatingButtons } from '#/components/floating-buttons/floating-buttons';
 import { useSessionContext } from '#/providers/session-provider.component';
-import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import type { DictionaryValue } from '#/types//dictionary-value.type';
-import { removeSets, updateSet } from '#/store/reducers/sets.reducer';
 import FlashCardComponent from '#/components/flash-card/flash-card';
-import { statsSelectors } from '#/store/selectors/stats.selectors';
 import type { FlashCard } from '#/shared/models/flash-card.model';
-import { updateStatistics } from '#/store/reducers/stats.reducer';
-import { setsSelectors } from '#/store/selectors/sets.selectors';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { Button } from '#/components/_ui/button/button';
 import { useAppContext } from '#/providers/app-context';
@@ -49,13 +43,16 @@ export default function SetHardlinkPage() {
   const router = useRouter();
   const { fetch, isLoading } = useFetch();
   const { isLoggedIn } = useSessionContext();
-  const { flashcards, addFlashCards } = useAppContext();
-
-  const sets = useAppSelector(setsSelectors.selectSetsArray);
-  const statistics = useAppSelector(statsSelectors.selectStats);
-  const categories: DictionaryValue<string>[] = useAppSelector(
-    setsSelectors.selectCategoriesAsDictionary,
-  );
+  const {
+    flashcards,
+    addFlashCards,
+    sets,
+    categories,
+    updateSet,
+    removeSets,
+    stats,
+    updateStats,
+  } = useAppContext();
 
   const [set, setSet] = useState<FlashCardSet>(
     sets.filter((set) => set?.hardlink === setHardLink)[0],
@@ -65,8 +62,6 @@ export default function SetHardlinkPage() {
       setHardLink.replace(/-/g, ' ').slice(1),
   );
   const [accuracy] = useState<number>(0);
-
-  const dispatch = useAppDispatch();
 
   useEffect(() => {
     setSet(sets.filter((set) => set?.hardlink === setHardLink)[0]);
@@ -78,12 +73,10 @@ export default function SetHardlinkPage() {
       ...prev,
       flashCards,
     }));
-    dispatch(
-      updateSet({
-        ...set,
-        flashCards,
-      }),
-    );
+    updateSet({
+      ...set,
+      flashCards,
+    });
   };
 
   const handleEditSet = (set: Partial<FlashCardSet>[]) => {
@@ -92,7 +85,7 @@ export default function SetHardlinkPage() {
       const hardlink = set[0].name?.replace(/ /g, '-').toLowerCase();
       router.prefetch(`flashcards/sets/${hardlink}`);
 
-      dispatch(updateSet(set[0]));
+      updateSet(set[0]);
       setSet(set[0] as FlashCardSet);
 
       router.push(`${hardlink}`);
@@ -102,7 +95,7 @@ export default function SetHardlinkPage() {
   const handleRemoveSet = () => {
     window.umami.track('Delete set');
     if (set?.frontUuid) {
-      dispatch(removeSets([set?.frontUuid]));
+      removeSets([set]);
       router.push('/flashcards/sets');
     }
   };
@@ -157,12 +150,10 @@ export default function SetHardlinkPage() {
 
     if (flashCardsResponse.length > 0) {
       addFlashCards(mappedFlashCards);
-      dispatch(
-        updateSet({
-          ...set,
-          flashCards: [...set.flashCards, ...mappedFlashCards],
-        }),
-      );
+      updateSet({
+        ...set,
+        flashCards: [...set.flashCards, ...mappedFlashCards],
+      });
     }
   };
 
@@ -181,19 +172,15 @@ export default function SetHardlinkPage() {
       window.umami.track('Add flash cards', { count: newFlashCards.length });
       addFlashCards(newFlashCards);
 
-      dispatch(
-        updateStatistics({
-          updatedValue: statistics.createdFlashCards + newFlashCards.length,
-          property: 'createdFlashCards',
-        }),
-      );
+      updateStats({
+        ...stats,
+        createdFlashCards: stats.createdFlashCards + newFlashCards.length,
+      });
 
-      dispatch(
-        updateSet({
-          ...set,
-          flashCards: [...set.flashCards, ...flashcardUuids],
-        }),
-      );
+      updateSet({
+        ...set,
+        flashCards: [...set.flashCards, ...flashcardUuids],
+      });
 
       setTimeout(() => {
         window.document.body.scrollIntoView({

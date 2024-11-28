@@ -4,13 +4,10 @@ import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 
 import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter';
-import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import type { FlashCard } from '#/shared/models/flash-card.model';
 import { Button } from '#/components/_ui/button/button';
 
 import { FloatingButtons } from '../floating-buttons/floating-buttons';
-import { statsSelectors } from '#/store/selectors/stats.selectors';
-import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { AlertDialog } from '../_ui/alert-dialog/alert-dialog';
 import FlashCardComponent from '../flash-card/flash-card';
 import { useAppContext } from '#/providers/app-context';
@@ -19,13 +16,20 @@ import { cn } from '#/shared/utils/cn.util';
 import dynamic from 'next/dynamic';
 
 const NewFlashCardModal = dynamic(() =>
-  import('#/components/new-flash-card-modal/new-flash-card-modal').then((x) => x.NewFlashCardModal),
+  import('#/components/new-flash-card-modal/new-flash-card-modal').then(
+    (x) => x.NewFlashCardModal,
+  ),
 );
 
 export default function FlashCardsTable() {
-  const statistics = useAppSelector(statsSelectors.selectStats);
-  const { flashcards, removeFlashCards, addFlashCards, updateFlashCards } = useAppContext();
-  const dispatch = useAppDispatch();
+  const {
+    flashcards,
+    removeFlashCards,
+    addFlashCards,
+    updateFlashCards,
+    stats,
+    updateStats,
+  } = useAppContext();
 
   const [selected, setSelected] = useState<FlashCard[]>([]);
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
@@ -33,12 +37,17 @@ export default function FlashCardsTable() {
   const [tileSize] = useState<'sm' | 'md' | 'lg'>('sm');
 
   const isSelected = (flashCard: FlashCard) => {
-    return selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !== -1;
+    return (
+      selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
+      -1
+    );
   };
 
   const toggleSelected = (flashCard: FlashCard) => {
     if (isSelected(flashCard)) {
-      setSelected((prev) => prev.filter((item) => flashCard.frontUuid !== item.frontUuid));
+      setSelected((prev) =>
+        prev.filter((item) => flashCard.frontUuid !== item.frontUuid),
+      );
     } else {
       setSelected((prev) => [...prev, flashCard]);
     }
@@ -54,12 +63,10 @@ export default function FlashCardsTable() {
     window.umami.track('Add flash cards', { count: flashCards.length });
     addFlashCards(flashCards);
 
-    dispatch(
-      updateStatistics({
-        updatedValue: statistics.createdFlashCards + flashCards.length,
-        property: 'createdFlashCards',
-      }),
-    );
+    updateStats({
+      ...stats,
+      createdFlashCards: stats.createdFlashCards + flashCards.length,
+    });
 
     setTimeout(() => {
       window.document.body.scrollIntoView({

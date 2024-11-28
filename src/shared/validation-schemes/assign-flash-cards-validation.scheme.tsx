@@ -5,7 +5,16 @@ import { FormScheme } from '#/types/form-scheme.type';
 import { z } from 'zod';
 
 export const assignFlashCardsValidationScheme = z.object({
-  flashCards: z.array(z.string().uuid()),
+  flashCards: z.array(
+    z.object({
+      frontUuid: z.string().uuid(),
+      weight: z.number().nonnegative(),
+      question: z.string().min(1),
+      questionAddition: z.string().min(1),
+      answer: z.string().min(1).max(255),
+      order: z.number().nonnegative(),
+    }),
+  ),
 });
 
 export const assignFlashCardsScheme = (

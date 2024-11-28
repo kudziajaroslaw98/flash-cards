@@ -1,12 +1,11 @@
 'use client';
 
-import { statsSelectors } from '#/store/selectors/stats.selectors';
 import { Stats } from '#/types//local-storage-stats.type';
-import { useAppSelector } from '#/hooks/store-hooks.hook';
+import { useAppContext } from '#/providers/app-context';
 import CardComponent from '#/components/_ui/card/card';
 
 export default function StatsListComponent() {
-  const statistics = useAppSelector(statsSelectors.selectStats);
+  const { stats } = useAppContext();
 
   const labels: Record<keyof Stats, string> = {
     answers: 'Answers',
@@ -21,7 +20,7 @@ export default function StatsListComponent() {
       <h4 className='text-green-400'>Your statistics</h4>
 
       <div className='flex max-w-2xl flex-wrap justify-center gap-4'>
-        {Object.entries(statistics)?.map(([key, value]) => (
+        {Object.entries(stats)?.map(([key, value]) => (
           <CardComponent
             key={key}
             backgroundGradientWidth={100}
