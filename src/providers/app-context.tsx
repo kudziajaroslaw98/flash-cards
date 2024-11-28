@@ -291,14 +291,21 @@ export default function AppProvider(props: PropsWithChildren) {
   /////////////////
 
   const migrateSets = useCallback(() => {
-    setSetsArray((prev) =>
-      prev.map((set) => ({
+    setSetsArray((prev) => {
+      const updatedSets = prev.map((set) => ({
         ...set,
         flashCards: flashCardsArray.filter((flashCard) =>
           set.flashCards.includes(flashCard.frontUuid as unknown as FlashCard),
         ),
-      })),
-    );
+      }));
+      const setsObject: Record<string, FlashCardSet> = {};
+      updatedSets.forEach((item: FlashCardSet) => {
+        setsObject[item.frontUuid] = item;
+      });
+
+      localStorage.setItem('sets', JSON.stringify(setsObject));
+      return updatedSets;
+    });
   }, [flashCardsArray]);
 
   /////////////////
