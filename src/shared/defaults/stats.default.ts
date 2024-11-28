@@ -1,4 +1,4 @@
-import { Stats } from '#/types//local-storage-stats.type';
+import type { Stats } from '#/types/stats.type';
 
 export const DEFAULT_STATS: Stats = {
   answers: 0,
@@ -6,4 +6,6 @@ export const DEFAULT_STATS: Stats = {
   correctAnswers: 0,
   incorrectAnswers: 0,
   createdFlashCards: 10,
+  streak: 1,
+  lastSyncAt: new Date(),
 };
