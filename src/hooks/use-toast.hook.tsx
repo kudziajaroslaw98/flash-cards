@@ -1,10 +1,8 @@
-import { UUID } from '#/types//uuid.type';
-
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { v4 } from 'uuid';
+import uuid from '#/shared/utils/uuid.util';
 
 export interface ToastModel {
-  uuid: UUID;
+  uuid: string;
   title: string;
   type: 'success' | 'error' | 'warning' | 'info' | 'async';
   timeInSeconds?: number;
@@ -23,12 +21,12 @@ interface AsyncToastConfig {
 export default function useToast() {
   const [toasts, setToast] = useState<ToastModel[]>([]);
   const [internalToasts, setInternalToasts] = useState<
-    Record<UUID, InternalToastModel>
+    Record<string, InternalToastModel>
   >({});
   const intervalTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const close = useCallback(
-    (toastUuid: UUID) => {
+    (toastUuid: string) => {
       const clonedToasts = { ...internalToasts };
 
       delete clonedToasts[toastUuid];
@@ -39,13 +37,13 @@ export default function useToast() {
   );
 
   const show = (toast: Omit<ToastModel, 'uuid'>) => {
-    const uuid = v4() as UUID;
+    const uuidString = uuid();
 
     setInternalToasts((prev) => ({
       ...prev,
-      [uuid]: {
+      [uuidString]: {
         ...toast,
-        uuid,
+        uuid: uuidString,
         dueTo: new Date(
           new Date().getTime() + (toast?.timeInSeconds ?? 1) * 1000,
         ),
@@ -54,14 +52,14 @@ export default function useToast() {
   };
 
   const showAsync = (config: AsyncToastConfig, promise: Promise<unknown>) => {
-    const uuid = v4() as UUID;
+    const uuidString = uuid();
 
     setInternalToasts((prev) => ({
       ...prev,
-      [uuid]: {
+      [uuidString]: {
         title: config.pendingTitle,
         type: 'async',
-        uuid,
+        uuid: uuidString,
         dueTo: new Date(new Date().getTime() + 60 * 1000),
       },
     }));
@@ -70,10 +68,10 @@ export default function useToast() {
       .then(() => {
         setInternalToasts((prev) => ({
           ...prev,
-          [uuid]: {
+          [uuidString]: {
             title: config.successTitle,
             type: 'success',
-            uuid,
+            uuid: uuidString,
             dueTo: new Date(new Date().getTime() + 3 * 1000),
           },
         }));
@@ -81,10 +79,10 @@ export default function useToast() {
       .catch(() => {
         setInternalToasts((prev) => ({
           ...prev,
-          [uuid]: {
+          [uuidString]: {
             title: config.errorTitle,
             type: 'error',
-            uuid,
+            uuid: uuidString,
             dueTo: new Date(new Date().getTime() + 3 * 1000),
           },
         }));

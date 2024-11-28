@@ -6,8 +6,7 @@ import ThemeProvider from './theme-provider.component';
 import ToastProvider from './toast-provider.component';
 import { domMax, LazyMotion } from 'framer-motion';
 import type { PropsWithChildren } from 'react';
-import { store } from '#/store/redux.store';
-import { Provider } from 'react-redux';
+import AppProvider from './app-context';
 
 export default function ClientSideProviders(props: PropsWithChildren) {
   return (
@@ -15,7 +14,7 @@ export default function ClientSideProviders(props: PropsWithChildren) {
       features={domMax}
       strict
     >
-      <Provider store={store}>
+      <AppProvider>
         <ToastProvider>
           <SessionProvider>
             <ThemeProvider>
@@ -23,7 +22,7 @@ export default function ClientSideProviders(props: PropsWithChildren) {
             </ThemeProvider>
           </SessionProvider>
         </ToastProvider>
-      </Provider>
+      </AppProvider>
     </LazyMotion>
   );
 }

@@ -4,21 +4,13 @@ import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 
 import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter';
-import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import type { FlashCard } from '#/shared/models/flash-card.model';
 import { Button } from '#/components/_ui/button/button';
 
-import {
-  addNewFlashCards,
-  removeFlashCards,
-  updateFlashCards,
-} from '#/store/reducers/flashcards.reducer';
-import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
 import { FloatingButtons } from '../floating-buttons/floating-buttons';
-import { statsSelectors } from '#/store/selectors/stats.selectors';
-import { updateStatistics } from '#/store/reducers/stats.reducer';
 import { AlertDialog } from '../_ui/alert-dialog/alert-dialog';
 import FlashCardComponent from '../flash-card/flash-card';
+import { useAppContext } from '#/providers/app-context';
 import { AnimatePresence } from 'framer-motion';
 import { cn } from '#/shared/utils/cn.util';
 import dynamic from 'next/dynamic';
@@ -30,11 +22,14 @@ const NewFlashCardModal = dynamic(() =>
 );
 
 export default function FlashCardsTable() {
-  const statistics = useAppSelector(statsSelectors.selectStats);
-  const flashCardsArray = useAppSelector(
-    flashCardSelectors.selectFlashCardsArray,
-  ).sort((head, tail) => head.order - tail.order);
-  const dispatch = useAppDispatch();
+  const {
+    flashcards,
+    removeFlashCards,
+    addFlashCards,
+    updateFlashCards,
+    stats,
+    updateStats,
+  } = useAppContext();
 
   const [selected, setSelected] = useState<FlashCard[]>([]);
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
@@ -60,20 +55,18 @@ export default function FlashCardsTable() {
 
   const removeSelected = () => {
     window.umami.track('Remove flash cards', { count: selected.length });
-    dispatch(removeFlashCards(selected.map((item) => item.frontUuid)));
+    removeFlashCards(selected);
     setSelected([]);
   };
 
   const addNewRecord = (flashCards: Partial<FlashCard>[]) => {
     window.umami.track('Add flash cards', { count: flashCards.length });
-    dispatch(addNewFlashCards(flashCards));
+    addFlashCards(flashCards);
 
-    dispatch(
-      updateStatistics({
-        updatedValue: statistics.createdFlashCards + flashCards.length,
-        property: 'createdFlashCards',
-      }),
-    );
+    updateStats({
+      ...stats,
+      createdFlashCards: stats.createdFlashCards + flashCards.length,
+    });
 
     setTimeout(() => {
       window.document.body.scrollIntoView({
@@ -93,7 +86,7 @@ export default function FlashCardsTable() {
 
   const editSelectedRecords = (editRecords: Partial<FlashCard>[]) => {
     window.umami.track('Edit flash cards', { count: editRecords.length });
-    dispatch(updateFlashCards(editRecords));
+    updateFlashCards(editRecords);
   };
 
   const handleEditButtonClick = () => {
@@ -108,10 +101,10 @@ export default function FlashCardsTable() {
 
   return (
     <div className='flex w-full flex-col gap-6 py-8'>
-      <FlashCardsCounterComponent count={flashCardsArray.length} />
+      <FlashCardsCounterComponent count={flashcards.length} />
 
       <div className='relative flex h-full w-full flex-col'>
-        {flashCardsArray.length > 0 && (
+        {flashcards.length > 0 && (
           <div
             className={cn([
               'grid w-full justify-center gap-4',
@@ -121,7 +114,7 @@ export default function FlashCardsTable() {
             ])}
           >
             <AnimatePresence mode='popLayout'>
-              {flashCardsArray.map((flashCard) => (
+              {flashcards.map((flashCard) => (
                 <div key={flashCard.frontUuid}>
                   <FlashCardComponent
                     flashCard={flashCard}
@@ -167,7 +160,7 @@ export default function FlashCardsTable() {
             }
           />
 
-          {flashCardsArray.length > 0 && (
+          {flashcards.length > 0 && (
             <AlertDialog
               onCancel={() => {
                 window.umami.track('Cancel remove flash cards');

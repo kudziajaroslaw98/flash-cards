@@ -7,7 +7,6 @@ import type { DictionaryValue } from '#/types//dictionary-value.type';
 import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 import FormComponent from '../form-component/form';
-import type { UUID } from '#/types//uuid.type';
 import { Button } from '../_ui/button/button';
 import uuid from '#/shared/utils/uuid.util';
 import { useCompletion } from 'ai/react';
@@ -48,7 +47,7 @@ export const NewSetModal = ({
     if (selectedSets.length === 0) {
       setSets([
         {
-          frontUuid: uuid() as UUID,
+          frontUuid: uuid(),
           name: '',
           description: '',
         },
@@ -63,7 +62,7 @@ export const NewSetModal = ({
     if (selectedSets.length === 0) {
       setSets([
         {
-          frontUuid: uuid() as UUID,
+          frontUuid: uuid(),
           name: '',
           description: '',
         },
@@ -117,7 +116,7 @@ export const NewSetModal = ({
     } else {
       if (!isInEditMode) {
         const newSet: Partial<FlashCardSet> = {
-          frontUuid: uuid() as UUID,
+          frontUuid: uuid(),
           name: '',
           description: '',
         };

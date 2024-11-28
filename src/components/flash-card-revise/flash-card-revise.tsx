@@ -6,22 +6,17 @@ import {
 } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 
-import { Button } from '#/components/_ui/button/button';
-import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
-import useKeyPress from '#/hooks/use-key-press.hook';
+import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
 import type { FlashCard } from '#/shared/models/flash-card.model';
-import { cn } from '#/shared/utils/cn.util';
-import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
-import { updateFlashCard } from '#/store/reducers/flashcards.reducer';
-import { updateStatistics } from '#/store/reducers/stats.reducer';
-import { flashCardSelectors } from '#/store/selectors/flashcards.selectors';
-import { setsSelectors } from '#/store/selectors/sets.selectors';
-import { statsSelectors } from '#/store/selectors/stats.selectors';
-import Card from '../_ui/card/card';
+import FlashCardComponent from '../flash-card/flash-card';
+import { Button } from '#/components/_ui/button/button';
+import { useAppContext } from '#/providers/app-context';
+import useKeyPress from '#/hooks/use-key-press.hook';
 import Dropdown from '../_ui/dropdown/dropdown';
 import LinkComponent from '../_ui/link/link';
-import FlashCardComponent from '../flash-card/flash-card';
+import { cn } from '#/shared/utils/cn.util';
+import Card from '../_ui/card/card';
 
 export default function FlashCardReviseComponent() {
   const defaultSet = { value: 'default', label: 'All flash cards' };
@@ -31,22 +26,20 @@ export default function FlashCardReviseComponent() {
   const [clickedCard, setClickedCard] = useState<FlashCard>();
   const [clicked, setClicked] = useState(false);
 
-  const flashCardsArray = useAppSelector(
-    flashCardSelectors.selectFlashCardsArray,
-  );
-
-  const sets = useAppSelector(setsSelectors.selectSetsArray);
-  const setsDictionary = useAppSelector(setsSelectors.selectSetsAsDictionary);
-
-  const statistics = useAppSelector(statsSelectors.selectStats);
-
-  const dispatch = useAppDispatch();
+  const {
+    sets,
+    setsDictionary,
+    flashcards,
+    updateFlashCard,
+    stats,
+    updateStats,
+  } = useAppContext();
 
   const {
     pickedItems: randomCards,
     reshuffle,
     setNewArray,
-  } = useRandomArrayItems<FlashCard>(flashCardsArray, 4);
+  } = useRandomArrayItems<FlashCard>(flashcards, 4);
 
   const isCorrect = (flashCard?: FlashCard) => {
     const comparisonItem = flashCard ?? clickedCard;
@@ -66,38 +59,32 @@ export default function FlashCardReviseComponent() {
     }
 
     const correct = isCorrect(flashCard);
-    const clonedStats = { ...statistics };
+    const clonedStats = { ...stats };
 
     clonedStats.answers += 1;
 
     if (correct) {
       clonedStats.correctAnswers += 1;
       if (revisedCard && revisedCard?.weight > 0.01) {
-        dispatch(
-          updateFlashCard({
-            flashCard: flashCard,
-            updatedValue: +(flashCard.weight - 0.01).toFixed(2),
-            property: 'weight',
-          }),
-        );
+        updateFlashCard({
+          ...flashCard,
+          weight: +(flashCard.weight - 0.01).toFixed(2),
+        });
       }
     } else {
       clonedStats.incorrectAnswers += 1;
 
-      dispatch(
-        updateFlashCard({
-          flashCard: flashCard,
-          updatedValue: +(flashCard.weight + 0.01).toFixed(2),
-          property: 'weight',
-        }),
-      );
+      updateFlashCard({
+        ...flashCard,
+        weight: +(flashCard.weight + 0.01).toFixed(2),
+      });
     }
 
     clonedStats.accuracy = parseFloat(
       (clonedStats.correctAnswers / clonedStats.answers).toFixed(2),
     );
 
-    dispatch(updateStatistics({ updatedValue: clonedStats }));
+    updateStats({ ...clonedStats });
     setClickedCard(flashCard);
     setClicked(true);
   };
@@ -134,20 +121,17 @@ export default function FlashCardReviseComponent() {
     if (clicked) return;
 
     if (revisedSet === defaultSet.value) {
-      setNewArray(flashCardsArray);
+      setNewArray(flashcards);
     } else {
-      const setFlashcardsIds = sets.filter(
+      const setFlashCards = sets.filter(
         (set) => set.frontUuid === revisedSet,
       )[0].flashCards;
-      const setFlashCards = flashCardsArray.filter((flashcard) =>
-        setFlashcardsIds.includes(flashcard.frontUuid),
-      );
 
       setNewArray(setFlashCards);
     }
 
     reshuffle();
-  }, [revisedSet, flashCardsArray]);
+  }, [revisedSet, flashcards]);
 
   useKeyPress(['r'], () => reshuffleFlashCardsWithKey('r'));
   useKeyPress(['ArrowRight'], () => reshuffleFlashCardsWithKey('ArrowRight'));
@@ -156,7 +140,7 @@ export default function FlashCardReviseComponent() {
   useKeyPress(['3'], () => changeClicked(randomCards[2], '3'));
   useKeyPress(['4'], () => changeClicked(randomCards[3], '4'));
 
-  return flashCardsArray.length > 0 ? (
+  return flashcards.length > 0 ? (
     <div className='flex h-full w-full flex-col justify-stretch'>
       <div className='flex h-full w-full flex-col items-center gap-8 pb-44'>
         <div className='grid w-full items-center justify-center'>

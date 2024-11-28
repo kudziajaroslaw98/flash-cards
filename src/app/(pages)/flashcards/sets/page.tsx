@@ -8,22 +8,15 @@ import {
   StarIcon,
   TrashIcon,
 } from '@heroicons/react/24/solid';
-import {
-  addNewSets,
-  removeSets,
-  updateSet,
-  updateSets,
-} from '#/store/reducers/sets.reducer';
+
 import { FloatingButtons } from '#/components/floating-buttons/floating-buttons';
 import { StarIcon as StarIconOutline } from '@heroicons/react/24/outline';
-import { useAppDispatch, useAppSelector } from '#/hooks/store-hooks.hook';
 import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
-import type { DictionaryValue } from '#/types//dictionary-value.type';
-import { setsSelectors } from '#/store/selectors/sets.selectors';
 import Dropdown from '#/components/_ui/dropdown/dropdown';
 import { Button } from '#/components/_ui/button/button';
+import { useAppContext } from '#/providers/app-context';
 import useLongPress from '#/hooks/use-long-press.hook';
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, m } from 'framer-motion';
@@ -64,10 +57,8 @@ export default function SetsPage() {
   const [isFavourite, toggleFavourite] = useState(false);
   const [searchedText, setSearchedText] = useState('');
   const [searchedCategory, setSearchedCategory] = useState<string[]>([]);
-  const sets = useAppSelector(setsSelectors.selectSetsArray);
-  const categories: DictionaryValue<string>[] = useAppSelector(
-    setsSelectors.selectCategoriesAsDictionary,
-  );
+  const { sets, categories, addSets, removeSets, updateSets, updateSet } =
+    useAppContext();
 
   const [filteredSets, setFilteredSets] = useState<FlashCardSet[]>([]);
   const [selected, setSelected] = useState<FlashCardSet[]>([]);
@@ -76,16 +67,14 @@ export default function SetsPage() {
 
   const toggleRef = useRef<HTMLButtonElement>(null);
 
-  const dispatch = useAppDispatch();
-
   const handleNewSets = (sets: Partial<FlashCardSet>[]) => {
     window.umami.track('add_sets', { count: sets.length });
-    dispatch(addNewSets(sets));
+    addSets(sets);
   };
 
   const handleEditSets = (sets: Partial<FlashCardSet>[]) => {
     window.umami.track('edit_sets', { count: sets.length });
-    dispatch(updateSets(sets));
+    updateSets(sets);
   };
 
   const handleFilterWithMultipleCryteria = () => {
@@ -138,7 +127,7 @@ export default function SetsPage() {
 
   const handleSetToggleChange = (set: FlashCardSet) => {
     window.umami.track('Toggle set favourite');
-    dispatch(updateSet({ ...set, isFavourite: !set.isFavourite }));
+    updateSet({ ...set, isFavourite: !set.isFavourite });
   };
 
   const toggleSelected = (set: FlashCardSet) => {
@@ -157,7 +146,7 @@ export default function SetsPage() {
 
   const removeSelected = () => {
     window.umami.track('Remove sets', { count: selected.length });
-    dispatch(removeSets(selected.map((item) => item.frontUuid)));
+    removeSets(selected);
     setSelected([]);
   };
 
@@ -173,6 +162,7 @@ export default function SetsPage() {
       } else {
         window.umami.track('Set short pressed - open set');
 
+        // TODO: Toggling doesnt work again
         if (toggleRef.current?.contains(e.target as Node)) {
           handleSetToggleChange(set.at(0) as FlashCardSet);
         } else {

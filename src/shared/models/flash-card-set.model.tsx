@@ -1,10 +1,10 @@
-import { UUID } from '#/types/uuid.type';
+import type { FlashCard } from './flash-card.model';
 
 export type FlashCardSet = {
-  frontUuid: UUID;
+  frontUuid: string;
   name: string;
   description: string;
-  flashCards: UUID[];
+  flashCards: FlashCard[];
   isFavourite: boolean;
   category?: string;
   hardlink: string;
