@@ -47,6 +47,9 @@ export default function SyncSessionProvider(
       metadata: metadata,
     });
 
+    // TODO: Add error handling
+    // TODO: Add Promise.all() and split sync to different endpoints
+
     const responsePromise = fetch<ApiResponse<ApiSyncResponse>>(
       API_ROUTES.SYNC,
       {
