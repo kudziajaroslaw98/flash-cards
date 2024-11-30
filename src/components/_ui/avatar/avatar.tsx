@@ -30,7 +30,13 @@ const generateHash = (text?: string): string => {
   return Math.abs(hash).toString(36);
 };
 
-export default function AvatarComponent({ className, text, imageSrc, imageAlt, onClick }: AvatarProps) {
+export default function AvatarComponent({
+  className,
+  text,
+  imageSrc,
+  imageAlt,
+  onClick,
+}: AvatarProps) {
   const [avatar, setAvatar] = useState('');
   const { value: seed } = useLocalStorage({
     key: 'seed',
@@ -42,7 +48,7 @@ export default function AvatarComponent({ className, text, imageSrc, imageAlt, o
   useEffect(() => {
     setAvatar(
       createAvatar(botttsNeutral, {
-        seed: seed.seed,
+        seed: seed.seed.seed,
       }).toDataUri(),
     );
   }, [seed]);
@@ -68,7 +74,9 @@ export default function AvatarComponent({ className, text, imageSrc, imageAlt, o
           fill
         />
       ) : (
-        <span className='text-sm font-semibold text-slate-800 dark:text-gray-100'>{firstLetters}</span>
+        <span className='text-sm font-semibold text-slate-800 dark:text-gray-100'>
+          {firstLetters}
+        </span>
       )}
     </button>
   );

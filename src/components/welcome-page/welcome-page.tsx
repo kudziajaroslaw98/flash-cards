@@ -9,7 +9,7 @@ import Link from 'next/link';
 
 export const WelcomePage = () => {
   const { user } = useSessionContext();
-  const { flashcards, stats } = useAppContext();
+  const { flashcards, metadata } = useAppContext();
 
   return (
     <>
@@ -21,7 +21,7 @@ export const WelcomePage = () => {
             transition={{ duration: 0.7, ease: 'easeOut' }}
             className='mb-4 flex w-48 flex-col items-center justify-center text-4xl font-black text-gray-700'
           >
-            <span>🔥{stats.streak}</span>
+            <span>🔥{metadata.streak}</span>
             <span className='ml-4 text-center text-2xl font-bold'>day</span>
           </m.div>
           <m.div className='flex gap-2'>
@@ -39,7 +39,7 @@ export const WelcomePage = () => {
               transition={{ delay: 1, duration: 0.7, ease: 'easeOut' }}
               className='text-4xl font-bold text-gray-700'
             >
-              {user?.user_metadata.firstName}
+              {user?.user_metadata.full_name.split(' ')[0]}
             </m.div>
             <m.span
               initial={{ y: 20, opacity: 0 }}
@@ -74,7 +74,7 @@ export const WelcomePage = () => {
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 2, duration: 0.7, ease: 'easeOut' }}
-              className='mb-8 h-[1px] w-1/2 bg-gray-300'
+              className='mb-8 h-[1px] w-1/2 bg-gray-200'
             ></m.div>
 
             <m.div

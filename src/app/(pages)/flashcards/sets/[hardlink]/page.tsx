@@ -50,8 +50,8 @@ export default function SetHardlinkPage() {
     categories,
     updateSet,
     removeSets,
-    stats,
-    updateStats,
+    metadata,
+    updateMetadata,
   } = useAppContext();
 
   const [set, setSet] = useState<FlashCardSet>(
@@ -146,6 +146,8 @@ export default function SetHardlinkPage() {
       frontUuid: uuid(),
       weight: 1.0,
       order: flashcards.length + index + 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }));
 
     if (flashCardsResponse.length > 0) {
@@ -172,9 +174,9 @@ export default function SetHardlinkPage() {
       window.umami.track('Add flash cards', { count: newFlashCards.length });
       addFlashCards(newFlashCards);
 
-      updateStats({
-        ...stats,
-        createdFlashCards: stats.createdFlashCards + newFlashCards.length,
+      updateMetadata({
+        ...metadata,
+        createdFlashCards: metadata.createdFlashCards + newFlashCards.length,
       });
 
       updateSet({

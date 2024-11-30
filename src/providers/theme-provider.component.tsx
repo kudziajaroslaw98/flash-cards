@@ -1,6 +1,13 @@
 'use client';
 
-import { createContext, PropsWithChildren, useCallback, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 
@@ -17,16 +24,15 @@ export const ThemeContext = createContext<ThemeContextType>({
 });
 
 export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
-  const { value, setToLocalStorage } = useLocalStorage({
-    key: 'theme',
-    defaultValue: {
-      theme: 'dark',
-    },
-  });
   const [theme, setTheme] = useState('dark');
+  const { setToLocalStorage, initiated } = useLocalStorage({
+    key: 'theme',
+    defaultValue: 'dark',
+    setValue: setTheme,
+  });
 
   const changeTheme = () => {
-    const newTheme = value.theme === 'dark' ? 'light' : 'dark';
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
 
     fetch(API_ROUTES.THEME, {
       method: 'POST',
@@ -36,7 +42,7 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
       body: JSON.stringify({ theme: newTheme }),
     });
     setTheme(newTheme);
-    setToLocalStorage({ theme: value.theme === 'dark' ? 'light' : 'dark' });
+    setToLocalStorage(theme === 'dark' ? 'light' : 'dark');
 
     if (newTheme === 'dark') {
       document.querySelector('html')?.classList?.add('dark');
@@ -56,13 +62,13 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
   }, [theme]);
 
   useEffect(() => {
-    if (value.theme === 'dark') {
+    if (initiated === false) return;
+    if (theme === 'dark') {
       document.querySelector('html')?.classList?.add('dark');
     } else {
       document.querySelector('html')?.classList?.remove('dark');
     }
-    setTheme(value.theme);
-  }, [value.theme]);
+  }, [initiated]);
 
   return (
     <ThemeContext.Provider

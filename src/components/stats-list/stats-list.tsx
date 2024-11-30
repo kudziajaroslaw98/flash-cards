@@ -2,12 +2,12 @@
 
 import { useAppContext } from '#/providers/app-context';
 import CardComponent from '#/components/_ui/card/card';
-import type { Stats } from '#/types/stats.type';
+import type { Metadata } from '#/types/metadata.type';
 
 export default function StatsListComponent() {
-  const { stats } = useAppContext();
+  const { metadata } = useAppContext();
 
-  const labels: Record<keyof Stats, string> = {
+  const labels: Record<keyof Omit<Metadata, 'theme'>, string> = {
     answers: 'Answers',
     correctAnswers: 'Correct answers',
     incorrectAnswers: 'Incorrect answers',
@@ -23,7 +23,7 @@ export default function StatsListComponent() {
 
       <div className='flex max-w-2xl flex-wrap justify-center gap-4'>
         {Object.entries({
-          ...stats,
+          ...metadata,
           lastSyncAt: 'soon',
           streak: 'soon',
         })?.map(([key, value]) => (
@@ -39,7 +39,7 @@ export default function StatsListComponent() {
             </span>
 
             <p className='grow font-semibold text-gray-600 dark:text-slate-200 sm:w-full sm:text-center'>
-              {labels[key as keyof Stats]}
+              {labels[key as keyof Omit<Metadata, 'theme'>]}
             </p>
           </CardComponent>
         ))}

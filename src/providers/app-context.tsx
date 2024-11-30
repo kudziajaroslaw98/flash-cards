@@ -10,10 +10,10 @@ import { FLASHCARDS_LOCAL_STORAGE_INIT } from '#/shared/defaults/flashcards-loca
 import { SETS_LOCAL_STORAGE_INIT } from '#/shared/defaults/sets-local-storage-init';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import type { DictionaryValue } from '#/types/dictionary-value.type';
+import { DEFAULT_METADATA } from '#/shared/defaults/stats.default';
 import type { FlashCard } from '#/shared/models/flash-card.model';
-import { DEFAULT_STATS } from '#/shared/defaults/stats.default';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
-import type { Stats } from '#/types/stats.type';
+import type { Metadata } from '#/types/metadata.type';
 import uuid from '#/shared/utils/uuid.util';
 
 export type AppContextType = {
@@ -21,17 +21,20 @@ export type AppContextType = {
   sets: FlashCardSet[];
   setsDictionary: DictionaryValue<string>[];
   categories: DictionaryValue<string>[];
-  stats: Stats;
+  metadata: Metadata;
+  theme: 'dark' | 'light';
+  setTheme: (theme: 'dark' | 'light') => void;
   setFlashCards: (flashcards: FlashCard[]) => void;
   addFlashCards: (flashcards: Partial<FlashCard>[]) => void;
   removeFlashCards: (flashcards: FlashCard[]) => void;
   updateFlashCards: (flashcards: Partial<FlashCard>[]) => void;
   updateFlashCard: (flashcard: Partial<FlashCard>) => void;
+  setSets: (sets: FlashCardSet[]) => void;
   addSets: (set: Partial<FlashCardSet>[]) => void;
   removeSets: (set: FlashCardSet[]) => void;
   updateSet: (set: Partial<FlashCardSet>) => void;
   updateSets: (sets: Partial<FlashCardSet>[]) => void;
-  updateStats: (stats: Partial<Stats>) => void;
+  updateMetadata: (stats: Partial<Metadata>) => void;
 };
 
 export const AppContext = createContext<AppContextType>({
@@ -39,17 +42,20 @@ export const AppContext = createContext<AppContextType>({
   sets: [],
   setsDictionary: [],
   categories: [],
-  stats: DEFAULT_STATS,
+  metadata: DEFAULT_METADATA,
+  theme: 'dark',
+  setTheme: () => null,
   setFlashCards: () => null,
   addFlashCards: () => null,
   removeFlashCards: () => null,
   updateFlashCards: () => null,
   updateFlashCard: () => null,
+  setSets: () => null,
   addSets: () => null,
   removeSets: () => null,
   updateSet: () => null,
   updateSets: () => null,
-  updateStats: () => null,
+  updateMetadata: () => null,
 });
 
 export default function AppProvider(props: PropsWithChildren) {
@@ -63,7 +69,8 @@ export default function AppProvider(props: PropsWithChildren) {
   const [setsDictionary, setSetsDictionary] = useState<
     DictionaryValue<string>[]
   >([]);
-  const [stats, setStats] = useState<Stats>(DEFAULT_STATS);
+  const [metadata, setMetadata] = useState<Metadata>(DEFAULT_METADATA);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   /////////////////
   // LOCAL STORAGE
@@ -79,10 +86,15 @@ export default function AppProvider(props: PropsWithChildren) {
     defaultValue: SETS_LOCAL_STORAGE_INIT,
     setArrayValue: setSetsArray,
   });
-  const { initiated: statsInitiated } = useLocalStorage({
-    key: 'stats',
-    defaultValue: DEFAULT_STATS,
-    setValue: setStats,
+  const { initiated: metadataInitiated } = useLocalStorage({
+    key: 'metadata',
+    defaultValue: DEFAULT_METADATA,
+    setValue: setMetadata,
+  });
+  useLocalStorage({
+    key: 'theme',
+    defaultValue: 'dark',
+    setValue: setTheme,
   });
 
   /////////////////
@@ -111,6 +123,8 @@ export default function AppProvider(props: PropsWithChildren) {
         questionAddition: flashCard.questionAddition ?? '',
         answer: flashCard.answer ?? '',
         order: flashcardSize + (index + 1),
+        createdAt: new Date(),
+        updatedAt: new Date(),
         weight: 1.0,
       };
     });
@@ -148,6 +162,8 @@ export default function AppProvider(props: PropsWithChildren) {
         questionAddition: flashCard.questionAddition ?? '',
         question: flashCard.question ?? '',
         answer: flashCard.answer ?? '',
+        createdAt: flashCard.createdAt ?? new Date(),
+        updatedAt: new Date(),
       }),
     );
 
@@ -174,6 +190,8 @@ export default function AppProvider(props: PropsWithChildren) {
       questionAddition: flashcard.questionAddition ?? '',
       question: flashcard.question ?? '',
       answer: flashcard.answer ?? '',
+      createdAt: flashcard.createdAt ?? new Date(),
+      updatedAt: new Date(),
     };
 
     const updatedFlashcards = flashCardsArray.map((item) => {
@@ -205,6 +223,8 @@ export default function AppProvider(props: PropsWithChildren) {
       isFavourite: set.isFavourite ?? false,
       category: set.category ?? '',
       hardlink: set.name?.replace(/ /g, '-').toLowerCase() ?? '',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }));
 
     const setsOutput = [...setsArray, ...mappedSets];
@@ -214,6 +234,16 @@ export default function AppProvider(props: PropsWithChildren) {
 
     localStorage.setItem('sets', JSON.stringify(setsObject));
     setSetsArray(setsOutput);
+  };
+
+  const setSets = (sets: FlashCardSet[]) => {
+    const setsObject: Record<string, FlashCardSet> = {};
+    sets.forEach((item: FlashCardSet) => {
+      setsObject[item.frontUuid] = item;
+    });
+
+    localStorage.setItem('sets', JSON.stringify(setsObject));
+    setSetsArray(sets);
   };
 
   const removeSets = (sets: FlashCardSet[]) => {
@@ -240,6 +270,8 @@ export default function AppProvider(props: PropsWithChildren) {
       isFavourite: set.isFavourite ?? false,
       category: set.category ?? '',
       hardlink: set.name?.replace(/ /g, '-').toLowerCase() ?? '',
+      createdAt: set.createdAt ?? new Date(),
+      updatedAt: new Date(),
     }));
 
     const updatedSets = setsArray.map((set) => {
@@ -264,6 +296,8 @@ export default function AppProvider(props: PropsWithChildren) {
       isFavourite: set.isFavourite ?? false,
       category: set.category ?? '',
       hardlink: set.name?.replace(/ /g, '-').toLowerCase() ?? '',
+      createdAt: set.createdAt ?? new Date(),
+      updatedAt: new Date(),
     };
 
     const updatedSets = setsArray.map((item) => {
@@ -284,11 +318,11 @@ export default function AppProvider(props: PropsWithChildren) {
   // STATS MANAGEMENT
   /////////////////
 
-  const updateStats = (update: Partial<Stats>) => {
-    const updatedStats = { ...stats, ...update };
+  const updateMetadata = (update: Partial<Metadata>) => {
+    const updatedMetadata = { ...metadata, ...update };
 
-    localStorage.setItem('stats', JSON.stringify(updatedStats));
-    setStats(updatedStats);
+    localStorage.setItem('metadata', JSON.stringify(updatedMetadata));
+    setMetadata(updatedMetadata);
   };
 
   /////////////////
@@ -352,33 +386,25 @@ export default function AppProvider(props: PropsWithChildren) {
   }, [setsArray, migrateSets]);
 
   useEffect(() => {
-    if (!statsInitiated) return;
+    if (!metadataInitiated) return;
 
-    if (stats.lastSyncAt) {
+    if (metadata.lastSyncAt) {
       console.log('here');
       const now = new Date();
-      const lastSyncAt = new Date(stats.lastSyncAt);
+      const lastSyncAt = new Date(metadata.lastSyncAt);
 
       const dayNow = now.getDate();
       const dayLastSyncAt = lastSyncAt.getDate();
 
       const isNewDay = dayNow !== dayLastSyncAt;
 
-      setStats((prev) => ({
+      setMetadata((prev) => ({
         ...prev,
-        lastSyncAt: new Date(),
         streak: isNewDay ? prev.streak + 1 : prev.streak,
       }));
-      localStorage.setItem('stats', JSON.stringify(stats));
-    } else {
-      setStats((prev) => ({
-        ...prev,
-        lastSyncAt: new Date(),
-        streak: 1,
-      }));
-      localStorage.setItem('stats', JSON.stringify(stats));
+      localStorage.setItem('stats', JSON.stringify(metadata));
     }
-  }, [statsInitiated]);
+  }, [metadataInitiated]);
 
   return (
     <AppContext.Provider
@@ -387,17 +413,20 @@ export default function AppProvider(props: PropsWithChildren) {
         sets: setsArray,
         setsDictionary,
         categories,
-        stats,
+        metadata: metadata,
+        theme: theme,
+        setTheme,
         setFlashCards,
         addFlashCards,
         removeFlashCards,
         updateFlashCards,
         updateFlashCard,
+        setSets,
         addSets,
         removeSets,
         updateSets,
         updateSet,
-        updateStats,
+        updateMetadata,
       }}
     >
       {props.children}

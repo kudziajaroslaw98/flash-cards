@@ -1,10 +1,13 @@
 'use client';
 
 import { PropsWithChildren, createContext, useCallback, useState } from 'react';
-import { Metadata, MetadataModel } from '#/types//local-storage-metadata.type';
+import type { ApiSyncResponse } from '#/types/api-sync-response.type';
 import { useSessionContext } from './session-provider.component';
-import useLocalStorage from '#/hooks/use-local-storage.hook';
+import type { ApiResponse } from '#/types/api-response.type';
+import { API_ROUTES } from '#/shared/defaults/api-routes';
 import useInterval from '#/hooks/use-interval.hook';
+import useFetch from '#/hooks/use-fetch.hook';
+import { useAppContext } from './app-context';
 
 export type SyncSessionContextType = {
   sync: () => void;
@@ -17,84 +20,54 @@ export const SyncSessionContext = createContext<SyncSessionContextType>({
 export default function SyncSessionProvider(
   props: Readonly<PropsWithChildren>,
 ) {
-  // const { fetch } = useFetch();
-  // const { showAsync } = useToastContext();
-
-  const { value: themeLS, setToLocalStorage: setTheme } = useLocalStorage({
-    key: 'theme',
-    defaultValue: {
-      theme: 'dark',
-    },
-  });
-  const { value: metadata, setToLocalStorage: setMetadata } = useLocalStorage<
-    MetadataModel[keyof MetadataModel],
-    Metadata
-  >({
-    key: 'metadata',
-    defaultValue: {
-      lastSyncAt: null,
-    },
-  });
+  const { fetch } = useFetch();
 
   const { isLoggedIn } = useSessionContext();
+  const {
+    metadata,
+    theme,
+    flashcards,
+    sets,
+    setFlashCards,
+    setSets,
+    updateMetadata,
+  } = useAppContext();
 
   const [initialRender, setInitialRender] = useState(true);
   const MIN_IN_MS = 60_000;
-  const DEFAULT_SYNC_INTERVAL_IN_MS = MIN_IN_MS * 1;
+  const DEFAULT_SYNC_INTERVAL_IN_MS = MIN_IN_MS * 30;
 
   const syncWithDB = useCallback(async () => {
-    setTheme(themeLS);
-    setMetadata(metadata);
-    return;
-    // TODO: finish when all functionality is implemented
+    if (!isLoggedIn) return;
 
-    // console.log('syncing');
-    // if (!isLoggedIn) return;
-    // console.log('syncing proceed');
+    const fetchBody = JSON.stringify({
+      flashcards,
+      sets,
+      theme,
+      metadata: metadata,
+    });
 
-    // const fetchBody = JSON.stringify({
-    //   flashcards,
-    //   stats,
-    //   theme: themeLS.theme,
-    //   lastSyncAt: metadata.lastSyncAt,
-    // });
+    const responsePromise = fetch<ApiResponse<ApiSyncResponse>>(
+      API_ROUTES.SYNC,
+      {
+        method: 'POST',
+        body: fetchBody,
+      },
+    );
 
-    // const responsePromise = fetch<ApiResponse<ApiSyncResponse>>('ApiRoutes.SYNC', {
-    //   method: 'POST',
-    //   body: fetchBody,
-    // });
+    const response = await responsePromise;
 
-    // showAsync(
-    //   {
-    //     pendingTitle: 'Syncing in progress',
-    //     successTitle: 'Syncing succeeded',
-    //     errorTitle: 'Syncing failed',
-    //   },
-    //   responsePromise,
-    // );
-
-    // const response = await responsePromise;
-
-    // if (response.success) {
-    //   const flashcardsObject: FlashCards = {};
-
-    //   response.data.flashcards.forEach((flashcard) => {
-    //     flashcardsObject[flashcard.frontUuid] = flashcard;
-    //   });
-
-    //   setMetadata({
-    //     lastSyncAt: response.data.lastSyncAt,
-    //   });
-    //   setTheme({ theme: response.data.theme });
-    //   dispatch(setFlashCardsAfterSync(flashcardsObject));
-    //   dispatch(setStatsAfterSync(response.data.stats));
-    // }
-  }, [isLoggedIn, themeLS, metadata]);
+    if (response.success) {
+      updateMetadata(response.data.metadata);
+      setFlashCards(response.data.flashcards);
+      setSets(response.data.sets);
+    }
+  }, [isLoggedIn, metadata, flashcards, sets, theme]);
 
   const getInterval = () => {
     if (isLoggedIn) {
       if (initialRender) {
-        return 0;
+        return 1000;
       }
       return DEFAULT_SYNC_INTERVAL_IN_MS;
     }

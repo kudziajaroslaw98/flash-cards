@@ -78,6 +78,23 @@ export default function SignInComponent() {
           label='Google'
           size={'full'}
         ></Button>
+
+        {process.env.NODE_ENV === 'development' && (
+          <Button
+            variant={'primary-outline'}
+            onClick={() =>
+              supabase.auth.signInWithPassword({
+                email: 'test@test.com',
+                password: 'test',
+              })
+            }
+            disabled={isLoading ?? false}
+            loading={isLoading ?? false}
+            iconPosition='left'
+            label='password'
+            size={'full'}
+          ></Button>
+        )}
       </div>
     </m.div>
   );
