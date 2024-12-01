@@ -3,17 +3,25 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type PropsWithChildren,
 } from 'react';
 import { FLASHCARDS_LOCAL_STORAGE_INIT } from '#/shared/defaults/flashcards-local-storage-init';
 import { SETS_LOCAL_STORAGE_INIT } from '#/shared/defaults/sets-local-storage-init';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
+import type { ApiSyncResponse } from '#/types/api-sync-response.type';
 import type { DictionaryValue } from '#/types/dictionary-value.type';
 import { DEFAULT_METADATA } from '#/shared/defaults/stats.default';
 import type { FlashCard } from '#/shared/models/flash-card.model';
+import { useSessionContext } from './session-provider.component';
+import { createClient } from '#/shared/utils/supabase/client';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
+import type { ApiResponse } from '#/types/api-response.type';
+import { API_ROUTES } from '#/shared/defaults/api-routes';
 import type { Metadata } from '#/types/metadata.type';
+import useFetch from '#/hooks/use-fetch.hook';
+import omit from '#/shared/utils/omit.util';
 import uuid from '#/shared/utils/uuid.util';
 
 export type AppContextType = {
@@ -34,7 +42,7 @@ export type AppContextType = {
   removeSets: (set: FlashCardSet[]) => void;
   updateSet: (set: Partial<FlashCardSet>) => void;
   updateSets: (sets: Partial<FlashCardSet>[]) => void;
-  updateMetadata: (stats: Partial<Metadata>) => void;
+  updateMetadata: (metadata: Partial<Metadata>) => void;
 };
 
 export const AppContext = createContext<AppContextType>({
@@ -60,6 +68,14 @@ export const AppContext = createContext<AppContextType>({
 
 export default function AppProvider(props: PropsWithChildren) {
   /////////////////
+  // EXTERNAL HOOKS
+  /////////////////
+
+  const { fetch } = useFetch();
+  const { isLoggedIn, user } = useSessionContext();
+  const supabase = createClient();
+
+  /////////////////
   // STATE
   /////////////////
 
@@ -71,6 +87,7 @@ export default function AppProvider(props: PropsWithChildren) {
   >([]);
   const [metadata, setMetadata] = useState<Metadata>(DEFAULT_METADATA);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const websocketChannel = useRef<ReturnType<typeof supabase.channel>>();
 
   /////////////////
   // LOCAL STORAGE
@@ -86,7 +103,7 @@ export default function AppProvider(props: PropsWithChildren) {
     defaultValue: SETS_LOCAL_STORAGE_INIT,
     setArrayValue: setSetsArray,
   });
-  const { initiated: metadataInitiated } = useLocalStorage({
+  useLocalStorage({
     key: 'metadata',
     defaultValue: DEFAULT_METADATA,
     setValue: setMetadata,
@@ -111,7 +128,7 @@ export default function AppProvider(props: PropsWithChildren) {
     setFlashCardsArray(flashcards);
   };
 
-  const addFlashCards = (flashcards: Partial<FlashCard>[]) => {
+  const addFlashCards = async (flashcards: Partial<FlashCard>[]) => {
     const flashcardsObject: Record<string, FlashCard> = {};
     const flashcardSize = flashCardsArray.length;
 
@@ -136,12 +153,70 @@ export default function AppProvider(props: PropsWithChildren) {
 
     localStorage.setItem('flashcards', JSON.stringify(flashcardsObject));
     setFlashCardsArray(flashcardsOutput);
+
+    await supabase
+      .from('flashcards')
+      .insert(
+        mappedFlashCards.map((item) => ({ ...item, user_uuid: user?.id })),
+      );
   };
 
-  const removeFlashCards = (flashcards: FlashCard[]) => {
+  const addFlashsFromWebsocket = (flashcard: FlashCard) => {
+    setFlashCardsArray((prev) => {
+      const exists = prev.some(
+        (item) => item.frontUuid === flashcard.frontUuid,
+      );
+
+      if (exists) {
+        return prev;
+      } else {
+        const array = [...prev, flashcard];
+        const object: Record<string, FlashCard> = {};
+        array.forEach((item) => {
+          object[item.frontUuid] = item;
+        });
+        localStorage.setItem('flashcards', JSON.stringify(object));
+        return array;
+      }
+    });
+  };
+
+  const removeFlashCards = async (flashcards: FlashCard[]) => {
+    const flashcardsObject: Record<string, FlashCard> = {};
+    const flashcardsToDelete: string[] = [];
+    const filteredFlashcards = flashCardsArray.filter((item: FlashCard) => {
+      if (!flashcards.includes(item)) {
+        return true;
+      }
+      flashcardsToDelete.push(item.frontUuid);
+      return false;
+    });
+
+    // TODO: It wont work on listening to postgres msg's
+    // I need to broadcast messages to other subscribers here.
+    await supabase
+      .from('flashcards')
+      .delete()
+      .in('frontUuid', flashcardsToDelete);
+
+    websocketChannel.current?.send({
+      type: 'broadcast',
+      event: 'flashcards_delete',
+      payload: { flashcards: flashcardsToDelete },
+    });
+
+    filteredFlashcards.forEach((item: FlashCard) => {
+      flashcardsObject[item.frontUuid] = item;
+    });
+
+    localStorage.setItem('flashcards', JSON.stringify(flashcardsObject));
+    setFlashCardsArray(filteredFlashcards);
+  };
+
+  const removeFlashCardsByUuid = async (uuids: string[]) => {
     const flashcardsObject: Record<string, FlashCard> = {};
     const filteredFlashcards = flashCardsArray.filter(
-      (item: FlashCard) => !flashcards.includes(item),
+      (item: FlashCard) => !uuids.includes(item.frontUuid),
     );
 
     filteredFlashcards.forEach((item: FlashCard) => {
@@ -152,7 +227,7 @@ export default function AppProvider(props: PropsWithChildren) {
     setFlashCardsArray(filteredFlashcards);
   };
 
-  const updateFlashCards = (flashcards: Partial<FlashCard>[]) => {
+  const updateFlashCards = async (flashcards: Partial<FlashCard>[]) => {
     const flashcardsObject: Record<string, FlashCard> = {};
     const mappedFlashCards: FlashCard[] = flashcards.map(
       (flashCard, index) => ({
@@ -179,9 +254,18 @@ export default function AppProvider(props: PropsWithChildren) {
 
     localStorage.setItem('flashcards', JSON.stringify(flashcardsObject));
     setFlashCardsArray(updatedFlashcards);
+
+    await Promise.all(
+      updatedFlashcards.map((flashcard) => {
+        return supabase
+          .from('flashcards')
+          .update(flashcard)
+          .eq('frontUuid', flashcard.frontUuid);
+      }),
+    );
   };
 
-  const updateFlashCard = (flashcard: Partial<FlashCard>) => {
+  const updateFlashCard = async (flashcard: Partial<FlashCard>) => {
     const flashcardsObject: Record<string, FlashCard> = {};
     const updatedFlashcard = {
       frontUuid: flashcard.frontUuid ?? uuid(),
@@ -206,13 +290,35 @@ export default function AppProvider(props: PropsWithChildren) {
 
     localStorage.setItem('flashcards', JSON.stringify(flashcardsObject));
     setFlashCardsArray(updatedFlashcards);
+
+    await supabase
+      .from('flashcards')
+      .update(updatedFlashcard)
+      .eq('frontUuid', flashcard.frontUuid);
+  };
+
+  const updateFlashCardsFromWebsocket = (flashcard: FlashCard) => {
+    setFlashCardsArray((prev) => {
+      const updatedFlashcards = prev.map((item) => {
+        if (item.frontUuid === flashcard.frontUuid) {
+          return flashcard;
+        }
+        return item;
+      });
+      const object: Record<string, FlashCard> = {};
+      updatedFlashcards.forEach((item) => {
+        object[item.frontUuid] = item;
+      });
+      localStorage.setItem('flashcards', JSON.stringify(object));
+      return updatedFlashcards;
+    });
   };
 
   /////////////////
   // SETS MANAGEMENT
   /////////////////
 
-  const addSets = (sets: Partial<FlashCardSet>[]) => {
+  const addSets = (sets: Partial<FlashCardSet>[], checkIfExists = false) => {
     const setsObject: Record<string, FlashCardSet> = {};
 
     const mappedSets: FlashCardSet[] = sets.map((set) => ({
@@ -226,6 +332,12 @@ export default function AppProvider(props: PropsWithChildren) {
       createdAt: new Date(),
       updatedAt: new Date(),
     }));
+
+    if (checkIfExists) {
+      const uuids = mappedSets.map((set) => set.frontUuid);
+      const newSets = setsArray.filter((set) => !uuids.includes(set.frontUuid));
+      mappedSets.push(...newSets);
+    }
 
     const setsOutput = [...setsArray, ...mappedSets];
     setsOutput.forEach((item: FlashCardSet) => {
@@ -326,6 +438,130 @@ export default function AppProvider(props: PropsWithChildren) {
   };
 
   /////////////////
+  // SYNCHRONIZATION
+  /////////////////
+
+  const applyWebsockets = async () => {
+    if (!isLoggedIn) return;
+    const { data } = await supabase.auth.getUser();
+    const user_channel = supabase.channel(`user-${data.user?.id}`);
+    websocketChannel.current = user_channel;
+    // FLASHCARDS - UPDATE
+    websocketChannel.current.on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'flashcards' },
+      (payload) => {
+        console.log(payload);
+        if (payload.new) {
+          const updatedFlashcard = payload.new as FlashCard & {
+            user_uuid: string;
+            id: string;
+          };
+          updateFlashCardsFromWebsocket(
+            omit(updatedFlashcard, ['user_uuid', 'id']) as FlashCard,
+          );
+        }
+      },
+    );
+
+    // // FLASHCARDS - INSERT
+    websocketChannel.current.on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'flashcards' },
+      (payload) => {
+        console.log(payload);
+        if (payload.new) {
+          const newFlashcard = payload.new as FlashCard & {
+            user_uuid: string;
+            id: string;
+          };
+          addFlashsFromWebsocket(omit(newFlashcard, ['user_uuid', 'id']));
+        }
+      },
+    );
+
+    // FLASHCARDS - DELETE
+    websocketChannel.current.on(
+      'broadcast',
+      { event: 'flashcards_delete' },
+      ({ payload }) => {
+        if (
+          payload.flashcards &&
+          payload.flashcards.length >= 0 &&
+          Array.isArray(payload.flashcards)
+        ) {
+          removeFlashCardsByUuid(payload.flashcards);
+        }
+      },
+    );
+
+    // // SETS - UPDATE
+    // websocketChannel.current.on(
+    //   'postgres_changes',
+    //   { event: 'UPDATE', schema: 'public', table: 'sets' },
+    //   (payload) => {
+    //     if (payload.new) {
+    //       updateSet(payload.new as FlashCardSet);
+    //     }
+    //   },
+    // );
+
+    // // SETS - INSERT
+    // websocketChannel.current.on(
+    //   'postgres_changes',
+    //   { event: 'INSERT', schema: 'public', table: 'sets' },
+    //   (payload) => {
+    //     if (payload.new) {
+    //       addSets([payload.new as FlashCardSet], true);
+    //     }
+    //   },
+    // );
+
+    // // SETS - DELETE
+    // websocketChannel.current.on(
+    //   'postgres_changes',
+    //   { event: 'DELETE', schema: 'public', table: 'sets' },
+    //   (payload) => {
+    //     if (payload.old) {
+    //       removeSets([payload.old as FlashCardSet]);
+    //     }
+    //   },
+    // );
+
+    websocketChannel.current.subscribe();
+  };
+
+  const syncWithDB = async () => {
+    if (!isLoggedIn) return;
+
+    const fetchBody = JSON.stringify({
+      flashcards: flashCardsArray,
+      sets: setsArray,
+      theme,
+      metadata: metadata,
+    });
+
+    // TODO: Add error handling
+    // TODO: Add Promise.all() and split sync to different endpoints
+
+    const response = await fetch<ApiResponse<ApiSyncResponse>>(
+      API_ROUTES.SYNC,
+      {
+        method: 'POST',
+        body: fetchBody,
+      },
+    );
+
+    if (response.success) {
+      updateMetadata(response.data.metadata);
+      setFlashCards(response.data.flashcards);
+      setSets(response.data.sets);
+    }
+
+    await applyWebsockets();
+  };
+
+  /////////////////
   // MIGRATION
   /////////////////
 
@@ -385,26 +621,37 @@ export default function AppProvider(props: PropsWithChildren) {
     setSetsDictionary(setsDictionary);
   }, [setsArray, migrateSets]);
 
+  // useEffect(() => {
+  //   if (!metadataInitiated) return;
+
+  //   if (metadata.lastSyncAt) {
+  //     const now = new Date();
+  //     const lastSyncAt = new Date(metadata.lastSyncAt);
+
+  //     const dayNow = now.getDate();
+  //     const dayLastSyncAt = lastSyncAt.getDate();
+
+  //     const isNewDay = dayNow !== dayLastSyncAt;
+
+  //     setMetadata((prev) => ({
+  //       ...prev,
+  //       streak: isNewDay ? prev.streak + 1 : prev.streak,
+  //     }));
+  //     localStorage.setItem('metadata', JSON.stringify(metadata));
+  //   }
+  // }, [metadataInitiated]);
+
   useEffect(() => {
-    if (!metadataInitiated) return;
+    if (!isLoggedIn) return;
+    syncWithDB();
 
-    if (metadata.lastSyncAt) {
-      console.log('here');
-      const now = new Date();
-      const lastSyncAt = new Date(metadata.lastSyncAt);
-
-      const dayNow = now.getDate();
-      const dayLastSyncAt = lastSyncAt.getDate();
-
-      const isNewDay = dayNow !== dayLastSyncAt;
-
-      setMetadata((prev) => ({
-        ...prev,
-        streak: isNewDay ? prev.streak + 1 : prev.streak,
-      }));
-      localStorage.setItem('stats', JSON.stringify(metadata));
-    }
-  }, [metadataInitiated]);
+    return () => {
+      if (websocketChannel.current) {
+        websocketChannel.current.unsubscribe();
+        supabase.removeChannel(websocketChannel.current);
+      }
+    };
+  }, [isLoggedIn]);
 
   return (
     <AppContext.Provider

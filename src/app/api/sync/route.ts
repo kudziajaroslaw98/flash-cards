@@ -130,6 +130,8 @@ async function upsertDataInDb(
   userUuid: string,
   newLastSyncAt: Date,
 ) {
+  // TODO: update only changed flashcards ?
+
   const flashCardsUuids = body.flashcards.map(
     (flashcard) => flashcard.frontUuid,
   );
@@ -145,12 +147,15 @@ async function upsertDataInDb(
     uuids: setsUuids,
   });
 
-  await supabase.from('metadata').update({
-    user_uuid: userUuid,
-    ...body.metadata,
-    theme: body.theme,
-    lastSyncAt: newLastSyncAt,
-  });
+  await supabase
+    .from('metadata')
+    .update({
+      user_uuid: userUuid,
+      ...body.metadata,
+      theme: body.theme,
+      lastSyncAt: newLastSyncAt,
+    })
+    .eq('user_uuid', userUuid);
 
   await supabase.from('sets').upsert(
     body.sets.map((set) => ({
@@ -207,13 +212,22 @@ export async function POST(request: Request) {
       .eq('user_uuid', userUuid)
       .maybeSingle();
 
-    if (metadata.data === null || metadata.data?.lastSyncAt === null) {
+    const bodyDate = body.metadata.lastSyncAt
+      ? new Date(body.metadata.lastSyncAt).setSeconds(0, 0)
+      : null;
+    const metadataDate = metadata.data.lastSyncAt
+      ? new Date(metadata.data.lastSyncAt).setSeconds(0, 0)
+      : null;
+
+    console.log('metadata body', bodyDate);
+    console.log('metadata', metadataDate);
+    console.log(bodyDate! < metadataDate!);
+    console.log(bodyDate! >= metadataDate!);
+
+    if (metadata.data === null || metadataDate === null) {
       await newUserSync(body, supabase, userUuid, newLastSyncAt);
     } else {
-      if (
-        body.metadata.lastSyncAt === null ||
-        new Date(body.metadata.lastSyncAt) < new Date(metadata.data.lastSyncAt)
-      ) {
+      if (bodyDate === null || bodyDate < metadataDate) {
         const { flashcards, sets, metadata } = await fetchDataFromDb(
           supabase,
           userUuid,
@@ -236,11 +250,12 @@ export async function POST(request: Request) {
           responseBody.metadata = newMetadata as Metadata;
           responseBody.theme = metadata.theme ?? 'dark';
         }
-      } else if (body.metadata.lastSyncAt >= metadata.data.lastSyncAt) {
+      } else if (bodyDate >= metadataDate) {
         await upsertDataInDb(body, supabase, userUuid, newLastSyncAt);
-        responseBody.metadata.lastSyncAt = newLastSyncAt;
       }
     }
+
+    responseBody.metadata.lastSyncAt = newLastSyncAt;
 
     return Response.json({ success: true, data: responseBody });
   } catch (error) {

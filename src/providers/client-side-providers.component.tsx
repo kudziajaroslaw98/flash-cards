@@ -1,6 +1,5 @@
 'use client';
 
-import SyncSessionProvider from './sync-session-provider.component';
 import SessionProvider from './session-provider.component';
 import ThemeProvider from './theme-provider.component';
 import ToastProvider from './toast-provider.component';
@@ -14,15 +13,13 @@ export default function ClientSideProviders(props: PropsWithChildren) {
       features={domMax}
       strict
     >
-      <AppProvider>
-        <ToastProvider>
-          <SessionProvider>
-            <ThemeProvider>
-              <SyncSessionProvider>{props.children}</SyncSessionProvider>
-            </ThemeProvider>
-          </SessionProvider>
-        </ToastProvider>
-      </AppProvider>
+      <SessionProvider>
+        <AppProvider>
+          <ToastProvider>
+            <ThemeProvider>{props.children}</ThemeProvider>
+          </ToastProvider>
+        </AppProvider>
+      </SessionProvider>
     </LazyMotion>
   );
 }
