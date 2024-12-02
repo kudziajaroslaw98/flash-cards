@@ -31,8 +31,8 @@ export default function FlashCardReviseComponent() {
     setsDictionary,
     flashcards,
     updateFlashCard,
-    stats,
-    updateStats,
+    metadata,
+    updateMetadata,
   } = useAppContext();
 
   const {
@@ -59,7 +59,7 @@ export default function FlashCardReviseComponent() {
     }
 
     const correct = isCorrect(flashCard);
-    const clonedStats = { ...stats };
+    const clonedStats = { ...metadata };
 
     clonedStats.answers += 1;
 
@@ -84,7 +84,7 @@ export default function FlashCardReviseComponent() {
       (clonedStats.correctAnswers / clonedStats.answers).toFixed(2),
     );
 
-    updateStats({ ...clonedStats });
+    updateMetadata({ ...clonedStats });
     setClickedCard(flashCard);
     setClicked(true);
   };

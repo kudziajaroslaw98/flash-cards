@@ -63,7 +63,6 @@ export default function SetsPage() {
   const [filteredSets, setFilteredSets] = useState<FlashCardSet[]>([]);
   const [selected, setSelected] = useState<FlashCardSet[]>([]);
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
-  const [isInEditMode, setIsInEditMode] = useState(false);
 
   const toggleRef = useRef<HTMLButtonElement>(null);
 
@@ -291,7 +290,6 @@ export default function SetsPage() {
               <Button
                 onClick={() => {
                   window.umami.track('Add set clicked');
-                  setIsInEditMode(false);
                 }}
                 icon={<PlusIcon className='h-4 w-4' />}
                 size={'icon-square'}
@@ -300,7 +298,7 @@ export default function SetsPage() {
             handleNew={handleNewSets}
             handleEdit={handleEditSets}
             selectedSets={[]}
-            isInEditMode={isInEditMode}
+            isInEditMode={false}
             categories={categories}
           />
 
@@ -309,7 +307,6 @@ export default function SetsPage() {
               <Button
                 onClick={() => {
                   window.umami.track('Edit set clicked');
-                  setIsInEditMode(true);
                 }}
                 icon={<PencilIcon className='h-4 w-4' />}
                 size={'icon-square'}
@@ -320,7 +317,7 @@ export default function SetsPage() {
             handleNew={handleNewSets}
             handleEdit={handleEditSets}
             selectedSets={selected}
-            isInEditMode={isInEditMode}
+            isInEditMode={true}
             categories={categories}
           />
 

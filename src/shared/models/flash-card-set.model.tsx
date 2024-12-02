@@ -8,4 +8,6 @@ export type FlashCardSet = {
   isFavourite: boolean;
   category?: string;
   hardlink: string;
+  createdAt: Date;
+  updatedAt: Date;
 };

@@ -27,8 +27,8 @@ export default function FlashCardsTable() {
     removeFlashCards,
     addFlashCards,
     updateFlashCards,
-    stats,
-    updateStats,
+    metadata,
+    updateMetadata,
   } = useAppContext();
 
   const [selected, setSelected] = useState<FlashCard[]>([]);
@@ -63,9 +63,9 @@ export default function FlashCardsTable() {
     window.umami.track('Add flash cards', { count: flashCards.length });
     addFlashCards(flashCards);
 
-    updateStats({
-      ...stats,
-      createdFlashCards: stats.createdFlashCards + flashCards.length,
+    updateMetadata({
+      ...metadata,
+      createdFlashCards: metadata.createdFlashCards + flashCards.length,
     });
 
     setTimeout(() => {

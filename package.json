@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "set NODE_ENV=development&& next",
     "dev-turbo": "set NODE_ENV=development&& set TURBO=true&& next --turbo",
+    "dev-scan": "set NODE_ENV=development&& next & npx react-scan@latest localhost:3000",
     "build": "set NODE_ENV=production&& next build",
     "analyze": "set NODE_ENV=production&& cross-env ANALYZE=true next build",
     "start": "set NODE_ENV=production&& next start -p 3001",

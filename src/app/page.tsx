@@ -43,9 +43,9 @@ export default async function Home() {
       label:
         'Generating new words for deck based on words that are already in it',
     },
-    { done: false, label: 'Live updates (WebSockets)' },
+    { done: true, label: 'Live updates (WebSockets)' },
     { done: false, label: 'Importing flash cards from CSV file' },
-    { done: false, label: 'Synchronize your flash cards across all devices' },
+    { done: true, label: 'Synchronize your flash cards across all devices' },
   ];
 
   return (

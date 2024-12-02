@@ -1,19 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 
 export interface UseLocalStorageOutput<T, K extends Record<string, T>> {
   value: K;
   arrayOfValues: T[];
-  setToLocalStorage: (_value: K) => void;
+  setToLocalStorage: (_value: K | T) => void;
   initiated: boolean;
 }
 
 type useLocalStorageProp<T, K extends Record<string, T>> = {
   key: string;
-  defaultValue?: K;
+  defaultValue?: T | K;
   sortStrategy?: (_head: T, _tail: T) => number;
-  setValue?: (_value: K) => void;
+  setValue?: Dispatch<SetStateAction<T>> | Dispatch<SetStateAction<K>>;
   setArrayValue?: (_value: T[]) => void;
 };
 
@@ -24,11 +24,13 @@ export default function useLocalStorage<T, K extends Record<string, T>>({
   setValue,
   setArrayValue,
 }: useLocalStorageProp<T, K>): UseLocalStorageOutput<T, K> {
-  const [json, setJSON] = useState<K | undefined>(defaultValue || undefined);
+  const [json, setJSON] = useState<T | K | undefined>(
+    defaultValue || undefined,
+  );
   const [array, setArray] = useState<T[]>([]);
   const [initiated, setInitiated] = useState(false);
 
-  const setToLocalStorage = (value: K) => {
+  const setToLocalStorage = (value: K | T) => {
     window.localStorage.setItem(key, JSON.stringify(value));
 
     setJSON(value);
@@ -38,40 +40,35 @@ export default function useLocalStorage<T, K extends Record<string, T>>({
     if (window && window?.localStorage) {
       const localStorageValue = window.localStorage.getItem(key);
       let value = defaultValue ?? ({} as K);
+      let array = [] as T[];
 
-      if (localStorageValue === null) {
+      if (localStorageValue === null && defaultValue) {
         window.localStorage.setItem(key, JSON.stringify(defaultValue));
-      } else {
-        value = JSON.parse(localStorageValue) as K;
+      } else if (localStorageValue !== null) {
+        value = JSON.parse(localStorageValue);
       }
 
       setJSON(value);
       if (setValue) {
-        setValue(value);
+        setValue(value as SetStateAction<K> & SetStateAction<T>);
       }
+
+      if (sortStrategy) {
+        array = Object.values(value).sort((head, tail) =>
+          sortStrategy(head, tail),
+        );
+      } else {
+        array = Object.values(value);
+      }
+
+      setArray(array);
+      if (setArrayValue) {
+        setArrayValue(array);
+      }
+
+      setInitiated(true);
     }
   }, []);
-
-  useEffect(() => {
-    if (!defaultValue) return;
-    const validJson = json as K;
-    let array = [] as T[];
-
-    if (sortStrategy) {
-      array = Object.values(validJson).sort((head, tail) =>
-        sortStrategy(head, tail),
-      );
-    } else {
-      array = Object.values(validJson);
-    }
-
-    setArray(array);
-    if (setArrayValue) {
-      setArrayValue(array);
-    }
-
-    setInitiated(true);
-  }, [json]);
 
   return {
     value: json as K,
