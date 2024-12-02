@@ -126,9 +126,10 @@ export default function RootLayout({
           strategy='lazyOnload'
         />
 
-        {process.env.NODE_ENV === 'development' && (
-          <Script src={`https://unpkg.com/react-scan/dist/auto.global.js`} />
-        )}
+        {process.env.NODE_ENV === 'development' &&
+          process.env.TURBO !== 'true' && (
+            <Script src={`https://unpkg.com/react-scan/dist/auto.global.js`} />
+          )}
       </head>
       <body
         suppressHydrationWarning

@@ -9,7 +9,7 @@ import { z } from 'zod';
 type requestBody = {
   metadata: Metadata;
   theme: 'light' | 'dark';
-  lastSyncAt: Date;
+  newLastSyncAt: Date;
 };
 
 async function getUserUuid(supabase: SupabaseClient) {
@@ -30,14 +30,17 @@ async function newUserSync(
   userUuid: string,
   newLastSyncAt: Date,
 ) {
-  await supabase.from('metadata').upsert(
-    {
-      user_uuid: userUuid,
-      ...body.metadata,
-      theme: body.theme,
-      lastSyncAt: newLastSyncAt,
-    },
-    { onConflict: 'user_uuid', ignoreDuplicates: false },
+  console.log(
+    'newUserSync',
+    await supabase.from('metadata').upsert(
+      {
+        user_uuid: userUuid,
+        ...body.metadata,
+        theme: body.theme,
+        lastSyncAt: newLastSyncAt,
+      },
+      { onConflict: 'user_uuid', ignoreDuplicates: false },
+    ),
   );
 }
 
@@ -102,7 +105,7 @@ async function validateBody(body: Record<string, unknown>) {
       streak: z.number().nonnegative(),
     }),
     theme: z.enum(['light', 'dark']),
-    lastSyncAt: z.union([z.date(), z.string()]),
+    newLastSyncAt: z.union([z.date(), z.string(), z.null()]),
   });
   const validityCheck = checkValidity(body, validationScheme);
 
@@ -123,27 +126,31 @@ export async function POST(request: Request) {
     validateBody(body);
 
     const responseBody: ApiMetadataSyncResponse = {
-      metadata: { ...body.metadata, lastSyncAt: body.lastSyncAt },
+      metadata: { ...body.metadata, lastSyncAt: body.newLastSyncAt },
       theme: body.theme,
     };
 
     const supabase = await createClient();
     const userUuid = await getUserUuid(supabase);
+
     const metadata = await supabase
       .from('metadata')
       .select()
       .eq('user_uuid', userUuid)
       .maybeSingle();
 
-    const bodyDateAsNumber = body.lastSyncAt
-      ? new Date(body.lastSyncAt).setSeconds(0, 0)
+
+    const bodyDateAsNumber = body.metadata.lastSyncAt
+      ? new Date(body.metadata.lastSyncAt).setSeconds(0, 0)
       : null;
-    const metadataDate = metadata.data.lastSyncAt
+    const metadataDate = metadata.data?.lastSyncAt 
       ? new Date(metadata.data.lastSyncAt).setSeconds(0, 0)
       : null;
-    const bodyDate = new Date(new Date(body.lastSyncAt).setSeconds(0, 0));
+    const bodyDate = new Date(new Date(body.newLastSyncAt).setSeconds(0, 0));
 
     if (metadata.data === null || metadataDate === null) {
+      console.log('🚀 ~ POST ~ metadataDate:', metadataDate);
+
       await newUserSync(body, supabase, userUuid, bodyDate);
     } else {
       if (bodyDateAsNumber === null || bodyDateAsNumber < metadataDate) {
@@ -153,7 +160,10 @@ export async function POST(request: Request) {
           bodyDate,
         );
 
-        responseBody.metadata = omit(metadata, ['theme']);
+        responseBody.metadata = {
+          ...omit(metadata, ['theme']),
+          lastSyncAt: bodyDate,
+        };
         responseBody.theme = metadata.theme!;
       } else if (bodyDateAsNumber >= metadataDate) {
         await upsertDataInDb(body, supabase, userUuid, bodyDate);

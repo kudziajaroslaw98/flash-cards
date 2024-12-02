@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 type requestBody = {
   sets: FlashCardSet[];
-  lastSyncAt: Date;
+  lastSyncAt: Date | null;
 };
 
 async function getUserUuid(supabase: SupabaseClient) {
@@ -120,25 +120,28 @@ async function validateBody(body: Record<string, unknown>) {
         name: z.string().min(1),
         description: z.string().min(1),
         isFavourite: z.boolean(),
-        category: z.string().min(1),
+        category: z.string().optional(),
         hardlink: z.string().min(1),
         createdAt: z.union([z.date(), z.string()]),
         updatedAt: z.union([z.date(), z.string()]),
         flashCards: z.array(
-          z.object({
-            question: z.string().min(1),
-            answer: z.string().min(1),
-            questionAddition: z.string().min(1),
-            order: z.number().nonnegative(),
-            frontUuid: z.string().uuid(),
-            weight: z.number().nonnegative(),
-            createdAt: z.union([z.date(), z.string()]),
-            updatedAt: z.union([z.date(), z.string()]),
-          }),
+          z.union([
+            z.object({
+              question: z.string().min(1),
+              answer: z.string().min(1),
+              questionAddition: z.string().min(1),
+              order: z.number().nonnegative(),
+              frontUuid: z.string().uuid(),
+              weight: z.number().nonnegative(),
+              createdAt: z.union([z.date(), z.string()]),
+              updatedAt: z.union([z.date(), z.string()]),
+            }),
+            z.null(),
+          ]),
         ),
       }),
     ),
-    lastSyncAt: z.union([z.coerce.date(), z.null(), z.string()]),
+    lastSyncAt: z.union([z.date(), z.null(), z.string()]),
   });
   const validityCheck = checkValidity(body, validationScheme);
 
@@ -172,7 +175,7 @@ export async function POST(request: Request) {
     const bodyDate = body.lastSyncAt
       ? new Date(body.lastSyncAt).setSeconds(0, 0)
       : null;
-    const metadataDate = metadata.data.lastSyncAt
+    const metadataDate = metadata.data?.lastSyncAt
       ? new Date(metadata.data.lastSyncAt).setSeconds(0, 0)
       : null;
 

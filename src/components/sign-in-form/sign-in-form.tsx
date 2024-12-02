@@ -80,20 +80,37 @@ export default function SignInComponent() {
         ></Button>
 
         {process.env.NODE_ENV === 'development' && (
-          <Button
-            variant={'primary-outline'}
-            onClick={() =>
-              supabase.auth.signInWithPassword({
-                email: 'test@test.com',
-                password: 'test',
-              })
-            }
-            disabled={isLoading ?? false}
-            loading={isLoading ?? false}
-            iconPosition='left'
-            label='password'
-            size={'full'}
-          ></Button>
+          <>
+            <Button
+              variant={'primary-outline'}
+              onClick={() =>
+                supabase.auth.signInWithPassword({
+                  email: 'test@test.com',
+                  password: 'test',
+                })
+              }
+              disabled={isLoading ?? false}
+              loading={isLoading ?? false}
+              iconPosition='left'
+              label='password'
+              size={'full'}
+            ></Button>
+
+            <Button
+              variant={'primary-outline'}
+              onClick={() =>
+                supabase.auth.signInWithPassword({
+                  email: 'test2@test.com',
+                  password: 'test',
+                })
+              }
+              disabled={isLoading ?? false}
+              loading={isLoading ?? false}
+              iconPosition='left'
+              label='password 2'
+              size={'full'}
+            ></Button>
+          </>
         )}
       </div>
     </m.div>

@@ -149,7 +149,7 @@ export async function POST(request: Request) {
     const bodyDate = body.lastSyncAt
       ? new Date(body.lastSyncAt).setSeconds(0, 0)
       : null;
-    const metadataDate = metadata.data.lastSyncAt
+    const metadataDate = metadata.data?.lastSyncAt
       ? new Date(metadata.data.lastSyncAt).setSeconds(0, 0)
       : null;
 
