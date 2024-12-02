@@ -125,6 +125,10 @@ export default function RootLayout({
           data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID!}
           strategy='lazyOnload'
         />
+
+        {process.env.NODE_ENV === 'development' && (
+          <Script src={`https://unpkg.com/react-scan/dist/auto.global.js`} />
+        )}
       </head>
       <body
         suppressHydrationWarning
