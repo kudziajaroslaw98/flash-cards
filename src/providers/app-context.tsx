@@ -9,9 +9,11 @@ import {
 } from 'react';
 import { FLASHCARDS_LOCAL_STORAGE_INIT } from '#/shared/defaults/flashcards-local-storage-init';
 import { SETS_LOCAL_STORAGE_INIT } from '#/shared/defaults/sets-local-storage-init';
+import type { ApiFlashcardsSyncResponse } from '#/app/api/flashcard/sync/route';
+import type { ApiMetadataSyncResponse } from '#/app/api/metadata/sync/route';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import type { ApiSyncResponse } from '#/types/api-sync-response.type';
 import type { DictionaryValue } from '#/types/dictionary-value.type';
+import type { ApiSetsSyncResponse } from '#/app/api/set/sync/route';
 import { DEFAULT_METADATA } from '#/shared/defaults/stats.default';
 import type { FlashCard } from '#/shared/models/flash-card.model';
 import { useSessionContext } from './session-provider.component';
@@ -146,7 +148,12 @@ export default function AppProvider(props: PropsWithChildren) {
       };
     });
 
-    const flashcardsOutput = [...flashCardsArray, ...mappedFlashCards];
+    const flashcardsOutput = [...flashCardsArray, ...mappedFlashCards].map(
+      (item, index) => ({
+        ...item,
+        order: index,
+      }),
+    );
     flashcardsOutput.forEach((item: FlashCard) => {
       flashcardsObject[item.frontUuid] = item;
     });
@@ -170,7 +177,10 @@ export default function AppProvider(props: PropsWithChildren) {
       if (exists) {
         return prev;
       } else {
-        const array = [...prev, flashcard];
+        const array = [...prev, flashcard].map((item, index) => ({
+          ...item,
+          order: index,
+        }));
         const object: Record<string, FlashCard> = {};
         array.forEach((item) => {
           object[item.frontUuid] = item;
@@ -184,13 +194,18 @@ export default function AppProvider(props: PropsWithChildren) {
   const removeFlashCards = async (flashcards: FlashCard[]) => {
     const flashcardsObject: Record<string, FlashCard> = {};
     const flashcardsToDelete: string[] = [];
-    const filteredFlashcards = flashCardsArray.filter((item: FlashCard) => {
-      if (!flashcards.includes(item)) {
-        return true;
-      }
-      flashcardsToDelete.push(item.frontUuid);
-      return false;
-    });
+    const filteredFlashcards = flashCardsArray
+      .filter((item: FlashCard) => {
+        if (!flashcards.includes(item)) {
+          return true;
+        }
+        flashcardsToDelete.push(item.frontUuid);
+        return false;
+      })
+      .map((item, index) => ({
+        ...item,
+        order: index,
+      }));
 
     // TODO: It wont work on listening to postgres msg's
     // I need to broadcast messages to other subscribers here.
@@ -199,25 +214,28 @@ export default function AppProvider(props: PropsWithChildren) {
       .delete()
       .in('frontUuid', flashcardsToDelete);
 
-    websocketChannel.current?.send({
-      type: 'broadcast',
-      event: 'flashcards_delete',
-      payload: { flashcards: flashcardsToDelete },
-    });
-
     filteredFlashcards.forEach((item: FlashCard) => {
       flashcardsObject[item.frontUuid] = item;
     });
 
     localStorage.setItem('flashcards', JSON.stringify(flashcardsObject));
     setFlashCardsArray(filteredFlashcards);
+
+    websocketChannel.current?.send({
+      type: 'broadcast',
+      event: 'flashcards_delete',
+      payload: { flashcards: flashcardsToDelete },
+    });
   };
 
   const removeFlashCardsByUuid = async (uuids: string[]) => {
     const flashcardsObject: Record<string, FlashCard> = {};
-    const filteredFlashcards = flashCardsArray.filter(
-      (item: FlashCard) => !uuids.includes(item.frontUuid),
-    );
+    const filteredFlashcards = flashCardsArray
+      .filter((item: FlashCard) => !uuids.includes(item.frontUuid))
+      .map((item, index) => ({
+        ...item,
+        order: index,
+      }));
 
     filteredFlashcards.forEach((item: FlashCard) => {
       flashcardsObject[item.frontUuid] = item;
@@ -444,14 +462,15 @@ export default function AppProvider(props: PropsWithChildren) {
   const applyWebsockets = async () => {
     if (!isLoggedIn) return;
     const { data } = await supabase.auth.getUser();
-    const user_channel = supabase.channel(`user-${data.user?.id}`);
+    const user_channel = supabase.channel(`user-${data.user?.id}`, {
+      config: { private: true },
+    });
     websocketChannel.current = user_channel;
     // FLASHCARDS - UPDATE
     websocketChannel.current.on(
       'postgres_changes',
       { event: 'UPDATE', schema: 'public', table: 'flashcards' },
       (payload) => {
-        console.log(payload);
         if (payload.new) {
           const updatedFlashcard = payload.new as FlashCard & {
             user_uuid: string;
@@ -469,7 +488,6 @@ export default function AppProvider(props: PropsWithChildren) {
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'flashcards' },
       (payload) => {
-        console.log(payload);
         if (payload.new) {
           const newFlashcard = payload.new as FlashCard & {
             user_uuid: string;
@@ -534,29 +552,65 @@ export default function AppProvider(props: PropsWithChildren) {
   const syncWithDB = async () => {
     if (!isLoggedIn) return;
 
-    const fetchBody = JSON.stringify({
-      flashcards: flashCardsArray,
-      sets: setsArray,
-      theme,
-      metadata: metadata,
-    });
+    const lastSyncAt = new Date();
 
-    // TODO: Add error handling
-    // TODO: Add Promise.all() and split sync to different endpoints
+    const fetchFlashCards: Promise<ApiResponse<ApiFlashcardsSyncResponse>> =
+      fetch(API_ROUTES.SYNC_FLASH_CARDS, {
+        method: 'POST',
+        body: JSON.stringify({
+          flashcards: flashCardsArray,
+          lastSyncAt: lastSyncAt,
+        }),
+      });
 
-    const response = await fetch<ApiResponse<ApiSyncResponse>>(
-      API_ROUTES.SYNC,
+    const fetchSets: Promise<ApiResponse<ApiSetsSyncResponse>> = fetch(
+      API_ROUTES.SYNC_SETS,
       {
         method: 'POST',
-        body: fetchBody,
+        body: JSON.stringify({
+          sets: setsArray,
+          lastSyncAt: lastSyncAt,
+        }),
       },
     );
 
-    if (response.success) {
-      updateMetadata(response.data.metadata);
-      setFlashCards(response.data.flashcards);
-      setSets(response.data.sets);
-    }
+    const fetchMetadata: Promise<ApiResponse<ApiMetadataSyncResponse>> = fetch(
+      API_ROUTES.SYNC_METADATA,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          metadata: metadata,
+          theme: theme,
+          lastSyncAt: lastSyncAt,
+        }),
+      },
+    );
+
+    const responses = await Promise.allSettled([
+      fetchFlashCards,
+      fetchSets,
+      fetchMetadata,
+    ]);
+
+    responses.forEach((response) => {
+      if (response.status === 'fulfilled') {
+        if (response.value.success) {
+          const value = response.value.data;
+
+          if ('flashcards' in value) {
+            setFlashCardsArray(value.flashcards);
+          } else if ('sets' in value) {
+            setSetsArray(value.sets);
+          } else {
+            setMetadata(value.metadata);
+            setTheme(value.theme);
+          }
+        }
+
+        return;
+      }
+      console.error(response.reason);
+    });
 
     await applyWebsockets();
   };
@@ -656,7 +710,7 @@ export default function AppProvider(props: PropsWithChildren) {
   return (
     <AppContext.Provider
       value={{
-        flashcards: flashCardsArray,
+        flashcards: flashCardsArray.sort((a, b) => a.order - b.order),
         sets: setsArray,
         setsDictionary,
         categories,
