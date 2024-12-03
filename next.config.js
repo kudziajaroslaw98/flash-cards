@@ -23,13 +23,13 @@ const nextConfig = {
     return [
       {
         source: `/xs.js`,
-        destination: `${process.env.NEXT_PUBLIC_UMAMI_SRC}`
+        destination: `${process.env.NEXT_PUBLIC_UMAMI_SRC}`,
       },
       {
         source: `/api/send`,
-        destination: `${process.env.NEXT_PUBLIC_UMAMI_API}`
+        destination: `${process.env.NEXT_PUBLIC_UMAMI_API}`,
       },
-    ]
+    ];
   },
   images: {
     remotePatterns: [
@@ -40,8 +40,8 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
-      }
-    ]
+      },
+    ],
   },
 };
 module.exports = process.env.TURBO

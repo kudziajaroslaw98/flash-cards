@@ -19,6 +19,8 @@ export type TextAreaProps = {
   touched?: boolean;
   error?: string | null;
   handleGenerate?: () => void;
+  blockGenerate?: boolean;
+  loadingGenerate?: boolean;
 } & Pick<
   TextareaHTMLAttributes<HTMLTextAreaElement>,
   | 'value'
@@ -43,6 +45,8 @@ export default function TextArea({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   type = 'textarea',
   handleGenerate,
+  blockGenerate = false,
+  loadingGenerate = false,
   ...props
 }: TextAreaProps) {
   const [value, setValue] = useState(props.value);
@@ -52,7 +56,7 @@ export default function TextArea({
     if (textAreaRef.current) {
       const minHeight = 40;
 
-      textAreaRef.current.style.height = '40px';
+      textAreaRef.current.style.height = 'auto';
       textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight >= minHeight ? textAreaRef.current.scrollHeight : minHeight}px`;
     }
   }, 75);
@@ -103,7 +107,7 @@ export default function TextArea({
 
   const generate = () => {
     window.umami.track('Generate text clicked', { name: props.name });
-    if (handleGenerate) {
+    if (handleGenerate && !blockGenerate && !loadingGenerate) {
       handleGenerate();
     }
   };
@@ -152,9 +156,11 @@ export default function TextArea({
             type='button'
             variant={'secondary'}
             size={'icon-xs'}
-            className='absolute right-[10px] top-[10px] z-40'
+            className='absolute right-[10px] top-[10px] z-40 disabled:cursor-not-allowed'
             onClick={generate}
             icon={<SparklesIcon className='size-3' />}
+            loading={loadingGenerate}
+            disabled={blockGenerate}
           />
         )}
       </span>

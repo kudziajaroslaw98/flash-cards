@@ -80,6 +80,7 @@ export default function Dropdown<T>({
   onChange,
   onBlur,
   onFocus,
+  onAddNew,
   error = null,
   touched = false,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -232,6 +233,10 @@ export default function Dropdown<T>({
       value: newItemValue,
       label: newItemValue,
     } as DictionaryValue<T>;
+
+    if (onAddNew) {
+      onAddNew(newItemValue);
+    }
 
     setItems((prev) => [...prev, newItem]);
     setIsInAddNewMode(false);

@@ -15,6 +15,9 @@ export const newSetValidationScheme = z.object({
 export const newSetFormScheme = (
   dictionaryItems: DictionaryValue<string>[],
   handleGenerate: () => void,
+  loadingGenerate: boolean,
+  isLoggedIn: boolean,
+  onAddNew: (value: string) => void,
 ): FormScheme<Pick<FlashCardSet, 'name' | 'description' | 'category'>> => ({
   inputs: {
     name: {
@@ -29,6 +32,8 @@ export const newSetFormScheme = (
       label: 'Description',
       placeholder: 'Set description',
       handleGenerate: handleGenerate,
+      loadingGenerate: loadingGenerate,
+      blockGenerate: !isLoggedIn,
     },
     category: {
       type: 'dropdown',
@@ -38,6 +43,7 @@ export const newSetFormScheme = (
       config: dictionaryItems,
       addNew: true,
       clearAll: true,
+      onAddNew,
     },
   },
   validation: newSetValidationScheme,

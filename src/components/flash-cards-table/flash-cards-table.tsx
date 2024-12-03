@@ -1,7 +1,7 @@
 'use client';
 
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/solid';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter';
 import type { FlashCard } from '#/shared/models/flash-card.model';
@@ -36,14 +36,14 @@ export default function FlashCardsTable() {
   const [isInEditMode, setIsInEditMode] = useState(false);
   const [tileSize] = useState<'sm' | 'md' | 'lg'>('sm');
 
-  const isSelected = (flashCard: FlashCard) => {
+  const isSelected = useCallback((flashCard: FlashCard) => {
     return (
       selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
       -1
     );
-  };
+  },[selected]);
 
-  const toggleSelected = (flashCard: FlashCard) => {
+  const toggleSelected = useCallback((flashCard: FlashCard) => {
     if (isSelected(flashCard)) {
       setSelected((prev) =>
         prev.filter((item) => flashCard.frontUuid !== item.frontUuid),
@@ -51,7 +51,7 @@ export default function FlashCardsTable() {
     } else {
       setSelected((prev) => [...prev, flashCard]);
     }
-  };
+  },[isSelected]);
 
   const removeSelected = () => {
     window.umami.track('Remove flash cards', { count: selected.length });
@@ -129,7 +129,7 @@ export default function FlashCardsTable() {
           </div>
         )}
 
-        <FloatingButtons>
+        <FloatingButtons className='mt-4'>
           <NewFlashCardModal
             handleNewFlashCard={addNewRecord}
             handleEditFlashCard={editSelectedRecords}

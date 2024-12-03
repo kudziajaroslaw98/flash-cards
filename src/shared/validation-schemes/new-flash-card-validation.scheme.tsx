@@ -13,6 +13,8 @@ export const newFlashCardValidationScheme = z.object({
 
 export const newFlashCardScheme = (
   handleGenerate: () => void,
+  loadingGenerate: boolean,
+  isLoggedIn: boolean,
 ): FormScheme<Pick<FlashCard, 'question' | 'questionAddition' | 'answer'>> => ({
   inputs: {
     question: {
@@ -33,6 +35,8 @@ export const newFlashCardScheme = (
       label: 'Answer',
       placeholder: 'Military valor and skill.',
       handleGenerate: handleGenerate,
+      loadingGenerate,
+      blockGenerate: !isLoggedIn,
     },
   },
   validation: newFlashCardValidationScheme,
