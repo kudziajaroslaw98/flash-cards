@@ -30,17 +30,14 @@ async function newUserSync(
   userUuid: string,
   newLastSyncAt: Date,
 ) {
-  console.log(
-    'newUserSync',
-    await supabase.from('metadata').upsert(
-      {
-        user_uuid: userUuid,
-        ...body.metadata,
-        theme: body.theme,
-        lastSyncAt: newLastSyncAt,
-      },
-      { onConflict: 'user_uuid', ignoreDuplicates: false },
-    ),
+  await supabase.from('metadata').upsert(
+    {
+      user_uuid: userUuid,
+      ...body.metadata,
+      theme: body.theme,
+      lastSyncAt: newLastSyncAt,
+    },
+    { onConflict: 'user_uuid', ignoreDuplicates: false },
   );
 }
 
@@ -139,18 +136,15 @@ export async function POST(request: Request) {
       .eq('user_uuid', userUuid)
       .maybeSingle();
 
-
     const bodyDateAsNumber = body.metadata.lastSyncAt
       ? new Date(body.metadata.lastSyncAt).setSeconds(0, 0)
       : null;
-    const metadataDate = metadata.data?.lastSyncAt 
+    const metadataDate = metadata.data?.lastSyncAt
       ? new Date(metadata.data.lastSyncAt).setSeconds(0, 0)
       : null;
     const bodyDate = new Date(new Date(body.newLastSyncAt).setSeconds(0, 0));
 
     if (metadata.data === null || metadataDate === null) {
-      console.log('🚀 ~ POST ~ metadataDate:', metadataDate);
-
       await newUserSync(body, supabase, userUuid, bodyDate);
     } else {
       if (bodyDateAsNumber === null || bodyDateAsNumber < metadataDate) {

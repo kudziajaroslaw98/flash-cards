@@ -277,7 +277,7 @@ export default function AppProvider(props: PropsWithChildren) {
     setFlashCardsArray(updatedFlashcards);
 
     await Promise.all(
-      updatedFlashcards.map((flashcard) =>
+      mappedFlashCards.map((flashcard) =>
         supabase
           .from('flashcards')
           .update(flashcard)
@@ -471,7 +471,7 @@ export default function AppProvider(props: PropsWithChildren) {
     setSetsArray(updatedSets);
 
     await Promise.all(
-      updatedSets.map((set) =>
+      mappedSets.map((set) =>
         supabase.from('sets').update(set).eq('frontUuid', set.frontUuid),
       ),
     );
@@ -550,7 +550,6 @@ export default function AppProvider(props: PropsWithChildren) {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'flashcards' },
         (payload) => {
-          console.log("🚀 ~ applyWebsockets ~ payload:", payload)
           if (payload.new) {
             const updatedFlashcard = payload.new as FlashCard & {
               user_uuid: string;
@@ -568,8 +567,6 @@ export default function AppProvider(props: PropsWithChildren) {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'flashcards' },
         (payload) => {
-          console.log('🚀 ~ applyWebsockets ~ payload:', payload);
-
           if (payload.new) {
             const newFlashcard = payload.new as FlashCard & {
               user_uuid: string;
@@ -582,8 +579,6 @@ export default function AppProvider(props: PropsWithChildren) {
 
       // FLASHCARDS - DELETE
       .on('broadcast', { event: 'flashcards_delete' }, ({ payload }) => {
-        console.log('🚀 ~ .on ~ payload:', payload);
-
         if (
           payload.flashcards &&
           payload.flashcards.length >= 0 &&
@@ -598,7 +593,6 @@ export default function AppProvider(props: PropsWithChildren) {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'sets' },
         (payload) => {
-          console.log(payload);
           if (payload.new) {
             const updatedSet = payload.new as FlashCardSet & {
               user_uuid: string;
@@ -616,7 +610,6 @@ export default function AppProvider(props: PropsWithChildren) {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'sets' },
         (payload) => {
-          console.log(payload);
           if (payload.new) {
             const newSet = payload.new as FlashCardSet & {
               user_uuid: string;
@@ -629,7 +622,6 @@ export default function AppProvider(props: PropsWithChildren) {
 
       // SETS - DELETE
       .on('broadcast', { event: 'sets_delete' }, ({ payload }) => {
-        console.log(payload);
         if (
           payload.sets &&
           payload.sets.length >= 0 &&

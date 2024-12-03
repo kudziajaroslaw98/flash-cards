@@ -33,6 +33,7 @@ export const NewFlashCardModal = ({
   const [flashCards, setFlashCards] =
     useState<Omit<FlashCard, 'weight' | 'order'>[]>(selectedFlashCards);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [loadingGenerate, setLoadingGenerate] = useState(false);
   const { isLoggedIn } = useSessionContext();
   const submitRef = useRef<HTMLButtonElement>(null);
   const { completion, complete } = useCompletion({
@@ -160,15 +161,17 @@ export const NewFlashCardModal = ({
       formValue.questionAddition !== '' &&
       isLoggedIn
     ) {
+      setLoadingGenerate(true);
       await complete(
         `generate description to: '${formValue.questionAddition}'`,
       );
+      setLoadingGenerate(false);
     }
   }, [formValue, complete, isLoggedIn]);
 
   const getFormScheme = useMemo(
-    () => newFlashCardScheme(handleGenerate),
-    [handleGenerate],
+    () => newFlashCardScheme(handleGenerate, loadingGenerate, isLoggedIn),
+    [handleGenerate, loadingGenerate, isLoggedIn],
   );
 
   return (

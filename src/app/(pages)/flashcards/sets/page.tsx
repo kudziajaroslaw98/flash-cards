@@ -160,9 +160,9 @@ export default function SetsPage() {
         toggleSelected(set.at(0) as FlashCardSet);
       } else {
         window.umami.track('Set short pressed - open set');
+        const target = e.target as HTMLElement;
 
-        // TODO: Toggling doesnt work again
-        if (toggleRef.current?.contains(e.target as Node)) {
+        if (target?.classList?.contains('toggle-button')) {
           handleSetToggleChange(set.at(0) as FlashCardSet);
         } else {
           router.push(`/flashcards/sets/${set.at(0)?.hardlink}`);
@@ -204,10 +204,7 @@ export default function SetsPage() {
 
             <ToggleButton
               toggled={isFavourite}
-              toggle={() => {
-                window.umami.track('Toggle favourite');
-                toggleFavourite(!isFavourite);
-              }}
+              toggle={() => toggleFavourite(!isFavourite)}
               activeIcon={<StarIcon className='h-4 w-4' />}
               inactiveIcon={<StarIconOutline className='h-4 w-4' />}
               size={'icon'}
@@ -269,13 +266,11 @@ export default function SetsPage() {
                     <ToggleButton
                       ref={toggleRef}
                       toggled={set.isFavourite}
-                      toggle={() => {
-                        handleSetToggleChange(set);
-                      }}
                       activeIcon={<StarIcon className='h-4 w-4' />}
                       inactiveIcon={<StarIconOutline className='h-4 w-4' />}
                       size={'icon-sm'}
                       toggleVariant='text'
+                      className='toggle-button z-30'
                     />
                   </div>
                 </Card>

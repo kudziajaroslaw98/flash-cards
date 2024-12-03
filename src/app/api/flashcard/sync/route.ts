@@ -90,8 +90,6 @@ async function upsertDataInDb(
     ),
   );
 
-  console.log(changedFlashcards);
-
   await supabase.from('flashcards').upsert(
     changedFlashcards.map((flashcard) => ({
       user_uuid: userUuid,

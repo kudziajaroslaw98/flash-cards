@@ -8,11 +8,7 @@ export default async function Home() {
       done: true,
       label: 'Revise flash cards using simple spaced repetition algorithm',
     },
-    {
-      done: false,
-      label:
-        'Revise flash cards using more sophisticated spaced repetition algorithm',
-    },
+
     {
       done: true,
       label: 'Accounts',
@@ -21,6 +17,7 @@ export default async function Home() {
       done: true,
       label: 'OAuth login with Google, GitHub',
     },
+    { done: true, label: 'Synchronize your flash cards across all devices' },
     {
       done: true,
       label:
@@ -35,8 +32,6 @@ export default async function Home() {
       label: 'Revise set flash cards (now revise work on all flash cards)',
     },
     { done: true, label: 'Organize flash cards into decks' },
-    { done: false, label: 'Community Section with shared decks' },
-    { done: false, label: 'Daily word suggestion' },
     { done: true, label: 'Generating descriptions to words with AI' },
     {
       done: true,
@@ -44,8 +39,20 @@ export default async function Home() {
         'Generating new words for deck based on words that are already in it',
     },
     { done: true, label: 'Live updates (WebSockets)' },
+    { done: false, label: 'Generate a set from PDF' },
     { done: false, label: 'Importing flash cards from CSV file' },
-    { done: true, label: 'Synchronize your flash cards across all devices' },
+    {
+      done: false,
+      label:
+        'Revise flash cards using more sophisticated spaced repetition algorithm',
+    },
+    { done: false, label: 'Code optimization' },
+    { done: false, label: 'Community Section with shared decks' },
+    { done: false, label: 'Daily word suggestion' },
+    { done: false, label: 'Statistics and analytics' },
+    { done: false, label: 'Rate limit to prevent abuse' },
+    { done: false, label: 'Setting generation level A2/B2/C1' },
+    { done: false, label: 'Filters on flashcard list' },
   ];
 
   return (

@@ -5,7 +5,7 @@ type ToggleButtonProps = {
   activeIcon?: ReactNode;
   inactiveIcon?: ReactNode;
   toggled: boolean;
-  toggle: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  toggle?: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   toggleVariant?: 'outline' | 'text';
 } & ButtonProps;
 
@@ -15,7 +15,7 @@ const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonProps>(
       activeIcon,
       inactiveIcon,
       toggled = true,
-      toggle,
+      toggle = () => {},
       toggleVariant = 'outline',
       ...props
     },

@@ -25,7 +25,7 @@ interface NewSetModalProps {
 export const NewSetModal = ({
   handleNew,
   handleEdit,
-  categories,
+  categories: initialCategories,
   trigger,
   selectedSets = [],
   isInEditMode = false,
@@ -35,6 +35,8 @@ export const NewSetModal = ({
   const [formValue, setFormValue] = useState<Partial<FlashCardSet>>({});
   const [sets, setSets] = useState<Partial<FlashCardSet>[]>(selectedSets);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [loadingGenerate, setLoadingGenerate] = useState(false);
+  const [categories, setCategories] = useState<DictionaryValue<string>[]>([]);
   const { isLoggedIn } = useSessionContext();
 
   const { completion, complete } = useCompletion({
@@ -57,6 +59,10 @@ export const NewSetModal = ({
     }
     setFormValue({});
   };
+
+  useEffect(() => {
+    setCategories(initialCategories);
+  }, [initialCategories]);
 
   useEffect(() => {
     if (selectedSets.length === 0) {
@@ -145,13 +151,32 @@ export const NewSetModal = ({
 
   const handleGenerate = useCallback(async () => {
     if (formValue.name !== undefined && formValue.name !== '' && isLoggedIn) {
+      setLoadingGenerate(true);
       await complete(`generate description to: '${formValue.name}'`);
+      setLoadingGenerate(false);
     }
   }, [formValue, complete, isLoggedIn]);
 
+  const handleAddNewCategory = useCallback((value: string) => {
+    setCategories((prev) => [...prev, { value, label: value }]);
+  }, []);
+
   const getFormScheme = useMemo(
-    () => newSetFormScheme(categories, handleGenerate),
-    [categories, handleGenerate],
+    () =>
+      newSetFormScheme(
+        categories,
+        handleGenerate,
+        loadingGenerate,
+        isLoggedIn,
+        handleAddNewCategory,
+      ),
+    [
+      categories,
+      handleGenerate,
+      loadingGenerate,
+      isLoggedIn,
+      handleAddNewCategory,
+    ],
   );
 
   return (

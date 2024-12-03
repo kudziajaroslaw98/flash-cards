@@ -11,7 +11,7 @@ import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
 import AvatarComponent from '#/components/_ui/avatar/avatar';
 import { Button } from '#/components/_ui/button/button';
 import Switch from '#/components/_ui/switch/switch';
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
 
 export default function SettingsPage() {
@@ -20,6 +20,7 @@ export default function SettingsPage() {
   const [lastName, setLastName] = useState(user?.user_metadata?.lastName);
   const [email, setEmail] = useState(user?.email);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
   const [notificationEnabled, setNotificationEnabled] = useState(false);
 
   useEffect(() => {
@@ -69,6 +70,11 @@ export default function SettingsPage() {
         setNotificationEnabled(false);
       }
     });
+  };
+
+  const handleClearData = () => {
+    localStorage.clear();
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -146,6 +152,32 @@ export default function SettingsPage() {
       <div className='w-full max-w-sm'>
         <span className='text-sm font-semibold text-red-500'>Danger Zone</span>
         <section className='flex flex-col gap-4 rounded-md border border-red-500 p-4'>
+          <p className='flex flex-col gap-2 text-gray-600'>
+            <span className='text-sm font-semibold text-red-500'>Warning</span>
+
+            <span className='text-sm text-gray-700 dark:text-slate-200'>
+              Clearing data will{' '}
+              <span className='font-bold text-red-500'>remove all</span> your
+              data.
+            </span>
+          </p>
+
+          <AlertDialog
+            headerText='Clear Data'
+            bodyText='Are you sure you want to clear your data? This action cannot be undone.'
+            trigger={
+              <button
+                disabled={isClearing}
+                className={`rounded-lg bg-red-500 px-4 py-2 font-bold text-gray-50 hover:bg-red-700 focus:border-red-500 focus:outline-none focus:ring ${
+                  isClearing ? 'cursor-not-allowed opacity-50' : ''
+                }`}
+              >
+                {isClearing ? 'Clearing...' : 'Clear Data'}
+              </button>
+            }
+            onAccept={handleClearData}
+            onCancel={() => setIsClearing(false)}
+          ></AlertDialog>
           <p className='flex flex-col gap-2 text-gray-600'>
             <span className='text-sm font-semibold text-red-500'>Warning</span>
 
