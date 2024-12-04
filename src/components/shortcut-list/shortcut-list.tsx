@@ -57,7 +57,10 @@ const ShortcutListItem = ({ shortcut }: { shortcut: Shortcut }) => {
   const keys = () => (
     <span className='flex items-center'>
       {shortcut.keys?.map((key, index) => (
-        <span key={`shortcut-${shortcut.name}-key-${index}`}>
+        <span
+          key={`shortcut-${shortcut.name}-key-${index}`}
+          className='flex'
+        >
           <span className='flex items-center justify-center rounded border border-gray-200 px-2 py-1 text-xs font-semibold dark:border-slate-900'>
             {key}
           </span>
