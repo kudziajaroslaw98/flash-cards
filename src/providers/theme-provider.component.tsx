@@ -12,14 +12,12 @@ import useLocalStorage from '#/hooks/use-local-storage.hook';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 
 export type ThemeContextType = {
-  isDarkMode: boolean;
   isLightMode: boolean;
   changeTheme: () => void;
 };
 
 export const ThemeContext = createContext<ThemeContextType>({
-  isDarkMode: false,
-  isLightMode: true,
+  isLightMode: false,
   changeTheme: () => null,
 });
 
@@ -53,10 +51,6 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
     window.umami.track('Theme changed', { theme: newTheme });
   };
 
-  const isDarkMode = useCallback((): boolean => {
-    return theme === 'dark';
-  }, [theme]);
-
   const isLightMode = useCallback((): boolean => {
     return theme === 'light';
   }, [theme]);
@@ -74,7 +68,6 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
     <ThemeContext.Provider
       value={{
         changeTheme,
-        isDarkMode: isDarkMode(),
         isLightMode: isLightMode(),
       }}
     >

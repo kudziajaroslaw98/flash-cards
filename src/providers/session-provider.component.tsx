@@ -45,6 +45,7 @@ export default function SessionProvider(props: Readonly<PropsWithChildren>) {
     await supabase.auth.signOut();
     setSession(null);
     setUser(null);
+    localStorage.clear();
     router.refresh();
   };
 

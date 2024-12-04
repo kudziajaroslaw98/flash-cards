@@ -41,6 +41,7 @@ export default async function Home() {
     { done: true, label: 'Live updates (WebSockets)' },
     { done: false, label: 'Generate a set from PDF' },
     { done: false, label: 'Importing flash cards from CSV file' },
+    { done: false, label: 'Exporting flash cards to CSV file' },
     {
       done: false,
       label:

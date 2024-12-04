@@ -26,7 +26,10 @@ export const AssignFlashCardsModal = ({
   });
 
   const submitRef = useRef<HTMLButtonElement>(null);
-  const initialValue = useMemo(() => ({ flashCards: [...setCards] }), [setCards]);
+  const initialValue = useMemo(
+    () => ({ flashCards: [...setCards] }),
+    [setCards],
+  );
 
   const getFormScheme = useMemo(
     () =>
@@ -38,7 +41,7 @@ export const AssignFlashCardsModal = ({
           };
         }),
       ),
-    [flashCards, setCards],
+    [flashCards],
   );
 
   const handleDialogClose = () => {

@@ -9,12 +9,14 @@ import { useEffect, useState } from 'react';
 import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
 import type { FlashCard } from '#/shared/models/flash-card.model';
+import { ShortcutList } from '../shortcut-list/shortcut-list';
 import FlashCardComponent from '../flash-card/flash-card';
 import { Button } from '#/components/_ui/button/button';
 import { useAppContext } from '#/providers/app-context';
 import useKeyPress from '#/hooks/use-key-press.hook';
 import Dropdown from '../_ui/dropdown/dropdown';
 import LinkComponent from '../_ui/link/link';
+import { ArrowBigRight } from 'lucide-react';
 import { cn } from '#/shared/utils/cn.util';
 import Card from '../_ui/card/card';
 
@@ -169,6 +171,26 @@ export default function FlashCardReviseComponent() {
             )}
           </div>
         </div>
+
+        <ShortcutList
+          className='hidden md:flex'
+          shortcuts={[
+            {
+              name: 'Reshuffle',
+              keys: [
+                'R',
+                <ArrowBigRight
+                  key='ArrowBigRight'
+                  className='size-4'
+                />,
+              ],
+            },
+            {
+              name: 'Answer 1 - 4',
+              keys: ['1', '2', '3', '4'],
+            },
+          ]}
+        />
 
         <div className='mt-8 grid gap-2 xl:grid-cols-[repeat(2,minmax(20rem,1fr))]'>
           {randomCards.map((flashCard, index) => (

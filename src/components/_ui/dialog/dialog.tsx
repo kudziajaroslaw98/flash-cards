@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useRef,
 } from 'react';
+import { ShortcutList } from '#/components/shortcut-list/shortcut-list';
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import DialogProvider from '#/providers/dialog.providers';
 import { Trigger } from '#/components/_shared/trigger';
@@ -85,10 +86,23 @@ export const Dialog = ({
           >
             <div className='fixed right-0 top-0 z-[100] h-screen w-screen bg-black/75 backdrop-blur-sm'>
               <div
-                className='flex h-full w-full  items-center justify-center gap-4'
+                className='flex h-full w-full  flex-col items-center justify-center gap-4'
                 ref={ref}
               >
                 {props.children}
+                <ShortcutList
+                  className='hidden text-gray-300 md:flex'
+                  shortcuts={[
+                    {
+                      name: 'Close Dialog',
+                      keys: ['Escape'],
+                    },
+                    {
+                      name: 'Submit',
+                      keys: ['Enter'],
+                    },
+                  ]}
+                />
               </div>
             </div>
           </DialogProvider>,

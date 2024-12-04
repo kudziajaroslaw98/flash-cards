@@ -8,7 +8,6 @@ import type { FlashCard } from '#/shared/models/flash-card.model';
 import { Button } from '#/components/_ui/button/button';
 
 import { FloatingButtons } from '../floating-buttons/floating-buttons';
-import { AlertDialog } from '../_ui/alert-dialog/alert-dialog';
 import FlashCardComponent from '../flash-card/flash-card';
 import { useAppContext } from '#/providers/app-context';
 import { AnimatePresence } from 'framer-motion';
@@ -21,7 +20,13 @@ const NewFlashCardModal = dynamic(() =>
   ),
 );
 
-export default function FlashCardsTable() {
+const AlertDialog = dynamic(() =>
+  import('#/components/_ui/alert-dialog/alert-dialog').then(
+    (x) => x.AlertDialog,
+  ),
+);
+
+export default function FlashCardsList() {
   const {
     flashcards,
     removeFlashCards,
@@ -36,22 +41,28 @@ export default function FlashCardsTable() {
   const [isInEditMode, setIsInEditMode] = useState(false);
   const [tileSize] = useState<'sm' | 'md' | 'lg'>('sm');
 
-  const isSelected = useCallback((flashCard: FlashCard) => {
-    return (
-      selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
-      -1
-    );
-  },[selected]);
-
-  const toggleSelected = useCallback((flashCard: FlashCard) => {
-    if (isSelected(flashCard)) {
-      setSelected((prev) =>
-        prev.filter((item) => flashCard.frontUuid !== item.frontUuid),
+  const isSelected = useCallback(
+    (flashCard: FlashCard) => {
+      return (
+        selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
+        -1
       );
-    } else {
-      setSelected((prev) => [...prev, flashCard]);
-    }
-  },[isSelected]);
+    },
+    [selected],
+  );
+
+  const toggleSelected = useCallback(
+    (flashCard: FlashCard) => {
+      if (isSelected(flashCard)) {
+        setSelected((prev) =>
+          prev.filter((item) => flashCard.frontUuid !== item.frontUuid),
+        );
+      } else {
+        setSelected((prev) => [...prev, flashCard]);
+      }
+    },
+    [isSelected],
+  );
 
   const removeSelected = () => {
     window.umami.track('Remove flash cards', { count: selected.length });
@@ -144,39 +155,40 @@ export default function FlashCardsTable() {
             }
           />
 
-          <NewFlashCardModal
-            handleNewFlashCard={addNewRecord}
-            handleEditFlashCard={editSelectedRecords}
-            selectedFlashCards={isInEditMode ? selected : []}
-            isInEditMode={isInEditMode}
-            trigger={
-              <Button
-                onClick={handleEditButtonClick}
-                icon={<PencilIcon className='h-4 w-4' />}
-                size={'icon-square'}
-                disabled={selected.length === 0}
-                variant={'secondary'}
-              />
-            }
-          />
-
           {flashcards.length > 0 && (
-            <AlertDialog
-              onCancel={() => {
-                window.umami.track('Cancel remove flash cards');
-              }}
-              headerText='Are you absolutely sure?'
-              bodyText='This action cannot be undone. This will permanently delete your flash cards.'
-              trigger={
-                <Button
-                  disabled={selected.length === 0}
-                  variant={'destructive'}
-                  icon={<TrashIcon className='h-4 w-4' />}
-                  size={'icon-square'}
-                />
-              }
-              onAccept={removeSelected}
-            />
+            <>
+              <NewFlashCardModal
+                handleNewFlashCard={addNewRecord}
+                handleEditFlashCard={editSelectedRecords}
+                selectedFlashCards={isInEditMode ? selected : []}
+                isInEditMode={isInEditMode}
+                trigger={
+                  <Button
+                    onClick={handleEditButtonClick}
+                    icon={<PencilIcon className='h-4 w-4' />}
+                    size={'icon-square'}
+                    disabled={selected.length === 0}
+                    variant={'secondary'}
+                  />
+                }
+              />
+              <AlertDialog
+                onCancel={() => {
+                  window.umami.track('Cancel remove flash cards');
+                }}
+                headerText='Are you absolutely sure?'
+                bodyText='This action cannot be undone. This will permanently delete your flash cards.'
+                trigger={
+                  <Button
+                    disabled={selected.length === 0}
+                    variant={'destructive'}
+                    icon={<TrashIcon className='h-4 w-4' />}
+                    size={'icon-square'}
+                  />
+                }
+                onAccept={removeSelected}
+              />
+            </>
           )}
         </FloatingButtons>
       </div>

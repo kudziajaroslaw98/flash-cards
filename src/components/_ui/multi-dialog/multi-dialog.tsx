@@ -4,7 +4,9 @@ import {
   PlusIcon,
 } from '@heroicons/react/24/solid';
 import { useCallback, useMemo, useRef, type PropsWithChildren } from 'react';
+import { ShortcutList } from '#/components/shortcut-list/shortcut-list';
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
+import { ArrowBigLeft, ArrowBigRight } from 'lucide-react';
 import DialogProvider from '#/providers/dialog.providers';
 import { Trigger } from '#/components/_shared/trigger';
 import useKeyPress from '#/hooks/use-key-press.hook';
@@ -178,6 +180,38 @@ export const MultiDialog = ({
                   <div className='text-sm text-gray-200'>
                     {`${currentIndex + 1} | ${maxIndex}`}
                   </div>
+
+                  <ShortcutList
+                    className='hidden text-gray-300 md:flex'
+                    shortcuts={[
+                      {
+                        name: 'Close Dialog',
+                        keys: ['Escape'],
+                      },
+                      {
+                        name: 'Submit',
+                        keys: ['Enter'],
+                      },
+                      {
+                        name: 'Next/Add',
+                        keys: [
+                          <ArrowBigRight
+                            key='ArrowBigRight'
+                            className='size-4'
+                          />,
+                        ],
+                      },
+                      {
+                        name: 'Previous',
+                        keys: [
+                          <ArrowBigLeft
+                            key='ArrowBigRight'
+                            className='size-4'
+                          />,
+                        ],
+                      },
+                    ]}
+                  />
                 </div>
 
                 <span className='hidden md:flex'>{buttonRight}</span>

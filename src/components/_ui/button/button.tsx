@@ -81,11 +81,14 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         tabIndex={disabled ? -1 : 0}
         {...props}
       >
-        <span className='pointer-events-none'>
-          {loading && <ArrowPathIcon className={'h-4 w-4 animate-spin'} />}
+        {loading ||
+          (!loading && props.icon && (
+            <span className='pointer-events-none'>
+              {loading && <ArrowPathIcon className={'h-4 w-4 animate-spin'} />}
 
-          {!loading && props.icon}
-        </span>
+              {!loading && props.icon}
+            </span>
+          ))}
 
         {props?.label && props.label}
       </button>

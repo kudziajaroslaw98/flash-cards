@@ -60,11 +60,13 @@ export const AlertDialog = ({
           <Button
             onClick={handleCancel}
             variant={'secondary-outline'}
+            size={'full'}
             label='Cancel'
           />
           <Button
             onClick={handleAccept}
             variant={'destructive'}
+            size={'full'}
             label='Confirm'
           />
         </Modal.Footer>
