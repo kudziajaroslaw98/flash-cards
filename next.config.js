@@ -17,7 +17,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 const cspHeader = `
-    default-src 'self' https://umami.finalphase.app https://supabase.finalphase.app https://supabase.finalphase.app/auth/v1/token?grant_type=refresh_token wss://supabase.finalphase.app;
+    default-src 'self' https://umami.finalphase.app https://supabase.finalphase.app wss://supabase.finalphase.app;
     script-src 'self' 'unsafe-eval' 'unsafe-inline' https://umami.finalphase.app;
     style-src 'self' 'unsafe-eval' 'unsafe-inline';
     img-src 'self' avatars.githubusercontent.com lh3.googleusercontent.com blob: data:;
