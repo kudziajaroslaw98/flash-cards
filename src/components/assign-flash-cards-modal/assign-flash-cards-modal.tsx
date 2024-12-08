@@ -26,20 +26,15 @@ export const AssignFlashCardsModal = ({
   });
 
   const submitRef = useRef<HTMLButtonElement>(null);
-  const initialValue = useMemo(
-    () => ({ flashCards: [...setCards] }),
-    [setCards],
-  );
+  const initialValue = { flashCards: setCards };
 
   const getFormScheme = useMemo(
     () =>
       assignFlashCardsScheme(
-        flashCards?.map((flashCard) => {
-          return {
-            label: flashCard?.questionAddition,
-            value: flashCard,
-          };
-        }),
+        flashCards?.map((flashCard) => ({
+          label: flashCard?.questionAddition,
+          value: flashCard,
+        })),
       ),
     [flashCards],
   );

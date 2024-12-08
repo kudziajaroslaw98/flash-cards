@@ -116,32 +116,29 @@ export default function Dropdown<T>({
   useEffect(() => {
     if (
       config.length === 0 ||
-      (configRef.current !== null &&
-        !isDifferent(config, configRef.current) &&
-        valueRef.current !== null &&
-        !isDifferent(value, valueRef.current))
+      (configRef.current !== null && !isDifferent(config, configRef.current))
     ) {
       return;
     }
-    const dropdownItems: DictionaryValue<T>[] = config;
+    console.log(valueRef.current, value);
+    console.log(configRef.current, config);
 
     configRef.current = config;
     valueRef.current = value ?? null;
 
     setItems(config);
-    setSelected(
-      dropdownItems.filter((item) => {
-        if (Array.isArray(value)) {
-          if (value.includes(item.value)) {
-            return true;
-          }
-        } else if (item.value === value) {
-          return true;
-        }
-        return false;
-      }),
-    );
-  }, [config, value]);
+  }, [config]);
+
+  useEffect(() => {
+    if (
+      configRef.current === null ||
+      (valueRef.current !== null && !isDifferent(value, valueRef.current))
+    ) {
+      return;
+    }
+    console.log('valueRef.current', value);
+    valueRef.current = value;
+  }, [value]);
 
   useEffect(() => {
     setFilteredItems(
@@ -151,7 +148,30 @@ export default function Dropdown<T>({
           ?.includes(searchValue?.toLocaleLowerCase()),
       ),
     );
+
+    setSelected(
+      items.filter((item) => {
+        if (Array.isArray(valueRef.current)) {
+          console.log('isArray');
+          console.log(valueRef.current.includes(item.value));
+          console.log(valueRef.current);
+          console.log(item.value);
+          if (
+            valueRef.current.some((value) => !isDifferent(value, item.value))
+          ) {
+            return true;
+          }
+        } else {
+          console.log('isNotArray');
+          return item.value === valueRef.current;
+        }
+      }),
+    );
   }, [items, searchValue]);
+
+  useEffect(() => {
+    console.log('value', value, 'selected', selected);
+  }, [value, selected]);
 
   useEffect(() => {
     if (searchValue !== '') {

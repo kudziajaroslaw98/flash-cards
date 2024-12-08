@@ -13,19 +13,11 @@ export default async function Home() {
       done: true,
       label: 'Accounts',
     },
-    {
-      done: true,
-      label: 'OAuth login with Google, GitHub',
-    },
     { done: true, label: 'Synchronize your flash cards across all devices' },
     {
       done: true,
       label:
         'Improve the user experience with floating buttons (mobile/desktop)',
-    },
-    {
-      done: true,
-      label: 'Drop redux in favor of useContext',
     },
     {
       done: true,
@@ -38,7 +30,7 @@ export default async function Home() {
       label:
         'Generating new words for deck based on words that are already in it',
     },
-    { done: true, label: 'Live updates (WebSockets)' },
+    { done: true, label: 'Live updates' },
     { done: false, label: 'Generate a set from PDF' },
     { done: false, label: 'Importing flash cards from CSV file' },
     { done: false, label: 'Exporting flash cards to CSV file' },
@@ -47,12 +39,10 @@ export default async function Home() {
       label:
         'Revise flash cards using more sophisticated spaced repetition algorithm',
     },
-    { done: false, label: 'Code optimization' },
     { done: false, label: 'Community Section with shared decks' },
     { done: false, label: 'Daily word suggestion' },
     { done: false, label: 'Statistics and analytics' },
-    { done: false, label: 'Rate limit to prevent abuse' },
-    { done: false, label: 'Setting generation level A2/B2/C1' },
+    { done: false, label: 'Setting to adjust generation level A2/B2/C1' },
     { done: false, label: 'Filters on flashcard list' },
   ];
 

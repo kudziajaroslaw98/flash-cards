@@ -1,9 +1,10 @@
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
+import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { isDifferent } from '#/shared/utils/is-different.util';
+import omit from '#/shared/utils/omit.util';
 import { createClient } from '#/shared/utils/supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import omit from '#/shared/utils/omit.util';
 import { z } from 'zod';
 
 type requestBody = {
@@ -154,7 +155,32 @@ export type ApiSetsSyncResponse = {
   sets: FlashCardSet[];
 };
 
+const rateLimit = new RateLimit(1, 10);
+
 export async function POST(request: Request) {
+  const supabase = await createClient();
+  const user = (await supabase.auth.getUser()).data.user;
+
+  if (user === null) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'User not logged in',
+      }),
+    );
+  }
+
+  try {
+    rateLimit.checkRateLimit(user.id);
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : 'Rate limit exceeded',
+      }),
+    );
+  }
+  
   try {
     const body: requestBody = await request.json();
 

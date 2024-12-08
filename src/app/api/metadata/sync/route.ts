@@ -2,6 +2,7 @@ import { DEFAULT_METADATA } from '#/shared/defaults/stats.default';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { createClient } from '#/shared/utils/supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { RateLimit } from '#/shared/utils/api-limiter';
 import type { Metadata } from '#/types/metadata.type';
 import omit from '#/shared/utils/omit.util';
 import { z } from 'zod';
@@ -115,8 +116,32 @@ export type ApiMetadataSyncResponse = {
   metadata: Metadata;
   theme: 'light' | 'dark';
 };
+const rateLimit = new RateLimit(1, 10);
 
 export async function POST(request: Request) {
+  const supabase = await createClient();
+  const user = (await supabase.auth.getUser()).data.user;
+
+  if (user === null) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'User not logged in',
+      }),
+    );
+  }
+
+  try {
+    rateLimit.checkRateLimit(user.id);
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : 'Rate limit exceeded',
+      }),
+    );
+  }
+
   try {
     const body: requestBody = await request.json();
 

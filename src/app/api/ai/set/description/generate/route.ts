@@ -1,22 +1,35 @@
+import { RateLimit } from "#/shared/utils/api-limiter";
 import { createClient } from "#/shared/utils/supabase/server";
-import { isLoggedIn } from "#/shared/utils/supabase/supabase-helpers";
 import { createOpenAI } from "@ai-sdk/openai";
 import { streamText } from "ai";
 
 export const maxDuration = 30;
+const rateLimit = new RateLimit(1, 10);
 
 export async function POST(req: Request) {
-    const { prompt }: { prompt: string } = await req.json();
     const supabase = await createClient();
+    const user = (await supabase.auth.getUser()).data.user;
 
-    if (await !isLoggedIn(supabase)) {
-        return new Response(
-            JSON.stringify({
-                success: false,
-                error: "User not logged in",
-            }),
-        );
+    if (user === null) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'User not logged in',
+        }),
+      );
     }
+
+    try {
+      rateLimit.checkRateLimit(user.id);
+    } catch (error) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: error instanceof Error ? error.message : 'Rate limit exceeded',
+        }),
+      );
+    }
+    const { prompt }: { prompt: string } = await req.json();
 
     const openai = createOpenAI({
         apiKey: process.env.OPENAI_API_KEY,

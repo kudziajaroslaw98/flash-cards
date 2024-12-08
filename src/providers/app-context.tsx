@@ -1,20 +1,3 @@
-import type { ApiFlashcardsSyncResponse } from '#/app/api/flashcard/sync/route';
-import type { ApiMetadataSyncResponse } from '#/app/api/metadata/sync/route';
-import type { ApiSetsSyncResponse } from '#/app/api/set/sync/route';
-import useFetch from '#/hooks/use-fetch.hook';
-import useLocalStorage from '#/hooks/use-local-storage.hook';
-import { API_ROUTES } from '#/shared/defaults/api-routes';
-import { FLASHCARDS_LOCAL_STORAGE_INIT } from '#/shared/defaults/flashcards-local-storage-init';
-import { SETS_LOCAL_STORAGE_INIT } from '#/shared/defaults/sets-local-storage-init';
-import { DEFAULT_METADATA } from '#/shared/defaults/stats.default';
-import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import type { FlashCard } from '#/shared/models/flash-card.model';
-import omit from '#/shared/utils/omit.util';
-import { createClient } from '#/shared/utils/supabase/client';
-import uuid from '#/shared/utils/uuid.util';
-import type { ApiResponse } from '#/types/api-response.type';
-import type { DictionaryValue } from '#/types/dictionary-value.type';
-import type { Metadata } from '#/types/metadata.type';
 import {
   createContext,
   useCallback,
@@ -24,7 +7,24 @@ import {
   useState,
   type PropsWithChildren,
 } from 'react';
+import { FLASHCARDS_LOCAL_STORAGE_INIT } from '#/shared/defaults/flashcards-local-storage-init';
+import { SETS_LOCAL_STORAGE_INIT } from '#/shared/defaults/sets-local-storage-init';
+import type { ApiFlashcardsSyncResponse } from '#/app/api/flashcard/sync/route';
+import type { ApiMetadataSyncResponse } from '#/app/api/metadata/sync/route';
+import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
+import type { DictionaryValue } from '#/types/dictionary-value.type';
+import type { ApiSetsSyncResponse } from '#/app/api/set/sync/route';
+import { DEFAULT_METADATA } from '#/shared/defaults/stats.default';
+import type { FlashCard } from '#/shared/models/flash-card.model';
 import { useSessionContext } from './session-provider.component';
+import { createClient } from '#/shared/utils/supabase/client';
+import useLocalStorage from '#/hooks/use-local-storage.hook';
+import type { ApiResponse } from '#/types/api-response.type';
+import { API_ROUTES } from '#/shared/defaults/api-routes';
+import type { Metadata } from '#/types/metadata.type';
+import useFetch from '#/hooks/use-fetch.hook';
+import omit from '#/shared/utils/omit.util';
+import uuid from '#/shared/utils/uuid.util';
 
 export type AppContextType = {
   flashcards: FlashCard[];
@@ -142,8 +142,8 @@ export default function AppProvider(props: PropsWithChildren) {
         questionAddition: flashCard.questionAddition ?? '',
         answer: flashCard.answer ?? '',
         order: flashcardSize + (index + 1),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         weight: 1.0,
       };
     });
@@ -258,8 +258,8 @@ export default function AppProvider(props: PropsWithChildren) {
         questionAddition: flashCard.questionAddition ?? '',
         question: flashCard.question ?? '',
         answer: flashCard.answer ?? '',
-        createdAt: flashCard.createdAt ?? new Date(),
-        updatedAt: new Date(),
+        createdAt: flashCard.createdAt ?? new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       }),
     );
 
@@ -295,8 +295,8 @@ export default function AppProvider(props: PropsWithChildren) {
       questionAddition: flashcard.questionAddition ?? '',
       question: flashcard.question ?? '',
       answer: flashcard.answer ?? '',
-      createdAt: flashcard.createdAt ?? new Date(),
-      updatedAt: new Date(),
+      createdAt: flashcard.createdAt ?? new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     const updatedFlashcards = flashCardsArray.map((item) => {
@@ -350,8 +350,8 @@ export default function AppProvider(props: PropsWithChildren) {
       isFavourite: set.isFavourite ?? false,
       category: set.category ?? '',
       hardlink: set.name?.replace(/ /g, '-').toLowerCase() ?? '',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     }));
 
     const setsOutput = [...setsArray, ...mappedSets];
@@ -455,8 +455,8 @@ export default function AppProvider(props: PropsWithChildren) {
       isFavourite: set.isFavourite ?? false,
       category: set.category ?? '',
       hardlink: set.name?.replace(/ /g, '-').toLowerCase() ?? '',
-      createdAt: set.createdAt ?? new Date(),
-      updatedAt: new Date(),
+      createdAt: set.createdAt ?? new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     }));
 
     const updatedSets = setsArray.map((set) => {
@@ -477,7 +477,7 @@ export default function AppProvider(props: PropsWithChildren) {
     );
   };
 
-  const updateSet = (set: Partial<FlashCardSet>) => {
+  const updateSet = async (set: Partial<FlashCardSet>) => {
     const setsObject: Record<string, FlashCardSet> = {};
     const updatedSet = {
       frontUuid: set.frontUuid ?? uuid(),
@@ -487,8 +487,8 @@ export default function AppProvider(props: PropsWithChildren) {
       isFavourite: set.isFavourite ?? false,
       category: set.category ?? '',
       hardlink: set.name?.replace(/ /g, '-').toLowerCase() ?? '',
-      createdAt: set.createdAt ?? new Date(),
-      updatedAt: new Date(),
+      createdAt: set.createdAt ?? new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
 
     const updatedSets = setsArray.map((item) => {

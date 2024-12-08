@@ -48,8 +48,8 @@ export const NewFlashCardModal = ({
           question: 'What is the definition of word below?',
           questionAddition: '',
           answer: '',
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         },
       ]);
     } else {
@@ -66,8 +66,8 @@ export const NewFlashCardModal = ({
           question: 'What is the definition of word below?',
           questionAddition: '',
           answer: '',
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         },
       ]);
     } else {
@@ -124,8 +124,8 @@ export const NewFlashCardModal = ({
           question: 'What is the definition of word below?',
           questionAddition: '',
           answer: '',
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         };
 
         setFlashCards((prev) => [
