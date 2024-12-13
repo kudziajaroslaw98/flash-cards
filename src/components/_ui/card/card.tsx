@@ -1,3 +1,4 @@
+'use client';
 import { DetailedHTMLProps, HTMLAttributes, PropsWithChildren } from 'react';
 import { m, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { cn } from '#/shared/utils/cn.util';
@@ -47,7 +48,7 @@ export default function Card({
         style={{
           background: useMotionTemplate`radial-gradient(${
             backgroundGradientWidth ?? 300
-          }px circle at ${mouseX}px ${mouseY}px, rgb(226 226 226 / .2), transparent 60%)`,
+          }px circle at ${mouseX}px ${mouseY}px, rgb(226 226 226 / .3), transparent 60%)`,
         }}
       />
 
@@ -56,7 +57,7 @@ export default function Card({
         style={{
           background: useMotionTemplate`radial-gradient(${
             backgroundGradientWidth ?? 300
-          }px circle at ${mouseX}px ${mouseY}px, rgb(10 15 27 / .2), transparent 60%)`,
+          }px circle at ${mouseX}px ${mouseY}px, rgb(10 15 27 / .6), transparent 60%)`,
         }}
       />
       {children}

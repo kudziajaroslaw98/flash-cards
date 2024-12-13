@@ -5,6 +5,7 @@ type SwitchProps =
   | {
       showLabel: false;
       value: boolean;
+      variant?: 'vertical' | 'vertical-reversed';
       onClick: () => void;
     }
   | {
@@ -12,12 +13,22 @@ type SwitchProps =
       value: boolean;
       checkedLabel: string;
       uncheckedLabel: string;
+      variant: 'vertical' | 'vertical-reversed';
       onClick: () => void;
     };
 
-export default function Switch(props: PropsWithChildren<SwitchProps>) {
+export default function Switch({
+  variant = 'vertical',
+  ...props
+}: PropsWithChildren<SwitchProps>) {
   return (
-    <label className='relative inline-flex cursor-pointer items-center'>
+    <label
+      className={cn([
+        'relative cursor-pointer items-center',
+        variant === 'vertical' && 'inline-flex',
+        variant === 'vertical-reversed' && 'inline-flex flex-row-reverse',
+      ])}
+    >
       <input
         onChange={() => {
           props.onClick();
@@ -43,7 +54,13 @@ export default function Switch(props: PropsWithChildren<SwitchProps>) {
       </div>
 
       {props.showLabel && (
-        <span className='ms-3 text-sm text-green-500 dark:text-slate-200'>
+        <span
+          className={cn([
+            'text-sm text-green-500 dark:text-slate-200',
+            variant === 'vertical' && 'ml-3',
+            variant === 'vertical-reversed' && 'mr-3',
+          ])}
+        >
           {props.value ? props.checkedLabel : props.uncheckedLabel}
         </span>
       )}

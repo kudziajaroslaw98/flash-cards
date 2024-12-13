@@ -5,7 +5,11 @@ export const APP_ROUTES = {
     revise: '/flashcards/revise',
     sets: '/flashcards/sets',
   },
+  account: {
+    profile: '/account/profile',
+    settings: '/account/settings',
+  },
+  pricing: '/pricing',
   signIn: '/sign-in',
   signUp: '/sign-up',
-  settings: '/settings',
 } as const;

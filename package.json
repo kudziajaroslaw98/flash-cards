@@ -20,6 +20,7 @@
     "@dicebear/collection": "^9.2.2",
     "@dicebear/core": "^9.2.2",
     "@heroicons/react": "^2.2.0",
+    "@stripe/stripe-js": "^5.2.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.46.1",
     "ai": "^4.0.0",
@@ -29,6 +30,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sharp": "^0.33.5",
+    "stripe": "^17.4.0",
     "uuid": "^11.0.3",
     "zod": "^3.23.8"
   },
