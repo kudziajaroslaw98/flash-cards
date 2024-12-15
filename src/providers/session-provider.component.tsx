@@ -12,8 +12,8 @@ import type { User, UserAttributes } from '@supabase/supabase-js';
 import { createClient } from '#/shared/utils/supabase/client';
 import type { ApiResponse } from '#/types//api-response.type';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
-import { usePathname, useRouter } from 'next/navigation';
 import useFetch from '#/hooks/use-fetch.hook';
+import { usePathname } from 'next/navigation';
 
 export type SessionContextType = {
   isLoggedIn: boolean;
@@ -38,7 +38,6 @@ export const SessionContext = createContext<SessionContextType>({
 export default function SessionProvider(props: Readonly<PropsWithChildren>) {
   const supabase = createClient();
   const pathname = usePathname();
-  const router = useRouter();
   const { fetch } = useFetch();
   const [user, setUser] = useState<User | null>(null);
   const pickedPlan = user?.user_metadata?.stripe_subscribed_plan ?? null;
@@ -49,7 +48,6 @@ export default function SessionProvider(props: Readonly<PropsWithChildren>) {
     await supabase.auth.signOut();
     setUser(null);
     localStorage.clear();
-    router.refresh();
   };
 
   const checkSession = useCallback(async () => {
@@ -63,9 +61,8 @@ export default function SessionProvider(props: Readonly<PropsWithChildren>) {
   const updateUser = async (user: UserAttributes) => {
     const { data, error } = await supabase.auth.updateUser(user);
 
-    if (error === null) {
+    if (user !== null && error === null) {
       setUser(data.user);
-      checkSession();
     }
   };
 
@@ -77,7 +74,6 @@ export default function SessionProvider(props: Readonly<PropsWithChildren>) {
     if (response.success) {
       await supabase.auth.signOut();
       setUser(null);
-      router.refresh();
     }
   };
 

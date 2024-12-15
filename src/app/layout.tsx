@@ -142,7 +142,7 @@ export default function RootLayout({
             <div className='mx-auto flex h-auto min-h-full w-full max-w-7xl gap-8 p-4 xl:gap-8'>
               <HeaderComponent />
               <SidebarComponent />
-              <main className='relative flex h-auto min-h-full w-full flex-col md:pt-24'>
+              <main className='relative flex h-auto min-h-full w-full flex-col md:pt-12'>
                 {children}
               </main>
             </div>

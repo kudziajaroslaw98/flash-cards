@@ -57,7 +57,7 @@ export default function Card({
         style={{
           background: useMotionTemplate`radial-gradient(${
             backgroundGradientWidth ?? 300
-          }px circle at ${mouseX}px ${mouseY}px, rgb(10 15 27 / .6), transparent 60%)`,
+          }px circle at ${mouseX}px ${mouseY}px, rgb(10 15 27 / .2), transparent 60%)`,
         }}
       />
       {children}

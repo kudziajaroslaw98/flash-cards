@@ -13,18 +13,6 @@ type requestBody = {
   newLastSyncAt: Date;
 };
 
-async function getUserUuid(supabase: SupabaseClient) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (user === null || user === undefined) {
-    throw new Error('User not found');
-  }
-
-  return user.id;
-}
-
 async function newUserSync(
   body: requestBody,
   supabase: SupabaseClient,
@@ -108,6 +96,7 @@ async function validateBody(body: Record<string, unknown>) {
   const validityCheck = checkValidity(body, validationScheme);
 
   if (!validityCheck.valid) {
+    console.error('[metadata/sync] Invalid body', validityCheck.error);
     throw new Error(validityCheck.error);
   }
 }
@@ -116,22 +105,21 @@ export type ApiMetadataSyncResponse = {
   metadata: Metadata;
   theme: 'light' | 'dark';
 };
-const rateLimit = new RateLimit(1, 10);
+const rateLimit = new RateLimit(1, 10, '[metadata/sync]');
 
 export async function POST(request: Request) {
   const supabase = await createClient();
-  const user = (await supabase.auth.getUser()).data.user;
-
-  if (user === null) {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: 'User not logged in',
-      }),
-    );
-  }
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
   try {
+    if (user === null || error !== null) {
+      console.error('[metadata/sync] User not logged in');
+      throw new Error('User not logged in');
+    }
+
     rateLimit.checkRateLimit(user.id);
   } catch (error) {
     return new Response(
@@ -152,8 +140,8 @@ export async function POST(request: Request) {
       theme: body.theme,
     };
 
+    const userUuid = user.id;
     const supabase = await createClient();
-    const userUuid = await getUserUuid(supabase);
 
     const metadata = await supabase
       .from('metadata')
@@ -169,10 +157,30 @@ export async function POST(request: Request) {
       : null;
     const bodyDate = new Date(new Date(body.newLastSyncAt).setSeconds(0, 0));
 
+    console.log(
+      '[metadata/sync] User [',
+      userUuid,
+      '] Syncing data from [',
+      metadataDate ? new Date(metadataDate).toISOString() : null,
+      '] to [',
+      bodyDate ? new Date(bodyDate).toISOString() : null,
+      ']',
+    );
+
     if (metadata.data === null || metadataDate === null) {
+      console.log(
+        '[metadata/sync] user (',
+        userUuid,
+        ') has no metadata, creating new metadata',
+      );
       await newUserSync(body, supabase, userUuid, bodyDate);
     } else {
       if (bodyDateAsNumber === null || bodyDateAsNumber < metadataDate) {
+        console.log(
+          '[metadata/sync] user (',
+          userUuid,
+          ') has outdated metadata, fetching new data',
+        );
         const { metadata } = await fetchDataFromDb(
           supabase,
           userUuid,
@@ -185,12 +193,18 @@ export async function POST(request: Request) {
         };
         responseBody.theme = metadata.theme!;
       } else if (bodyDateAsNumber >= metadataDate) {
+        console.log(
+          '[metadata/sync] user (',
+          userUuid,
+          ') has up-to-date metadata, updating metadata',
+        );
         await upsertDataInDb(body, supabase, userUuid, bodyDate);
       }
     }
 
     return Response.json({ success: true, data: responseBody });
   } catch (error) {
+    console.error('[metadata/sync] Error syncing metadata', error);
     return Response.json({
       success: false,
       error:

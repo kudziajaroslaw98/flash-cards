@@ -1,18 +1,20 @@
-'use client';
+import Checkout from '#/components/checkout/checkout';
 
-import { useSearchParams } from 'next/navigation';
+export default async function CheckoutPage(props: {
+  params: Record<string, string>;
+  searchParams: Promise<{
+    success?: string;
+    cancel?: string;
+  }>;
+}) {
+  const params = await props.searchParams;
 
-export default function CheckoutPage() {
-  const searchParams = useSearchParams();
-  // const { fetch } = useFetch();
-
-  // useEffect(() => {
-  //   if (searchParams.get('success') && !searchParams.get('cancel')) {
-  //     fetch(`${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/api/checkout`, {
-  //       method: 'GET',
-  //     });
-  //   }
-  // }, []);
-
-  return <>{searchParams.get('success') || searchParams.get('cancel')}</>;
+  return (
+    <article className='flex h-full w-full flex-col'>
+      <Checkout
+        success={params['success'] ?? null}
+        cancel={params['cancel'] ?? null}
+      />
+    </article>
+  );
 }

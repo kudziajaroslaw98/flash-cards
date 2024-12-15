@@ -18,6 +18,7 @@ export const newSetFormScheme = (
   loadingGenerate: boolean,
   isLoggedIn: boolean,
   onAddNew: (value: string) => void,
+  isPlanActive: boolean,
 ): FormScheme<Pick<FlashCardSet, 'name' | 'description' | 'category'>> => ({
   inputs: {
     name: {
@@ -33,7 +34,7 @@ export const newSetFormScheme = (
       placeholder: 'Set description',
       handleGenerate: handleGenerate,
       loadingGenerate: loadingGenerate,
-      blockGenerate: !isLoggedIn,
+      blockGenerate: !isLoggedIn || !isPlanActive,
     },
     category: {
       type: 'dropdown',

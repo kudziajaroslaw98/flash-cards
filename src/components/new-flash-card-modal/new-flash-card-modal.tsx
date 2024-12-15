@@ -34,7 +34,7 @@ export const NewFlashCardModal = ({
     useState<Omit<FlashCard, 'weight' | 'order'>[]>(selectedFlashCards);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loadingGenerate, setLoadingGenerate] = useState(false);
-  const { isLoggedIn } = useSessionContext();
+  const { isLoggedIn, isPlanActive } = useSessionContext();
   const submitRef = useRef<HTMLButtonElement>(null);
   const { completion, complete } = useCompletion({
     api: API_ROUTES.ANSWER_GENERATE,
@@ -159,7 +159,8 @@ export const NewFlashCardModal = ({
     if (
       formValue.questionAddition !== undefined &&
       formValue.questionAddition !== '' &&
-      isLoggedIn
+      isLoggedIn &&
+      isPlanActive
     ) {
       setLoadingGenerate(true);
       await complete(
@@ -167,11 +168,17 @@ export const NewFlashCardModal = ({
       );
       setLoadingGenerate(false);
     }
-  }, [formValue, complete, isLoggedIn]);
+  }, [formValue, complete, isLoggedIn, isPlanActive]);
 
   const getFormScheme = useMemo(
-    () => newFlashCardScheme(handleGenerate, loadingGenerate, isLoggedIn),
-    [handleGenerate, loadingGenerate, isLoggedIn],
+    () =>
+      newFlashCardScheme(
+        handleGenerate,
+        loadingGenerate,
+        isLoggedIn,
+        isPlanActive,
+      ),
+    [handleGenerate, loadingGenerate, isLoggedIn, isPlanActive],
   );
 
   return (

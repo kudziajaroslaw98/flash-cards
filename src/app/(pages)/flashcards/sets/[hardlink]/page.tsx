@@ -43,7 +43,7 @@ export default function SetHardlinkPage() {
   const setHardLink = useParams()?.hardlink as string;
   const router = useRouter();
   const { fetch, isLoading } = useFetch();
-  const { isLoggedIn } = useSessionContext();
+  const { isLoggedIn, isPlanActive } = useSessionContext();
   const {
     flashcards,
     addFlashCards,
@@ -125,7 +125,7 @@ export default function SetHardlinkPage() {
 
   const handleGenerateFlashCards = async () => {
     window.umami.track('Generate flash cards');
-    if (!isLoggedIn) return;
+    if (!isLoggedIn || !isPlanActive) return;
 
     const response:
       | ApiResponse<unknown>
@@ -336,7 +336,7 @@ export default function SetHardlinkPage() {
           />
 
           <Button
-            disabled={!isLoggedIn}
+            disabled={!isLoggedIn || !isPlanActive}
             icon={<SparklesIcon className='size-4' />}
             size={'icon-square'}
             variant={'secondary-outline'}

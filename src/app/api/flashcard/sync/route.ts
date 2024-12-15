@@ -12,18 +12,6 @@ type requestBody = {
   lastSyncAt: Date;
 };
 
-async function getUserUuid(supabase: SupabaseClient) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (user === null || user === undefined) {
-    throw new Error('User not found');
-  }
-
-  return user.id;
-}
-
 async function newUserSync(
   body: requestBody,
   supabase: SupabaseClient,
@@ -119,6 +107,7 @@ async function validateBody(body: Record<string, unknown>) {
   const validityCheck = checkValidity(body, validationScheme);
 
   if (!validityCheck.valid) {
+    console.error('[flashcard/sync] Invalid body', validityCheck.error);
     throw new Error(validityCheck.error);
   }
 }
@@ -126,22 +115,21 @@ async function validateBody(body: Record<string, unknown>) {
 export type ApiFlashcardsSyncResponse = {
   flashcards: FlashCard[];
 };
-const rateLimit = new RateLimit(1, 10);
+const rateLimit = new RateLimit(1, 10, '[flashcard/sync]');
 
 export async function POST(request: Request) {
   const supabase = await createClient();
-  const user = (await supabase.auth.getUser()).data.user;
-
-  if (user === null) {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: 'User not logged in',
-      }),
-    );
-  }
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
   try {
+    if (user === null || error !== null) {
+      console.error('[flashcard/sync] User not logged in');
+      throw new Error('User not logged in');
+    }
+
     rateLimit.checkRateLimit(user.id);
   } catch (error) {
     return new Response(
@@ -161,8 +149,8 @@ export async function POST(request: Request) {
       flashcards: body.flashcards,
     };
 
+    const userUuid = user.id;
     const supabase = await createClient();
-    const userUuid = await getUserUuid(supabase);
     const metadata = await supabase
       .from('metadata')
       .select()
@@ -176,19 +164,45 @@ export async function POST(request: Request) {
       ? new Date(metadata.data.lastSyncAt).setSeconds(0, 0)
       : null;
 
+    console.log(
+      '[flashcard/sync] User [',
+      userUuid,
+      '] Syncing data from [',
+      metadataDate ? new Date(metadataDate).toISOString() : null,
+      '] to [',
+      bodyDate ? new Date(bodyDate).toISOString() : null,
+      ']',
+    );
+
     if (metadata.data === null || metadataDate === null) {
+      console.log(
+        '[flashcard/sync] user (',
+        userUuid,
+        ') has no metadata, creating new flashcards',
+      );
       await newUserSync(body, supabase, userUuid);
     } else {
       if (bodyDate === null || bodyDate < metadataDate) {
+        console.log(
+          '[flashcard/sync] user (',
+          userUuid,
+          ') has outdated metadata, fetching new flashcards',
+        );
         const { flashcards } = await fetchDataFromDb(supabase, userUuid);
         responseBody.flashcards = flashcards;
       } else if (bodyDate >= metadataDate) {
+        console.log(
+          '[flashcard/sync] user (',
+          userUuid,
+          ') has up-to-date metadata, updating flashcards',
+        );
         await upsertDataInDb(body, supabase, userUuid);
       }
     }
 
     return Response.json({ success: true, data: responseBody });
   } catch (error) {
+    console.error('[flashcard/sync] Error syncing data', error);
     return Response.json({
       success: false,
       error:

@@ -15,6 +15,7 @@ export const newFlashCardScheme = (
   handleGenerate: () => void,
   loadingGenerate: boolean,
   isLoggedIn: boolean,
+  isPlanActive: boolean,
 ): FormScheme<Pick<FlashCard, 'question' | 'questionAddition' | 'answer'>> => ({
   inputs: {
     question: {
@@ -36,7 +37,7 @@ export const newFlashCardScheme = (
       placeholder: 'Military valor and skill.',
       handleGenerate: handleGenerate,
       loadingGenerate,
-      blockGenerate: !isLoggedIn,
+      blockGenerate: !isLoggedIn || !isPlanActive,
     },
   },
   validation: newFlashCardValidationScheme,

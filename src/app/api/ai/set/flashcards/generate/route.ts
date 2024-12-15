@@ -25,22 +25,25 @@ async function validateBody(body: Record<string, unknown>) {
   }
 }
 
-const rateLimit = new RateLimit(1, 10);
+const rateLimit = new RateLimit(1, 10, '[ai/set/flashcards/generate]');
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const user = (await supabase.auth.getUser()).data.user;
 
-  if (user === null) {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: 'User not logged in',
-      }),
-    );
-  }
-
   try {
+    if (user === null) {
+      console.error('[ai/set/flashcards/generate] User not logged in');
+      throw new Error('User not logged in');
+    }
+
+    if (user.user_metadata?.stripe_subscription_status !== 'active') {
+      console.error(
+        '[ai/set/flashcards/generate] User is not subscribed to a paid plan',
+      );
+      throw new Error('User is not subscribed to a paid plan');
+    }
+
     rateLimit.checkRateLimit(user.id);
   } catch (error) {
     return new Response(
@@ -51,11 +54,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  console.log(
+    '[ai/set/flashcards/generate] User [',
+    user.id,
+    '] is generating flashcards',
+  );
+
   const { flashCards: flashcards, setName } = await req.json();
 
   try {
     validateBody({ flashcards, setName });
   } catch {
+    console.error(
+      '[ai/set/flashcards/generate] Invalid request body from user [',
+      user.id,
+      ']',
+    );
+
     return new Response(
       JSON.stringify({
         success: false,
