@@ -679,14 +679,16 @@ export default function AppProvider(props: PropsWithChildren) {
     responses.forEach((response) => {
       if (response.status === 'fulfilled') {
         if (response.value.success) {
-          const value = response.value.data;
+          const value = response.value?.data;
 
           if ('flashcards' in value) {
             setFlashCardsArray(value.flashcards);
             const flashCardsObject: Record<string, FlashCard> = {};
+
             value.flashcards.forEach((item: FlashCard) => {
               flashCardsObject[item.frontUuid] = item;
             });
+
             localStorage.setItem(
               'flashcards',
               JSON.stringify(flashCardsObject),
@@ -694,13 +696,16 @@ export default function AppProvider(props: PropsWithChildren) {
           } else if ('sets' in value) {
             setSetsArray(value.sets);
             const setsObject: Record<string, FlashCardSet> = {};
+
             value.sets.forEach((item: FlashCardSet) => {
               setsObject[item.frontUuid] = item;
             });
+
             localStorage.setItem('sets', JSON.stringify(setsObject));
-          } else {
+          } else if ('metadata' in value) {
             setMetadata(value.metadata);
             setTheme(value.theme);
+
             localStorage.setItem('metadata', JSON.stringify(value.metadata));
             localStorage.setItem('theme', JSON.stringify(value.theme));
           }

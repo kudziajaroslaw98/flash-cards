@@ -99,13 +99,10 @@ const createOrRetrieveCheckoutSession = async (
   );
 
   const checkoutSession = await stripe.checkout.sessions.create({
-    automatic_tax: {
-      enabled: true,
-    },
     customer: customerId,
     line_items: [
       {
-        price: 'price_1QUDAGDKMh5G3jeEEXb0W0tg',
+        price: 'price_1QTmyMDKMh5G3jeEjRhDFjXH',
         quantity: 1,
       },
     ],
