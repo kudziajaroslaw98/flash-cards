@@ -2,13 +2,8 @@ import { Inter, Roboto_Mono } from 'next/font/google';
 import type { Metadata } from 'next';
 
 import ClientSideProviders from '#/providers/client-side-providers.component';
-import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import './globals.css';
-
-const ToastsComponent = dynamic(() => import('#/components/toasts/toasts'), {
-  ssr: false,
-});
 
 const inter = Inter({
   subsets: ['latin'],

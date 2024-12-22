@@ -178,7 +178,7 @@ export default async function Home() {
           <div className='z-10 flex flex-col items-center justify-center gap-4'>
             <h4 className='text-green-500'>We felt like that too.</h4>
             <span className='text-gray-800 dark:text-slate-400'>
-              That's why we created this app. The place where...
+              That&apos;s why we created this app. The place where...
             </span>
           </div>
           <div>
