@@ -1,13 +1,13 @@
 {
+  "plugins": [
+    "prettier-plugin-sort-imports",
+    "prettier-plugin-organize-attributes",
+    "prettier-plugin-organize-imports",
+    "prettier-plugin-tailwindcss"
+  ],
   "singleQuote": true,
   "jsxSingleQuote": true,
   "singleAttributePerLine": true,
   "bracketSpacing": true,
-  "tailwindConfig": "./tailwind.config.ts",
-  "plugins": [
-    "prettier-plugin-sort-imports",
-    "prettier-plugin-organize-imports",
-    "prettier-plugin-organize-attributes",
-    "prettier-plugin-tailwindcss"
-  ]
+  "tailwindConfig": "./tailwind.config.ts"
 }

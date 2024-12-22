@@ -1,9 +1,10 @@
 'use client';
 import { Button } from '../_ui/button/button';
 import { cn } from '#/shared/utils/cn.util';
+import { useEffect, useState } from 'react';
+import { useReward } from 'react-rewards';
 import * as m from 'framer-motion/m';
 import Card from '../_ui/card/card';
-import { useState } from 'react';
 import Link from 'next/link';
 function Checkout({
   success,
@@ -13,6 +14,7 @@ function Checkout({
   cancel?: string | null;
 }) {
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const { reward } = useReward('confettiReward', 'confetti');
   const animatedCheckIcon = () => {
     return (
       <m.svg
@@ -77,6 +79,12 @@ function Checkout({
       </m.svg>
     );
   };
+
+  useEffect(() => {
+    if (success) {
+      reward();
+    }
+  }, [reward, success]);
 
   return (
     <m.div
@@ -150,6 +158,8 @@ function Checkout({
             />
           </Link>
         </div>
+
+        {success && <span id='confettiReward' />}
       </Card>
     </m.div>
   );

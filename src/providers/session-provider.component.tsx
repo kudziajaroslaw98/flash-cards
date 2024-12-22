@@ -48,6 +48,7 @@ export default function SessionProvider(props: Readonly<PropsWithChildren>) {
     await supabase.auth.signOut();
     setUser(null);
     localStorage.clear();
+    window.location.reload();
   };
 
   const checkSession = useCallback(async () => {

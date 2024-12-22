@@ -102,7 +102,10 @@ const createOrRetrieveCheckoutSession = async (
     customer: customerId,
     line_items: [
       {
-        price: 'price_1QTmyMDKMh5G3jeEjRhDFjXH',
+        // prod price,
+        // price: 'price_1QTmyMDKMh5G3jeEjRhDFjXH',
+        // test price
+        price: 'price_1QUDAGDKMh5G3jeEEXb0W0tg',
         quantity: 1,
       },
     ],

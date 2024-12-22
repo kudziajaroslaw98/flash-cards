@@ -137,7 +137,7 @@ export default function SidebarComponent() {
       </div>
 
       <div
-        className={`flex h-full w-full flex-col justify-center gap-8 overflow-y-scroll p-4`}
+        className={`flex h-full w-full flex-col justify-center gap-8 overflow-y-auto p-4`}
       >
         <div
           className={`hidden h-full flex-col gap-8 md:flex  ${!expanded && 'items-center'}`}
