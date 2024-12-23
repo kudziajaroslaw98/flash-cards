@@ -94,9 +94,9 @@ export default function SignInComponent() {
         ></Button>
 
         <div className='flex w-full items-center justify-center gap-4 py-4'>
-          <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-900' />
-          <span className='text-sm text-gray-300 dark:text-slate-800'>OR</span>
-          <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-900' />
+          <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800' />
+          <span className='text-sm text-gray-300 dark:text-slate-700'>OR</span>
+          <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800' />
         </div>
 
         <Link href={'/flashcards/learn'}>
