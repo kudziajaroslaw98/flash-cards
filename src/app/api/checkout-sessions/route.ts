@@ -4,6 +4,8 @@ import { stripe } from '#/shared/utils/stripe/config';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
+export const dynamic = 'force-dynamic' // defaults to auto
+
 const validationScheme = z.union([
   z.string().max(4).toLowerCase().includes('free'),
   z.string().max(8).toLowerCase().includes('standard'),
