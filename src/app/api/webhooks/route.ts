@@ -2,6 +2,8 @@ import supabaseAdmin from '#/shared/utils/supabase/admin';
 import { stripe } from '#/shared/utils/stripe/config';
 import type Stripe from 'stripe';
 
+export const dynamic = 'force-dynamic' // defaults to auto
+
 const relevantEvents = new Set([
   'customer.subscription.created',
   'customer.subscription.updated',
