@@ -211,7 +211,7 @@ export default function FlashCardReviseComponent() {
                 {index + 1}
               </span>
 
-              <span className='flex w-[280px] text-sm text-gray-800 dark:text-slate-400'>
+              <span className='flex w-[280px] text-sm text-gray-600 dark:text-slate-400'>
                 {flashCard.answer}
               </span>
             </div>
