@@ -127,6 +127,7 @@ h6 {
 
   background-image: url('/images/flashcards-screenshot.png');
   background-size: cover;
+  background-position: center;
   width: calc(100% - 4px);
   height: calc(100% - 4px);
   top: 2px;

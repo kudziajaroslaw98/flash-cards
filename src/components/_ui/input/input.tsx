@@ -78,7 +78,7 @@ function Input({
 
       <span
         className={cn([
-          'flex h-10 w-full items-center gap-4 rounded-md border border-gray-200 bg-gray-100 p-2 px-4 transition-shadow has-[:focus]:ring has-[:focus]:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-900',
+          'flex h-10 w-full items-center gap-4 rounded-md border border-gray-300  p-2 px-4 transition-shadow has-[:focus]:ring has-[:focus]:ring-green-400/50 dark:border-slate-800',
           touched && !valid ? '!border-red-400' : '',
           touched && valid ? '!border-green-400' : '',
         ])}
@@ -95,8 +95,8 @@ function Input({
             label
               ? 'placeholder:text-gray-400 dark:placeholder:text-slate-700'
               : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
-            'peer w-full bg-gray-100 text-sm text-gray-800',
-            'text-inherit outline-none transition-all dark:bg-slate-900 dark:text-slate-200',
+            'peer w-full text-sm text-gray-800',
+            'bg-transparent text-inherit outline-none transition-all dark:text-slate-200',
           ])}
           onFocus={handleFocus}
           onBlur={handleBlur}

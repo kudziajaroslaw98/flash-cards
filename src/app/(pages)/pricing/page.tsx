@@ -3,9 +3,9 @@
 import { useSessionContext } from '#/providers/session-provider.component';
 import { Button } from '#/components/_ui/button/button';
 import LinkComponent from '#/components/_ui/link/link';
+import { DollarSign, MailIcon } from 'lucide-react';
 import Badge from '#/components/_ui/badge/badge';
 import Card from '#/components/_ui/card/card';
-import { MailIcon } from 'lucide-react';
 
 export default function PricingPage() {
   const { isLoggedIn, pickedPlan, isPlanActive } = useSessionContext();
@@ -14,7 +14,10 @@ export default function PricingPage() {
     <div className='flex h-full w-full flex-col items-center justify-center'>
       <div className='flex h-full w-full flex-col items-center justify-center gap-4'>
         <section className='flex flex-wrap justify-center gap-4'>
-          <Card className='w-72'>
+          <Card
+            className='w-72'
+            motion={false}
+          >
             <div className='flex flex-col gap-4'>
               <div className='flex flex-col gap-2'>
                 <h5 className='flex items-center justify-between text-2xl font-bold'>
@@ -32,8 +35,9 @@ export default function PricingPage() {
               </div>
 
               <span className='flex flex-col items-center justify-center py-6'>
-                <span className='text-7xl font-semibold text-green-500'>
-                  $0
+                <span className='flex -translate-x-4 items-center text-7xl font-semibold '>
+                  <DollarSign className='size-8 -translate-y-3 text-green-500' />
+                  <span>0</span>
                 </span>
 
                 <span className='pt-2 text-gray-500 dark:text-slate-500'>
@@ -82,8 +86,12 @@ export default function PricingPage() {
           <form
             action={`/api/checkout-sessions/?plan=standard`}
             method='POST'
+            className='relative'
           >
-            <Card className='w-72'>
+            <Card
+              className='z-20 w-72'
+              motion={false}
+            >
               <div className='flex flex-col gap-4'>
                 <div className='flex flex-col gap-2'>
                   <h5 className='flex items-center justify-between text-2xl font-bold'>
@@ -97,13 +105,14 @@ export default function PricingPage() {
                       )}
                   </h5>
                   <p className='text-sm text-gray-500 dark:text-slate-500'>
-                    Not creative today? We got you
+                    Not creative today? I got you
                   </p>
                 </div>
 
                 <span className='flex flex-col items-center justify-center py-6'>
-                  <span className='text-7xl font-semibold text-green-500'>
-                    $2.5
+                  <span className='flex -translate-x-4 items-center text-7xl font-semibold'>
+                    <DollarSign className='size-8 -translate-y-3 text-green-500' />
+                    <span>2.5</span>
                   </span>
 
                   <span className='pt-2 text-gray-500 dark:text-slate-500'>
@@ -153,6 +162,7 @@ export default function PricingPage() {
                 </div>
               </div>
             </Card>
+            <div className='radial-gradient absolute -left-[2px] -top-[2px] z-10 flex h-[calc(100%+4px)] w-[calc(100%+4px)] rounded-md opacity-30 content-[""]'></div>
           </form>
         </section>
 

@@ -1,18 +1,16 @@
 import {
   Activity,
   AppWindow,
-  ChartLine,
   CircleSlash,
   DollarSign,
   Dot,
-  Github,
   GithubIcon,
-  Instagram,
   LayoutGrid,
   MailIcon,
   Meh,
   MessageCircleOff,
   MessageCircleReply,
+  Scroll,
   Shapes,
   Smile,
   Sparkles,
@@ -21,8 +19,10 @@ import {
 import { Button } from '#/components/_ui/button/button';
 import Card from '#/components/_ui/card/card';
 
+import { ScrollReveal } from '#/components/_ui/scroll-reveal/scroll-reveal';
 import Timeline from '#/components/_ui/timeline/timeline';
 import Badge from '#/components/_ui/badge/badge';
+import { stagger } from 'framer-motion';
 import * as m from 'framer-motion/m';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -86,7 +86,7 @@ export default async function Home() {
 
   const listItem = (text: string) => (
     <li className='flex gap-2'>
-      <Dot className='flex size-8 text-green-500' />
+      <Dot className='flex size-6 min-w-6 text-green-500' />
       <span className='max-w-72 hyphens-auto'>{text}</span>
     </li>
   );
@@ -122,6 +122,9 @@ export default async function Home() {
       body: (
         <ul className='flex flex-col gap-2'>
           {listItem('More advanced spaced repetition algorithm')}
+          {listItem(
+            'Chrome extension to add flashcards from the text you read on the web',
+          )}
           <li>More coming soon..</li>
         </ul>
       ),
@@ -161,12 +164,31 @@ export default async function Home() {
     new URL(`${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/pricing`).href,
   );
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 50, viewport: { once: true } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      viewport: { once: true },
+      transition: {
+        duration: 0.5,
+        ease: 'easeOut',
+        staggerChildren: 0.4,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 50, viewport: { once: true } },
+    visible: { opacity: 1, y: 0, viewport: { once: true } },
+  };
+
   return (
-    <div className='dark flex h-auto min-h-full w-full flex-col  bg-gray-50  dark:bg-slate-950'>
+    <div className='dark flex h-auto min-h-full w-full flex-col  bg-gray-50  px-4 dark:bg-slate-950'>
       {/* Hero section */}
       <div className='relative mx-auto flex h-auto min-h-full w-full max-w-7xl flex-col items-center justify-center gap-8 p-4 pt-20 md:pt-0 xl:gap-8'>
         <div className='absolute bottom-0 left-0 right-0 top-0 h-[800px] bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_20%,#000_70%,transparent_110%)]'></div>
-        <div className='relative flex h-[1000px] w-full max-w-2xl flex-col items-center justify-center gap-4'>
+        <div className='relative flex w-full max-w-2xl flex-col items-center justify-center gap-4 py-32 md:py-64'>
           <Image
             src='/images/flash-cards-logo.svg'
             alt='Flash Cards Logo'
@@ -197,152 +219,187 @@ export default async function Home() {
             iconPosition='right'
           />
 
-          <div className='hero-section-img mt-16 flex h-96 w-full items-center justify-center rounded-md'></div>
+          <ScrollReveal className='hero-section-img mt-16 flex h-96 w-full items-center justify-center rounded-md'></ScrollReveal>
         </div>
 
         <section className='container flex flex-col items-center justify-center gap-8 py-12'>
-          <h4 className='text-gray-800 dark:text-slate-200'>
-            Did you ever felt like that?
-          </h4>
+          <ScrollReveal>
+            <h4 className='text-gray-800 dark:text-slate-200'>
+              Did you ever felt like that?
+            </h4>
+          </ScrollReveal>
+
           <div>
-            <ul className='grid w-full grid-cols-1 justify-center gap-4 sm:grid-cols-2'>
+            <m.ul
+              variants={containerVariants}
+              initial='hidden'
+              whileInView='visible'
+              viewport={{ once: true }}
+              className='grid w-full grid-cols-1 justify-center gap-4 sm:grid-cols-2'
+            >
               {painPoints.map(({ id, icon, body }) => (
-                <li
+                <ScrollReveal
                   key={`pain-point-${id}`}
-                  className='relative flex w-full max-w-72 flex-col gap-8 rounded-md border border-gray-200 p-4 text-sm text-gray-800 dark:border-gray-900  dark:text-slate-200'
+                  variants={itemVariants}
                 >
-                  <div className='absolute left-0 top-0 z-[2] h-full w-full  bg-[radial-gradient(#22c55e15_1px,transparent_1px)] bg-[size:20px_20px]'></div>
-                  {icon}
-                  <span>{body}</span>
-                </li>
+                  <li className='relative flex w-full max-w-72 flex-col gap-8 rounded-md border border-gray-200 p-4 text-sm text-gray-800 dark:border-gray-900  dark:text-slate-200'>
+                    <div className='absolute left-0 top-0 z-[2] h-full w-full  bg-[radial-gradient(#22c55e15_1px,transparent_1px)] bg-[size:20px_20px]'></div>
+                    {icon}
+                    <span>{body}</span>
+                  </li>
+                </ScrollReveal>
               ))}
-            </ul>
+            </m.ul>
           </div>
         </section>
 
         <section className='container relative flex flex-col items-center justify-center gap-8 py-12'>
           <div className='absolute left-0 top-0 z-[2] h-full w-full bg-[radial-gradient(at_75%_60%,#7ed321_0px,transparent_50%),radial-gradient(at_64%_21%,#417505_0px,transparent_50%),radial-gradient(at_7%_69%,#417505_0px,transparent_50%)] opacity-20 blur-3xl'></div>
-          <div className='z-10 flex flex-col items-center justify-center gap-4'>
+          <ScrollReveal className='z-10 flex flex-col items-center justify-center gap-4'>
             <h4 className='text-green-500'>We felt like that too.</h4>
-            <span className='text-gray-800 dark:text-slate-400'>
+            <span className='text-center text-gray-800 dark:text-slate-400'>
               That&apos;s why I created this app. The place where...
             </span>
-          </div>
+          </ScrollReveal>
           <div>
-            <ul className='z-10 grid w-full grid-cols-1 justify-center gap-4 sm:grid-cols-2'>
+            <m.ul
+              variants={containerVariants}
+              initial='hidden'
+              whileInView='visible'
+              viewport={{ once: true }}
+              className='z-10 grid w-full grid-cols-1 justify-center gap-4 sm:grid-cols-2'
+            >
               {valuePoints.map(({ id, icon, body }) => (
-                <li
+                <ScrollReveal
                   key={`value-point-${id}`}
-                  className='relative flex w-full max-w-72 flex-col gap-8 rounded-md border border-gray-200 p-4 text-sm text-gray-800 dark:border-gray-900 dark:text-slate-200'
+                  variants={itemVariants}
+                  className='flex h-full w-full'
                 >
-                  <div className='absolute left-0 top-0 z-[2] h-full w-full  bg-[radial-gradient(#22c55e15_1px,transparent_1px)] bg-[size:20px_20px]'></div>
-                  {icon}
-                  <span className='z-10 rounded-md bg-black/5 p-2 backdrop-blur-md'>
-                    {body}
-                  </span>
-                </li>
+                  <li
+                    key={`value-point-${id}`}
+                    className='relative flex w-full max-w-72 flex-col gap-8 rounded-md border border-gray-200 p-4 text-sm text-gray-800 dark:border-gray-900 dark:text-slate-200'
+                  >
+                    <div className='absolute left-0 top-0 z-[2] h-full w-full  bg-[radial-gradient(#22c55e15_1px,transparent_1px)] bg-[size:20px_20px]'></div>
+                    {icon}
+                    <span className='z-10 rounded-md bg-black/5 p-2 backdrop-blur-md'>
+                      {body}
+                    </span>
+                  </li>
+                </ScrollReveal>
               ))}
-            </ul>
+            </m.ul>
           </div>
         </section>
 
-        <section className='container z-[2] flex flex-col items-center justify-start rounded-md bg-slate-200/5 py-6 backdrop-blur-md'>
-          <div className='flex flex-col items-center gap-4'>
+        <section className='container z-[2] flex flex-col items-center justify-start rounded-md py-6 backdrop-blur-md'>
+          <ScrollReveal className='flex flex-col items-center gap-4'>
             <h4 className='text-gray-800 dark:text-slate-200'>
               So, what are you waiting for?
             </h4>
             <span className='text-gray-800 dark:text-slate-400'>
               Start learning now!
             </span>
-          </div>
+          </ScrollReveal>
 
-          <Button
-            variant='primary-outline'
-            label='Start Now'
-            className='group mx-auto mt-8 min-w-36 font-semibold'
-            icon={animatedPlayIcon}
-            iconPosition='right'
-          />
+          <ScrollReveal>
+            <Button
+              variant='primary-outline'
+              label='Start Now'
+              className='group mx-auto mt-8 min-w-36 font-semibold'
+              icon={animatedPlayIcon}
+              iconPosition='right'
+            />
+          </ScrollReveal>
         </section>
 
         <section className='container relative flex flex-col items-center justify-center gap-8 py-12'>
-          <div className='flex flex-col items-center justify-center gap-4'>
+          <ScrollReveal className='flex flex-col items-center justify-center gap-4'>
             <h4 className='text-green-500'>Pricing</h4>
             <span className='text-center text-gray-800 dark:text-slate-400'>
               Need more details? I got you covered. <br />
-              Here are our plans.
             </span>
-          </div>
+          </ScrollReveal>
 
-          <div className='flex flex-wrap  justify-center gap-8 md:gap-4'>
-            <Card
-              className='w-72'
-              motion={false}
+          <m.div
+            initial='hidden'
+            whileInView='visible'
+            viewport={{ once: true }}
+            variants={containerVariants}
+            className='flex flex-wrap  justify-center gap-8 md:gap-4'
+          >
+            <ScrollReveal variants={itemVariants}>
+              <Card
+                className='w-72'
+                motion={false}
+              >
+                <div className='flex flex-col gap-4'>
+                  <div className='flex flex-col gap-2'>
+                    <h5 className='flex items-center justify-between text-2xl font-bold'>
+                      <span>Free</span>
+                    </h5>
+
+                    <p className='text-sm text-gray-500 dark:text-slate-500'>
+                      Free forever, no credit card required
+                    </p>
+                  </div>
+
+                  <span className='flex flex-col items-center justify-center py-6'>
+                    <span className='flex -translate-x-4 items-center text-7xl font-semibold '>
+                      <DollarSign className='size-8 -translate-y-3 text-green-500' />
+                      <span>0</span>
+                    </span>
+
+                    <span className='pt-2 text-gray-500 dark:text-slate-500'>
+                      per month
+                    </span>
+                  </span>
+                  <Link
+                    href='/sign-in'
+                    className='contents'
+                  >
+                    <Button
+                      label={'Get started'}
+                      variant={'primary-outline'}
+                      className='font-bold'
+                    />
+                  </Link>
+
+                  <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800'></div>
+
+                  <div className='flex flex-col gap-2'>
+                    <p className='font-semibold text-gray-600 dark:text-slate-400'>
+                      Features:
+                    </p>
+                    <ul className='flex flex-col gap-2 text-sm text-gray-500 dark:text-slate-500'>
+                      <li className='flex gap-2'>
+                        <span>•</span>
+                        <span>Unlimited flashcards</span>
+                      </li>
+
+                      <li className='flex gap-2'>
+                        <span>•</span>
+                        <span>Unlimited decks</span>
+                      </li>
+
+                      <li className='flex gap-2'>
+                        <span>•</span>
+                        <span>Unlimited revise</span>
+                      </li>
+
+                      <li className='flex gap-2'>
+                        <span>•</span>
+                        <span>Cross-device sync</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </Card>
+            </ScrollReveal>
+
+            <ScrollReveal
+              variants={itemVariants}
+              className='relative'
             >
-              <div className='flex flex-col gap-4'>
-                <div className='flex flex-col gap-2'>
-                  <h5 className='flex items-center justify-between text-2xl font-bold'>
-                    <span>Free</span>
-                  </h5>
-
-                  <p className='text-sm text-gray-500 dark:text-slate-500'>
-                    Free forever, no credit card required
-                  </p>
-                </div>
-
-                <span className='flex flex-col items-center justify-center py-6'>
-                  <span className='flex -translate-x-4 items-center text-7xl font-semibold '>
-                    <DollarSign className='size-8 -translate-y-3 text-green-500' />
-                    <span>0</span>
-                  </span>
-
-                  <span className='pt-2 text-gray-500 dark:text-slate-500'>
-                    per month
-                  </span>
-                </span>
-                <Link
-                  href='/sign-in'
-                  className='contents'
-                >
-                  <Button
-                    label={'Get started'}
-                    variant={'primary-outline'}
-                    className='font-bold'
-                  />
-                </Link>
-
-                <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800'></div>
-
-                <div className='flex flex-col gap-2'>
-                  <p className='font-semibold text-gray-600 dark:text-slate-400'>
-                    Features:
-                  </p>
-                  <ul className='flex flex-col gap-2 text-sm text-gray-500 dark:text-slate-500'>
-                    <li className='flex gap-2'>
-                      <span>•</span>
-                      <span>Unlimited flashcards</span>
-                    </li>
-
-                    <li className='flex gap-2'>
-                      <span>•</span>
-                      <span>Unlimited decks</span>
-                    </li>
-
-                    <li className='flex gap-2'>
-                      <span>•</span>
-                      <span>Unlimited revise</span>
-                    </li>
-
-                    <li className='flex gap-2'>
-                      <span>•</span>
-                      <span>Cross-device sync</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </Card>
-
-            <div className='relative'>
               <Card
                 className='z-20 w-72'
                 motion={false}
@@ -413,51 +470,50 @@ export default async function Home() {
                   </div>
                 </div>
               </Card>
-              <div className='radial-gradient absolute -left-[2px] -top-[2px] z-10 flex h-[calc(100%+4px)] w-[calc(100%+4px)] rounded-md content-[""]'></div>
-            </div>
-          </div>
+              <div className='radial-gradient absolute -left-[2px] -top-[2px] z-10 flex h-[calc(100%+4px)] w-[calc(100%+4px)] rounded-md opacity-30 content-[""]'></div>
+            </ScrollReveal>
+          </m.div>
         </section>
 
         <section className='container relative flex flex-col items-center justify-center gap-8 py-12'>
           <div className='absolute left-0 top-0 z-[2] h-full w-full bg-[radial-gradient(at_20%_80%,#7ed321_0px,transparent_50%),radial-gradient(at_44%_41%,#417505_0px,transparent_50%),radial-gradient(at_90%_69%,#417505_0px,transparent_50%)] opacity-20 blur-3xl'></div>
 
-          <div className='flex flex-col items-center justify-center gap-4'>
+          <ScrollReveal className='flex flex-col items-center justify-center gap-4'>
             <h4 className='text-gray-800 dark:text-slate-200'>Road Map</h4>
             <span className='text-center text-gray-800 dark:text-slate-400'>
               You have decided to support me? Wonderful! <br /> Here is what you
               can expect to come.
             </span>
-          </div>
+          </ScrollReveal>
 
-          <h5 className='text-green-500'>2025</h5>
+          <ScrollReveal>
+            <h5 className='text-green-500'>2025</h5>
+          </ScrollReveal>
 
-          <Timeline
-            items={timelineItems}
-            title='2025'
-          />
+          <ScrollReveal>
+            <Timeline
+              items={timelineItems}
+              title='2025'
+            />
+          </ScrollReveal>
         </section>
 
-        <section className='container relative flex flex-col items-center justify-center gap-8 py-12'>
-          <div className='flex flex-col items-center justify-center gap-4'>
+        <section className='container z-[2] flex flex-col items-center justify-start gap-4 rounded-md  py-6 backdrop-blur-md'>
+          <ScrollReveal className='flex flex-col items-center justify-center gap-2'>
             <h4 className='text-gray-800 dark:text-slate-200'>Contact</h4>
             <span className='text-center text-gray-800 dark:text-slate-400'>
               More questions? Reach out to Me!
             </span>
-          </div>
+          </ScrollReveal>
 
-          <div className='flex flex-col items-center justify-center gap-4'>
-            <div className='flex flex-col gap-4'>
-              <Link
-                href={'https://x.com/@baldmanhimself'}
-                target='_blank'
-                className='flex items-center gap-8 underline decoration-green-500 underline-offset-2'
-              >
-                <XIcon className='size-6 text-green-500' />
-                <span className='text-gray-800 dark:text-slate-200'>
-                  @baldmanhimself
-                </span>
-              </Link>
-
+          <m.div
+            initial='hidden'
+            whileInView='visible'
+            viewport={{ once: true }}
+            variants={containerVariants}
+            className='flex flex-col items-center gap-4'
+          >
+            <ScrollReveal variants={itemVariants}>
               <Link
                 href={'mailto:jaroslawkudzia73@gmail.com'}
                 target='_blank'
@@ -468,8 +524,21 @@ export default async function Home() {
                   jaroslawkudzia73@gmail.com
                 </span>
               </Link>
-            </div>
-          </div>
+            </ScrollReveal>
+
+            <ScrollReveal variants={itemVariants}>
+              <Link
+                href={'https://x.com/@baldmanhimself'}
+                target='_blank'
+                className='flex items-center gap-8 underline decoration-green-500 underline-offset-2'
+              >
+                <XIcon className='size-6 text-green-500' />
+                <span className='text-gray-800 dark:text-slate-200'>
+                  @baldmanhimself
+                </span>
+              </Link>
+            </ScrollReveal>
+          </m.div>
         </section>
 
         <footer className='container relative flex flex-col items-center justify-center gap-8 pt-12'>

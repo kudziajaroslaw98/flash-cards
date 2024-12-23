@@ -13,7 +13,7 @@ type TimelineProps = {
 
 export default function Timeline(props: TimelineProps) {
   return (
-    <div className='relative grid h-auto grid-cols-[0px_50px_1fr] items-center justify-center md:grid-cols-[1fr_125px_1fr]'>
+    <div className='relative grid h-auto grid-cols-[0px_48px_1fr] items-center justify-center md:grid-cols-[1fr_125px_1fr]'>
       {props.items.map((item, index) => (
         <div
           className='group contents'
@@ -42,14 +42,14 @@ export default function Timeline(props: TimelineProps) {
               <>
                 <div className='size-6 rounded-full bg-green-500'></div>
                 {index < props.items.length - 1 && (
-                  <div className='absolute left-[48%] top-5 h-full w-1 bg-green-500'></div>
+                  <div className='absolute left-[48%] top-5 h-full w-1 bg-green-500/20'></div>
                 )}
               </>
             ) : (
               <>
                 <div className='size-6 rounded-full  border-4 border-green-500 bg-slate-950'></div>
                 {index < props.items.length - 1 && (
-                  <div className='absolute left-[48%] top-5 h-full w-1 bg-green-500'></div>
+                  <div className='absolute left-[48%] top-5 h-full w-1 bg-green-500/20'></div>
                 )}
               </>
             )}

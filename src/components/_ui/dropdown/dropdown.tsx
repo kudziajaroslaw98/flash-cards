@@ -13,7 +13,7 @@ import { Button } from '../button/button';
 import Input from '../input/input';
 
 const DropdownVariants = cva(
-  `absolute flex-col overflow-clip rounded-md border dark:border-slate-800/40 dark:bg-slate-800 flex w-full min-w-fit bg-gray-50/95 backdrop-blur-lg`,
+  `absolute flex-col overflow-clip rounded-md border dark:border-slate-900/95 dark:bg-slate-950 flex w-full min-w-fit bg-gray-50/95 backdrop-blur-lg`,
   {
     variants: {
       contextPosition: {
@@ -305,7 +305,7 @@ export default function Dropdown<T>({
             'transition ',
             selected.length > 0
               ? 'border-green-500 text-green-500'
-              : 'border-gray-200  text-gray-500 dark:border-slate-800/40 ',
+              : 'border-gray-300  text-gray-500 dark:border-slate-800 ',
             error ? 'border-red-400 text-red-400 dark:border-red-400' : '',
           ])}
           onClick={handleClickOnDropdown}

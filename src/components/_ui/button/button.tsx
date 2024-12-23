@@ -4,13 +4,13 @@ import { ArrowPathIcon } from '@heroicons/react/24/solid';
 import { cn } from '#/shared/utils/cn.util';
 
 const buttonVariants = cva(
-  `inline-flex w-full max-w-80 items-center text-sm justify-center gap-2 rounded-md border transition active:scale-95 disabled:!border-gray-300 dark:disabled:!border-gray-800/40 disabled:!bg-transparent disabled:!text-gray-400 disabled:!opacity-80 dark:disabled:!bg-transparent ring-0 outline-0 focus:ring ring-green-400/50`,
+  `inline-flex w-full max-w-80 items-center text-sm justify-center gap-2 rounded-md border transition active:scale-95 disabled:!border-gray-300 dark:disabled:!border-gray-800 disabled:!bg-transparent disabled:!text-gray-400 dark:disabled:!bg-transparent disabled:opacity-50 disabled:cursor-not-allowed ring-0 outline-0 focus:ring ring-green-400/50`,
   {
     variants: {
       variant: {
         disabled: '',
         'disabled-outline':
-          'border-gray-200 dark:border-slate-800/40 bg-transparent text-gray-500 opacity-80 dark:bg-transparent',
+          'border-gray-300 dark:border-slate-800 bg-transparent text-gray-500 dark:bg-transparent',
         'disabled-text':
           'hover:bg-gray-200/50 dark:hover:bg-slate-800/50 border-transparent dark:border-transparent',
         'disabled-fill':
