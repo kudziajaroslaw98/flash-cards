@@ -193,7 +193,7 @@ export default async function Home() {
   );
 
   return (
-    <div className='dark relative h-auto min-h-full w-full flex-col bg-gray-50 px-4 dark:bg-slate-950'>
+    <div className='dark relative h-auto min-h-full w-full flex-col px-4 bg-slate-950'>
       <header className='fixed left-0 top-0 z-50 hidden h-32 w-full flex-col items-center justify-center md:flex '>
         <div className='mask-image-gradient-to-t absolute left-0 top-0 z-20 flex h-full w-full items-center justify-center bg-transparent bg-[radial-gradient(transparent_1px,#020617_1px)] from-transparent via-black via-60% to-black to-100% bg-[size:4px_4px] backdrop-blur-sm' />
         <nav className='z-30 flex h-full w-full items-start justify-between px-4 py-4 md:px-16 md:pt-8'>
@@ -278,14 +278,14 @@ export default async function Home() {
           <span className='flex flex-col items-center gap-4 bg-gradient-to-r from-green-600 to-green-400 bg-clip-text p-2 text-center text-5xl !font-black text-transparent'>
             <span>Learning words made</span>
             <span className='relative inline-block max-w-min px-4 before:absolute before:-inset-1 before:block before:-skew-y-3 before:rounded-sm before:bg-green-400'>
-              <span className='relative z-10 text-white dark:text-slate-950'>
+              <span className='relative z-10  text-slate-950'>
                 easy
               </span>
             </span>
           </span>
 
           <div className='flex w-full items-center justify-center gap-4'>
-            <p className='text-center text-lg text-gray-800 dark:text-slate-200'>
+            <p className='text-center text-lg text-slate-200'>
               Anywhere, anytime.
             </p>
           </div>
@@ -305,7 +305,7 @@ export default async function Home() {
 
         <section className='container flex flex-col items-center justify-center gap-8 py-12'>
           <ScrollReveal>
-            <h4 className='text-gray-800 dark:text-slate-200'>
+            <h4 className='text-slate-200'>
               Did you ever felt like that?
             </h4>
           </ScrollReveal>
@@ -323,7 +323,7 @@ export default async function Home() {
                   key={`pain-point-${id}`}
                   variants={itemVariants}
                 >
-                  <li className='relative flex w-full max-w-72 flex-col gap-8 rounded-md border border-gray-200 p-4 text-sm text-gray-800 dark:border-gray-900  dark:text-slate-200'>
+                  <li className='relative flex w-full max-w-72 flex-col gap-8 rounded-md border  p-4 text-sm  border-gray-900  text-slate-200'>
                     <div className='absolute left-0 top-0 z-[2] h-full w-full  bg-[radial-gradient(#22c55e15_1px,transparent_1px)] bg-[size:20px_20px]'></div>
                     {icon}
                     <span>{body}</span>
@@ -341,7 +341,7 @@ export default async function Home() {
           <div className='absolute left-0 top-0 z-[2] h-full w-full bg-[radial-gradient(at_75%_60%,#7ed321_0px,transparent_50%),radial-gradient(at_64%_21%,#417505_0px,transparent_50%),radial-gradient(at_7%_69%,#417505_0px,transparent_50%)] opacity-20 blur-3xl'></div>
           <ScrollReveal className='z-10 flex flex-col items-center justify-center gap-4'>
             <h4 className='text-green-500'>We felt like that too.</h4>
-            <span className='text-center text-gray-800 dark:text-slate-400'>
+            <span className='text-center  text-slate-400'>
               That&apos;s why I created this app. The place where...
             </span>
           </ScrollReveal>
@@ -361,7 +361,7 @@ export default async function Home() {
                 >
                   <li
                     key={`value-point-${id}`}
-                    className='relative flex w-full max-w-72 flex-col gap-8 rounded-md border border-gray-200 p-4 text-sm text-gray-800 dark:border-gray-900 dark:text-slate-200'
+                    className='relative flex w-full max-w-72 flex-col gap-8 rounded-md border p-4 text-sm  border-gray-900 text-slate-200'
                   >
                     <div className='absolute left-0 top-0 z-[2] h-full w-full  bg-[radial-gradient(#22c55e15_1px,transparent_1px)] bg-[size:20px_20px]'></div>
                     {icon}
@@ -377,10 +377,10 @@ export default async function Home() {
 
         <section className='container z-[2] flex flex-col items-center justify-start rounded-md py-6 backdrop-blur-md'>
           <ScrollReveal className='flex flex-col items-center gap-4'>
-            <h4 className='text-gray-800 dark:text-slate-200'>
+            <h4 className=' text-slate-200'>
               So, what are you waiting for?
             </h4>
-            <span className='text-gray-800 dark:text-slate-400'>
+            <span className=' text-slate-400'>
               Start learning now!
             </span>
           </ScrollReveal>
@@ -404,7 +404,7 @@ export default async function Home() {
         >
           <ScrollReveal className='flex flex-col items-center justify-center gap-4'>
             <h4 className='text-green-500'>Pricing</h4>
-            <span className='text-center text-gray-800 dark:text-slate-400'>
+            <span className='text-center  text-slate-400'>
               Need more details? I got you covered. <br />
             </span>
           </ScrollReveal>
@@ -427,7 +427,7 @@ export default async function Home() {
                       <span>Free</span>
                     </h5>
 
-                    <p className='text-sm text-gray-500 dark:text-slate-500'>
+                    <p className='text-sm text-slate-500'>
                       Free forever, no credit card required
                     </p>
                   </div>
@@ -438,7 +438,7 @@ export default async function Home() {
                       <span>0</span>
                     </span>
 
-                    <span className='pt-2 text-gray-500 dark:text-slate-500'>
+                    <span className='pt-2  text-slate-500'>
                       per month
                     </span>
                   </span>
@@ -453,13 +453,13 @@ export default async function Home() {
                     />
                   </Link>
 
-                  <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800'></div>
+                  <div className='h-[2px] w-full bg-slate-800'></div>
 
                   <div className='flex flex-col gap-2'>
-                    <p className='font-semibold text-gray-600 dark:text-slate-400'>
+                    <p className='font-semibold text-slate-400'>
                       Features:
                     </p>
-                    <ul className='flex flex-col gap-2 text-sm text-gray-500 dark:text-slate-500'>
+                    <ul className='flex flex-col gap-2 text-sm text-slate-500'>
                       <li className='flex gap-2'>
                         <span>•</span>
                         <span>Unlimited flashcards</span>
@@ -501,7 +501,7 @@ export default async function Home() {
                         Popular
                       </Badge>
                     </h5>
-                    <p className='text-sm text-gray-500 dark:text-slate-500'>
+                    <p className='text-sm text-slate-500'>
                       Not creative today? I got you
                     </p>
                   </div>
@@ -512,7 +512,7 @@ export default async function Home() {
                       <span>2.5</span>
                     </span>
 
-                    <span className='pt-2 text-gray-500 dark:text-slate-500'>
+                    <span className='pt-2 text-slate-500'>
                       per month
                     </span>
                   </span>
@@ -529,13 +529,13 @@ export default async function Home() {
                     />
                   </Link>
 
-                  <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800'></div>
+                  <div className='h-[2px] w-full bg-slate-800'></div>
 
                   <div className='flex flex-col gap-2'>
-                    <p className='font-semibold text-gray-600 dark:text-slate-400'>
+                    <p className='font-semibold text-slate-400'>
                       Features:
                     </p>
-                    <ul className='flex flex-col gap-2 text-sm text-gray-500 dark:text-slate-500'>
+                    <ul className='flex flex-col gap-2 text-sm text-slate-500'>
                       <li className='flex gap-2'>
                         <span>•</span>
                         <span>Generate flashcards</span>
@@ -571,8 +571,8 @@ export default async function Home() {
           <div className='absolute left-0 top-0 z-[2] h-full w-full bg-[radial-gradient(at_20%_80%,#7ed321_0px,transparent_50%),radial-gradient(at_44%_41%,#417505_0px,transparent_50%),radial-gradient(at_90%_69%,#417505_0px,transparent_50%)] opacity-20 blur-3xl'></div>
 
           <ScrollReveal className='flex flex-col items-center justify-center gap-4'>
-            <h4 className='text-gray-800 dark:text-slate-200'>Road Map</h4>
-            <span className='text-center text-gray-800 dark:text-slate-400'>
+            <h4 className='text-slate-200'>Road Map</h4>
+            <span className='text-center text-slate-400'>
               You have decided to support me? Wonderful! <br /> Here is what you
               can expect to come.
             </span>
@@ -595,8 +595,8 @@ export default async function Home() {
           className='container z-[2] flex flex-col items-center justify-start gap-4 rounded-md  py-6 backdrop-blur-md'
         >
           <ScrollReveal className='flex flex-col items-center justify-center gap-2'>
-            <h4 className='text-gray-800 dark:text-slate-200'>Contact</h4>
-            <span className='text-center text-gray-800 dark:text-slate-400'>
+            <h4 className=' text-slate-200'>Contact</h4>
+            <span className='text-center text-slate-400'>
               More questions? Reach out to Me!
             </span>
           </ScrollReveal>
@@ -615,7 +615,7 @@ export default async function Home() {
                 className='flex items-center gap-8 underline decoration-green-500 underline-offset-2'
               >
                 <MailIcon className='size-6 text-green-500' />
-                <span className='text-gray-800 dark:text-slate-200'>
+                <span className=' text-slate-200'>
                   jaroslawkudzia73@gmail.com
                 </span>
               </Link>
@@ -628,7 +628,7 @@ export default async function Home() {
                 className='flex items-center gap-8 underline decoration-green-500 underline-offset-2'
               >
                 {xLogo}
-                <span className='text-gray-800 dark:text-slate-200'>
+                <span className=' text-slate-200'>
                   @baldmanhimself
                 </span>
               </Link>
@@ -653,7 +653,7 @@ export default async function Home() {
           </div>
 
           <div className='flex flex-col items-center justify-center gap-4'>
-            <span className='text-center text-gray-800 dark:text-slate-400'>
+            <span className='text-center text-slate-400'>
               © 2024 Flash Cards. All rights reserved.
             </span>
           </div>
