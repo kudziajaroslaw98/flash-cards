@@ -1,11 +1,18 @@
 import {
+  Activity,
   AppWindow,
+  ChartLine,
   CircleSlash,
   DollarSign,
+  Dot,
+  Github,
+  GithubIcon,
+  Instagram,
   LayoutGrid,
   MailIcon,
   Meh,
   MessageCircleOff,
+  MessageCircleReply,
   Shapes,
   Smile,
   Sparkles,
@@ -14,34 +21,13 @@ import {
 import { Button } from '#/components/_ui/button/button';
 import Card from '#/components/_ui/card/card';
 
+import Timeline from '#/components/_ui/timeline/timeline';
 import Badge from '#/components/_ui/badge/badge';
 import * as m from 'framer-motion/m';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default async function Home() {
-  // const roadMapPoints = [
-  //   {
-  //     done: true,
-  //     label: 'Revise flash cards using simple spaced repetition algorithm',
-  //   },
-  //   { done: true, label: 'Synchronize your flash cards across all devices' },
-  //   { done: true, label: 'Generating descriptions to words with AI' },
-  //   {
-  //     done: true,
-  //     label:
-  //       'Generating new words for deck based on words that are already in it',
-  //   },
-  //   { done: false, label: 'Generate a set from PDF' },
-  //   {
-  //     done: false,
-  //     label:
-  //       'Revise flash cards using more sophisticated spaced repetition algorithm',
-  //   },
-  //   { done: false, label: 'Community Section with shared decks' },
-  //   { done: false, label: 'Filters on flashcard list' },
-  // ];
-
   const painPoints = [
     {
       id: 1,
@@ -51,7 +37,7 @@ export default async function Home() {
     {
       id: 2,
       icon: <MessageCircleOff className='size-8 text-green-500' />,
-      body: 'Lack of words you could use in conversations?',
+      body: 'You felt like you lack of words you could use in conversations?',
     },
     {
       id: 3,
@@ -61,7 +47,7 @@ export default async function Home() {
     {
       id: 4,
       icon: <Shapes className='size-8 text-green-500' />,
-      body: 'Other apps are bloated with unnecessary features?',
+      body: 'App you currently use is bloated with unnecessary features?',
     },
   ];
 
@@ -85,6 +71,66 @@ export default async function Home() {
       id: 4,
       icon: <LayoutGrid className='size-8 text-green-500' />,
       body: 'Interface looks good and snapy.',
+    },
+    {
+      id: 5,
+      icon: <MessageCircleReply className='size-8 text-green-500' />,
+      body: 'You actually have possibility to make this app better by giving feedback.',
+    },
+    {
+      id: 6,
+      icon: <Activity className='size-8 text-green-500' />,
+      body: 'You can track your progress and study statistics.',
+    },
+  ];
+
+  const listItem = (text: string) => (
+    <li className='flex gap-2'>
+      <Dot className='flex size-8 text-green-500' />
+      <span className='max-w-72 hyphens-auto'>{text}</span>
+    </li>
+  );
+
+  const timelineItems = [
+    {
+      active: true,
+      body: (
+        <ul className='flex flex-col gap-2'>
+          {listItem('Generate sets from pdf/txt files')}
+          {listItem('Improved stats page')}
+          {listItem('Filters on flashcard list')}
+          {listItem('Community section with shared decks')}
+        </ul>
+      ),
+      headline: 'Q1',
+    },
+    {
+      active: false,
+      body: (
+        <ul className='flex flex-col gap-2'>
+          {listItem(
+            'Create more rewarding system for flashcards (e.g. streaks/points)',
+          )}
+          {listItem('Export / Import flashcards to / from CSV')}
+          {listItem('More customization options for generating with AI')}
+        </ul>
+      ),
+      headline: 'Q2',
+    },
+    {
+      active: false,
+      body: (
+        <ul className='flex flex-col gap-2'>
+          {listItem('More advanced spaced repetition algorithm')}
+          <li>More coming soon..</li>
+        </ul>
+      ),
+      headline: 'Q3',
+    },
+    {
+      active: false,
+      body: <span>Coming soon..</span>,
+      headline: 'Q4',
     },
   ];
 
@@ -127,6 +173,7 @@ export default async function Home() {
             width={64}
             height={64}
           />
+
           <span className='flex flex-col items-center gap-4 bg-gradient-to-r from-green-600 to-green-400 bg-clip-text p-2 text-center text-5xl !font-black text-transparent'>
             <span>Learning words made</span>
             <span className='relative inline-block max-w-min px-4 before:absolute before:-inset-1 before:block before:-skew-y-3 before:rounded-sm before:bg-green-400'>
@@ -178,7 +225,7 @@ export default async function Home() {
           <div className='z-10 flex flex-col items-center justify-center gap-4'>
             <h4 className='text-green-500'>We felt like that too.</h4>
             <span className='text-gray-800 dark:text-slate-400'>
-              That&apos;s why we created this app. The place where...
+              That&apos;s why I created this app. The place where...
             </span>
           </div>
           <div>
@@ -222,7 +269,7 @@ export default async function Home() {
           <div className='flex flex-col items-center justify-center gap-4'>
             <h4 className='text-green-500'>Pricing</h4>
             <span className='text-center text-gray-800 dark:text-slate-400'>
-              Need more details? We got you covered. <br />
+              Need more details? I got you covered. <br />
               Here are our plans.
             </span>
           </div>
@@ -309,7 +356,7 @@ export default async function Home() {
                       </Badge>
                     </h5>
                     <p className='text-sm text-gray-500 dark:text-slate-500'>
-                      Not creative today? We got you
+                      Not creative today? I got you
                     </p>
                   </div>
 
@@ -372,10 +419,29 @@ export default async function Home() {
         </section>
 
         <section className='container relative flex flex-col items-center justify-center gap-8 py-12'>
+          <div className='absolute left-0 top-0 z-[2] h-full w-full bg-[radial-gradient(at_20%_80%,#7ed321_0px,transparent_50%),radial-gradient(at_44%_41%,#417505_0px,transparent_50%),radial-gradient(at_90%_69%,#417505_0px,transparent_50%)] opacity-20 blur-3xl'></div>
+
+          <div className='flex flex-col items-center justify-center gap-4'>
+            <h4 className='text-gray-800 dark:text-slate-200'>Road Map</h4>
+            <span className='text-center text-gray-800 dark:text-slate-400'>
+              You have decided to support me? Wonderful! <br /> Here is what you
+              can expect to come.
+            </span>
+          </div>
+
+          <h5 className='text-green-500'>2025</h5>
+
+          <Timeline
+            items={timelineItems}
+            title='2025'
+          />
+        </section>
+
+        <section className='container relative flex flex-col items-center justify-center gap-8 py-12'>
           <div className='flex flex-col items-center justify-center gap-4'>
             <h4 className='text-gray-800 dark:text-slate-200'>Contact</h4>
             <span className='text-center text-gray-800 dark:text-slate-400'>
-              More questions? Reach out to us!
+              More questions? Reach out to Me!
             </span>
           </div>
 
@@ -405,6 +471,47 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
+        <footer className='container relative flex flex-col items-center justify-center gap-8 pt-12'>
+          <div className='flex items-center justify-center gap-2'>
+            <Image
+              src={'/images/flash-cards-logo.svg'}
+              alt='Flash Cards Logo'
+              width={32}
+              height={32}
+            />
+
+            <span
+              className={`overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text px-2 text-xl font-black uppercase tracking-tighter text-transparent transition-all`}
+            >
+              FlashCards
+            </span>
+          </div>
+
+          <div className='flex flex-col items-center justify-center gap-4'>
+            <span className='text-center text-gray-800 dark:text-slate-400'>
+              © 2024 Flash Cards. All rights reserved.
+            </span>
+          </div>
+
+          <div className='flex items-center justify-center gap-4'>
+            <Link
+              href={'https://x.com/baldmanhimself'}
+              target='_blank'
+              className='flex items-center gap-8 rounded-full bg-slate-900/50 p-2 underline decoration-green-500 underline-offset-2'
+            >
+              <XIcon className='size-6 text-green-500' />
+            </Link>
+
+            <Link
+              href={'https://github.com/kudziajaroslaw98'}
+              target='_blank'
+              className='flex items-center gap-8 rounded-full bg-slate-900/50 p-2 underline decoration-green-500 underline-offset-2'
+            >
+              <GithubIcon className='size-6 text-green-500' />
+            </Link>
+          </div>
+        </footer>
       </div>
     </div>
   );
