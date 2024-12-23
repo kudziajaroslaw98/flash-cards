@@ -13,7 +13,6 @@ import {
   Shapes,
   Smile,
   Sparkles,
-  Twitter,
 } from 'lucide-react';
 import { Button } from '#/components/_ui/button/button';
 import Card from '#/components/_ui/card/card';
@@ -22,7 +21,6 @@ import { ScrollReveal } from '#/components/_ui/scroll-reveal/scroll-reveal';
 import Timeline from '#/components/_ui/timeline/timeline';
 import LinkComponent from '#/components/_ui/link/link';
 import Badge from '#/components/_ui/badge/badge';
-import { useScroll } from 'framer-motion';
 import * as m from 'framer-motion/m';
 import Image from 'next/image';
 import Link from 'next/link';

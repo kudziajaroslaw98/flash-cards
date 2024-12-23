@@ -6,7 +6,6 @@ import { Button } from '#/components/_ui/button/button';
 import { Github } from 'lucide-react';
 import { m } from 'framer-motion';
 import { useState } from 'react';
-import Image from 'next/image';
 
 export default function SignInComponent() {
   const supabase = createClient();
