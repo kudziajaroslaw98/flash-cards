@@ -4,7 +4,6 @@ import { createClient } from '#/shared/utils/supabase/client';
 import { FingerPrintIcon } from '@heroicons/react/24/solid';
 import { Button } from '#/components/_ui/button/button';
 import { ArrowLeftIcon, Github } from 'lucide-react';
-import LinkComponent from '../_ui/link/link';
 import { m } from 'framer-motion';
 import { useState } from 'react';
 import Link from 'next/link';
