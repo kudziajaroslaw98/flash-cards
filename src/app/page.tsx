@@ -10,19 +10,19 @@ import {
   Meh,
   MessageCircleOff,
   MessageCircleReply,
-  Scroll,
   Shapes,
   Smile,
   Sparkles,
-  XIcon,
+  Twitter,
 } from 'lucide-react';
 import { Button } from '#/components/_ui/button/button';
 import Card from '#/components/_ui/card/card';
 
 import { ScrollReveal } from '#/components/_ui/scroll-reveal/scroll-reveal';
 import Timeline from '#/components/_ui/timeline/timeline';
+import LinkComponent from '#/components/_ui/link/link';
 import Badge from '#/components/_ui/badge/badge';
-import { stagger } from 'framer-motion';
+import { useScroll } from 'framer-motion';
 import * as m from 'framer-motion/m';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -147,7 +147,7 @@ export default async function Home() {
       strokeWidth='2'
       strokeLinecap='round'
       strokeLinejoin='round'
-      className='size-4 animate-[bounce-horizontal_3s_ease-in-out_infinite] fill-none transition-all group-hover:translate-x-1 group-hover:fill-white'
+      className='size-4 fill-none transition-all group-hover:translate-x-1 group-hover:fill-white'
     >
       <m.polygon
         points='6 3 20 12 6 21 6 3'
@@ -183,12 +183,93 @@ export default async function Home() {
     visible: { opacity: 1, y: 0, viewport: { once: true } },
   };
 
+  const xLogo = (
+    <svg
+      className='size-6 fill-green-500 text-green-500'
+      viewBox='0 0 1200 1227'
+      fill='none'
+      xmlns='http://www.w3.org/2000/svg'
+    >
+      <path d='M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z' />
+    </svg>
+  );
+
   return (
-    <div className='dark flex h-auto min-h-full w-full flex-col  bg-gray-50  px-4 dark:bg-slate-950'>
+    <div className='dark relative h-auto min-h-full w-full flex-col bg-gray-50 px-4 dark:bg-slate-950'>
+      <header className='fixed left-0 top-0 z-50 hidden h-32 w-full flex-col items-center justify-center md:flex '>
+        <div className='mask-image-gradient-to-t absolute left-0 top-0 z-20 flex h-full w-full items-center justify-center bg-transparent bg-[radial-gradient(transparent_1px,#020617_1px)] from-transparent via-black via-60% to-black to-100% bg-[size:4px_4px] backdrop-blur-sm' />
+        <nav className='z-30 flex h-full w-full items-start justify-between px-4 py-4 md:px-16 md:pt-8'>
+          <div className='flex items-center justify-center'>
+            <Image
+              src='/images/flash-cards-logo.svg'
+              alt='Flash Cards Logo'
+              width={32}
+              height={32}
+            />
+
+            <span
+              className={`hidden overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text px-1 text-xl font-black uppercase tracking-tighter text-transparent transition-all lg:flex`}
+            >
+              FlashCards
+            </span>
+          </div>
+
+          <ul className='flex flex-row items-center justify-center gap-4 text-slate-200'>
+            <li>
+              <LinkComponent
+                href='#features'
+                className='text-sm'
+              >
+                Features
+              </LinkComponent>
+            </li>
+
+            <li>
+              <LinkComponent
+                href='#pricing'
+                className='text-sm'
+              >
+                Pricing
+              </LinkComponent>
+            </li>
+
+            <li>
+              <LinkComponent
+                href='#roadmap'
+                className='text-sm'
+              >
+                Road Map
+              </LinkComponent>
+            </li>
+
+            <li>
+              <LinkComponent
+                href='#contact'
+                className='text-sm'
+              >
+                Contact
+              </LinkComponent>
+            </li>
+
+            <li className='pl-8'>
+              <Link href='/sign-in'>
+                <Button
+                  variant='primary-outline'
+                  label='Start Now'
+                  className='group mx-auto min-w-36 font-semibold'
+                  icon={animatedPlayIcon}
+                  iconPosition='right'
+                />
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </header>
+
       {/* Hero section */}
+      <div className='absolute bottom-0 left-0 right-0 top-0 h-[800px] bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_20%,#000_70%,transparent_110%)]'></div>
       <div className='relative mx-auto flex h-auto min-h-full w-full max-w-7xl flex-col items-center justify-center gap-8 p-4 pt-20 md:pt-0 xl:gap-8'>
-        <div className='absolute bottom-0 left-0 right-0 top-0 h-[800px] bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_20%,#000_70%,transparent_110%)]'></div>
-        <div className='relative flex w-full max-w-2xl flex-col items-center justify-center gap-4 py-32 md:py-64'>
+        <div className='relative flex w-full max-w-2xl flex-col items-center justify-center gap-4 py-32 md:py-48'>
           <Image
             src='/images/flash-cards-logo.svg'
             alt='Flash Cards Logo'
@@ -211,13 +292,15 @@ export default async function Home() {
             </p>
           </div>
 
-          <Button
-            variant='primary-outline'
-            label='Start Now'
-            className='group mx-auto mt-8 min-w-36 font-semibold'
-            icon={animatedPlayIcon}
-            iconPosition='right'
-          />
+          <Link href='/sign-in'>
+            <Button
+              variant='primary-outline'
+              label='Start Now'
+              className='group mx-auto mt-8 min-w-36 font-semibold'
+              icon={animatedPlayIcon}
+              iconPosition='right'
+            />
+          </Link>
 
           <ScrollReveal className='hero-section-img mt-16 flex h-96 w-full items-center justify-center rounded-md'></ScrollReveal>
         </div>
@@ -253,7 +336,10 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className='container relative flex flex-col items-center justify-center gap-8 py-12'>
+        <section
+          id='features'
+          className='container relative flex scroll-mt-16 flex-col items-center justify-center gap-8 py-12'
+        >
           <div className='absolute left-0 top-0 z-[2] h-full w-full bg-[radial-gradient(at_75%_60%,#7ed321_0px,transparent_50%),radial-gradient(at_64%_21%,#417505_0px,transparent_50%),radial-gradient(at_7%_69%,#417505_0px,transparent_50%)] opacity-20 blur-3xl'></div>
           <ScrollReveal className='z-10 flex flex-col items-center justify-center gap-4'>
             <h4 className='text-green-500'>We felt like that too.</h4>
@@ -302,17 +388,22 @@ export default async function Home() {
           </ScrollReveal>
 
           <ScrollReveal>
-            <Button
-              variant='primary-outline'
-              label='Start Now'
-              className='group mx-auto mt-8 min-w-36 font-semibold'
-              icon={animatedPlayIcon}
-              iconPosition='right'
-            />
+            <Link href='/sign-in'>
+              <Button
+                variant='primary-outline'
+                label='Start Now'
+                className='group mx-auto mt-8 min-w-36 font-semibold'
+                icon={animatedPlayIcon}
+                iconPosition='right'
+              />
+            </Link>
           </ScrollReveal>
         </section>
 
-        <section className='container relative flex flex-col items-center justify-center gap-8 py-12'>
+        <section
+          id='pricing'
+          className='container relative flex scroll-mt-16 flex-col items-center justify-center gap-8 py-12'
+        >
           <ScrollReveal className='flex flex-col items-center justify-center gap-4'>
             <h4 className='text-green-500'>Pricing</h4>
             <span className='text-center text-gray-800 dark:text-slate-400'>
@@ -475,7 +566,10 @@ export default async function Home() {
           </m.div>
         </section>
 
-        <section className='container relative flex flex-col items-center justify-center gap-8 py-12'>
+        <section
+          id='roadmap'
+          className='container relative flex scroll-mt-16 flex-col items-center justify-center gap-8 py-12'
+        >
           <div className='absolute left-0 top-0 z-[2] h-full w-full bg-[radial-gradient(at_20%_80%,#7ed321_0px,transparent_50%),radial-gradient(at_44%_41%,#417505_0px,transparent_50%),radial-gradient(at_90%_69%,#417505_0px,transparent_50%)] opacity-20 blur-3xl'></div>
 
           <ScrollReveal className='flex flex-col items-center justify-center gap-4'>
@@ -498,7 +592,10 @@ export default async function Home() {
           </ScrollReveal>
         </section>
 
-        <section className='container z-[2] flex flex-col items-center justify-start gap-4 rounded-md  py-6 backdrop-blur-md'>
+        <section
+          id='contact'
+          className='container z-[2] flex flex-col items-center justify-start gap-4 rounded-md  py-6 backdrop-blur-md'
+        >
           <ScrollReveal className='flex flex-col items-center justify-center gap-2'>
             <h4 className='text-gray-800 dark:text-slate-200'>Contact</h4>
             <span className='text-center text-gray-800 dark:text-slate-400'>
@@ -532,7 +629,7 @@ export default async function Home() {
                 target='_blank'
                 className='flex items-center gap-8 underline decoration-green-500 underline-offset-2'
               >
-                <XIcon className='size-6 text-green-500' />
+                {xLogo}
                 <span className='text-gray-800 dark:text-slate-200'>
                   @baldmanhimself
                 </span>
@@ -569,7 +666,7 @@ export default async function Home() {
               target='_blank'
               className='flex items-center gap-8 rounded-full bg-slate-900/50 p-2 underline decoration-green-500 underline-offset-2'
             >
-              <XIcon className='size-6 text-green-500' />
+              {xLogo}
             </Link>
 
             <Link

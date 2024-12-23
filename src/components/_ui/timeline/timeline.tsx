@@ -16,10 +16,10 @@ export default function Timeline(props: TimelineProps) {
     <div className='relative grid h-auto grid-cols-[0px_48px_1fr] items-center justify-center md:grid-cols-[1fr_125px_1fr]'>
       {props.items.map((item, index) => (
         <div
-          className='group contents'
+          className='group/timeline contents'
           key={`timeline-${title?.trim()?.replaceAll(' ', '-')}-item-${index}`}
         >
-          <div className='col-span-1 col-start-1 hidden gap-8 pb-8 md:flex md:group-odd:hidden'>
+          <div className='col-span-1 col-start-1 hidden gap-8 pb-8 md:flex md:group-odd/timeline:hidden'>
             <div className='flex flex-col gap-2'>
               <h6 className='text-xl text-gray-800 dark:text-slate-200'>
                 {item.headline}
@@ -55,7 +55,7 @@ export default function Timeline(props: TimelineProps) {
             )}
           </div>
 
-          <div className='col-span-1 col-start-3 flex gap-8 pb-8 md:group-even:hidden'>
+          <div className='col-span-1 col-start-3 flex gap-8 pb-8 md:group-even/timeline:hidden'>
             <div className='flex flex-col gap-2'>
               <h6 className='text-xl text-gray-800 dark:text-slate-200'>
                 {item.headline}

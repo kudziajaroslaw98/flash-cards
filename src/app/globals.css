@@ -145,3 +145,7 @@ h6 {
   );
   mask: linear-gradient(to bottom, #000, transparent);
 }
+
+.header-mask{
+  mask: linear-gradient(to bottom, #000 80%, transparent 100%);
+}

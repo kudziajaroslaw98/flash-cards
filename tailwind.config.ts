@@ -144,6 +144,7 @@ const config: Config = {
         { values: theme('textShadow') }
       )
     }),
+    require('@lostisworld/tailwind-mask'),
   ],
 };
 export default config;
