@@ -20,6 +20,7 @@ import { useSessionContext } from '#/providers/session-provider.component';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import FlashCardComponent from '#/components/flash-card/flash-card';
 import type { FlashCard } from '#/shared/models/flash-card.model';
+import type { ApiResponse } from '#/types/api-response.type';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { Button } from '#/components/_ui/button/button';
 import { useAppContext } from '#/providers/app-context';
@@ -42,7 +43,7 @@ export default function SetHardlinkPage() {
   const setHardLink = useParams()?.hardlink as string;
   const router = useRouter();
   const { fetch, isLoading } = useFetch();
-  const { isLoggedIn } = useSessionContext();
+  const { isLoggedIn, isPlanActive } = useSessionContext();
   const {
     flashcards,
     addFlashCards,
@@ -124,20 +125,29 @@ export default function SetHardlinkPage() {
 
   const handleGenerateFlashCards = async () => {
     window.umami.track('Generate flash cards');
-    if (!isLoggedIn) return;
+    if (!isLoggedIn || !isPlanActive) return;
 
-    const setFlashCards = flashcards.filter((flashCard) =>
-      set?.flashCards?.includes(flashCard),
-    );
-
-    const flashCardsResponse: Record<'word' | 'definition', string>[] =
-      await fetch(API_ROUTES.SET_FLASHCARDS, {
+    const response:
+      | ApiResponse<unknown>
+      | Record<'word' | 'definition', string>[] = await fetch(
+      API_ROUTES.SET_FLASHCARDS,
+      {
         method: 'POST',
         body: JSON.stringify({
-          flashCards: setFlashCards ?? [],
+          flashCards:
+            set.flashCards.map((flashCard) => flashCard.questionAddition) ?? [],
           setName: set?.name ?? '',
         }),
-      });
+      },
+    );
+
+    if ('success' in response && !response?.success) {
+      console.warn(response?.error);
+      return;
+    }
+
+    const flashCardsResponse: Record<'word' | 'definition', string>[] =
+      response as Record<'word' | 'definition', string>[];
 
     const mappedFlashCards = flashCardsResponse.map((flashCard, index) => ({
       question: 'What is the definition of word below?',
@@ -145,9 +155,9 @@ export default function SetHardlinkPage() {
       answer: flashCard.definition,
       frontUuid: uuid(),
       weight: 1.0,
-      order: flashcards.length + index + 1,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      order: flashcards.length + index,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     }));
 
     if (flashCardsResponse.length > 0) {
@@ -275,7 +285,7 @@ export default function SetHardlinkPage() {
         >
           {set?.flashCards &&
             set?.flashCards.map((flashCard) => (
-              <div key={flashCard.frontUuid}>
+              <div key={`flashcard-${flashCard.frontUuid}`}>
                 <FlashCardComponent
                   flashCard={flashCard}
                   size={'sm'}
@@ -326,7 +336,7 @@ export default function SetHardlinkPage() {
           />
 
           <Button
-            disabled={!isLoggedIn}
+            disabled={!isLoggedIn || !isPlanActive}
             icon={<SparklesIcon className='size-4' />}
             size={'icon-square'}
             variant={'secondary-outline'}

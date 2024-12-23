@@ -8,60 +8,62 @@ import {
   useEffect,
   useState,
 } from 'react';
-import type { Session, User, UserAttributes } from '@supabase/supabase-js';
+import type { User, UserAttributes } from '@supabase/supabase-js';
 import { createClient } from '#/shared/utils/supabase/client';
 import type { ApiResponse } from '#/types//api-response.type';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
-import { usePathname, useRouter } from 'next/navigation';
 import useFetch from '#/hooks/use-fetch.hook';
+import { usePathname } from 'next/navigation';
 
 export type SessionContextType = {
   isLoggedIn: boolean;
-  session: Session | null;
   logOut: () => void;
   updateUser: (user: UserAttributes) => void;
   deleteUser: () => void;
   user: User | null;
+  pickedPlan: string | null;
+  isPlanActive: boolean;
 };
 
 export const SessionContext = createContext<SessionContextType>({
   isLoggedIn: false,
-  session: null,
   logOut: () => {},
   updateUser: () => {},
   deleteUser: () => {},
   user: null,
+  pickedPlan: null,
+  isPlanActive: false,
 });
 
 export default function SessionProvider(props: Readonly<PropsWithChildren>) {
   const supabase = createClient();
   const pathname = usePathname();
-  const router = useRouter();
   const { fetch } = useFetch();
-  const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const pickedPlan = user?.user_metadata?.stripe_subscribed_plan ?? null;
+  const isPlanActive =
+    user?.user_metadata?.stripe_subscription_status === 'active';
 
   const logOut = async () => {
     await supabase.auth.signOut();
-    setSession(null);
     setUser(null);
     localStorage.clear();
-    router.refresh();
+    window.location.reload();
   };
 
   const checkSession = useCallback(async () => {
-    const { data } = await supabase.auth.getSession();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    setSession(data?.session ?? null);
-    setUser(data?.session?.user ?? null);
+    setUser(user);
   }, [supabase.auth]);
 
   const updateUser = async (user: UserAttributes) => {
     const { data, error } = await supabase.auth.updateUser(user);
 
-    if (error === null) {
+    if (user !== null && error === null) {
       setUser(data.user);
-      checkSession();
     }
   };
 
@@ -72,9 +74,7 @@ export default function SessionProvider(props: Readonly<PropsWithChildren>) {
 
     if (response.success) {
       await supabase.auth.signOut();
-      setSession(null);
       setUser(null);
-      router.refresh();
     }
   };
 
@@ -85,8 +85,9 @@ export default function SessionProvider(props: Readonly<PropsWithChildren>) {
   return (
     <SessionContext.Provider
       value={{
-        isLoggedIn: session !== null,
-        session,
+        isLoggedIn: user !== null,
+        pickedPlan: pickedPlan,
+        isPlanActive: isPlanActive,
         user,
         logOut,
         updateUser,

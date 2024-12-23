@@ -3,6 +3,7 @@ import checkValidity from '#/shared/utils/check-validity.util';
 import { isDifferent } from '#/shared/utils/is-different.util';
 import { createClient } from '#/shared/utils/supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { RateLimit } from '#/shared/utils/api-limiter';
 import omit from '#/shared/utils/omit.util';
 import { z } from 'zod';
 
@@ -10,18 +11,6 @@ type requestBody = {
   sets: FlashCardSet[];
   lastSyncAt: Date | null;
 };
-
-async function getUserUuid(supabase: SupabaseClient) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (user === null || user === undefined) {
-    throw new Error('User not found');
-  }
-
-  return user.id;
-}
 
 async function newUserSync(
   body: requestBody,
@@ -146,6 +135,7 @@ async function validateBody(body: Record<string, unknown>) {
   const validityCheck = checkValidity(body, validationScheme);
 
   if (!validityCheck.valid) {
+    console.error('[set/sync] Invalid body', validityCheck.error);
     throw new Error(validityCheck.error);
   }
 }
@@ -154,7 +144,31 @@ export type ApiSetsSyncResponse = {
   sets: FlashCardSet[];
 };
 
+const rateLimit = new RateLimit(1, 10, '[set/sync]');
+
 export async function POST(request: Request) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  try {
+    if (user === null || error !== null) {
+      console.error('[set/sync] User not logged in');
+      throw new Error('User not logged in');
+    }
+
+    rateLimit.checkRateLimit(user.id);
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : 'Rate limit exceeded',
+      }),
+    );
+  }
+
   try {
     const body: requestBody = await request.json();
 
@@ -164,8 +178,8 @@ export async function POST(request: Request) {
       sets: body.sets,
     };
 
+    const userUuid = user.id;
     const supabase = await createClient();
-    const userUuid = await getUserUuid(supabase);
     const metadata = await supabase
       .from('metadata')
       .select()
@@ -179,19 +193,45 @@ export async function POST(request: Request) {
       ? new Date(metadata.data.lastSyncAt).setSeconds(0, 0)
       : null;
 
+    console.log(
+      '[set/sync] User [',
+      userUuid,
+      '] Syncing data from [',
+      metadataDate ? new Date(metadataDate).toISOString() : null,
+      '] to [',
+      bodyDate ? new Date(bodyDate).toISOString() : null,
+      ']',
+    );
+
     if (metadata.data === null || metadataDate === null) {
+      console.log(
+        '[set/sync] user (',
+        userUuid,
+        ') has no metadata, creating new sets',
+      );
       await newUserSync(body, supabase, userUuid);
     } else {
       if (bodyDate === null || bodyDate < metadataDate) {
+        console.log(
+          '[set/sync] user (',
+          userUuid,
+          ') has old metadata, fetching new sets',
+        );
         const { sets } = await fetchDataFromDb(supabase, userUuid);
         responseBody.sets = sets ?? [];
       } else if (bodyDate >= metadataDate) {
+        console.log(
+          '[set/sync] user (',
+          userUuid,
+          ') has up-to-date metadata, updating sets',
+        );
         await upsertDataInDb(body, supabase, userUuid);
       }
     }
 
     return Response.json({ success: true, data: responseBody });
   } catch (error) {
+    console.error('[set/sync] Error syncing data', error);
     return Response.json({
       success: false,
       error:

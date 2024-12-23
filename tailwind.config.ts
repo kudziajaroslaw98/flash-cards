@@ -64,6 +64,10 @@ const config: Config = {
             display: 'none',
           },
         },
+        'bounce-horizontal': {
+          '0%, 100%': { transform: 'translateX(4px)' },
+          '50%': { transform: 'translateX(0)' },
+        },
         'background-gradient': {
           '0%, 100%': {
             backgroundPosition: '0% 25%',
@@ -103,6 +107,7 @@ const config: Config = {
         'fade-out-to-bottom': 'fade-out-to-bottom .3s ease-in-out forwards',
         'shake-infinite': 'shake 1s ease-in-out infinite',
         shake: 'shake 1s ease-in-out forwards',
+        'bounce-horizontal': 'bounce-horizontal 1s ease-in-out infinite',
       },
       gridTemplateColumns: {
         '4-auto': 'repeat(4, minmax(0, auto))',
@@ -139,6 +144,7 @@ const config: Config = {
         { values: theme('textShadow') }
       )
     }),
+    require('@lostisworld/tailwind-mask'),
   ],
 };
 export default config;

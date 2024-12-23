@@ -22,8 +22,10 @@ export const metadata: Metadata = {
 
 export default function SignInPage() {
   return (
-    <div className='flex h-full w-full items-center justify-center'>
-      <SignInFormComponent />
+    <div className='dark flex h-auto min-h-full w-full flex-col  bg-gray-50  px-4 dark:bg-slate-950'>
+      <div className='flex h-full w-full items-center justify-center'>
+        <SignInFormComponent />
+      </div>
     </div>
   );
 }

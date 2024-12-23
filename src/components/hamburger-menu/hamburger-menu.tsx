@@ -40,7 +40,7 @@ export default function HamburgerMenuComponent() {
     {
       type: 'item',
       label: 'Settings',
-      href: APP_ROUTES.settings,
+      href: APP_ROUTES.account.settings,
       icon: <Cog8ToothIcon className='size-4' />,
       visible: isLoggedIn,
     },

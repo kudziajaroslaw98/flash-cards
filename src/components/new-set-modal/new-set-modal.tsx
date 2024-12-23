@@ -37,7 +37,7 @@ export const NewSetModal = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loadingGenerate, setLoadingGenerate] = useState(false);
   const [categories, setCategories] = useState<DictionaryValue<string>[]>([]);
-  const { isLoggedIn } = useSessionContext();
+  const { isLoggedIn, isPlanActive } = useSessionContext();
 
   const { completion, complete } = useCompletion({
     api: API_ROUTES.SET_DESCRIPTION,
@@ -150,12 +150,17 @@ export const NewSetModal = ({
   };
 
   const handleGenerate = useCallback(async () => {
-    if (formValue.name !== undefined && formValue.name !== '' && isLoggedIn) {
+    if (
+      formValue.name !== undefined &&
+      formValue.name !== '' &&
+      isLoggedIn &&
+      isPlanActive
+    ) {
       setLoadingGenerate(true);
       await complete(`generate description to: '${formValue.name}'`);
       setLoadingGenerate(false);
     }
-  }, [formValue, complete, isLoggedIn]);
+  }, [formValue, complete, isLoggedIn, isPlanActive]);
 
   const handleAddNewCategory = useCallback((value: string) => {
     setCategories((prev) => [...prev, { value, label: value }]);
@@ -169,6 +174,7 @@ export const NewSetModal = ({
         loadingGenerate,
         isLoggedIn,
         handleAddNewCategory,
+        isPlanActive,
       ),
     [
       categories,
@@ -176,6 +182,7 @@ export const NewSetModal = ({
       loadingGenerate,
       isLoggedIn,
       handleAddNewCategory,
+      isPlanActive,
     ],
   );
 

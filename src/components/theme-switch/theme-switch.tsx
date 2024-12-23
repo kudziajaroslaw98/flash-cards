@@ -2,9 +2,10 @@ import { useThemeContext } from '#/providers/theme-provider.component';
 import { MoonIcon, SunIcon } from '@heroicons/react/24/solid';
 import Switch from '../_ui/switch/switch';
 
-interface ThemeSwitchProps {
+type ThemeSwitchProps = {
   showLabel: boolean;
-}
+  variant?: 'vertical' | 'vertical-reversed';
+};
 
 export default function ThemeSwitchComponent(props: ThemeSwitchProps) {
   const { changeTheme, isLightMode } = useThemeContext();
@@ -16,6 +17,7 @@ export default function ThemeSwitchComponent(props: ThemeSwitchProps) {
       showLabel={props.showLabel}
       checkedLabel='Light mode'
       uncheckedLabel='Dark mode'
+      variant={props.variant ?? 'vertical'}
     >
       {isLightMode ? (
         <SunIcon className='h-4 w-4' />

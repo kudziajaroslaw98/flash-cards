@@ -13,6 +13,8 @@ export const assignFlashCardsValidationScheme = z.object({
       questionAddition: z.string().min(1),
       answer: z.string().min(1).max(255),
       order: z.number().nonnegative(),
+      createdAt: z.union([z.date(), z.string()]),
+      updatedAt: z.union([z.date(), z.string()]),
     }),
   ),
 });
@@ -30,6 +32,7 @@ export const assignFlashCardsScheme = (
       controlLabel: 'Flash Cards',
       multipleLabel: 'Flash Cards',
       searchable: true,
+      clearAll: true,
     },
   },
   validation: assignFlashCardsValidationScheme,

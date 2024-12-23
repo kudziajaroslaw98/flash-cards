@@ -5,6 +5,6 @@ export type FlashCard = {
   questionAddition: string;
   answer: string;
   order: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 };

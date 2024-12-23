@@ -10,6 +10,7 @@ export interface LinkProps {
   label?: string;
   icon?: ReactNode;
   iconOnly?: boolean;
+  iconPosition?: 'left' | 'right';
   className?: string;
   underline?: boolean;
   onClick?: () => void;
@@ -20,6 +21,7 @@ export default function LinkComponent({
   label,
   icon,
   iconOnly,
+  iconPosition = 'left',
   className,
   onClick,
   underline = true,
@@ -39,7 +41,9 @@ export default function LinkComponent({
       onClick={handleClick}
       className={`group relative flex items-center justify-center underline-offset-2 transition-all hover:text-green-500 ${className} ${isPathActive && 'text-green-400'} `}
     >
-      <p className={`flex items-center ${iconOnly ? '' : 'gap-4'}`}>
+      <p
+        className={`flex items-center ${iconOnly ? '' : 'gap-4'} ${iconPosition === 'right' ? 'flex-row-reverse' : ''}`}
+      >
         {icon && icon} {label && !iconOnly && label}
         {props?.children}
       </p>

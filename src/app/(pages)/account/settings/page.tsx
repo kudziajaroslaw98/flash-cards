@@ -1,8 +1,8 @@
 'use client';
 
 import {
+  BanknotesIcon,
   BellIcon,
-  ChevronRightIcon,
   PaintBrushIcon,
 } from '@heroicons/react/24/solid';
 import { useSessionContext } from '#/providers/session-provider.component';
@@ -11,51 +11,15 @@ import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
 import AvatarComponent from '#/components/_ui/avatar/avatar';
 import { Button } from '#/components/_ui/button/button';
 import Switch from '#/components/_ui/switch/switch';
+import { capitalize } from '#/shared/utils/helpers';
 import { useEffect, useState } from 'react';
-import { z } from 'zod';
+import Link from 'next/link';
 
 export default function SettingsPage() {
-  const { user, updateUser, deleteUser } = useSessionContext();
-  const [firstName, setFirstName] = useState(user?.user_metadata?.firstName);
-  const [lastName, setLastName] = useState(user?.user_metadata?.lastName);
-  const [email, setEmail] = useState(user?.email);
+  const { user, deleteUser, pickedPlan, isPlanActive } = useSessionContext();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const [notificationEnabled, setNotificationEnabled] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      setFirstName(user?.user_metadata?.firstName);
-      setLastName(user?.user_metadata?.lastName);
-      setEmail(user?.email);
-    }
-  }, [user]);
-
-  const handleUpdateProfile = () => {
-    const metadata = {
-      firstName: firstName,
-      lastName: lastName,
-    };
-
-    const updateUserBody = {
-      email: email,
-      data: metadata,
-    };
-
-    const validation = z.object({
-      data: z.object({
-        firstName: z.string().min(1, 'First name is required'),
-        lastName: z.string().min(1, 'Last name is required'),
-      }),
-      email: z.string().email('Email is incorrect').optional(),
-    });
-
-    const result = validation.safeParse(updateUserBody);
-
-    if (result.success) {
-      updateUser(updateUserBody);
-    }
-  };
 
   const handleDeleteUser = () => {
     setIsDeleting(true);
@@ -98,15 +62,38 @@ export default function SettingsPage() {
 
             <span className='text-sm text-gray-500'>{user?.email}</span>
           </div>
+        </section>
+      </div>
 
-          <Button
-            label='Edit Profile'
-            disabled
-            onClick={() => handleUpdateProfile()}
-            icon={<ChevronRightIcon className='size-4' />}
-            iconPosition='right'
-            size={'sm'}
-          />
+      <div className='w-full max-w-sm'>
+        <span className='text-sm font-semibold text-gray-700 dark:text-slate-200'>
+          Premium
+        </span>
+
+        <section className='flex flex-col gap-4 rounded-md border border-gray-200 p-4 dark:border-slate-800'>
+          <div className='flex items-center justify-between gap-2 rounded-md'>
+            <div className='flex items-center gap-2'>
+              <div className='flex size-8 items-center justify-center rounded-md bg-gray-200 text-gray-700 dark:bg-slate-900 dark:text-slate-200'>
+                <BanknotesIcon className='size-4' />
+              </div>
+
+              <span className='text-sm font-semibold text-gray-700 dark:text-slate-200'>
+                Picked Plan
+              </span>
+            </div>
+
+            <span className='text-sm font-semibold text-gray-700 dark:text-slate-200'>
+              {isPlanActive ? capitalize(pickedPlan) : 'Free'}
+            </span>
+          </div>
+
+          <Link href='/pricing'>
+            <Button
+              label='Change Plan'
+              size='full'
+              className='max-w-full'
+            ></Button>
+          </Link>
         </section>
       </div>
 
@@ -115,7 +102,7 @@ export default function SettingsPage() {
           Preferences
         </span>
 
-        <section className='flex flex-col gap-4 rounded-md border border-gray-200 p-2 pt-2 dark:border-slate-800'>
+        <section className='flex flex-col gap-4 rounded-md border border-gray-200 p-4 dark:border-slate-800'>
           <div className='flex justify-between gap-2 rounded-md'>
             <div className='flex items-center gap-2'>
               <div className='flex size-8 items-center justify-center rounded-md bg-gray-200 text-gray-700 dark:bg-slate-900 dark:text-slate-200'>
@@ -127,7 +114,10 @@ export default function SettingsPage() {
               </span>
             </div>
 
-            <ThemeSwitchComponent showLabel={true} />
+            <ThemeSwitchComponent
+              showLabel={true}
+              variant='vertical-reversed'
+            />
           </div>
 
           <div className='flex justify-between gap-2 rounded-md'>
@@ -156,9 +146,9 @@ export default function SettingsPage() {
             <span className='text-sm font-semibold text-red-500'>Warning</span>
 
             <span className='text-sm text-gray-700 dark:text-slate-200'>
-              Clearing data will{' '}
+              Clearing local data will{' '}
               <span className='font-bold text-red-500'>remove all</span> your
-              data.
+              local data.
             </span>
           </p>
 
@@ -172,7 +162,7 @@ export default function SettingsPage() {
                   isClearing ? 'cursor-not-allowed opacity-50' : ''
                 }`}
               >
-                {isClearing ? 'Clearing...' : 'Clear Data'}
+                {isClearing ? 'Clearing...' : 'Clear Local Data'}
               </button>
             }
             onAccept={handleClearData}

@@ -11,6 +11,7 @@ import {
   LanguageIcon,
   RectangleStackIcon,
   Squares2X2Icon,
+  UserIcon,
 } from '@heroicons/react/24/solid';
 import { useSessionContext } from '#/providers/session-provider.component';
 import NavigationGroupComponent from '../_ui/navigation/navigation-group';
@@ -33,8 +34,8 @@ export default function SidebarComponent() {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
-  const { isLoggedIn, session, logOut } = useSessionContext();
-  const name = session?.user?.user_metadata?.name;
+  const { isLoggedIn, user, logOut } = useSessionContext();
+  const name = user?.user_metadata?.name;
 
   const iconSize = expanded ? 'size-4' : 'size-5';
   const groupIconSize = 'size-5';
@@ -44,12 +45,14 @@ export default function SidebarComponent() {
       type: 'item',
       label: 'Dashboard',
       href: APP_ROUTES.dashboard,
+      visible: true,
       icon: <Squares2X2Icon className={iconSize} />,
     },
     {
       type: 'group',
       label: 'Flash Cards',
       icon: <BoltIcon className={groupIconSize} />,
+      visible: true,
       items: [
         {
           type: 'item',
@@ -68,6 +71,20 @@ export default function SidebarComponent() {
           label: 'Revise',
           href: APP_ROUTES.flashcards.revise,
           icon: <LanguageIcon className={iconSize} />,
+        },
+      ],
+    },
+    {
+      type: 'group',
+      label: 'Account',
+      icon: <UserIcon className={groupIconSize} />,
+      visible: isLoggedIn,
+      items: [
+        {
+          type: 'item',
+          label: 'Settings',
+          href: APP_ROUTES.account.settings,
+          icon: <Cog8ToothIcon className={iconSize} />,
         },
       ],
     },
@@ -119,28 +136,34 @@ export default function SidebarComponent() {
         />
       </div>
 
-      <div className={`flex h-full w-full flex-col justify-center gap-8 p-4`}>
+      <div
+        className={`flex h-full w-full flex-col justify-center gap-8 overflow-y-auto p-4`}
+      >
         <div
-          className={`hidden flex-col gap-8 md:flex ${!expanded && 'items-center'}`}
+          className={`hidden h-full flex-col gap-8 md:flex  ${!expanded && 'items-center'}`}
         >
-          {navigation?.map((section) => (
-            <span key={section.label}>
-              {section?.type === 'item' && (
-                <NavigationItemComponent
-                  item={section}
-                  expanded={expanded}
-                  visible={section.visible}
-                />
-              )}
+          {navigation?.map(
+            (section) =>
+              section.visible && (
+                <span key={section.label}>
+                  {section?.type === 'item' && (
+                    <NavigationItemComponent
+                      item={section}
+                      expanded={expanded}
+                      visible={section.visible}
+                    />
+                  )}
 
-              {section?.type === 'group' && (
-                <NavigationGroupComponent
-                  group={section}
-                  expanded={expanded}
-                />
-              )}
-            </span>
-          ))}
+                  {section?.type === 'group' && (
+                    <NavigationGroupComponent
+                      group={section}
+                      expanded={expanded}
+                      visible={section.visible}
+                    />
+                  )}
+                </span>
+              ),
+          )}
         </div>
 
         <div className='flex h-full w-full items-end justify-center'>
@@ -161,7 +184,7 @@ export default function SidebarComponent() {
                     <AvatarComponent
                       className='size-10'
                       imageAlt='User Avatar'
-                      imageSrc={session?.user?.user_metadata?.avatar_url}
+                      imageSrc={user?.user_metadata?.avatar_url}
                       onClick={() => {
                         toggle(!toggled);
                       }}
@@ -189,7 +212,7 @@ export default function SidebarComponent() {
                       label: 'Settings',
                       icon: <Cog8ToothIcon className='size-6' />,
                       onClick: () => {
-                        router.push(APP_ROUTES.settings);
+                        router.push(APP_ROUTES.account.settings);
                         toggle(!toggled);
                       },
                       visible: isLoggedIn,
@@ -205,7 +228,7 @@ export default function SidebarComponent() {
                   </span>
 
                   <span className='w-full overflow-hidden text-ellipsis text-xs text-gray-400 dark:text-slate-500'>
-                    {isLoggedIn ? session?.user?.email : 'Click here to log in'}
+                    {isLoggedIn ? user?.email : 'Click here to log in'}
                   </span>
                 </div>
               </div>
