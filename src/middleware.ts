@@ -15,6 +15,20 @@ const settingsMiddleware = async (request: NextRequest) => {
   }
 };
 
+const signInMiddleware = async (request: NextRequest) => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (user !== null && error === null) {
+    return NextResponse.redirect(new URL('/flashcards/learn', request.url));
+  } else {
+    return NextResponse.next();
+  }
+};
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -51,6 +65,10 @@ export async function middleware(request: NextRequest) {
 
   if (request.nextUrl.pathname.startsWith('/account/settings')) {
     return settingsMiddleware(request);
+  }
+
+  if(request.nextUrl.pathname.startsWith('/sign-in')) {
+    return signInMiddleware(request);
   }
 
   return NextResponse.next();

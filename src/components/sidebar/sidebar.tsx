@@ -25,6 +25,7 @@ import AvatarComponent from '../_ui/avatar/avatar';
 import { Button } from '../_ui/button/button';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
+import { ArrowUp } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -34,7 +35,7 @@ export default function SidebarComponent() {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
-  const { isLoggedIn, user, logOut } = useSessionContext();
+  const { isLoggedIn, user, logOut, isPlanActive } = useSessionContext();
   const name = user?.user_metadata?.name;
 
   const iconSize = expanded ? 'size-4' : 'size-5';
@@ -92,6 +93,17 @@ export default function SidebarComponent() {
 
   const handleToggle = () => {
     toggleExpand(!expanded);
+  };
+
+  const handlePlanUpgrade = () => {
+    window.umami.track('Upgrade plan clicked');
+
+    if (!isLoggedIn) {
+      router.push(APP_ROUTES.signIn);
+      return;
+    } else {
+      router.push(APP_ROUTES.pricing);
+    }
   };
 
   return (
@@ -168,6 +180,18 @@ export default function SidebarComponent() {
 
         <div className='flex h-full w-full items-end justify-center'>
           <div className='flex flex-col items-center justify-center gap-8'>
+            <div className='flex w-full items-center justify-center gap-4'>
+              {!isPlanActive && (
+                <Button
+                  icon={<ArrowUp className='size-6' />}
+                  onClick={handlePlanUpgrade}
+                  label={expanded ? 'Upgrade Plan' : ''}
+                  size={expanded ? 'default' : 'icon'}
+                  variant={'secondary-text'}
+                />
+              )}
+            </div>
+
             <ThemeSwitchComponent showLabel={expanded} />
 
             <div

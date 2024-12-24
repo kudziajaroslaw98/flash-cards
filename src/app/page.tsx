@@ -193,9 +193,9 @@ export default async function Home() {
   );
 
   return (
-    <div className='dark relative h-auto min-h-full w-full flex-col px-4 bg-slate-950'>
+    <div className='dark relative h-auto min-h-full w-full flex-col bg-slate-950 px-4'>
       <header className='fixed left-0 top-0 z-50 hidden h-32 w-full flex-col items-center justify-center md:flex '>
-        <div className='mask-image-gradient-to-t absolute left-0 top-0 z-20 flex h-full w-full items-center justify-center bg-transparent bg-[radial-gradient(transparent_1px,#020617_1px)] from-transparent via-black via-60% to-black to-100% bg-[size:4px_4px] backdrop-blur-sm' />
+        <div className='absolute left-0 top-0 z-20 flex h-full w-full items-center justify-center bg-transparent bg-[radial-gradient(transparent_1px,#020617_1px)] from-transparent via-black via-60% to-black to-100% bg-[size:4px_4px] backdrop-blur-sm mask-image-gradient-to-t' />
         <nav className='z-30 flex h-full w-full items-start justify-between px-4 py-4 md:px-16 md:pt-8'>
           <div className='flex items-center justify-center'>
             <Image
@@ -278,9 +278,7 @@ export default async function Home() {
           <span className='flex flex-col items-center gap-4 bg-gradient-to-r from-green-600 to-green-400 bg-clip-text p-2 text-center text-5xl !font-black text-transparent'>
             <span>Learning words made</span>
             <span className='relative inline-block max-w-min px-4 before:absolute before:-inset-1 before:block before:-skew-y-3 before:rounded-sm before:bg-green-400'>
-              <span className='relative z-10  text-slate-950'>
-                easy
-              </span>
+              <span className='relative z-10  text-slate-950'>easy</span>
             </span>
           </span>
 
@@ -305,9 +303,7 @@ export default async function Home() {
 
         <section className='container flex flex-col items-center justify-center gap-8 py-12'>
           <ScrollReveal>
-            <h4 className='text-slate-200'>
-              Did you ever felt like that?
-            </h4>
+            <h4 className='text-slate-200'>Did you ever felt like that?</h4>
           </ScrollReveal>
 
           <div>
@@ -323,7 +319,7 @@ export default async function Home() {
                   key={`pain-point-${id}`}
                   variants={itemVariants}
                 >
-                  <li className='relative flex w-full max-w-72 flex-col gap-8 rounded-md border  p-4 text-sm  border-gray-900  text-slate-200'>
+                  <li className='relative flex w-full max-w-72 flex-col gap-8 rounded-md border  border-gray-900 p-4  text-sm  text-slate-200'>
                     <div className='absolute left-0 top-0 z-[2] h-full w-full  bg-[radial-gradient(#22c55e15_1px,transparent_1px)] bg-[size:20px_20px]'></div>
                     {icon}
                     <span>{body}</span>
@@ -340,7 +336,7 @@ export default async function Home() {
         >
           <div className='absolute left-0 top-0 z-[2] h-full w-full bg-[radial-gradient(at_75%_60%,#7ed321_0px,transparent_50%),radial-gradient(at_64%_21%,#417505_0px,transparent_50%),radial-gradient(at_7%_69%,#417505_0px,transparent_50%)] opacity-20 blur-3xl'></div>
           <ScrollReveal className='z-10 flex flex-col items-center justify-center gap-4'>
-            <h4 className='text-green-500'>We felt like that too.</h4>
+            <h4 className='text-green-500'>I felt like that too.</h4>
             <span className='text-center  text-slate-400'>
               That&apos;s why I created this app. The place where...
             </span>
@@ -361,7 +357,7 @@ export default async function Home() {
                 >
                   <li
                     key={`value-point-${id}`}
-                    className='relative flex w-full max-w-72 flex-col gap-8 rounded-md border p-4 text-sm  border-gray-900 text-slate-200'
+                    className='relative flex w-full max-w-72 flex-col gap-8 rounded-md border border-gray-900 p-4  text-sm text-slate-200'
                   >
                     <div className='absolute left-0 top-0 z-[2] h-full w-full  bg-[radial-gradient(#22c55e15_1px,transparent_1px)] bg-[size:20px_20px]'></div>
                     {icon}
@@ -377,12 +373,8 @@ export default async function Home() {
 
         <section className='container z-[2] flex flex-col items-center justify-start rounded-md py-6 backdrop-blur-md'>
           <ScrollReveal className='flex flex-col items-center gap-4'>
-            <h4 className=' text-slate-200'>
-              So, what are you waiting for?
-            </h4>
-            <span className=' text-slate-400'>
-              Start learning now!
-            </span>
+            <h4 className=' text-slate-200'>So, what are you waiting for?</h4>
+            <span className=' text-slate-400'>Start learning now!</span>
           </ScrollReveal>
 
           <ScrollReveal>
@@ -438,9 +430,7 @@ export default async function Home() {
                       <span>0</span>
                     </span>
 
-                    <span className='pt-2  text-slate-500'>
-                      per month
-                    </span>
+                    <span className='pt-2  text-slate-500'>per month</span>
                   </span>
                   <Link
                     href='/sign-in'
@@ -456,9 +446,7 @@ export default async function Home() {
                   <div className='h-[2px] w-full bg-slate-800'></div>
 
                   <div className='flex flex-col gap-2'>
-                    <p className='font-semibold text-slate-400'>
-                      Features:
-                    </p>
+                    <p className='font-semibold text-slate-400'>Features:</p>
                     <ul className='flex flex-col gap-2 text-sm text-slate-500'>
                       <li className='flex gap-2'>
                         <span>•</span>
@@ -512,9 +500,7 @@ export default async function Home() {
                       <span>2.5</span>
                     </span>
 
-                    <span className='pt-2 text-slate-500'>
-                      per month
-                    </span>
+                    <span className='pt-2 text-slate-500'>per month</span>
                   </span>
 
                   <Link
@@ -532,9 +518,7 @@ export default async function Home() {
                   <div className='h-[2px] w-full bg-slate-800'></div>
 
                   <div className='flex flex-col gap-2'>
-                    <p className='font-semibold text-slate-400'>
-                      Features:
-                    </p>
+                    <p className='font-semibold text-slate-400'>Features:</p>
                     <ul className='flex flex-col gap-2 text-sm text-slate-500'>
                       <li className='flex gap-2'>
                         <span>•</span>
@@ -628,9 +612,7 @@ export default async function Home() {
                 className='flex items-center gap-8 underline decoration-green-500 underline-offset-2'
               >
                 {xLogo}
-                <span className=' text-slate-200'>
-                  @baldmanhimself
-                </span>
+                <span className=' text-slate-200'>@baldmanhimself</span>
               </Link>
             </ScrollReveal>
           </m.div>
