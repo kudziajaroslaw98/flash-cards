@@ -20,10 +20,11 @@ import { Button } from '#/components/_ui/button/button';
 import LinkComponent from '#/components/_ui/link/link';
 import { useEffect, useRef, useState } from 'react';
 import AvatarComponent from '../_ui/avatar/avatar';
+import { ArrowUp } from 'lucide-react';
 import { m } from 'framer-motion';
 
 export default function HamburgerMenuComponent() {
-  const { isLoggedIn, user, logOut } = useSessionContext();
+  const { isLoggedIn, user, logOut, isPlanActive } = useSessionContext();
   const [toggled, toggle] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -102,6 +103,17 @@ export default function HamburgerMenuComponent() {
     </m.span>
   );
 
+  const handlePlanUpgrade = () => {
+    window.umami.track('Upgrade plan clicked');
+
+    if (!isLoggedIn) {
+      router.push(APP_ROUTES.signIn);
+      return;
+    } else {
+      router.push(APP_ROUTES.pricing);
+    }
+  };
+
   return (
     <div
       className='flex'
@@ -125,7 +137,20 @@ export default function HamburgerMenuComponent() {
             toggled={toggled}
           />
         }
-        afterMenuItems={<ThemeSwitchComponent showLabel />}
+        afterMenuItems={
+          <div className='flex w-full flex-col items-center justify-center gap-4'>
+            {!isPlanActive && (
+              <Button
+                icon={<ArrowUp className='size-6' />}
+                onClick={handlePlanUpgrade}
+                label={'Upgrade Plan'}
+                size={'default'}
+                variant={'secondary-text'}
+              />
+            )}
+            <ThemeSwitchComponent showLabel />
+          </div>
+        }
         beforeMenuItems={
           <div className='w-full'>
             {isLoggedIn && (

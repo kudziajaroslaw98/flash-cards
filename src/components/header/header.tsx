@@ -5,8 +5,8 @@ import Link from 'next/link';
 
 export default function HeaderComponent() {
   return (
-    <header className='fixed left-0 top-0 z-[90] h-20 w-full bg-gray-50/75 px-4 py-4 backdrop-blur-xl dark:bg-slate-900/75 md:hidden'>
-      <div className='mx-auto flex h-full max-w-5xl items-center justify-between'>
+    <header className='fixed left-0 top-0 z-[90] h-20 w-full bg-transparent px-4 py-4 md:hidden'>
+      <div className='relative z-30 mx-auto flex h-full max-w-5xl items-center justify-between'>
         <div className='flex items-center justify-center gap-4'>
           <Link
             href={'/'}
@@ -40,6 +40,7 @@ export default function HeaderComponent() {
           <HamburgerMenuComponent />
         </div>
       </div>
+      <div className='absolute left-0 top-0 z-20 flex h-full w-full items-center justify-center bg-transparent bg-[radial-gradient(transparent_1px,#f9fafb_1px)] from-transparent via-black via-20% to-black to-100% bg-[size:4px_4px] backdrop-blur-sm mask-image-gradient-to-t dark:bg-[radial-gradient(transparent_1px,#020617_1px)]' />
     </header>
   );
 }

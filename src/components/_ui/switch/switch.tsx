@@ -39,7 +39,7 @@ export default function Switch({
       />
       <div
         className={cn([
-          'relative h-6 w-10 rounded-full bg-gray-200 dark:bg-slate-900',
+          'relative h-6 w-10 rounded-full bg-gray-200 dark:bg-slate-950',
         ])}
       >
         <div
