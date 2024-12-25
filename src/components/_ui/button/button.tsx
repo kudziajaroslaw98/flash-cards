@@ -1,7 +1,7 @@
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
 import { cva, VariantProps } from 'class-variance-authority';
-import { ArrowPathIcon } from '@heroicons/react/24/solid';
 import { cn } from '#/shared/utils/cn.util';
+import { LoaderCircle } from 'lucide-react';
 
 const buttonVariants = cva(
   `inline-flex w-full max-w-80 items-center text-sm justify-center gap-2 rounded-md border transition active:scale-95 disabled:!border-gray-300 dark:disabled:!border-gray-800 disabled:!bg-transparent disabled:!text-gray-400 dark:disabled:!bg-transparent disabled:opacity-50 disabled:cursor-not-allowed ring-0 outline-0 focus:ring ring-green-400/50`,
@@ -84,7 +84,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {loading ||
           (!loading && props.icon && (
             <span className='pointer-events-none'>
-              {loading && <ArrowPathIcon className={'h-4 w-4 animate-spin'} />}
+              {loading && <LoaderCircle className={'h-4 w-4 animate-spin'} />}
 
               {!loading && props.icon}
             </span>

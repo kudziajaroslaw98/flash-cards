@@ -1,7 +1,6 @@
 'use client';
 
 import { DictionaryValue } from '#/types//dictionary-value.type';
-import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import { isDifferent } from '#/shared/utils/is-different.util';
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import { FormEvent, useEffect, useRef, useState } from 'react';
@@ -10,6 +9,7 @@ import DropdownLabel from './dropdown-label';
 import { cn } from '#/shared/utils/cn.util';
 import DropdownItem from './dropdown-item';
 import { Button } from '../button/button';
+import { Search } from 'lucide-react';
 import Input from '../input/input';
 
 const DropdownVariants = cva(
@@ -342,7 +342,7 @@ export default function Dropdown<T>({
                     valid={true}
                     placeholder={`Search in ${multipleLabel ?? label}...`}
                     name='search'
-                    icon={<MagnifyingGlassIcon className='h-4 w-4' />}
+                    icon={<Search className='h-4 w-4' />}
                     className='min-w-52 text-sm'
                     onInput={handleSearchValueChange}
                     tabIndex={0}
@@ -352,8 +352,8 @@ export default function Dropdown<T>({
               <div
                 className={
                   (props.searchable || props.clearAll) && items?.length > 0
-                    ? 'max-h-80 overflow-y-auto py-3'
-                    : 'max-h-80 overflow-y-auto'
+                    ? 'max-h-52 overflow-y-auto py-3'
+                    : 'max-h-52 overflow-y-auto'
                 }
               >
                 {isSearching &&

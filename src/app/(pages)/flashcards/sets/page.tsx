@@ -1,16 +1,7 @@
 'use client';
 
-import {
-  CheckBadgeIcon,
-  MagnifyingGlassIcon,
-  PencilIcon,
-  PlusIcon,
-  StarIcon,
-  TrashIcon,
-} from '@heroicons/react/24/solid';
-
 import { FloatingButtons } from '#/components/floating-buttons/floating-buttons';
-import { StarIcon as StarIconOutline } from '@heroicons/react/24/outline';
+import { BadgeCheck, Pencil, Plus, Search, Star, Trash } from 'lucide-react';
 import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
 import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
@@ -184,7 +175,7 @@ export default function SetsPage() {
               valid={true}
               placeholder='Search in decks...'
               for='search'
-              icon={<MagnifyingGlassIcon className='h-4 w-4' />}
+              icon={<Search className='h-4 w-4' />}
               className='!w-full !max-w-80 sm:!w-56'
               onChange={handleSearchedTextChange}
             />
@@ -205,8 +196,8 @@ export default function SetsPage() {
             <ToggleButton
               toggled={isFavourite}
               toggle={() => toggleFavourite(!isFavourite)}
-              activeIcon={<StarIcon className='h-4 w-4' />}
-              inactiveIcon={<StarIconOutline className='h-4 w-4' />}
+              activeIcon={<Star className='h-4 w-4 fill-current' />}
+              inactiveIcon={<Star className='h-4 w-4' />}
               size={'icon'}
             />
           </span>
@@ -244,7 +235,7 @@ export default function SetsPage() {
                   onTouchMove={onMove}
                 >
                   {selected.includes(set) && (
-                    <CheckBadgeIcon className='absolute -right-4 -top-4 h-6 w-6 text-green-400' />
+                    <BadgeCheck className='absolute -right-4 -top-4 h-6 w-6 text-green-400' />
                   )}
 
                   <div className='flex flex-col gap-4'>
@@ -266,8 +257,8 @@ export default function SetsPage() {
                     <ToggleButton
                       ref={toggleRef}
                       toggled={set.isFavourite}
-                      activeIcon={<StarIcon className='h-4 w-4' />}
-                      inactiveIcon={<StarIconOutline className='h-4 w-4' />}
+                      activeIcon={<Star className='h-4 w-4 fill-current' />}
+                      inactiveIcon={<Star className='h-4 w-4' />}
                       size={'icon-sm'}
                       toggleVariant='text'
                       className='toggle-button z-30'
@@ -286,7 +277,7 @@ export default function SetsPage() {
                 onClick={() => {
                   window.umami.track('Add set clicked');
                 }}
-                icon={<PlusIcon className='h-4 w-4' />}
+                icon={<Plus className='h-4 w-4' />}
                 size={'icon-square'}
               />
             }
@@ -303,7 +294,7 @@ export default function SetsPage() {
                 onClick={() => {
                   window.umami.track('Edit set clicked');
                 }}
-                icon={<PencilIcon className='h-4 w-4' />}
+                icon={<Pencil className='h-4 w-4' />}
                 size={'icon-square'}
                 disabled={selected.length === 0}
                 variant={'secondary'}
@@ -326,7 +317,7 @@ export default function SetsPage() {
               <Button
                 disabled={selected.length === 0}
                 variant={'destructive'}
-                icon={<TrashIcon className='h-4 w-4' />}
+                icon={<Trash className='h-4 w-4' />}
                 size={'icon-square'}
               />
             }

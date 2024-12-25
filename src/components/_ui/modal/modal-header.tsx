@@ -1,10 +1,10 @@
 import { DialogContext } from '#/providers/dialog.providers';
-import { XMarkIcon } from '@heroicons/react/24/solid';
+import { VariantProps } from 'class-variance-authority';
+import { modalHeaderVariants } from './modal.variants';
 import { ReactNode, useContext } from 'react';
 import { cn } from '#/shared/utils/cn.util';
 import { Button } from '../button/button';
-import { modalHeaderVariants } from './modal.variants';
-import { VariantProps } from 'class-variance-authority';
+import { X } from 'lucide-react';
 
 interface ModalHeaderProps extends VariantProps<typeof modalHeaderVariants> {
   children: ReactNode;
@@ -20,14 +20,16 @@ export const ModalHeader = ({
   const { isCloseButtonVisible, onDialogClose } = useContext(DialogContext);
 
   return (
-    <div className={cn(modalHeaderVariants({ variant, borderVisible, className }))}>
+    <div
+      className={cn(modalHeaderVariants({ variant, borderVisible, className }))}
+    >
       {children}
 
       {isCloseButtonVisible && (
         <Button
           variant='destructive-text'
           size='icon-sm'
-          icon={<XMarkIcon className='h-4 w-4' />}
+          icon={<X className='h-4 w-4' />}
           onClick={onDialogClose}
         />
       )}

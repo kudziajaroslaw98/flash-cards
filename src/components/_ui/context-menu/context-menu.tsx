@@ -11,20 +11,21 @@ import {
 import MenuItem from '#/components/_ui/context-menu/menu-item';
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import { cva, VariantProps } from 'class-variance-authority';
+import MenuGroupItem from './menu-group-item';
 import { cn } from '#/shared/utils/cn.util';
 
 const contextMenuVariants = cva(
-  `absolute w-64 overflow-clip rounded border border-gray-200 dark:border-slate-800 md:w-52`,
+  `absolute w-64 opacity-0 overflow-clip rounded border border-gray-200 dark:border-slate-800 md:w-52`,
   {
     variants: {
       contextPosition: {
-        top: 'right-0 -top-2 data-[open=true]:z-50 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+        top: 'right-0 -top-2 data-[open="open"]:animate-fade-in-to-top data-[open="closed"]:animate-fade-out-to-bottom',
         'top-right':
-          'right-0 -top-2 data-[open=true]:z-50 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+          'right-0 -top-2 data-[open="open"]:animate-fade-in-to-top data-[open="closed"]:animate-fade-out-to-bottom',
         'top-left':
-          'left-0 -top-2 data-[open=true]:z-50 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+          'left-0 -top-2 data-[open="open"]:animate-fade-in-to-top data-[open="closed"]:animate-fade-out-to-bottom',
         bottom:
-          'right-0 -bottom-2 data-[open=true]:z-50 data-[open=true]:animate-fade-in-to-bottom data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-top',
+          'right-0 -bottom-2 data-[open="open"]:animate-fade-in-to-bottom data-[open="closed"]:animate-fade-out-to-top',
       },
     },
     defaultVariants: {
@@ -33,13 +34,22 @@ const contextMenuVariants = cva(
   },
 );
 
-export interface ContextMenuItem {
-  label?: string;
-  icon?: ReactNode;
-  onClick: () => void;
-  active?: boolean;
-  visible?: boolean;
-}
+export type ContextMenuItem =
+  | {
+      type: 'item';
+      label?: string;
+      icon?: ReactNode;
+      onClick: () => void;
+      active?: boolean;
+      visible?: boolean;
+    }
+  | {
+      type: 'group';
+      label?: string;
+      items?: ContextMenuItem[];
+      icon?: ReactNode;
+      visible?: boolean;
+    };
 
 interface ContextMenuProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>,
@@ -89,48 +99,57 @@ export default function ContextMenu({
       >
         <div onClick={handleTriggerClick}>{props.triggerComponent}</div>
 
-        {open && (
-          <div
-            data-open={open}
-            className={cn([
-              contextMenuVariants({ contextPosition }),
-              className,
-            ])}
-          >
-            <ul className='flex h-auto w-full flex-col items-center'>
-              {!!props.beforeMenuItems && (
-                <MenuItem
-                  visible={!!props.beforeMenuItems}
-                  className={props.beforeMenuClass}
-                >
-                  {props.beforeMenuItems}
-                </MenuItem>
-              )}
+        <div
+          data-open={open ? 'open' : 'closed'}
+          className={cn([contextMenuVariants({ contextPosition }), className])}
+        >
+          <ul className='flex h-auto w-full flex-col items-center'>
+            {!!props.beforeMenuItems && (
+              <MenuItem
+                visible={!!props.beforeMenuItems}
+                className={props.beforeMenuClass}
+              >
+                {props.beforeMenuItems}
+              </MenuItem>
+            )}
 
-              {props.menuItems.map((item) => (
-                <MenuItem
-                  key={item.label}
-                  active={item.active}
-                  visible={item.visible}
-                  onClick={() => {
-                    item.onClick();
-                  }}
-                >
-                  {item.icon && item.icon} {item.label}
-                </MenuItem>
-              ))}
+            {props.menuItems.map((item: ContextMenuItem, index) => (
+              <>
+                {item.type === 'group' && (
+                  <MenuGroupItem
+                    key={`group-${item.label}-${index}`}
+                    className='group'
+                    visible={item.visible}
+                    items={item.items || []}
+                  >
+                    {item.icon && item.icon} {item.label}
+                  </MenuGroupItem>
+                )}
+                {item.type === 'item' && (
+                  <MenuItem
+                    key={`item-${item.label}-${index}`}
+                    active={item.active}
+                    visible={item.visible}
+                    onClick={() => {
+                      item.onClick();
+                    }}
+                  >
+                    {item.icon && item.icon} {item.label}
+                  </MenuItem>
+                )}
+              </>
+            ))}
 
-              {!!props.afterMenuItems && (
-                <MenuItem
-                  className={props.afterMenuClass}
-                  visible={!!props.afterMenuItems}
-                >
-                  {props.afterMenuItems}
-                </MenuItem>
-              )}
-            </ul>
-          </div>
-        )}
+            {!!props.afterMenuItems && (
+              <MenuItem
+                className={props.afterMenuClass}
+                visible={!!props.afterMenuItems}
+              >
+                {props.afterMenuItems}
+              </MenuItem>
+            )}
+          </ul>
+        </div>
       </div>
     </div>
   );

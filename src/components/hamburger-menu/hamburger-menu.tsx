@@ -1,17 +1,21 @@
 'use client';
 
 import {
-  AcademicCapIcon,
-  Bars3Icon,
-  Cog8ToothIcon,
-  HomeIcon,
-  LanguageIcon,
-  RectangleStackIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/solid';
+  ArrowUp,
+  GraduationCap,
+  Languages,
+  Layers,
+  LayoutDashboard,
+  Settings,
+  UserRound,
+  Zap,
+} from 'lucide-react';
+import ContextMenu, {
+  type ContextMenuItem,
+} from '#/components/_ui/context-menu/context-menu';
 import { useSessionContext } from '#/providers/session-provider.component';
 import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
-import ContextMenu from '#/components/_ui/context-menu/context-menu';
+import type { NavigationGroup } from '#/types/navigation-group.type';
 import ThemeSwitchComponent from '../theme-switch/theme-switch';
 import { NavigationItem } from '#/types//navigation-item.type';
 import { APP_ROUTES } from '#/shared/defaults/app.routes';
@@ -20,8 +24,7 @@ import { Button } from '#/components/_ui/button/button';
 import LinkComponent from '#/components/_ui/link/link';
 import { useEffect, useRef, useState } from 'react';
 import AvatarComponent from '../_ui/avatar/avatar';
-import { ArrowUp } from 'lucide-react';
-import { m } from 'framer-motion';
+import { MenuIcon } from '../_ui/_icons/menu';
 
 export default function HamburgerMenuComponent() {
   const { isLoggedIn, user, logOut, isPlanActive } = useSessionContext();
@@ -30,38 +33,56 @@ export default function HamburgerMenuComponent() {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const pathName = usePathname();
+  const iconSize = 'size-4';
+  const groupIconSize = 'size-5';
 
-  const navigationItems: NavigationItem[] = [
+  const navigationItems: (NavigationItem | NavigationGroup)[] = [
     {
       type: 'item',
       label: 'Dashboard',
       href: APP_ROUTES.dashboard,
-      icon: <HomeIcon className='size-4' />,
+      visible: true,
+      icon: <LayoutDashboard className={`${iconSize} fill-current`} />,
     },
     {
-      type: 'item',
-      label: 'Settings',
-      href: APP_ROUTES.account.settings,
-      icon: <Cog8ToothIcon className='size-4' />,
+      type: 'group',
+      label: 'Flash Cards',
+      icon: <Zap className={`${groupIconSize} fill-current`} />,
+      visible: true,
+      items: [
+        {
+          type: 'item',
+          label: 'Sets',
+          href: APP_ROUTES.flashcards.sets,
+          icon: <Layers className={iconSize} />,
+        },
+        {
+          type: 'item',
+          label: 'Learn',
+          href: APP_ROUTES.flashcards.learn,
+          icon: <GraduationCap className={iconSize} />,
+        },
+        {
+          type: 'item',
+          label: 'Revise',
+          href: APP_ROUTES.flashcards.revise,
+          icon: <Languages className={iconSize} />,
+        },
+      ],
+    },
+    {
+      type: 'group',
+      label: 'Account',
+      icon: <UserRound className={`${groupIconSize}`} />,
       visible: isLoggedIn,
-    },
-    {
-      type: 'item',
-      label: 'Sets',
-      href: APP_ROUTES.flashcards.sets,
-      icon: <RectangleStackIcon className='size-4' />,
-    },
-    {
-      type: 'item',
-      label: 'Learn',
-      href: APP_ROUTES.flashcards.learn,
-      icon: <AcademicCapIcon className='size-4' />,
-    },
-    {
-      type: 'item',
-      label: 'Revise',
-      href: APP_ROUTES.flashcards.revise,
-      icon: <LanguageIcon className='size-4' />,
+      items: [
+        {
+          type: 'item',
+          label: 'Settings',
+          href: APP_ROUTES.account.settings,
+          icon: <Settings className={iconSize} />,
+        },
+      ],
     },
   ];
 
@@ -81,28 +102,6 @@ export default function HamburgerMenuComponent() {
     };
   }, []);
 
-  const activeIcon = (
-    <m.span
-      animate={{ rotate: '180deg' }}
-      initial={{ rotate: '0deg' }}
-      exit={{ rotate: '0deg', opacity: 0 }}
-      className='text-inherit'
-    >
-      <XMarkIcon className='h-6 w-6' />
-    </m.span>
-  );
-
-  const inactiveIcon = (
-    <m.span
-      animate={{ rotate: '180deg' }}
-      initial={{ rotate: '0deg' }}
-      exit={{ rotate: '0deg', opacity: 0 }}
-      className='text-inherit'
-    >
-      <Bars3Icon className='h-6 w-6' />
-    </m.span>
-  );
-
   const handlePlanUpgrade = () => {
     window.umami.track('Upgrade plan clicked');
 
@@ -113,6 +112,38 @@ export default function HamburgerMenuComponent() {
       router.push(APP_ROUTES.pricing);
     }
   };
+
+  const mapToContextMenuItem = (
+    items: (NavigationItem | NavigationGroup)[],
+  ): ContextMenuItem[] => {
+    return items.map((item) => {
+      if (item.type === 'item') {
+        return {
+          type: 'item',
+          label: item.label,
+          icon: item.icon,
+          active: item.href === pathName,
+          visible: item.visible,
+          onClick: () => {
+            router.push(item.href);
+            setOpen(false);
+            toggle(false);
+          },
+        } satisfies ContextMenuItem;
+      } else {
+        return {
+          type: 'group',
+          label: item.label,
+          icon: item.icon,
+          visible: item.visible,
+          items: mapToContextMenuItem(item.items),
+        };
+      }
+    }) as ContextMenuItem[];
+  };
+
+  const mappedNavigationItems: ContextMenuItem[] =
+    mapToContextMenuItem(navigationItems);
 
   return (
     <div
@@ -125,11 +156,11 @@ export default function HamburgerMenuComponent() {
         afterMenuClass='py-4 justify-center'
         triggerComponent={
           <ToggleButton
+            animated={true}
             variant={'primary-text'}
             size={'icon'}
             className='z-30 w-10'
-            activeIcon={activeIcon}
-            inactiveIcon={inactiveIcon}
+            animatedIcon={MenuIcon({ animate: toggled })}
             toggle={() => {
               setOpen(!isOpen);
               toggle(!toggled);
@@ -198,17 +229,7 @@ export default function HamburgerMenuComponent() {
             )}
           </div>
         }
-        menuItems={navigationItems.map((item) => ({
-          label: item.label,
-          icon: item.icon,
-          active: item.href === pathName,
-          visible: item.visible,
-          onClick: () => {
-            router.push(item.href);
-            setOpen(false);
-            toggle(false);
-          },
-        }))}
+        menuItems={mappedNavigationItems}
       ></ContextMenu>
     </div>
   );

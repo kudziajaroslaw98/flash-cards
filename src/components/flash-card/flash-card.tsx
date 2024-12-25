@@ -1,8 +1,8 @@
 import type { FlashCard } from '#/shared/models/flash-card.model';
-import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 import useLongPress from '#/hooks/use-long-press.hook';
 import { cn } from '#/shared/utils/cn.util';
 import { useEffect, useState } from 'react';
+import { BadgeCheck } from 'lucide-react';
 import Card from '../_ui/card/card';
 import { m } from 'framer-motion';
 
@@ -86,7 +86,7 @@ export default function FlashCardComponent({
           {(!isFlipped || isInSelectionMode) && (
             <>
               {isSelected && (
-                <CheckBadgeIcon className='absolute -right-4 -top-4 h-6 w-6 text-green-400' />
+                <BadgeCheck className='absolute -right-4 -top-4 h-6 w-6 text-green-400' />
               )}
 
               <h5

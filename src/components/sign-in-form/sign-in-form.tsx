@@ -1,9 +1,8 @@
 'use client';
 
+import { ArrowLeftIcon, Fingerprint, Github } from 'lucide-react';
 import { createClient } from '#/shared/utils/supabase/client';
-import { FingerPrintIcon } from '@heroicons/react/24/solid';
 import { Button } from '#/components/_ui/button/button';
-import { ArrowLeftIcon, Github } from 'lucide-react';
 import { m } from 'framer-motion';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -66,7 +65,7 @@ export default function SignInComponent() {
 
       <h4 className='flex items-center justify-center gap-2 text-3xl font-semibold text-green-500'>
         <span>Sign in</span>
-        <FingerPrintIcon className={'size-8'} />
+        <Fingerprint className={'size-8'} />
       </h4>
 
       <div className='z-20 flex w-full flex-col gap-2'>

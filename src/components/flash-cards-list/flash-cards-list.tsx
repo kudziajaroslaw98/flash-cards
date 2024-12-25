@@ -1,6 +1,5 @@
 'use client';
 
-import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { useCallback, useEffect, useState } from 'react';
 
 import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter';
@@ -10,6 +9,7 @@ import { Button } from '#/components/_ui/button/button';
 import { FloatingButtons } from '../floating-buttons/floating-buttons';
 import FlashCardComponent from '../flash-card/flash-card';
 import { useAppContext } from '#/providers/app-context';
+import { Pencil, Plus, Trash } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { cn } from '#/shared/utils/cn.util';
 import dynamic from 'next/dynamic';
@@ -149,7 +149,7 @@ export default function FlashCardsList() {
             trigger={
               <Button
                 onClick={handleAddButtonClick}
-                icon={<PlusIcon className='h-4 w-4' />}
+                icon={<Plus className='h-4 w-4' />}
                 size={'icon-square'}
               />
             }
@@ -165,7 +165,7 @@ export default function FlashCardsList() {
                 trigger={
                   <Button
                     onClick={handleEditButtonClick}
-                    icon={<PencilIcon className='h-4 w-4' />}
+                    icon={<Pencil className='h-4 w-4' />}
                     size={'icon-square'}
                     disabled={selected.length === 0}
                     variant={'secondary'}
@@ -182,7 +182,7 @@ export default function FlashCardsList() {
                   <Button
                     disabled={selected.length === 0}
                     variant={'destructive'}
-                    icon={<TrashIcon className='h-4 w-4' />}
+                    icon={<Trash className='h-4 w-4' />}
                     size={'icon-square'}
                   />
                 }

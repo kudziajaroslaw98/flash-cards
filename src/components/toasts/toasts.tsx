@@ -1,12 +1,12 @@
 'use client';
 
 import {
-  ArrowPathIcon,
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-  InformationCircleIcon,
-  XCircleIcon,
-} from '@heroicons/react/24/solid';
+  CircleAlert,
+  CircleCheck,
+  CircleX,
+  Info,
+  LoaderCircle,
+} from 'lucide-react';
 import { useToastContext } from '#/providers/toast-provider.component';
 import { ToastModel } from '#/hooks/use-toast.hook';
 import { m } from 'framer-motion';
@@ -49,15 +49,15 @@ export default function ToastsComponent() {
   const toastIcons = (toast: ToastModel) => {
     switch (toast.type) {
       case 'success':
-        return <CheckCircleIcon className='h-6 w-6' />;
+        return <CircleCheck className='h-6 w-6' />;
       case 'error':
-        return <XCircleIcon className='h-6 w-6' />;
+        return <CircleX className='h-6 w-6' />;
       case 'warning':
-        return <ExclamationCircleIcon className='h-6 w-6' />;
+        return <CircleAlert className='h-6 w-6' />;
       case 'async':
-        return <ArrowPathIcon className='h-6 w-6 animate-spin' />;
+        return <LoaderCircle className='h-6 w-6 animate-spin' />;
       case 'info':
-        return <InformationCircleIcon className='h-6 w-6' />;
+        return <Info className='h-6 w-6' />;
     }
   };
 

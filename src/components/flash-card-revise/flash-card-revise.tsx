@@ -1,13 +1,11 @@
 'use client';
 
-import {
-  ArrowPathIcon,
-  ArrowTurnLeftDownIcon,
-} from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 
 import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
+import { FloatingButtons } from '../floating-buttons/floating-buttons';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
+import { ArrowRight, CornerDownLeft, RefreshCw } from 'lucide-react';
 import type { FlashCard } from '#/shared/models/flash-card.model';
 import { ShortcutList } from '../shortcut-list/shortcut-list';
 import FlashCardComponent from '../flash-card/flash-card';
@@ -16,7 +14,6 @@ import { useAppContext } from '#/providers/app-context';
 import useKeyPress from '#/hooks/use-key-press.hook';
 import Dropdown from '../_ui/dropdown/dropdown';
 import LinkComponent from '../_ui/link/link';
-import { ArrowBigRight } from 'lucide-react';
 import { cn } from '#/shared/utils/cn.util';
 import Card from '../_ui/card/card';
 
@@ -152,7 +149,7 @@ export default function FlashCardReviseComponent() {
               clicked && 'opacity-100',
             ])}
           >
-            <ArrowTurnLeftDownIcon className='size-5 text-green-400' />
+            <CornerDownLeft className='size-5 text-green-400' />
 
             <span className='w-32 text-xs italic text-gray-600 dark:text-slate-500'>
               Click on the card to flip it
@@ -179,7 +176,7 @@ export default function FlashCardReviseComponent() {
               name: 'Reshuffle',
               keys: [
                 'R',
-                <ArrowBigRight
+                <ArrowRight
                   key='ArrowBigRight'
                   className='size-4'
                 />,
@@ -219,10 +216,11 @@ export default function FlashCardReviseComponent() {
         </div>
       </div>
 
-      <div className='fixed bottom-0 right-0 z-40 flex h-36 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 px-2 backdrop-blur-md dark:bg-slate-950/10 sm:sticky sm:bottom-8'>
+      <FloatingButtons>
+        {/* <div className='fixed bottom-0 right-0 z-40 flex h-36 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 px-2 backdrop-blur-md dark:bg-slate-950/10 sm:sticky sm:bottom-8'> */}
         <Button
           label={'Reshuffle'}
-          icon={<ArrowPathIcon className='h-4 w-4' />}
+          icon={<RefreshCw className='h-4 w-4' />}
           iconPosition={'right'}
           onClick={reshuffleFlashCards}
           size={'xlg'}
@@ -234,9 +232,10 @@ export default function FlashCardReviseComponent() {
           onChange={changeRevisedSet}
           value={defaultSet.value}
           contextPosition={'top'}
-          labelClassName='max-w-xs'
+          labelClassName='max-w-xs bg-gray-50 dark:bg-slate-950'
         />
-      </div>
+        {/* </div> */}
+      </FloatingButtons>
     </div>
   ) : (
     <div className='flex h-full w-full flex-col items-center justify-center gap-4 text-xl'>

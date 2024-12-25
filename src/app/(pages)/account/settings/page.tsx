@@ -1,15 +1,11 @@
 'use client';
 
-import {
-  BanknotesIcon,
-  BellIcon,
-  PaintBrushIcon,
-} from '@heroicons/react/24/solid';
 import { useSessionContext } from '#/providers/session-provider.component';
 import ThemeSwitchComponent from '#/components/theme-switch/theme-switch';
 import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
 import AvatarComponent from '#/components/_ui/avatar/avatar';
 import { Button } from '#/components/_ui/button/button';
+import { Banknote, Bell, Palette } from 'lucide-react';
 import Switch from '#/components/_ui/switch/switch';
 import { capitalize } from '#/shared/utils/helpers';
 import { useEffect, useState } from 'react';
@@ -74,7 +70,7 @@ export default function SettingsPage() {
           <div className='flex items-center justify-between gap-2 rounded-md'>
             <div className='flex items-center gap-2'>
               <div className='flex size-8 items-center justify-center rounded-md bg-gray-200 text-gray-700 dark:bg-slate-900 dark:text-slate-200'>
-                <BanknotesIcon className='size-4' />
+                <Banknote className='size-4' />
               </div>
 
               <span className='text-sm font-semibold text-gray-700 dark:text-slate-200'>
@@ -106,7 +102,7 @@ export default function SettingsPage() {
           <div className='flex justify-between gap-2 rounded-md'>
             <div className='flex items-center gap-2'>
               <div className='flex size-8 items-center justify-center rounded-md bg-gray-200 text-gray-700 dark:bg-slate-900 dark:text-slate-200'>
-                <PaintBrushIcon className='size-4' />
+                <Palette className='size-4' />
               </div>
 
               <span className='text-sm font-semibold text-gray-700 dark:text-slate-200'>
@@ -123,7 +119,7 @@ export default function SettingsPage() {
           <div className='flex justify-between gap-2 rounded-md'>
             <div className='flex items-center gap-2'>
               <div className='flex size-8 items-center justify-center rounded-md bg-gray-200 text-gray-700 dark:bg-slate-900 dark:text-slate-200'>
-                <BellIcon className='size-4' />
+                <Bell className='size-4' />
               </div>
 
               <span className='text-sm font-semibold text-gray-700 dark:text-slate-200'>

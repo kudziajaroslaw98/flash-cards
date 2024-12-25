@@ -1,12 +1,13 @@
 import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  PlusIcon,
-} from '@heroicons/react/24/solid';
+  ArrowBigLeft,
+  ArrowBigRight,
+  ArrowLeft,
+  ArrowRight,
+  Plus,
+} from 'lucide-react';
 import { useCallback, useMemo, useRef, type PropsWithChildren } from 'react';
 import { ShortcutList } from '#/components/shortcut-list/shortcut-list';
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
-import { ArrowBigLeft, ArrowBigRight } from 'lucide-react';
 import DialogProvider from '#/providers/dialog.providers';
 import { Trigger } from '#/components/_shared/trigger';
 import useKeyPress from '#/hooks/use-key-press.hook';
@@ -117,7 +118,7 @@ export const MultiDialog = ({
       size='icon'
       variant={currentIndex === 0 ? 'disabled-fill' : 'primary'}
       disabled={currentIndex === 0}
-      icon={<ArrowLeftIcon className='h-4 w-4' />}
+      icon={<ArrowLeft className='h-4 w-4' />}
       onClick={handleLeftButtonClick}
     />
   );
@@ -129,9 +130,9 @@ export const MultiDialog = ({
       disabled={canMoveRight && isInEditMode}
       icon={
         reachedEnd && !isInEditMode ? (
-          <PlusIcon className='h-4 w-4' />
+          <Plus className='h-4 w-4' />
         ) : (
-          <ArrowRightIcon className='h-4 w-4' />
+          <ArrowRight className='h-4 w-4' />
         )
       }
       onClick={handleRightButtonClick}

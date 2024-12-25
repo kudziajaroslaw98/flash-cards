@@ -1,6 +1,6 @@
 import { useThemeContext } from '#/providers/theme-provider.component';
-import { MoonIcon, SunIcon } from '@heroicons/react/24/solid';
 import Switch from '../_ui/switch/switch';
+import { Moon, Sun } from 'lucide-react';
 
 type ThemeSwitchProps = {
   showLabel: boolean;
@@ -20,9 +20,9 @@ export default function ThemeSwitchComponent(props: ThemeSwitchProps) {
       variant={props.variant ?? 'vertical'}
     >
       {isLightMode ? (
-        <SunIcon className='h-4 w-4' />
+        <Sun className='h-4 w-4 fill-current' />
       ) : (
-        <MoonIcon className='h-4 w-4' />
+        <Moon className='h-4 w-4 fill-current' />
       )}
     </Switch>
   );

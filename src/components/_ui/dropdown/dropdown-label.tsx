@@ -1,4 +1,4 @@
-import { ChevronDownIcon } from '@heroicons/react/24/solid';
+import { ChevronDown } from 'lucide-react';
 
 export default function DropdownLabel({
   selectedCount,
@@ -28,7 +28,7 @@ export default function DropdownLabel({
       )}
 
       <span className='text-inherit'>
-        <ChevronDownIcon
+        <ChevronDown
           className={`h-4 w-4 transition ${visible ? 'rotate-180' : ''}`}
         />
       </span>

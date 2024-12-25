@@ -1,5 +1,4 @@
 import HamburgerMenuComponent from '#/components/hamburger-menu/hamburger-menu';
-import { HashtagIcon } from '@heroicons/react/24/solid';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -22,18 +21,10 @@ export default function HeaderComponent() {
               />
             </span>
 
-            <h1 className='bg-gradient-to-r from-green-600 to-green-400  bg-clip-text text-2xl font-black uppercase tracking-tighter text-transparent transition-all'>
+            <h1 className='bg-gradient-to-r from-green-600 to-green-400 bg-clip-text px-1 text-2xl font-black uppercase tracking-tighter text-transparent transition-all'>
               FLASHCARDS
             </h1>
           </Link>
-
-          <span className='hidden items-center gap-1 text-gray-500 dark:text-slate-300 lg:flex'>
-            <span>
-              <HashtagIcon className='h-4 w-4' />
-            </span>
-
-            <p>Learning words made easy</p>
-          </span>
         </div>
 
         <div className='flex items-center justify-center gap-4 md:gap-8'>

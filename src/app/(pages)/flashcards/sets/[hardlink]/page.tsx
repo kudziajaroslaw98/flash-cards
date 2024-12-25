@@ -1,15 +1,15 @@
 'use client';
 import {
-  ArrowDownTrayIcon,
-  ArrowLeftIcon,
-  ArrowUpTrayIcon,
-  Cog8ToothIcon,
-  DocumentCheckIcon,
-  PencilIcon,
-  PlusIcon,
-  SparklesIcon,
-  TrashIcon,
-} from '@heroicons/react/24/solid';
+  ArrowLeft,
+  CopyCheck,
+  Download,
+  Pencil,
+  Plus,
+  Settings,
+  Sparkles,
+  Trash,
+  Upload,
+} from 'lucide-react';
 import { AssignFlashCardsModal } from '#/components/assign-flash-cards-modal/assign-flash-cards-modal';
 import ContextMenu, {
   ContextMenuItem,
@@ -103,20 +103,23 @@ export default function SetHardlinkPage() {
 
   const contextMenuActions: ContextMenuItem[] = [
     {
+      type: 'item',
       label: 'Delete set',
-      icon: <TrashIcon className='h-6 w-6' />,
+      icon: <Trash className='h-6 w-6' />,
       onClick: handleRemoveSet,
     },
     {
+      type: 'item',
       label: 'export set CSV',
-      icon: <ArrowDownTrayIcon className='h-6 w-6' />,
+      icon: <Download className='h-6 w-6' />,
       onClick: () => {
         window.umami.track('Export set CSV');
       },
     },
     {
+      type: 'item',
       label: 'Import set CSV',
-      icon: <ArrowUpTrayIcon className='h-6 w-6' />,
+      icon: <Upload className='h-6 w-6' />,
       onClick: () => {
         window.umami.track('Import set CSV');
       },
@@ -210,7 +213,7 @@ export default function SetHardlinkPage() {
           <LinkComponent
             href='/flashcards/sets'
             icon={
-              <ArrowLeftIcon className='h-4 w-4 transition group-hover:translate-x-2 group-active:translate-x-1' />
+              <ArrowLeft className='h-4 w-4 transition group-hover:translate-x-2 group-active:translate-x-1' />
             }
             label='Back'
             className='group w-auto pb-4 text-green-400'
@@ -228,7 +231,7 @@ export default function SetHardlinkPage() {
               contextPosition='bottom'
               triggerComponent={
                 <Button
-                  icon={<Cog8ToothIcon className='h-4 w-4' />}
+                  icon={<Settings className='h-4 w-4' />}
                   size={'icon'}
                   variant={'primary-outline'}
                   onClick={() => window.umami.track('Set options clicked')}
@@ -298,7 +301,7 @@ export default function SetHardlinkPage() {
           <NewFlashCardModal
             trigger={
               <Button
-                icon={<PlusIcon className='size-4' />}
+                icon={<Plus className='size-4' />}
                 size={'icon-square'}
                 variant={'primary'}
               />
@@ -311,7 +314,7 @@ export default function SetHardlinkPage() {
           <AssignFlashCardsModal
             trigger={
               <Button
-                icon={<DocumentCheckIcon className='size-4' />}
+                icon={<CopyCheck className='size-4' />}
                 size={'icon-square'}
                 variant={'primary'}
               />
@@ -328,7 +331,7 @@ export default function SetHardlinkPage() {
             categories={categories}
             trigger={
               <Button
-                icon={<PencilIcon className='size-4' />}
+                icon={<Pencil className='size-4' />}
                 size={'icon-square'}
                 variant={'secondary'}
               />
@@ -337,7 +340,7 @@ export default function SetHardlinkPage() {
 
           <Button
             disabled={!isLoggedIn || !isPlanActive}
-            icon={<SparklesIcon className='size-4' />}
+            icon={<Sparkles className='size-4' />}
             size={'icon-square'}
             variant={'secondary-outline'}
             onClick={handleGenerateFlashCards}

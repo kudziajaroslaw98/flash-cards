@@ -46,10 +46,14 @@ const config: Config = {
             transform: 'translateY(100%)',
             display: 'flex',
           },
-          '100%': {
+          '99%': {
             opacity: '0',
             transform: 'translateY(95%)',
-            display: 'none',
+          },
+          '100%': {
+            opacity:'0',
+            visibility: 'collapse',
+            'z-index': '-100',
           },
         },
         'fade-out-to-bottom': {
@@ -58,10 +62,15 @@ const config: Config = {
             transform: 'translateY(-100%)',
             display: 'flex',
           },
-          '100%': {
+          
+          '99%': {
             opacity: '0',
             transform: 'translateY(-95%)',
-            display: 'none',
+          },
+          '100%': {
+            opacity: '0',
+            visibility: 'collapse',
+            'z-index': '-100',
           },
         },
         'bounce-horizontal': {
@@ -99,13 +108,13 @@ const config: Config = {
       },
       animation: {
         'background-gradient': 'background-gradient 12s ease infinite',
-        'fade-in-to-bottom': 'fade-in-to-bottom .3s ease-in-out forwards',
-        'fade-in': 'fade-in .3s ease-in-out forwards',
+        'fade-in-to-bottom': 'fade-in-to-bottom .4s ease-out forwards',
+        'fade-in': 'fade-in .4s ease-in-out forwards',
         'fade-out': 'fade-out .3s ease-in-out forwards',
-        'fade-in-to-top': 'fade-in-to-top .3s ease-in-out forwards',
-        'fade-out-to-top': 'fade-out-to-top .3s ease-in-out forwards',
-        'fade-out-to-bottom': 'fade-out-to-bottom .3s ease-in-out forwards',
-        'shake-infinite': 'shake 1s ease-in-out infinite',
+        'fade-in-to-top': 'fade-in-to-top .4s ease-out forwards',
+        'fade-out-to-top': 'fade-out-to-top .3s ease-out forwards',
+        'fade-out-to-bottom': 'fade-out-to-bottom .3s ease-out forwards',
+        'shake-infinite': 'shake 1s ease-out infinite',
         shake: 'shake 1s ease-in-out forwards',
         'bounce-horizontal': 'bounce-horizontal 1s ease-in-out infinite',
       },

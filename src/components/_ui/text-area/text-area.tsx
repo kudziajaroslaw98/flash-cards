@@ -5,10 +5,10 @@ import {
   useRef,
   useState,
 } from 'react';
-import { SparklesIcon } from '@heroicons/react/24/solid';
 import useDebounce from '#/hooks/use-debounce.hook';
 import { cn } from '#/shared/utils/cn.util';
 import { Button } from '../button/button';
+import { Sparkles } from 'lucide-react';
 
 export type TextAreaProps = {
   type?: 'textarea';
@@ -158,7 +158,7 @@ export default function TextArea({
             size={'icon-xs'}
             className='absolute right-[10px] top-[10px] z-40 disabled:cursor-not-allowed'
             onClick={generate}
-            icon={<SparklesIcon className='size-3' />}
+            icon={<Sparkles className='size-3' />}
             loading={loadingGenerate}
             disabled={blockGenerate}
           />

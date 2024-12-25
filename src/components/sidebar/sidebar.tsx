@@ -1,18 +1,19 @@
 'use client';
 
 import {
-  AcademicCapIcon,
-  ArrowLeftIcon,
-  ArrowRightEndOnRectangleIcon,
-  ArrowRightIcon,
-  ArrowRightStartOnRectangleIcon,
-  BoltIcon,
-  Cog8ToothIcon,
-  LanguageIcon,
-  RectangleStackIcon,
-  Squares2X2Icon,
-  UserIcon,
-} from '@heroicons/react/24/solid';
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  GraduationCap,
+  Languages,
+  Layers,
+  LayoutDashboard,
+  LogIn,
+  LogOut,
+  Settings,
+  UserRound,
+  Zap,
+} from 'lucide-react';
 import { useSessionContext } from '#/providers/session-provider.component';
 import NavigationGroupComponent from '../_ui/navigation/navigation-group';
 import NavigationItemComponent from '../_ui/navigation/navigation-item';
@@ -25,7 +26,6 @@ import AvatarComponent from '../_ui/avatar/avatar';
 import { Button } from '../_ui/button/button';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
-import { ArrowUp } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -47,45 +47,45 @@ export default function SidebarComponent() {
       label: 'Dashboard',
       href: APP_ROUTES.dashboard,
       visible: true,
-      icon: <Squares2X2Icon className={iconSize} />,
+      icon: <LayoutDashboard className={`${iconSize} fill-current`} />,
     },
     {
       type: 'group',
       label: 'Flash Cards',
-      icon: <BoltIcon className={groupIconSize} />,
+      icon: <Zap className={`${groupIconSize} fill-current`} />,
       visible: true,
       items: [
         {
           type: 'item',
           label: 'Sets',
           href: APP_ROUTES.flashcards.sets,
-          icon: <RectangleStackIcon className={iconSize} />,
+          icon: <Layers className={iconSize} />,
         },
         {
           type: 'item',
           label: 'Learn',
           href: APP_ROUTES.flashcards.learn,
-          icon: <AcademicCapIcon className={iconSize} />,
+          icon: <GraduationCap className={iconSize} />,
         },
         {
           type: 'item',
           label: 'Revise',
           href: APP_ROUTES.flashcards.revise,
-          icon: <LanguageIcon className={iconSize} />,
+          icon: <Languages className={iconSize} />,
         },
       ],
     },
     {
       type: 'group',
       label: 'Account',
-      icon: <UserIcon className={groupIconSize} />,
+      icon: <UserRound className={`${groupIconSize}`} />,
       visible: isLoggedIn,
       items: [
         {
           type: 'item',
           label: 'Settings',
           href: APP_ROUTES.account.settings,
-          icon: <Cog8ToothIcon className={iconSize} />,
+          icon: <Settings className={iconSize} />,
         },
       ],
     },
@@ -128,7 +128,7 @@ export default function SidebarComponent() {
           />
 
           <span
-            className={`overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-xl font-black uppercase tracking-tighter text-transparent transition-all ${expanded ? 'max-w-full' : 'hidden max-w-0'}`}
+            className={`overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text pr-1 text-xl font-black uppercase tracking-tighter text-transparent transition-all ${expanded ? 'max-w-full' : 'hidden max-w-0'}`}
           >
             FlashCards
           </span>
@@ -139,9 +139,9 @@ export default function SidebarComponent() {
           className='absolute -right-2'
           icon={
             expanded ? (
-              <ArrowLeftIcon className='size-3' />
+              <ArrowLeft className='size-3' />
             ) : (
-              <ArrowRightIcon className='size-3' />
+              <ArrowRight className='size-3' />
             )
           }
           onClick={handleToggle}
@@ -216,11 +216,12 @@ export default function SidebarComponent() {
                   }
                   menuItems={[
                     {
+                      type: 'item',
                       label: isLoggedIn ? 'Log Out' : 'Log In',
                       icon: isLoggedIn ? (
-                        <ArrowRightStartOnRectangleIcon className='size-6' />
+                        <LogIn className='size-6' />
                       ) : (
-                        <ArrowRightEndOnRectangleIcon className='size-6' />
+                        <LogOut className='size-6' />
                       ),
                       onClick: () => {
                         if (isLoggedIn) {
@@ -233,8 +234,9 @@ export default function SidebarComponent() {
                       },
                     },
                     {
+                      type: 'item',
                       label: 'Settings',
-                      icon: <Cog8ToothIcon className='size-6' />,
+                      icon: <Settings className='size-6' />,
                       onClick: () => {
                         router.push(APP_ROUTES.account.settings);
                         toggle(!toggled);
