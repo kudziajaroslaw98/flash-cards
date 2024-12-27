@@ -2,10 +2,15 @@
 
 import { useEffect, useState } from 'react';
 
+import {
+  ArrowRight,
+  CornerDownLeft,
+  CornerLeftDown,
+  RefreshCw,
+} from 'lucide-react';
 import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
 import { FloatingButtons } from '../floating-buttons/floating-buttons';
 import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
-import { ArrowRight, CornerDownLeft, RefreshCw } from 'lucide-react';
 import type { FlashCard } from '#/shared/models/flash-card.model';
 import { ShortcutList } from '../shortcut-list/shortcut-list';
 import FlashCardComponent from '../flash-card/flash-card';
@@ -149,7 +154,7 @@ export default function FlashCardReviseComponent() {
               clicked && 'opacity-100',
             ])}
           >
-            <CornerDownLeft className='size-5 text-green-400' />
+            <CornerLeftDown className='size-5 text-green-400' />
 
             <span className='w-32 text-xs italic text-gray-600 dark:text-slate-500'>
               Click on the card to flip it

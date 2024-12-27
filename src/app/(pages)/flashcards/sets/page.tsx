@@ -194,6 +194,7 @@ export default function SetsPage() {
             />
 
             <ToggleButton
+              animated={false}
               toggled={isFavourite}
               toggle={() => toggleFavourite(!isFavourite)}
               activeIcon={<Star className='h-4 w-4 fill-current' />}
@@ -235,7 +236,7 @@ export default function SetsPage() {
                   onTouchMove={onMove}
                 >
                   {selected.includes(set) && (
-                    <BadgeCheck className='absolute -right-4 -top-4 h-6 w-6 text-green-400' />
+                    <BadgeCheck className='absolute -right-4 -top-4 h-6 w-6  fill-green-500 text-gray-50 dark:text-slate-950' />
                   )}
 
                   <div className='flex flex-col gap-4'>
@@ -255,6 +256,7 @@ export default function SetsPage() {
                     </div>
 
                     <ToggleButton
+                      animated={false}
                       ref={toggleRef}
                       toggled={set.isFavourite}
                       activeIcon={<Star className='h-4 w-4 fill-current' />}

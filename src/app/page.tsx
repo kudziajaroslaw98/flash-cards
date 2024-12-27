@@ -157,10 +157,7 @@ export default async function Home() {
   );
 
   const proLink = new URL(`${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/sign-in`);
-  proLink.searchParams.set(
-    'redirect',
-    new URL(`${process.env.NEXT_PUBLIC_APP_LOCAL_HREF}/pricing`).href,
-  );
+  proLink.searchParams.set('redirect', 'pricing');
 
   const containerVariants = {
     hidden: { opacity: 0, y: 50, viewport: { once: true } },

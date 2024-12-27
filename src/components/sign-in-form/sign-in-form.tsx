@@ -3,6 +3,7 @@
 import { ArrowLeftIcon, Fingerprint, Github } from 'lucide-react';
 import { createClient } from '#/shared/utils/supabase/client';
 import { Button } from '#/components/_ui/button/button';
+import { useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -10,12 +11,34 @@ import Link from 'next/link';
 export default function SignInComponent() {
   const supabase = createClient();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const searchParams = useSearchParams();
+
+  const getRedirectUrl = () => {
+    const redirect = searchParams.get('redirect');
+    let redirectUrl = new URL(
+      process.env.NEXT_PUBLIC_APP_LOCAL_HREF + '/api/auth/callback',
+    );
+
+    switch (redirect) {
+      case 'pricing':
+        redirectUrl.searchParams.set('next', '/pricing');
+        break;
+      default:
+        redirectUrl.searchParams.set('next', '/flashcards/learn');
+        break;
+    }
+
+    return redirectUrl;
+  };
 
   const handleOAuthGoogle = async () => {
     window.umami.track('Sign in with Google');
     setIsLoading(true);
     await supabase.auth.signInWithOAuth({
       provider: 'google',
+      options: {
+        redirectTo: getRedirectUrl().href,
+      },
     });
   };
 
@@ -24,6 +47,9 @@ export default function SignInComponent() {
     setIsLoading(true);
     await supabase.auth.signInWithOAuth({
       provider: 'github',
+      options: {
+        redirectTo: getRedirectUrl().href,
+      },
     });
   };
 

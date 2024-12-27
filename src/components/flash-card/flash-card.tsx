@@ -86,7 +86,7 @@ export default function FlashCardComponent({
           {(!isFlipped || isInSelectionMode) && (
             <>
               {isSelected && (
-                <BadgeCheck className='absolute -right-4 -top-4 h-6 w-6 text-green-400' />
+                <BadgeCheck className='absolute -right-4 -top-4 h-6 w-6 fill-green-500 text-gray-50 dark:text-slate-950' />
               )}
 
               <h5
