@@ -2,25 +2,20 @@
 
 import { useEffect, useState } from 'react';
 
-import {
-  ArrowRight,
-  CornerDownLeft,
-  CornerLeftDown,
-  RefreshCw,
-} from 'lucide-react';
-import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
-import { FloatingButtons } from '../floating-buttons/floating-buttons';
-import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
-import type { FlashCard } from '#/shared/models/flash-card.model';
-import { ShortcutList } from '../shortcut-list/shortcut-list';
-import FlashCardComponent from '../flash-card/flash-card';
 import { Button } from '#/components/_ui/button/button';
-import { useAppContext } from '#/providers/app-context';
 import useKeyPress from '#/hooks/use-key-press.hook';
+import useRandomArrayItems from '#/hooks/use-random-array-items.hook';
+import { useAppContext } from '#/providers/app-context';
+import type { FlashCard } from '#/shared/models/flash-card.model';
+import { cn } from '#/shared/utils/cn.util';
+import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
+import { ArrowRight, CornerLeftDown, RefreshCw } from 'lucide-react';
+import FlashCardComponent from '../flash-card/flash-card';
+import { FloatingButtons } from '../floating-buttons/floating-buttons';
+import { ShortcutList } from '../shortcut-list/shortcut-list';
+import Card from '../_ui/card/card';
 import Dropdown from '../_ui/dropdown/dropdown';
 import LinkComponent from '../_ui/link/link';
-import { cn } from '#/shared/utils/cn.util';
-import Card from '../_ui/card/card';
 
 export default function FlashCardReviseComponent() {
   const defaultSet = { value: 'default', label: 'All flash cards' };

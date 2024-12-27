@@ -6,19 +6,13 @@
     "next/core-web-vitals",
     "eslint:recommended"
   ],
-  "plugins": ["@typescript-eslint", "eslint-plugin-react-compiler"],
+  "plugins": ["@typescript-eslint"],
   "globals": {
     "React": "readonly"
   },
-  "overrides": [
-    {
-      "files": ["*.stories.@(ts|tsx|js|jsx|mjs|cjs)"]
-    }
-  ],
   "rules": {
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": ["error"],
-    "no-restricted-imports": "off",
-    "react-compiler/react-compiler": "error"
+    "no-restricted-imports": "off"
   }
 }
