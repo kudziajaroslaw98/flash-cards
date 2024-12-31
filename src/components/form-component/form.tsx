@@ -1,5 +1,18 @@
 'use client';
 
+import Input from '#/components/_ui/input/input';
+import isDropdown from '#/shared/guards/is-dropdown.guard';
+import isInput from '#/shared/guards/is-input.guard';
+import isTextArea from '#/shared/guards/is-text-area.guard';
+import { cn } from '#/shared/utils/cn.util';
+import { isDifferent } from '#/shared/utils/is-different.util';
+import {
+  FormScheme,
+  type ExtendedInputType,
+  type InputType,
+} from '#/types//form-scheme.type';
+import { AnimatePresence } from 'framer-motion';
+import * as m from 'framer-motion/m';
 import {
   useEffect,
   useRef,
@@ -8,15 +21,13 @@ import {
   type FormEvent,
   type SetStateAction,
 } from 'react';
-import type { SafeParseError, SafeParseSuccess, ZodIssueBase } from 'zod';
-import { isDifferent } from '#/shared/utils/is-different.util';
-import isTextArea from '#/shared/guards/is-text-area.guard';
-import isDropdown from '#/shared/guards/is-dropdown.guard';
-import { FormScheme } from '#/types//form-scheme.type';
-import isInput from '#/shared/guards/is-input.guard';
-import TextArea from '../_ui/text-area/text-area';
-import Input from '#/components/_ui/input/input';
+import {
+  type SafeParseError,
+  type SafeParseSuccess,
+  type ZodIssueBase,
+} from 'zod';
 import Dropdown from '../_ui/dropdown/dropdown';
+import TextArea from '../_ui/text-area/text-area';
 
 export default function FormComponent<T>(props: {
   scheme: FormScheme<T>;
@@ -32,11 +43,15 @@ export default function FormComponent<T>(props: {
     errors?: boolean;
     values?: boolean;
     touch?: boolean;
+    visibility?: boolean;
   };
 }) {
   const [inputsValidity, setInputsValidity] = useState<Record<string, boolean>>(
     {},
   );
+  const [inputsVisibility, setInputsVisibility] = useState<
+    Record<string, boolean>
+  >({});
   const [inputsErrors, setInputsErrors] = useState<
     Record<string, string | null>
   >({});
@@ -62,8 +77,32 @@ export default function FormComponent<T>(props: {
       let initialValids: Record<string, boolean> = {};
       let initialErrors: Record<string, string | null> = {};
       let tmpValues: Record<string, string> = {};
+      let initialVisibility: Record<string, boolean> = {};
 
-      Object.entries(props.scheme.inputs).forEach(([inputName]) => {
+      const inputs = Object.entries(props.scheme.inputs) as [
+        string,
+        ExtendedInputType<InputType, T>,
+      ][];
+
+      inputs.forEach(([inputName, input]) => {
+        if (input?._internal_constraints) {
+          const isInvalid = input._internal_constraints.some(
+            ({ key, constraint }) => {
+              if (!constraint.safeParse(formValues?.[key as string]).success) {
+                return true;
+              }
+            },
+          );
+
+          if (isInvalid) {
+            initialVisibility = { ...initialVisibility, [inputName]: false };
+          } else {
+            initialVisibility = { ...initialVisibility, [inputName]: true };
+          }
+        } else {
+          initialVisibility = { ...initialVisibility, [inputName]: true };
+        }
+
         initialInputs = [...initialInputs, inputName];
         initialValids = { ...initialValids, [inputName]: true };
         initialErrors = { ...initialErrors, [inputName]: null };
@@ -87,6 +126,7 @@ export default function FormComponent<T>(props: {
       setInputsErrors(initialErrors);
       setFormValues(initialValues);
       setDefaultValids(initialValids);
+      setInputsVisibility(initialVisibility);
       initialValuesRef.current = props.initialValues ?? null;
     }
   }, [props.initialValues, props.scheme.inputs]);
@@ -138,6 +178,12 @@ export default function FormComponent<T>(props: {
       console.log('form - touched - ', touchedInputs);
     }
   }, [props.debug, touchedInputs]);
+
+  useEffect(() => {
+    if (props?.debug?.visibility) {
+      console.log('form - visibility - ', inputsVisibility);
+    }
+  }, [props.debug, inputsVisibility]);
 
   const checkFormValidity = () => {
     const output: SafeParseSuccess<unknown> | SafeParseError<unknown> =
@@ -204,74 +250,95 @@ export default function FormComponent<T>(props: {
     setTouchedInputs((prev) => ({ ...prev, [inputName]: true }));
   };
 
+  const isHidden = (inputName: string) => {
+    return !inputsVisibility[inputName];
+  };
+
   return (
-    <form className={props.className}>
-      {Object.entries(props.scheme.inputs).map(([inputName, inputProps]) => {
-        return (
-          <span key={inputName}>
-            {/* @ts-expect-error We need to have possibility to edit only few attributes from object. Thats why we use Partial, but with it comes the error that the inputProps is unknown.*/}
+    <form className={cn([props.className])}>
+      <AnimatePresence initial={false}>
+        {Object.entries(inputsVisibility)
+          .filter(([inputName]) => !isHidden(inputName))
+          .map(([inputName], index) => {
+            const inputProps = props.scheme.inputs[inputName as keyof T];
 
-            {isTextArea(inputProps) && (
-              <TextArea
-                {...inputProps}
-                key={inputName}
-                value={formValues[inputName] as string}
-                valid={
-                  touchedInputs[inputName] ? inputsValidity[inputName] : true
-                }
-                error={
-                  touchedInputs[inputName] ? inputsErrors[inputName] : null
-                }
-                touched={touchedInputs[inputName]}
-                onInput={(e) => handleOnInput(e, inputName)}
-                onFocus={() => handleOnFocus(inputName)}
-                onBlur={handleOnBlur}
-              ></TextArea>
-            )}
+            return (
+              <m.div
+                key={`${inputName}-${index}`}
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, translateY: -20, opacity: 0 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+              >
+                {/* @ts-expect-error We need to have possibility to edit only few attributes from object. Thats why we use Partial, but with it comes the error that the inputProps is unknown.*/}
 
-            {/* @ts-expect-error We need to have possibility to edit only few attributes from object. Thats why we use Partial, but with it comes the error that the inputProps is unknown.*/}
+                {isTextArea(inputProps) && (
+                  <TextArea
+                    {...inputProps}
+                    key={`${inputName}-${index}`}
+                    value={formValues[inputName] as string}
+                    valid={
+                      touchedInputs[inputName]
+                        ? inputsValidity[inputName]
+                        : true
+                    }
+                    error={
+                      touchedInputs[inputName] ? inputsErrors[inputName] : null
+                    }
+                    touched={touchedInputs[inputName]}
+                    onInput={(e) => handleOnInput(e, inputName)}
+                    onFocus={() => handleOnFocus(inputName)}
+                    onBlur={handleOnBlur}
+                  ></TextArea>
+                )}
 
-            {isDropdown(inputProps) && (
-              <Dropdown
-                {...inputProps}
-                key={inputName}
-                value={formValues[inputName]}
-                valid={
-                  touchedInputs[inputName] ? inputsValidity[inputName] : true
-                }
-                error={
-                  touchedInputs[inputName] ? inputsErrors[inputName] : null
-                }
-                touched={touchedInputs[inputName]}
-                onChange={(e) => handleOnChange(e, inputName)}
-                onFocus={() => handleOnFocus(inputName)}
-                onBlur={handleOnBlur}
-              ></Dropdown>
-            )}
+                {/* @ts-expect-error We need to have possibility to edit only few attributes from object. Thats why we use Partial, but with it comes the error that the inputProps is unknown.*/}
 
-            {/* @ts-expect-error We need to have possibility to edit only few attributes from object. Thats why we use Partial, but with it comes the error that the inputProps is unknown.*/}
+                {isDropdown(inputProps) && (
+                  <Dropdown
+                    {...inputProps}
+                    key={`${inputName}-${index}`}
+                    value={formValues[inputName]}
+                    valid={
+                      touchedInputs[inputName]
+                        ? inputsValidity[inputName]
+                        : true
+                    }
+                    error={
+                      touchedInputs[inputName] ? inputsErrors[inputName] : null
+                    }
+                    touched={touchedInputs[inputName]}
+                    onChange={(e) => handleOnChange(e, inputName)}
+                    onFocus={() => handleOnFocus(inputName)}
+                    onBlur={handleOnBlur}
+                  ></Dropdown>
+                )}
 
-            {isInput(inputProps) && (
-              <Input
-                {...inputProps}
-                key={inputName}
-                valid={
-                  touchedInputs[inputName] ? inputsValidity[inputName] : true
-                }
-                error={
-                  touchedInputs[inputName] ? inputsErrors[inputName] : null
-                }
-                touched={touchedInputs[inputName]}
-                value={(formValues[inputName] as string) ?? ''}
-                onInput={(e) => handleOnInput(e, inputName)}
-                onFocus={() => handleOnFocus(inputName)}
-                onBlur={handleOnBlur}
-              />
-            )}
-          </span>
-        );
-      })}
+                {/* @ts-expect-error We need to have possibility to edit only few attributes from object. Thats why we use Partial, but with it comes the error that the inputProps is unknown.*/}
 
+                {isInput(inputProps) && (
+                  <Input
+                    {...inputProps}
+                    key={`${inputName}-${index}`}
+                    valid={
+                      touchedInputs[inputName]
+                        ? inputsValidity[inputName]
+                        : true
+                    }
+                    error={
+                      touchedInputs[inputName] ? inputsErrors[inputName] : null
+                    }
+                    touched={touchedInputs[inputName]}
+                    value={(formValues[inputName] as string) ?? ''}
+                    onInput={(e) => handleOnInput(e, inputName)}
+                    onFocus={() => handleOnFocus(inputName)}
+                    onBlur={handleOnBlur}
+                  />
+                )}
+              </m.div>
+            );
+          })}
+      </AnimatePresence>
       {props.formError && (
         <span
           className={`${

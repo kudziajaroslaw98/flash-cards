@@ -1,5 +1,15 @@
 'use client';
 
+import { Button } from '#/components/_ui/button/button';
+import ContextMenu, {
+  type ContextMenuItem,
+} from '#/components/_ui/context-menu/context-menu';
+import LinkComponent from '#/components/_ui/link/link';
+import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
+import { useSessionContext } from '#/providers/session-provider.component';
+import { APP_ROUTES } from '#/shared/defaults/app.routes';
+import { NavigationItem } from '#/types//navigation-item.type';
+import type { NavigationGroup } from '#/types/navigation-group.type';
 import {
   ArrowUp,
   GraduationCap,
@@ -10,21 +20,11 @@ import {
   UserRound,
   Zap,
 } from 'lucide-react';
-import ContextMenu, {
-  type ContextMenuItem,
-} from '#/components/_ui/context-menu/context-menu';
-import { useSessionContext } from '#/providers/session-provider.component';
-import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
-import type { NavigationGroup } from '#/types/navigation-group.type';
-import ThemeSwitchComponent from '../theme-switch/theme-switch';
-import { NavigationItem } from '#/types//navigation-item.type';
-import { APP_ROUTES } from '#/shared/defaults/app.routes';
 import { usePathname, useRouter } from 'next/navigation';
-import { Button } from '#/components/_ui/button/button';
-import LinkComponent from '#/components/_ui/link/link';
 import { useEffect, useRef, useState } from 'react';
-import AvatarComponent from '../_ui/avatar/avatar';
 import { MenuIcon } from '../_ui/_icons/menu';
+import AvatarComponent from '../_ui/avatar/avatar';
+import ThemeSwitchComponent from '../theme-switch/theme-switch';
 
 export default function HamburgerMenuComponent() {
   const { isLoggedIn, user, logOut, isPlanActive } = useSessionContext();
@@ -106,7 +106,7 @@ export default function HamburgerMenuComponent() {
     window.umami.track('Upgrade plan clicked');
 
     if (!isLoggedIn) {
-      router.push(APP_ROUTES.signIn);
+      router.push(APP_ROUTES.signIn + '?redirect=pricing');
       return;
     } else {
       router.push(APP_ROUTES.pricing);

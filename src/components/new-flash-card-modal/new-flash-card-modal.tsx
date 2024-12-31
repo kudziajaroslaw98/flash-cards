@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { newFlashCardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';
 import { useSessionContext } from '#/providers/session-provider.component';
-import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
-import { FlashCard } from '#/shared/models/flash-card.model';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
-import FormComponent from '../form-component/form';
-import { Button } from '../_ui/button/button';
 import uuid from '#/shared/utils/uuid.util';
+import { newFlashCardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';
+import type { FlashCard } from '#/types/flash-card.type';
 import { useCompletion } from 'ai/react';
+import { Button } from '../_ui/button/button';
 import Modal from '../_ui/modal/modal';
+import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
+import FormComponent from '../form-component/form';
 
 interface NewFlashCardModalProps {
   handleNewFlashCard: (
@@ -44,8 +44,9 @@ export const NewFlashCardModal = ({
     if (selectedFlashCards.length === 0) {
       setFlashCards([
         {
+          flashCardType: 'index',
           frontUuid: uuid(),
-          question: 'What is the definition of word below?',
+          question: '',
           questionAddition: '',
           answer: '',
           createdAt: new Date().toISOString(),
@@ -62,8 +63,9 @@ export const NewFlashCardModal = ({
     if (selectedFlashCards.length === 0) {
       setFlashCards([
         {
+          flashCardType: 'index',
           frontUuid: uuid(),
-          question: 'What is the definition of word below?',
+          question: '',
           questionAddition: '',
           answer: '',
           createdAt: new Date().toISOString(),
@@ -120,8 +122,9 @@ export const NewFlashCardModal = ({
     } else {
       if (!isInEditMode) {
         const newFlashCard = {
+          flashCardType: 'index' as const,
           frontUuid: uuid(),
-          question: 'What is the definition of word below?',
+          question: '',
           questionAddition: '',
           answer: '',
           createdAt: new Date().toISOString(),
@@ -208,6 +211,11 @@ export const NewFlashCardModal = ({
               scheme={getFormScheme}
               emitFormValue={setFormValue}
               initialValues={flashCards[currentIndex]}
+              debug={{
+                inputs: true,
+                values: true,
+                visibility: true,
+              }}
             />
           </Modal.Body>
 

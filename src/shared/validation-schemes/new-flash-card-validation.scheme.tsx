@@ -1,14 +1,15 @@
-import type { FlashCard } from '../models/flash-card.model';
+import type { FlashCard } from '#/types/flash-card.type';
 import type { FormScheme } from '#/types/form-scheme.type';
 import { z } from 'zod';
 
 export const newFlashCardValidationScheme = z.object({
-  question: z.string().min(1, 'Question is required'),
-  questionAddition: z.string().min(1, 'Addition is required'),
-  answer: z
+  flashCardType: z.string().min(1, 'Flash Card Type is required'),
+  question: z.string().optional(),
+  questionAddition: z
     .string()
-    .min(1, 'Answer is required')
-    .max(255, 'Answer is too long'),
+    .min(1, 'Word or sentence is required')
+    .optional(),
+  answer: z.string().max(255, 'Answer is too long').optional(),
 });
 
 export const newFlashCardScheme = (
@@ -16,21 +17,52 @@ export const newFlashCardScheme = (
   loadingGenerate: boolean,
   isLoggedIn: boolean,
   isPlanActive: boolean,
-): FormScheme<Pick<FlashCard, 'question' | 'questionAddition' | 'answer'>> => ({
+): FormScheme<
+  Pick<FlashCard, 'question' | 'questionAddition' | 'answer' | 'flashCardType'>
+> => ({
   inputs: {
+    flashCardType: {
+      type: 'dropdown',
+      value: 'index',
+      name: 'flashCardType',
+      controlLabel: 'Flash Card Type',
+      label: 'Flash Card Type',
+      config: [
+        { value: 'index', label: 'Index Flash Card' },
+        { value: 'full', label: 'With Question and Answer' },
+        { value: 'multiple', label: 'Multiple answers' },
+      ],
+      required: true,
+    },
+    questionAddition: {
+      type: 'text',
+      name: 'questionAddition',
+      label: 'Word / Sentence',
+      placeholder: 'Prowess',
+      required: true,
+    },
     question: {
+      _internal_constraints: [
+        {
+          key: 'flashCardType',
+          constraint: z.string().includes('full'),
+        },
+      ],
       type: 'text',
       name: 'question',
       label: 'Question',
       placeholder: 'What is the definition of word below?',
     },
-    questionAddition: {
-      type: 'text',
-      name: 'questionAddition',
-      label: 'Addition',
-      placeholder: 'Prowess',
-    },
     answer: {
+      _internal_constraints: [
+        {
+          key: 'flashCardType',
+          constraint: z
+            .string()
+            .includes('full')
+            .or(z.string().includes('multiple')),
+        },
+      ],
       type: 'textarea',
       name: 'answer',
       label: 'Answer',

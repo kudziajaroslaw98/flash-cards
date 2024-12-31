@@ -1,5 +1,5 @@
-import type { ContextMenuItem } from './context-menu';
 import type { PropsWithChildren } from 'react';
+import type { ContextMenuItem } from './context-menu';
 import MenuItem from './menu-item';
 
 interface MenuItemProps {
@@ -25,7 +25,10 @@ export default function MenuGroupItem(props: PropsWithChildren<MenuItemProps>) {
          flex w-full items-center gap-4 border-b border-b-slate-200 bg-gray-50 pl-6  text-sm text-green-400 dark:border-b-slate-800 dark:bg-slate-900 dark:text-green-400
          ${className ?? ''}`}
         >
-          <ul className='flex h-full w-full flex-col'>
+          <ul
+            key={`group-ul-item-${props.items[0].label}`}
+            className='flex h-full w-full flex-col'
+          >
             {props.items
               .filter((item) => item.type === 'item')
               .map((item, index) => (

@@ -10,12 +10,12 @@ import type { FlashCard } from '#/shared/models/flash-card.model';
 import { cn } from '#/shared/utils/cn.util';
 import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
 import { ArrowRight, CornerLeftDown, RefreshCw } from 'lucide-react';
-import FlashCardComponent from '../flash-card/flash-card';
-import { FloatingButtons } from '../floating-buttons/floating-buttons';
-import { ShortcutList } from '../shortcut-list/shortcut-list';
 import Card from '../_ui/card/card';
 import Dropdown from '../_ui/dropdown/dropdown';
 import LinkComponent from '../_ui/link/link';
+import FlashCardComponent from '../flash-card/flash-card';
+import { FloatingButtons } from '../floating-buttons/floating-buttons';
+import { ShortcutList } from '../shortcut-list/shortcut-list';
 
 export default function FlashCardReviseComponent() {
   const defaultSet = { value: 'default', label: 'All flash cards' };
@@ -193,13 +193,13 @@ export default function FlashCardReviseComponent() {
           {randomCards.map((flashCard, index) => (
             <div
               className={cn([
+                'flex w-[320px] cursor-pointer gap-4 rounded-md border border-gray-200 p-4 transition hover:bg-gray-100 dark:dark:border-slate-800/40 dark:hover:bg-slate-800',
                 clickedCard?.frontUuid === flashCard.frontUuid &&
                   isCorrect(flashCard) &&
                   'border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
                 clickedCard?.frontUuid === flashCard.frontUuid &&
                   !isCorrect(flashCard) &&
-                  'border-red-400/50 bg-red-100 hover:!bg-red-100 dark:!border-red-400/40 dark:bg-red-400/20 dark:hover:!bg-red-400/20',
-                'flex w-[320px] cursor-pointer gap-4 rounded-md border border-gray-200 p-4 transition hover:bg-gray-100 dark:dark:border-slate-800/40 dark:hover:bg-slate-800',
+                  'border-red-400/50 bg-red-400/20 hover:!bg-red-100 dark:!border-red-400/40 dark:bg-red-400/20 dark:hover:!bg-red-400/20',
               ])}
               key={`answer-${flashCard.frontUuid}`}
               onClick={() => changeClicked(flashCard)}
@@ -217,23 +217,25 @@ export default function FlashCardReviseComponent() {
       </div>
 
       <FloatingButtons>
-        {/* <div className='fixed bottom-0 right-0 z-40 flex h-36 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 px-2 backdrop-blur-md dark:bg-slate-950/10 sm:sticky sm:bottom-8'> */}
-        <Button
-          label={'Reshuffle'}
-          icon={<RefreshCw className='h-4 w-4' />}
-          iconPosition={'right'}
-          onClick={reshuffleFlashCards}
-          size={'xlg'}
-          className='!w-full !max-w-xs'
-        />
+        <div className='flex w-full flex-col items-center justify-center gap-4'>
+          {/* <div className='fixed bottom-0 right-0 z-40 flex h-36 w-full flex-col items-center justify-center gap-4 bg-gray-200/10 px-2 backdrop-blur-md dark:bg-slate-950/10 sm:sticky sm:bottom-8'> */}
+          <Button
+            label={'Reshuffle'}
+            icon={<RefreshCw className='h-4 w-4' />}
+            iconPosition={'right'}
+            onClick={reshuffleFlashCards}
+            size={'xlg'}
+            className='!w-full !max-w-xs'
+          />
 
-        <Dropdown
-          config={[defaultSet, ...setsDictionary]}
-          onChange={changeRevisedSet}
-          value={defaultSet.value}
-          contextPosition={'top'}
-          labelClassName='max-w-xs bg-gray-50 dark:bg-slate-950'
-        />
+          <Dropdown
+            config={[defaultSet, ...setsDictionary]}
+            onChange={changeRevisedSet}
+            value={defaultSet.value}
+            contextPosition={'top'}
+            labelClassName='max-w-xs bg-gray-50 dark:bg-slate-950'
+          />
+        </div>
         {/* </div> */}
       </FloatingButtons>
     </div>

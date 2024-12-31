@@ -1,7 +1,7 @@
 'use client';
-import { DetailedHTMLProps, HTMLAttributes, PropsWithChildren } from 'react';
-import { m, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { cn } from '#/shared/utils/cn.util';
+import { m, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { DetailedHTMLProps, HTMLAttributes, PropsWithChildren } from 'react';
 
 export interface CardProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -36,7 +36,7 @@ export default function Card({
         handleMouseMove(e.clientX, e.clientY, e.currentTarget)
       }
       className={cn([
-        `text-default group relative flex flex-col gap-4 rounded-md border border-gray-200 bg-gray-50 p-4 shadow-card transition-all  dark:border-slate-800/40 dark:bg-slate-900/40 dark:shadow-card-dark `,
+        `text-default group relative flex flex-col gap-4 rounded-md border border-gray-200 bg-gray-50 p-4 shadow-card transition-all  dark:border-slate-800/40 dark:bg-slate-950 dark:shadow-card-dark `,
         motion &&
           'active:scale-95 motion-safe:will-change-transform md:hover:translate-y-1 md:hover:shadow-card-hovered dark:md:hover:shadow-dark-card-hovered',
         className,

@@ -1,16 +1,16 @@
 'use client';
 
-import { DictionaryValue } from '#/types//dictionary-value.type';
-import { isDifferent } from '#/shared/utils/is-different.util';
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
-import { FormEvent, useEffect, useRef, useState } from 'react';
-import { cva, VariantProps } from 'class-variance-authority';
-import DropdownLabel from './dropdown-label';
 import { cn } from '#/shared/utils/cn.util';
-import DropdownItem from './dropdown-item';
-import { Button } from '../button/button';
+import { isDifferent } from '#/shared/utils/is-different.util';
+import { DictionaryValue } from '#/types//dictionary-value.type';
+import { cva, VariantProps } from 'class-variance-authority';
 import { Search } from 'lucide-react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
+import { Button } from '../button/button';
 import Input from '../input/input';
+import DropdownItem from './dropdown-item';
+import DropdownLabel from './dropdown-label';
 
 const DropdownVariants = cva(
   `absolute flex-col overflow-clip rounded-md border dark:border-slate-900/95 dark:bg-slate-950 flex w-full min-w-fit bg-gray-50/95 backdrop-blur-lg`,
@@ -359,7 +359,7 @@ export default function Dropdown<T>({
                 {isSearching &&
                   filteredItems?.map((item, index) => (
                     <DropdownItem<T>
-                      key={`dropdown_item_${item.label}_${index}`}
+                      key={`dropdown_item_${item.value}_${index}`}
                       item={item}
                       selected={selected}
                       changePickedItem={changePickedItem}
@@ -369,7 +369,7 @@ export default function Dropdown<T>({
                 {!isSearching &&
                   items?.map((item, index) => (
                     <DropdownItem<T>
-                      key={`dropdown_item_${item.label}_${index}`}
+                      key={`dropdown_item_${item.value}_${index}`}
                       item={item}
                       selected={selected}
                       changePickedItem={changePickedItem}
