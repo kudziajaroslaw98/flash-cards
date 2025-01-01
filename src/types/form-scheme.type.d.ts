@@ -19,7 +19,7 @@ export type InputType =
   | TextAreaProps
   | DropdownProps<unknown>;
 
-type ExtendedInputType<T, K> = T & InternalCommands<K>;
+export type ExtendedInputType<T, K> = T & InternalCommands<K>;
 
 export type FormScheme<
   T,
