@@ -1,27 +1,22 @@
 'use client';
 
-import { FloatingButtons } from '#/components/floating-buttons/floating-buttons';
-import { BadgeCheck, Pencil, Plus, Search, Star, Trash } from 'lucide-react';
 import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
-import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
-import Dropdown from '#/components/_ui/dropdown/dropdown';
+import Badge from '#/components/_ui/badge/badge';
 import { Button } from '#/components/_ui/button/button';
-import { useAppContext } from '#/providers/app-context';
-import useLongPress from '#/hooks/use-long-press.hook';
-import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, m } from 'framer-motion';
-import Input from '#/components/_ui/input/input';
 import Card from '#/components/_ui/card/card';
+import Dropdown from '#/components/_ui/dropdown/dropdown';
+import Input from '#/components/_ui/input/input';
+import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
+import { FloatingButtons } from '#/components/floating-buttons/floating-buttons';
+import { NewSetModal } from '#/components/new-set-modal/new-set-modal';
+import useLongPress from '#/hooks/use-long-press.hook';
+import { useAppContext } from '#/providers/app-context';
+import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
 import { cn } from '#/shared/utils/cn.util';
+import { AnimatePresence, m } from 'framer-motion';
+import { BadgeCheck, Pencil, Plus, Search, Star, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-
-const NewSetModal = dynamic(() =>
-  import('#/components/new-set-modal/new-set-modal').then((x) => x.NewSetModal),
-);
-
-const Badge = dynamic(() => import('#/components/_ui/badge/badge'));
+import { useEffect, useRef, useState } from 'react';
 
 // TODO: add metadata and move content of the page to correct client component
 // export const metadata: Metadata = {
@@ -224,6 +219,7 @@ export default function SetsPage() {
                 }}
               >
                 <Card
+                  tabIndex={0}
                   key={set.frontUuid}
                   className={cn([
                     'flex h-full cursor-pointer flex-col justify-between gap-4 sm:min-h-44 sm:gap-4',

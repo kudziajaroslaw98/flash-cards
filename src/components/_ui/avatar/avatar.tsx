@@ -1,11 +1,15 @@
 'use client';
 
 import useLocalStorage from '#/hooks/use-local-storage.hook';
-import { botttsNeutral } from '@dicebear/collection';
-import { createAvatar } from '@dicebear/core';
 import { cn } from '#/shared/utils/cn.util';
-import { useEffect, useState } from 'react';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { botttsNeutral } from '@dicebear/collection';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { createAvatar } from '@dicebear/core';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 interface AvatarProps {
   className?: string;
@@ -63,6 +67,7 @@ export default function AvatarComponent({
       onClick={() => onClick && onClick()}
       className={cn([
         'relative flex cursor-pointer items-center justify-center overflow-hidden rounded-full bg-gray-200 text-sm font-semibold text-slate-800 active:focus:scale-95 dark:bg-slate-800 dark:text-gray-100',
+        'outline-none focus:ring focus:ring-green-400/50',
         className,
       ])}
     >

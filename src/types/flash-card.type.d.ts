@@ -4,6 +4,7 @@ type BaseFlashCard = {
   order: number;
   createdAt: string;
   updatedAt: string;
+  revisedAt: string | Date;
 };
 
 export type FlashCard = BaseFlashCard &
@@ -15,7 +16,7 @@ export type FlashCard = BaseFlashCard &
         answer?: string;
       }
     | {
-        flashCardType: 'full';
+        flashCardType: 'single';
         questionAddition: string;
         question: string;
         answer: string;

@@ -40,19 +40,20 @@ export const NewFlashCardModal = ({
     api: API_ROUTES.ANSWER_GENERATE,
   });
 
+  const newFlashCard = {
+    flashCardType: 'index' as const,
+    frontUuid: uuid(),
+    question: '',
+    questionAddition: '',
+    answer: '',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    revisedAt: new Date().toISOString(),
+  };
+
   const clearInitialValues = () => {
     if (selectedFlashCards.length === 0) {
-      setFlashCards([
-        {
-          flashCardType: 'index',
-          frontUuid: uuid(),
-          question: '',
-          questionAddition: '',
-          answer: '',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ]);
+      setFlashCards([newFlashCard]);
     } else {
       setFlashCards(selectedFlashCards);
     }
@@ -61,17 +62,7 @@ export const NewFlashCardModal = ({
 
   useEffect(() => {
     if (selectedFlashCards.length === 0) {
-      setFlashCards([
-        {
-          flashCardType: 'index',
-          frontUuid: uuid(),
-          question: '',
-          questionAddition: '',
-          answer: '',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ]);
+      setFlashCards([newFlashCard]);
     } else {
       setFlashCards(selectedFlashCards);
     }
@@ -105,10 +96,16 @@ export const NewFlashCardModal = ({
     window.umami.track('Flash card dialog - submitted', { isInEditMode });
     setIsModalOpen(false);
 
+    const mappedFlashCards = flashCards.map((flashCard) => ({
+      ...flashCard,
+      answer: flashCard.flashCardType === 'index' ? '' : flashCard.answer,
+      question: flashCard.flashCardType === 'index' ? '' : flashCard.question,
+    }));
+
     if (isInEditMode) {
-      handleEditFlashCard(flashCards);
+      handleEditFlashCard(mappedFlashCards);
     } else {
-      handleNewFlashCard(flashCards);
+      handleNewFlashCard(mappedFlashCards);
     }
 
     clearInitialValues();
@@ -121,16 +118,6 @@ export const NewFlashCardModal = ({
       setCurrentIndex(currentIndex + 1);
     } else {
       if (!isInEditMode) {
-        const newFlashCard = {
-          flashCardType: 'index' as const,
-          frontUuid: uuid(),
-          question: '',
-          questionAddition: '',
-          answer: '',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-
         setFlashCards((prev) => [
           ...prev.map((item) =>
             item.frontUuid === formValue.frontUuid
@@ -211,11 +198,11 @@ export const NewFlashCardModal = ({
               scheme={getFormScheme}
               emitFormValue={setFormValue}
               initialValues={flashCards[currentIndex]}
-              debug={{
-                inputs: true,
-                values: true,
-                visibility: true,
-              }}
+              // debug={{
+              //   inputs: true,
+              //   values: true,
+              //   visibility: true,
+              // }}
             />
           </Modal.Body>
 

@@ -7,11 +7,18 @@ type ZodSchemaFromBaseObject<T> =
   | ZodObject<Record<keyof T, ZodTypeAny>>
   | ZodEffects<ZodObject<Record<keyof T, ZodTypeAny>>>;
 
-type InternalCommands<K> = {
-  _internal_constraints?: {
-    key: keyof K;
-    constraint: ZodTypeAny;
-  }[];
+export type InternalConstraint<T = unknown> = {
+  key: keyof T;
+  constraint: ZodTypeAny;
+} & (
+  | {
+      type: 'show';
+    }
+  | { type: 'prop'; propName: string; propValue: unknown }
+);
+
+export type InternalCommands<T> = {
+  _internal_constraints?: InternalConstraint<T>[];
 };
 
 export type InputType =

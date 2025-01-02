@@ -117,7 +117,7 @@ export default function SidebarComponent() {
       >
         <Link
           href={'/'}
-          className={`flex items-center font-thin tracking-wider ${expanded && 'gap-4'}`}
+          className={`flex items-center font-thin tracking-wider outline-none focus:ring focus:ring-green-400/50 ${expanded && 'gap-4'}`}
         >
           <Image
             width={24}

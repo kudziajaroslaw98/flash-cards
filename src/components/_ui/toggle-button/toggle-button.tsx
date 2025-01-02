@@ -3,17 +3,17 @@ import { forwardRef, useCallback, type ReactNode } from 'react';
 
 type ToggleButtonProps =
   | ({
-      animated?: false;
-      activeIcon?: ReactNode;
-      inactiveIcon?: ReactNode;
+      animated: false;
+      activeIcon: ReactNode;
+      inactiveIcon: ReactNode;
       animatedIcon?: ReactNode;
       toggled: boolean;
       toggle?: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
       toggleVariant?: 'outline' | 'text';
     } & ButtonProps)
   | ({
-      animated?: true;
-      animatedIcon?: ReactNode;
+      animated: true;
+      animatedIcon: ReactNode;
       activeIcon?: ReactNode;
       inactiveIcon?: ReactNode;
       toggled: boolean;
@@ -24,6 +24,10 @@ type ToggleButtonProps =
 const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonProps>(
   (
     {
+      animated = false,
+      activeIcon,
+      inactiveIcon,
+      animatedIcon,
       toggled = true,
       toggle = () => {},
       toggleVariant = 'outline',
@@ -32,17 +36,12 @@ const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonProps>(
     ref,
   ) => {
     const icon = useCallback(() => {
-      if (props.animated === false) {
-        return toggled ? props?.activeIcon : props?.inactiveIcon;
-      } else if (props.animated === true) {
-        return props?.animatedIcon;
+      if (animated) {
+        return animatedIcon;
+      } else {
+        return toggled ? activeIcon : inactiveIcon;
       }
-    }, [
-      props.animated,
-      props.activeIcon,
-      props.inactiveIcon,
-      props.animatedIcon,
-    ]);
+    }, [animated, activeIcon, inactiveIcon, animatedIcon]);
 
     const getVariantType = () => {
       if (toggled) {

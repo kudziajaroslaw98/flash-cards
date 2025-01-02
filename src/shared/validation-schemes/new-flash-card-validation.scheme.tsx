@@ -29,7 +29,7 @@ export const newFlashCardScheme = (
       label: 'Flash Card Type',
       config: [
         { value: 'index', label: 'Index Flash Card' },
-        { value: 'full', label: 'With Question and Answer' },
+        { value: 'single', label: 'Single answer' },
         { value: 'multiple', label: 'Multiple answers' },
       ],
       required: true,
@@ -41,25 +41,24 @@ export const newFlashCardScheme = (
       placeholder: 'Prowess',
       required: true,
     },
-    question: {
-      _internal_constraints: [
-        {
-          key: 'flashCardType',
-          constraint: z.string().includes('full'),
-        },
-      ],
-      type: 'text',
-      name: 'question',
-      label: 'Question',
-      placeholder: 'What is the definition of word below?',
-    },
     answer: {
       _internal_constraints: [
         {
+          type: 'show',
           key: 'flashCardType',
           constraint: z
             .string()
-            .includes('full')
+            .includes('single')
+            .or(z.string().includes('multiple')),
+        },
+        {
+          type: 'prop',
+          propName: 'required',
+          propValue: true,
+          key: 'flashCardType',
+          constraint: z
+            .string()
+            .includes('single')
             .or(z.string().includes('multiple')),
         },
       ],
@@ -70,6 +69,26 @@ export const newFlashCardScheme = (
       handleGenerate: handleGenerate,
       loadingGenerate,
       blockGenerate: !isLoggedIn || !isPlanActive,
+    },
+    question: {
+      _internal_constraints: [
+        {
+          type: 'show',
+          key: 'flashCardType',
+          constraint: z.string().includes('single'),
+        },
+        {
+          type: 'prop',
+          propName: 'required',
+          propValue: false,
+          key: 'flashCardType',
+          constraint: z.string().includes('single'),
+        },
+      ],
+      type: 'text',
+      name: 'question',
+      label: 'Question',
+      placeholder: 'What is the definition of word below?',
     },
   },
   validation: newFlashCardValidationScheme,

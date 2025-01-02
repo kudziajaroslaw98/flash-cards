@@ -1,3 +1,5 @@
+import { Button } from '#/components/_ui/button/button';
+import Card from '#/components/_ui/card/card';
 import {
   Activity,
   AppWindow,
@@ -14,13 +16,11 @@ import {
   Smile,
   Sparkles,
 } from 'lucide-react';
-import { Button } from '#/components/_ui/button/button';
-import Card from '#/components/_ui/card/card';
 
+import Badge from '#/components/_ui/badge/badge';
+import LinkComponent from '#/components/_ui/link/link';
 import { ScrollReveal } from '#/components/_ui/scroll-reveal/scroll-reveal';
 import Timeline from '#/components/_ui/timeline/timeline';
-import LinkComponent from '#/components/_ui/link/link';
-import Badge from '#/components/_ui/badge/badge';
 import * as m from 'framer-motion/m';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -633,7 +633,7 @@ export default async function Home() {
 
           <div className='flex flex-col items-center justify-center gap-4'>
             <span className='text-center text-slate-400'>
-              © 2024 Flash Cards. All rights reserved.
+              © {new Date().getFullYear()} Flash Cards. All rights reserved.
             </span>
           </div>
 

@@ -75,7 +75,7 @@ export default function FlashCardComponent({
         <Card
           tabIndex={0}
           className={cn([
-            'z-10 cursor-pointer flex-col items-center p-4 py-0',
+            'z-10 cursor-pointer flex-col items-center p-4 py-0 outline-none  focus:ring  focus:ring-green-400/50',
             isSelected ? 'ring ring-green-400/60' : '',
             size === 'sm' && 'h-56 w-44',
             size === 'md' && 'h-56 w-44',
