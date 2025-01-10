@@ -7,6 +7,13 @@ type ZodSchemaFromBaseObject<T> =
   | ZodObject<Record<keyof T, ZodTypeAny>>
   | ZodEffects<ZodObject<Record<keyof T, ZodTypeAny>>>;
 
+export type InputValidation<T> = {
+  key: keyof T;
+  constraint: ZodTypeAny;
+  whenKey?: keyof T;
+  whenConstraint?: ZodTypeAny;
+};
+
 export type InternalConstraint<T = unknown> = {
   key: keyof T;
   constraint: ZodTypeAny;
@@ -15,6 +22,7 @@ export type InternalConstraint<T = unknown> = {
       type: 'show';
     }
   | { type: 'prop'; propName: string; propValue: unknown }
+  | { type: 'validation'; whenKey?: keyof T; whenConstraint?: ZodTypeAny }
 );
 
 export type InternalCommands<T> = {
@@ -38,6 +46,5 @@ export type FormScheme<
     Record<keyof T, Input>
   >,
 > = {
-  validation: ZodSchemaFromBaseObject<SchemeType>;
   inputs: SchemeType;
 };

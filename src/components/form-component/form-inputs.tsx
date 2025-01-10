@@ -33,8 +33,6 @@ export default function FormInputsComponent<T>({
   inputsErrors,
   inputsVisibility,
 }: FormInputsProps<T>) {
-  console.log('touchedInputs', touchedInputs);
-
   const anyTouched = Object.values(touchedInputs).some((value) => value);
   const isPropConstraint = (item: InternalConstraint<T>) => {
     return (
@@ -54,8 +52,6 @@ export default function FormInputsComponent<T>({
       ),
     [inputsVisibility],
   );
-
-  console.log('anyTouched', anyTouched);
 
   return (
     <AnimatePresence>

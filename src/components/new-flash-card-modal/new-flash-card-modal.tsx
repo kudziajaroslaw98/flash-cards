@@ -40,20 +40,27 @@ export const NewFlashCardModal = ({
     api: API_ROUTES.ANSWER_GENERATE,
   });
 
-  const newFlashCard = {
-    flashCardType: 'index' as const,
+  const getNewFlashCard = () => ({
+    type: 'index' as const,
     frontUuid: uuid(),
     question: '',
     questionAddition: '',
     answer: '',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    revisedAt: new Date().toISOString(),
-  };
+    spacedRepetition: {
+      interval: 0,
+      easeFactor: 1.3,
+      reviews: 0,
+      lastReviewAt: new Date().toISOString(),
+      dueDate: new Date(Date.now()).toISOString(),
+    },
+    sets: [],
+  });
 
   const clearInitialValues = () => {
     if (selectedFlashCards.length === 0) {
-      setFlashCards([newFlashCard]);
+      setFlashCards([getNewFlashCard()]);
     } else {
       setFlashCards(selectedFlashCards);
     }
@@ -62,7 +69,7 @@ export const NewFlashCardModal = ({
 
   useEffect(() => {
     if (selectedFlashCards.length === 0) {
-      setFlashCards([newFlashCard]);
+      setFlashCards([getNewFlashCard()]);
     } else {
       setFlashCards(selectedFlashCards);
     }
@@ -72,8 +79,8 @@ export const NewFlashCardModal = ({
     setFlashCards((prev) =>
       prev.map((item) =>
         item.frontUuid === formValue.frontUuid
-          ? (formValue as Omit<FlashCard, 'weight' | 'order'>)
-          : (item as Omit<FlashCard, 'weight' | 'order'>),
+          ? (formValue as Omit<FlashCard, 'order'>)
+          : (item as Omit<FlashCard, 'order'>),
       ),
     );
   }, [formValue]);
@@ -98,8 +105,10 @@ export const NewFlashCardModal = ({
 
     const mappedFlashCards = flashCards.map((flashCard) => ({
       ...flashCard,
-      answer: flashCard.flashCardType === 'index' ? '' : flashCard.answer,
-      question: flashCard.flashCardType === 'index' ? '' : flashCard.question,
+      answer: flashCard.type === 'index' ? '' : flashCard.answer,
+      question: flashCard.type === 'index' ? '' : flashCard.question,
+      questionAddition:
+        flashCard.type === 'question' ? '' : flashCard.questionAddition,
     }));
 
     if (isInEditMode) {
@@ -121,10 +130,10 @@ export const NewFlashCardModal = ({
         setFlashCards((prev) => [
           ...prev.map((item) =>
             item.frontUuid === formValue.frontUuid
-              ? (formValue as Omit<FlashCard, 'weight' | 'order'>)
-              : (item as Omit<FlashCard, 'weight' | 'order'>),
+              ? (formValue as Omit<FlashCard, 'order'>)
+              : (item as Omit<FlashCard, 'order'>),
           ),
-          newFlashCard,
+          getNewFlashCard(),
         ]);
         setCurrentIndex((prev) => prev + 1);
       }
@@ -137,8 +146,8 @@ export const NewFlashCardModal = ({
       setFlashCards((prev) =>
         prev.map((item) =>
           item.frontUuid === formValue.frontUuid
-            ? (formValue as Omit<FlashCard, 'weight' | 'order'>)
-            : (item as Omit<FlashCard, 'weight' | 'order'>),
+            ? (formValue as Omit<FlashCard, 'order'>)
+            : (item as Omit<FlashCard, 'order'>),
         ),
       );
       setCurrentIndex((prev) => prev - 1);
@@ -147,14 +156,15 @@ export const NewFlashCardModal = ({
 
   const handleGenerate = useCallback(async () => {
     if (
-      formValue.questionAddition !== undefined &&
-      formValue.questionAddition !== '' &&
+      ((formValue.questionAddition !== undefined &&
+        formValue.questionAddition !== '') ||
+        formValue.type === 'question') &&
       isLoggedIn &&
       isPlanActive
     ) {
       setLoadingGenerate(true);
       await complete(
-        `generate description to: '${formValue.questionAddition}'`,
+        `generate ${formValue.type === 'question' ? 'answer' : 'description'} to: '${formValue.type === 'question' ? formValue.question : formValue.questionAddition}'`,
       );
       setLoadingGenerate(false);
     }
@@ -187,7 +197,9 @@ export const NewFlashCardModal = ({
         submitRef={submitRef}
       >
         <Modal className='w-full'>
-          <Modal.Header variant={'form'}>Create new flash card</Modal.Header>
+          <Modal.Header variant={'form'}>
+            {isInEditMode ? 'Edit flash card' : 'Create new flash card'}
+          </Modal.Header>
 
           <Modal.Body
             variant={'form'}
@@ -198,11 +210,6 @@ export const NewFlashCardModal = ({
               scheme={getFormScheme}
               emitFormValue={setFormValue}
               initialValues={flashCards[currentIndex]}
-              // debug={{
-              //   inputs: true,
-              //   values: true,
-              //   visibility: true,
-              // }}
             />
           </Modal.Body>
 

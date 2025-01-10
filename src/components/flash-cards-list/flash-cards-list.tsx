@@ -4,27 +4,16 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { Button } from '#/components/_ui/button/button';
 import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter';
-import type { FlashCard } from '#/shared/models/flash-card.model';
 
 import { useAppContext } from '#/providers/app-context';
 import { cn } from '#/shared/utils/cn.util';
+import type { FlashCard } from '#/types/flash-card.type';
 import { AnimatePresence } from 'framer-motion';
 import { Pencil, Plus, Trash } from 'lucide-react';
-import dynamic from 'next/dynamic';
+import { AlertDialog } from '../_ui/alert-dialog/alert-dialog';
 import FlashCardComponent from '../flash-card/flash-card';
 import { FloatingButtons } from '../floating-buttons/floating-buttons';
-
-const NewFlashCardModal = dynamic(() =>
-  import('#/components/new-flash-card-modal/new-flash-card-modal').then(
-    (x) => x.NewFlashCardModal,
-  ),
-);
-
-const AlertDialog = dynamic(() =>
-  import('#/components/_ui/alert-dialog/alert-dialog').then(
-    (x) => x.AlertDialog,
-  ),
-);
+import { NewFlashCardModal } from '../new-flash-card-modal/new-flash-card-modal';
 
 export default function FlashCardsList() {
   const {

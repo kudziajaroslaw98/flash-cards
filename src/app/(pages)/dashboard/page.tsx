@@ -18,6 +18,44 @@ export const metadata: Metadata = {
     'flashcards overview',
     'learning dashboard',
   ],
+  openGraph: {
+    title: 'Dashboard - Flash Cards',
+    description:
+      'View your learning progress, recent sets, and study statistics in one place.',
+    images: [
+      {
+        url: 'https://flashcards.finalphase.app/og/og_image.png',
+        width: 800,
+        height: 600,
+      },
+    ],
+    url: 'https://flashcards.finalphase.app/',
+    siteName: 'Dashboard - Flash Cards',
+    locale: 'en-US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Dashboard - Flash Cards',
+    description:
+      'View your learning progress, recent sets, and study statistics in one place.',
+    images: [
+      {
+        url: 'https://flashcards.finalphase.app/og/og_image.png',
+        width: 800,
+        height: 600,
+      },
+    ],
+  },
+  robots: {
+    index: true,
+    follow: false,
+  },
+  applicationName: 'Flash Cards - Learning Words Made Easy',
+  alternates: {
+    canonical: 'https://flashcards.finalphase.app/',
+  },
+  manifest: '/manifest.json',
 };
 
 export default function DashboardPage() {

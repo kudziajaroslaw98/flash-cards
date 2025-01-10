@@ -34,7 +34,6 @@ type FormInputProps<T> = {
 };
 
 export default function FormInput<T>({
-  anyTouched,
   inputName,
   index,
   value,
@@ -61,9 +60,6 @@ export default function FormInput<T>({
   return (
     <m.div
       key={`${inputName}-${index}`}
-      initial={anyTouched ? undefined : { height: 0, opacity: 0 }}
-      animate={{ height: 'auto', opacity: 1 }}
-      exit={{ height: 0, translateY: -20, opacity: 0 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
     >
       {isTextArea(inputProps) && (

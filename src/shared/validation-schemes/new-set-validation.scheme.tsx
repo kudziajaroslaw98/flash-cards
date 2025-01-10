@@ -1,7 +1,7 @@
 import type { DictionaryValue } from '#/types/dictionary-value.type';
-import type { FlashCardSet } from '../models/flash-card-set.model';
 import type { FormScheme } from '#/types/form-scheme.type';
 import { z } from 'zod';
+import type { FlashCardSet } from '../../types/flash-card-set.type';
 
 export const newSetValidationScheme = z.object({
   name: z.string().min(1, 'Name is required'),

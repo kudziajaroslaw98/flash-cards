@@ -2,15 +2,15 @@ import { newSetFormScheme } from '#/shared/validation-schemes/new-set-validation
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useSessionContext } from '#/providers/session-provider.component';
-import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import type { DictionaryValue } from '#/types//dictionary-value.type';
-import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
-import FormComponent from '../form-component/form';
-import { Button } from '../_ui/button/button';
 import uuid from '#/shared/utils/uuid.util';
+import type { DictionaryValue } from '#/types//dictionary-value.type';
+import type { FlashCardSet } from '#/types/flash-card-set.type';
 import { useCompletion } from 'ai/react';
+import { Button } from '../_ui/button/button';
 import Modal from '../_ui/modal/modal';
+import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
+import FormComponent from '../form-component/form';
 
 interface NewSetModalProps {
   handleNew?: (sets: Partial<FlashCardSet>[]) => void;

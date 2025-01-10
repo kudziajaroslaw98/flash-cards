@@ -344,11 +344,13 @@ export default function Dropdown<T>({
               </div>
             )}
             <div
-              className={
-                (props.searchable || props.clearAll) && items?.length > 0
-                  ? 'max-h-52 py-3'
-                  : 'max-h-52'
-              }
+              tabIndex={-1}
+              className={cn([
+                'max-h-52 overflow-y-auto px-2',
+                (props.searchable || props.clearAll) &&
+                  items?.length > 0 &&
+                  'py-3',
+              ])}
             >
               {isSearching &&
                 filteredItems?.map((item, index) => (
@@ -373,7 +375,7 @@ export default function Dropdown<T>({
             </div>
             {props.addNew && !isInAddNewMode && (
               <div
-                className='hover:text-green-40 flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-100 px-4 py-2 text-gray-500 transition hover:text-green-400  dark:border-slate-800/40 dark:bg-slate-900'
+                className='flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-100  px-4 py-2 text-gray-500 outline-none transition hover:text-green-400 focus:ring focus:ring-green-400/50  dark:border-slate-800/40 dark:bg-slate-900'
                 onClick={() => handleToggleAddNew()}
                 onKeyDown={(event) =>
                   event.key === 'Enter' && handleToggleAddNew('Enter')
@@ -385,7 +387,7 @@ export default function Dropdown<T>({
             )}
             {props.addNew && isInAddNewMode && (
               <div>
-                <div className='min-w-fit  bg-gray-100 p-1 py-2 dark:border-slate-800/40 dark:bg-slate-900 '>
+                <div className='min-w-fit  bg-gray-100 p-1 py-2 outline-none focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-900'>
                   <Input
                     type='text'
                     value={newItemValue}
@@ -430,7 +432,7 @@ export default function Dropdown<T>({
 
             {props.clearAll && (
               <div
-                className='flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-100 px-4 py-2 text-gray-500 transition hover:text-green-400  dark:border-slate-800/40 dark:bg-slate-900'
+                className='flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-100 px-4 py-2 text-gray-500 outline-none transition  hover:text-green-400 focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-900'
                 onClick={() => clearPicked()}
                 onKeyDown={(event) =>
                   event.key === 'Enter' && clearPicked('Enter')

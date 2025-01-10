@@ -19,6 +19,44 @@ export const metadata: Metadata = {
     'revision mode',
     'memory reinforcement',
   ],
+  openGraph: {
+    title: 'Revise Flash Cards - Review and Remember',
+    description:
+      'Review your flash cards with our advanced revision system. Strengthen your memory and track your progress.',
+    images: [
+      {
+        url: 'https://flashcards.finalphase.app/og/og_image.png',
+        width: 800,
+        height: 600,
+      },
+    ],
+    url: 'https://flashcards.finalphase.app/',
+    siteName: 'Revise Flash Cards - Review and Remember',
+    locale: 'en-US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Revise Flash Cards - Review and Remember',
+    description:
+      'Review your flash cards with our advanced revision system. Strengthen your memory and track your progress.',
+    images: [
+      {
+        url: 'https://flashcards.finalphase.app/og/og_image.png',
+        width: 800,
+        height: 600,
+      },
+    ],
+  },
+  robots: {
+    index: true,
+    follow: false,
+  },
+  applicationName: 'Flash Cards - Learning Words Made Easy',
+  alternates: {
+    canonical: 'https://flashcards.finalphase.app/',
+  },
+  manifest: '/manifest.json',
 };
 
 export default function RevisePage() {
