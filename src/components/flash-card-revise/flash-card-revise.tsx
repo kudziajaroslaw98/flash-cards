@@ -6,15 +6,15 @@ import { Button } from '#/components/_ui/button/button';
 import useKeyPress from '#/hooks/use-key-press.hook';
 import useSpacedRepetition from '#/hooks/use-spaced-repetition';
 import { useAppContext } from '#/providers/app-context';
-import { cn } from '#/shared/utils/cn.util';
 import type { FlashCard } from '#/types/flash-card.type';
-import { ArrowRight, CornerLeftDown, RefreshCw } from 'lucide-react';
-import Card from '../_ui/card/card';
+import { ArrowRight, RefreshCw } from 'lucide-react';
 import Dropdown from '../_ui/dropdown/dropdown';
 import LinkComponent from '../_ui/link/link';
-import FlashCardComponent from '../flash-card/flash-card';
 import { FloatingButtons } from '../floating-buttons/floating-buttons';
 import { ShortcutList } from '../shortcut-list/shortcut-list';
+import { AllRevised } from './all-revised';
+import { ReviseItem } from './revise-item';
+import { ReviseOptions } from './revise-options';
 
 export default function FlashCardReviseComponent() {
   const {
@@ -25,7 +25,6 @@ export default function FlashCardReviseComponent() {
     updateMetadata,
   } = useAppContext();
 
-  const defaultSet = { value: 'default', label: 'All flash cards' };
   const spaceRepetitionOptions = [
     {
       value: 'again',
@@ -49,6 +48,7 @@ export default function FlashCardReviseComponent() {
     },
   ] as const;
 
+  const defaultSet = { value: 'default', label: 'All flash cards' };
   const [revisedCard, setRevisedCard] = useState<FlashCard>();
   const [revisedSet, setRevisedSet] = useState<string>(defaultSet.value);
   const [clickedCard, setClickedCard] = useState<FlashCard>();
@@ -86,13 +86,9 @@ export default function FlashCardReviseComponent() {
     updateFlashCard(spacedItem);
   };
 
-  const isCorrect = (flashCard?: FlashCard) => {
-    const comparisonItem = flashCard ?? clickedCard;
+  const changeClicked = (flashCard: FlashCard | undefined, key?: string) => {
+    if (!flashCard) return;
 
-    return revisedCard === comparisonItem;
-  };
-
-  const changeClicked = (flashCard: FlashCard, key?: string) => {
     if (key) {
       window.umami.track('Answer clicked', { key });
     } else {
@@ -103,27 +99,18 @@ export default function FlashCardReviseComponent() {
       return;
     }
 
-    const correct = isCorrect(flashCard);
+    const correct = revisedCard?.frontUuid === flashCard.frontUuid;
     const clonedStats = { ...metadata };
 
     clonedStats.answers += 1;
 
-    // if (correct) {
-    //   clonedStats.correctAnswers += 1;
-    //   if (revisedCard && revisedCard?.weight > 0.01) {
-    //     updateFlashCard({
-    //       ...flashCard,
-    //       weight: +(flashCard.weight - 0.01).toFixed(2),
-    //     });
-    //   }
-    // } else {
-    //   clonedStats.incorrectAnswers += 1;
-
-    //   updateFlashCard({
-    //     ...flashCard,
-    //     weight: +(flashCard.weight + 0.01).toFixed(2),
-    //   });
-    // }
+    if (revisedCard?.type === 'single' && correct) {
+      clonedStats.correctAnswers += 1;
+      calculateRepetition(flashCard, 'good');
+    } else {
+      clonedStats.incorrectAnswers += 1;
+      calculateRepetition(flashCard, 'again');
+    }
 
     clonedStats.accuracy = parseFloat(
       (clonedStats.correctAnswers / clonedStats.answers).toFixed(2),
@@ -152,6 +139,7 @@ export default function FlashCardReviseComponent() {
     setClickedCard(undefined);
     setRevisedCard(undefined);
     setClickedOption(undefined);
+    setClicked(false);
 
     reroll();
   };
@@ -164,7 +152,20 @@ export default function FlashCardReviseComponent() {
 
   const continueRerollClick = () => {
     window.umami.track('Continue reshuffling');
+    setClickedCard(undefined);
+    setRevisedCard(undefined);
+    setClickedOption(undefined);
+    setClicked(false);
     setContinueReroll(true);
+  };
+
+  const clickRevisedOption = (key: string) => {
+    const index = parseInt(key) - 1;
+    if (revisedCard?.type === 'index' || revisedCard?.type === 'question') {
+      spaceRepetitionClick(spaceRepetitionOptions[index].value);
+    } else {
+      changeClicked(randomItems?.[index], key);
+    }
   };
 
   useEffect(() => {
@@ -173,44 +174,22 @@ export default function FlashCardReviseComponent() {
     setRevisedCard(randomItems?.[0]);
   }, [randomItems]);
 
-  useKeyPress(['r'], () => reshuffleFlashCardsWithKey('r'));
+  useKeyPress([' '], () => reshuffleFlashCardsWithKey('Space'));
   useKeyPress(['ArrowRight'], () => reshuffleFlashCardsWithKey('ArrowRight'));
-  // useKeyPress(['1'], () => changeClicked(randomCards[0], '1'));
-  // useKeyPress(['2'], () => changeClicked(randomCards[1], '2'));
-  // useKeyPress(['3'], () => changeClicked(randomCards[2], '3'));
-  // useKeyPress(['4'], () => changeClicked(randomCards[3], '4'));
+  useKeyPress(['1'], () => clickRevisedOption('1'));
+  useKeyPress(['2'], () => clickRevisedOption('2'));
+  useKeyPress(['3'], () => clickRevisedOption('3'));
+  useKeyPress(['4'], () => clickRevisedOption('4'));
 
   return flashcards.length > 0 ? (
     <div className='flex h-full w-full flex-col justify-stretch'>
       <div className='flex h-full w-full flex-col items-center gap-8 pb-44'>
         {(todayItemsEnd && continueReroll) || !todayItemsEnd ? (
           <>
-            <div className='grid w-full items-center justify-center'>
-              <div
-                className={cn([
-                  'flex w-full items-center justify-end gap-2 opacity-0 transition md:translate-x-20',
-                  clicked && revisedCard?.type !== 'index' && 'opacity-100',
-                ])}
-              >
-                <CornerLeftDown className='size-5 text-green-400' />
-
-                <span className='w-32 text-xs italic text-gray-600 dark:text-slate-500'>
-                  Click on the card to flip it
-                </span>
-              </div>
-
-              <div>
-                {revisedCard ? (
-                  <FlashCardComponent
-                    key={revisedCard.frontUuid}
-                    flashCard={revisedCard}
-                    flipBlocked={!clicked}
-                  />
-                ) : (
-                  <Card className='h-96 w-80' />
-                )}
-              </div>
-            </div>
+            <ReviseItem
+              clicked={clicked}
+              revisedCard={revisedCard}
+            />
 
             <ShortcutList
               className='hidden md:flex'
@@ -218,7 +197,7 @@ export default function FlashCardReviseComponent() {
                 {
                   name: 'Reshuffle',
                   keys: [
-                    'R',
+                    'Space',
                     <ArrowRight
                       key='ArrowBigRight'
                       className='size-4'
@@ -232,78 +211,24 @@ export default function FlashCardReviseComponent() {
               ]}
             />
 
-            <div className='mt-8 grid gap-2 xl:grid-cols-[repeat(2,minmax(20rem,1fr))]'>
-              {(revisedCard?.type === 'index' ||
-                revisedCard?.type === 'question') && (
-                <>
-                  {spaceRepetitionOptions.map((option, index) => (
-                    <div
-                      className={cn([
-                        'flex w-[320px] cursor-pointer gap-4 rounded-md border border-gray-200 p-4 transition hover:bg-gray-100 dark:border-slate-800/40 dark:hover:bg-slate-800',
-                        clickedOption === option.value &&
-                          'border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
-                      ])}
-                      key={`answer-${index}`}
-                      onClick={() => spaceRepetitionClick(option.value)}
-                    >
-                      <span className='flex size-8 min-h-8 min-w-8 items-center justify-center rounded-md bg-green-400 text-gray-100 dark:text-slate-900'>
-                        {index + 1}
-                      </span>
-
-                      <span className='flex w-[280px] text-sm text-gray-600 dark:text-slate-400'>
-                        {option.label} - {option.description}
-                      </span>
-                    </div>
-                  ))}
-                </>
-              )}
-
-              {revisedCard?.type === 'single' && randomItems !== null && (
-                <>
-                  {randomItems.map((flashCard, index) => (
-                    <div
-                      className={cn([
-                        'flex w-[320px] cursor-pointer gap-4 rounded-md border border-gray-200 p-4 transition hover:bg-gray-100 dark:dark:border-slate-800/40 dark:hover:bg-slate-800',
-                        clickedCard?.frontUuid === revisedCard.frontUuid &&
-                          isCorrect(revisedCard) &&
-                          'border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
-                        clickedCard?.frontUuid === revisedCard.frontUuid &&
-                          !isCorrect(revisedCard) &&
-                          'border-red-400/50 bg-red-400/20 hover:!bg-red-100 dark:!border-red-400/40 dark:bg-red-400/20 dark:hover:!bg-red-400/20',
-                      ])}
-                      key={`answer-${index}`}
-                      onClick={() => changeClicked(flashCard)}
-                    >
-                      <span className='flex size-8 min-h-8 min-w-8 items-center justify-center rounded-md bg-green-400 text-gray-100 dark:text-slate-900'>
-                        {index + 1}
-                      </span>
-
-                      <span className='flex w-[280px] text-sm text-gray-600 dark:text-slate-400'>
-                        {flashCard.answer}
-                      </span>
-                    </div>
-                  ))}
-                </>
-              )}
-            </div>
+            <ReviseOptions
+              clicked={clicked}
+              clickedCard={clickedCard}
+              clickedOption={clickedOption}
+              randomItems={randomItems}
+              revisedCard={revisedCard}
+              spaceRepetitionClick={spaceRepetitionClick}
+              changeClicked={changeClicked}
+            />
           </>
         ) : (
-          <div className='flex h-full w-full flex-col items-center justify-center gap-4'>
-            <p className='flex flex-col gap-1 text-center text-gray-600 dark:text-slate-400'>
-              <span>All today&apos;s cards have been reviewed</span>
-              <span>Do you want to continue?</span>
-              <span className='pt-2 text-sm text-gray-500 dark:text-slate-500'>
-                Review timeline will be only affected for <b>again and hard</b>{' '}
-                options
-              </span>
-            </p>
-
+          <AllRevised>
             <Button
               label='Continue'
               size={'sm'}
               onClick={continueRerollClick}
             />
-          </div>
+          </AllRevised>
         )}
       </div>
 
