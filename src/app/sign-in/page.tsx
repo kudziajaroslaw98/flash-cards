@@ -18,6 +18,44 @@ export const metadata: Metadata = {
     'student login',
     'learning account',
   ],
+  openGraph: {
+    title: 'Flash Cards - Learning Words Made Easy',
+    description:
+      'Sign in to your Flash Cards account to access your personalized study materials and track your progress.',
+    images: [
+      {
+        url: 'https://flashcards.finalphase.app/og/og_image.png',
+        width: 800,
+        height: 600,
+      },
+    ],
+    url: 'https://flashcards.finalphase.app',
+    siteName: 'Flash Cards - Learning Words Made Easy',
+    locale: 'en-US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Flash Cards - Learning Words Made Easy',
+    description:
+      'Sign in to your Flash Cards account to access your personalized study materials and track your progress.',
+    images: [
+      {
+        url: 'https://flashcards.finalphase.app/og/og_image.png',
+        width: 800,
+        height: 600,
+      },
+    ],
+  },
+  robots: {
+    index: true,
+    follow: false,
+  },
+  applicationName: 'Flash Cards - Learning Words Made Easy',
+  alternates: {
+    canonical: 'https://flashcards.finalphase.app/',
+  },
+  manifest: '/manifest.json',
 };
 
 export default function SignInPage() {

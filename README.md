@@ -24,20 +24,20 @@
 - [x] Offline Mode
 - [x] Organize flashcards into decks
 - [x] Get custom domain name
+- [x] Synchronize your flashcards across all devices
+- [x] Intergating Local Storage and Supabase postgres Database.
+- [x] Generating descriptions to words with AI
+- [x] Generating new words for deck based on words that are already in it
+- [x] Live updates (WebSockets)
+- [x] Logging in
+- [x] Review flashcards using a spaced repetition algorithm
 
 ## Road Map
 
-- [ ] Logging in
-- [ ] Review flashcards using a spaced repetition algorithm
 - [ ] Community Section with shared decks
 - [ ] Daily word suggestion
-- [ ] Generating descriptions to words with AI
-- [ ] Generating new words for deck based on words that are already in it
-- [ ] Live updates (WebSockets)
 - [ ] Add Storybook
 - [ ] Importing flashcards from csv file
-- [ ] Synchronize your flashcards across all devices
-- [ ] Intergating Local Storage and Supabase postgres Database.
 
 ## Tech Stack
 
@@ -47,10 +47,8 @@
 - React
 - TailwindCSS
 - NextPWA
-- Redux
 - Zod
 - TypeScript
-- Storybook (soon)
 
 ## Installation
 

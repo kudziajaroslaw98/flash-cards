@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { newFlashCardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';
 import { useSessionContext } from '#/providers/session-provider.component';
-import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
-import { FlashCard } from '#/shared/models/flash-card.model';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
-import FormComponent from '../form-component/form';
-import { Button } from '../_ui/button/button';
 import uuid from '#/shared/utils/uuid.util';
+import { newFlashCardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';
+import type { FlashCard } from '#/types/flash-card.type';
 import { useCompletion } from 'ai/react';
+import { Button } from '../_ui/button/button';
 import Modal from '../_ui/modal/modal';
+import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
+import FormComponent from '../form-component/form';
 
 interface NewFlashCardModalProps {
   handleNewFlashCard: (
@@ -40,18 +40,27 @@ export const NewFlashCardModal = ({
     api: API_ROUTES.ANSWER_GENERATE,
   });
 
+  const getNewFlashCard = () => ({
+    type: 'index' as const,
+    frontUuid: uuid(),
+    question: '',
+    questionAddition: '',
+    answer: '',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    spacedRepetition: {
+      interval: 0,
+      easeFactor: 1.3,
+      reviews: 0,
+      lastReviewAt: new Date().toISOString(),
+      dueDate: new Date(Date.now()).toISOString(),
+    },
+    sets: [],
+  });
+
   const clearInitialValues = () => {
     if (selectedFlashCards.length === 0) {
-      setFlashCards([
-        {
-          frontUuid: uuid(),
-          question: 'What is the definition of word below?',
-          questionAddition: '',
-          answer: '',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ]);
+      setFlashCards([getNewFlashCard()]);
     } else {
       setFlashCards(selectedFlashCards);
     }
@@ -60,16 +69,7 @@ export const NewFlashCardModal = ({
 
   useEffect(() => {
     if (selectedFlashCards.length === 0) {
-      setFlashCards([
-        {
-          frontUuid: uuid(),
-          question: 'What is the definition of word below?',
-          questionAddition: '',
-          answer: '',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ]);
+      setFlashCards([getNewFlashCard()]);
     } else {
       setFlashCards(selectedFlashCards);
     }
@@ -79,8 +79,8 @@ export const NewFlashCardModal = ({
     setFlashCards((prev) =>
       prev.map((item) =>
         item.frontUuid === formValue.frontUuid
-          ? (formValue as Omit<FlashCard, 'weight' | 'order'>)
-          : (item as Omit<FlashCard, 'weight' | 'order'>),
+          ? (formValue as Omit<FlashCard, 'order'>)
+          : (item as Omit<FlashCard, 'order'>),
       ),
     );
   }, [formValue]);
@@ -103,10 +103,18 @@ export const NewFlashCardModal = ({
     window.umami.track('Flash card dialog - submitted', { isInEditMode });
     setIsModalOpen(false);
 
+    const mappedFlashCards = flashCards.map((flashCard) => ({
+      ...flashCard,
+      answer: flashCard.type === 'index' ? '' : flashCard.answer,
+      question: flashCard.type === 'index' ? '' : flashCard.question,
+      questionAddition:
+        flashCard.type === 'question' ? '' : flashCard.questionAddition,
+    }));
+
     if (isInEditMode) {
-      handleEditFlashCard(flashCards);
+      handleEditFlashCard(mappedFlashCards);
     } else {
-      handleNewFlashCard(flashCards);
+      handleNewFlashCard(mappedFlashCards);
     }
 
     clearInitialValues();
@@ -119,22 +127,13 @@ export const NewFlashCardModal = ({
       setCurrentIndex(currentIndex + 1);
     } else {
       if (!isInEditMode) {
-        const newFlashCard = {
-          frontUuid: uuid(),
-          question: 'What is the definition of word below?',
-          questionAddition: '',
-          answer: '',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-
         setFlashCards((prev) => [
           ...prev.map((item) =>
             item.frontUuid === formValue.frontUuid
-              ? (formValue as Omit<FlashCard, 'weight' | 'order'>)
-              : (item as Omit<FlashCard, 'weight' | 'order'>),
+              ? (formValue as Omit<FlashCard, 'order'>)
+              : (item as Omit<FlashCard, 'order'>),
           ),
-          newFlashCard,
+          getNewFlashCard(),
         ]);
         setCurrentIndex((prev) => prev + 1);
       }
@@ -147,8 +146,8 @@ export const NewFlashCardModal = ({
       setFlashCards((prev) =>
         prev.map((item) =>
           item.frontUuid === formValue.frontUuid
-            ? (formValue as Omit<FlashCard, 'weight' | 'order'>)
-            : (item as Omit<FlashCard, 'weight' | 'order'>),
+            ? (formValue as Omit<FlashCard, 'order'>)
+            : (item as Omit<FlashCard, 'order'>),
         ),
       );
       setCurrentIndex((prev) => prev - 1);
@@ -157,14 +156,15 @@ export const NewFlashCardModal = ({
 
   const handleGenerate = useCallback(async () => {
     if (
-      formValue.questionAddition !== undefined &&
-      formValue.questionAddition !== '' &&
+      ((formValue.questionAddition !== undefined &&
+        formValue.questionAddition !== '') ||
+        formValue.type === 'question') &&
       isLoggedIn &&
       isPlanActive
     ) {
       setLoadingGenerate(true);
       await complete(
-        `generate description to: '${formValue.questionAddition}'`,
+        `generate ${formValue.type === 'question' ? 'answer' : 'description'} to: '${formValue.type === 'question' ? formValue.question : formValue.questionAddition}'`,
       );
       setLoadingGenerate(false);
     }
@@ -197,7 +197,9 @@ export const NewFlashCardModal = ({
         submitRef={submitRef}
       >
         <Modal className='w-full'>
-          <Modal.Header variant={'form'}>Create new flash card</Modal.Header>
+          <Modal.Header variant={'form'}>
+            {isInEditMode ? 'Edit flash card' : 'Create new flash card'}
+          </Modal.Header>
 
           <Modal.Body
             variant={'form'}

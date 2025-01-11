@@ -1,3 +1,21 @@
+import type { ApiFlashcardsSyncResponse } from '#/app/api/flashcard/sync/route';
+import type { ApiMetadataSyncResponse } from '#/app/api/metadata/sync/route';
+import type { ApiSetsSyncResponse } from '#/app/api/set/sync/route';
+import useFetch from '#/hooks/use-fetch.hook';
+import useLocalStorage from '#/hooks/use-local-storage.hook';
+import { API_ROUTES } from '#/shared/defaults/api-routes';
+import { FLASHCARDS_LOCAL_STORAGE_INIT } from '#/shared/defaults/flashcards-local-storage-init';
+import { SETS_LOCAL_STORAGE_INIT } from '#/shared/defaults/sets-local-storage-init';
+import { DEFAULT_METADATA } from '#/shared/defaults/stats.default';
+import { generateHash } from '#/shared/utils/generate-hash';
+import omit from '#/shared/utils/omit.util';
+import { createClient } from '#/shared/utils/supabase/client';
+import uuid from '#/shared/utils/uuid.util';
+import type { ApiResponse } from '#/types/api-response.type';
+import type { DictionaryValue } from '#/types/dictionary-value.type';
+import type { FlashCardSet } from '#/types/flash-card-set.type';
+import type { FlashCard, FlashCardType } from '#/types/flash-card.type';
+import type { Metadata } from '#/types/metadata.type';
 import {
   createContext,
   useCallback,
@@ -7,24 +25,7 @@ import {
   useState,
   type PropsWithChildren,
 } from 'react';
-import { FLASHCARDS_LOCAL_STORAGE_INIT } from '#/shared/defaults/flashcards-local-storage-init';
-import { SETS_LOCAL_STORAGE_INIT } from '#/shared/defaults/sets-local-storage-init';
-import type { ApiFlashcardsSyncResponse } from '#/app/api/flashcard/sync/route';
-import type { ApiMetadataSyncResponse } from '#/app/api/metadata/sync/route';
-import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import type { DictionaryValue } from '#/types/dictionary-value.type';
-import type { ApiSetsSyncResponse } from '#/app/api/set/sync/route';
-import { DEFAULT_METADATA } from '#/shared/defaults/stats.default';
-import type { FlashCard } from '#/shared/models/flash-card.model';
 import { useSessionContext } from './session-provider.component';
-import { createClient } from '#/shared/utils/supabase/client';
-import useLocalStorage from '#/hooks/use-local-storage.hook';
-import type { ApiResponse } from '#/types/api-response.type';
-import { API_ROUTES } from '#/shared/defaults/api-routes';
-import type { Metadata } from '#/types/metadata.type';
-import useFetch from '#/hooks/use-fetch.hook';
-import omit from '#/shared/utils/omit.util';
-import uuid from '#/shared/utils/uuid.util';
 
 export type AppContextType = {
   flashcards: FlashCard[];
@@ -33,12 +34,14 @@ export type AppContextType = {
   categories: DictionaryValue<string>[];
   metadata: Metadata;
   theme: 'dark' | 'light';
+  avatarSeed: string;
   setTheme: (theme: 'dark' | 'light') => void;
   setFlashCards: (flashcards: FlashCard[]) => void;
   addFlashCards: (flashcards: Partial<FlashCard>[]) => void;
   removeFlashCards: (flashcards: FlashCard[]) => void;
   updateFlashCards: (flashcards: Partial<FlashCard>[]) => void;
   updateFlashCard: (flashcard: Partial<FlashCard>) => void;
+  assignFlashCardsToSet: (flashcardUuids: string[], setUuid: string) => void;
   setSets: (sets: FlashCardSet[]) => void;
   addSets: (set: Partial<FlashCardSet>[]) => void;
   removeSets: (set: FlashCardSet[]) => void;
@@ -54,12 +57,14 @@ export const AppContext = createContext<AppContextType>({
   categories: [],
   metadata: DEFAULT_METADATA,
   theme: 'dark',
+  avatarSeed: '',
   setTheme: () => null,
   setFlashCards: () => null,
   addFlashCards: () => null,
   removeFlashCards: () => null,
   updateFlashCards: () => null,
   updateFlashCard: () => null,
+  assignFlashCardsToSet: () => null,
   setSets: () => null,
   addSets: () => null,
   removeSets: () => null,
@@ -70,7 +75,31 @@ export const AppContext = createContext<AppContextType>({
 
 export default function AppProvider(props: PropsWithChildren) {
   /////////////////
-  // EXTERNAL HOOKS
+  // #region DEFAULTS
+  /////////////////
+
+  const defaultFlashCard = {
+    questionAddition: '',
+    question: '',
+    answer: '',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    spacedRepetition: {
+      interval: 0,
+      easeFactor: 1.3,
+      lastReviewAt: new Date().toISOString(),
+      dueDate: new Date(Date.now() + 1000 * 60 * 10).toISOString(),
+      reviews: 0,
+    },
+    sets: [],
+  } as const;
+
+  /////////////////
+  // #endregion DEFAULTS
+  /////////////////
+
+  /////////////////
+  // #region EXTERNAL HOOKS
   /////////////////
 
   const { fetch } = useFetch();
@@ -78,9 +107,14 @@ export default function AppProvider(props: PropsWithChildren) {
   const supabase = createClient();
 
   /////////////////
-  // STATE
+  // #endregion EXTERNAL HOOKS
   /////////////////
 
+  /////////////////
+  // #region STATE
+  /////////////////
+
+  const [avatarSeed, setAvatarSeed] = useState<string>('');
   const [flashCardsArray, setFlashCardsArray] = useState<FlashCard[]>([]);
   const [setsArray, setSetsArray] = useState<FlashCardSet[]>([]);
   const [categories, setCategories] = useState<DictionaryValue<string>[]>([]);
@@ -92,7 +126,11 @@ export default function AppProvider(props: PropsWithChildren) {
   const websocketChannel = useRef<ReturnType<typeof supabase.channel>>();
 
   /////////////////
-  // LOCAL STORAGE
+  // #endregion STATE
+  /////////////////
+
+  /////////////////
+  // #region LOCAL STORAGE
   /////////////////
 
   useLocalStorage({
@@ -117,7 +155,11 @@ export default function AppProvider(props: PropsWithChildren) {
   });
 
   /////////////////
-  // FLASHCARDS MANAGEMENT
+  // #endregion LOCAL STORAGE
+  /////////////////
+
+  /////////////////
+  // #region FLASHCARDS MANAGEMENT
   /////////////////
 
   const setFlashCards = (flashcards: FlashCard[]) => {
@@ -137,14 +179,23 @@ export default function AppProvider(props: PropsWithChildren) {
     const mappedFlashCards: FlashCard[] = flashcards.map((flashCard, index) => {
       const flashCardUuid = flashCard.frontUuid ?? uuid();
       return {
+        type: flashCard.type ?? 'index',
         frontUuid: flashCardUuid,
-        question: flashCard.question ?? '',
-        questionAddition: flashCard.questionAddition ?? '',
-        answer: flashCard.answer ?? '',
+        question: flashCard.question ?? defaultFlashCard.question,
+        questionAddition:
+          flashCard.questionAddition ?? defaultFlashCard.questionAddition,
+        answer: flashCard.answer ?? defaultFlashCard.answer,
         order: flashcardSize + (index + 1),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        weight: 1.0,
+        spacedRepetition: flashCard.spacedRepetition ?? {
+          interval: 0,
+          easeFactor: 1.3,
+          lastReviewAt: new Date().toISOString(),
+          dueDate: new Date(Date.now()).toISOString(),
+          reviews: 0,
+        },
+        sets: flashCard.sets ?? [],
       };
     });
 
@@ -193,26 +244,24 @@ export default function AppProvider(props: PropsWithChildren) {
 
   const removeFlashCards = async (flashcards: FlashCard[]) => {
     const flashcardsObject: Record<string, FlashCard> = {};
-    const flashcardsToDelete: string[] = [];
+    const flashcardsToDelete: string[] = flashcards.map(
+      (item) => item.frontUuid,
+    );
     const filteredFlashcards = flashCardsArray
-      .filter((item: FlashCard) => {
-        if (!flashcards.includes(item)) {
-          return true;
-        }
-        flashcardsToDelete.push(item.frontUuid);
-        return false;
-      })
+      .filter((item: FlashCard) => !flashcards.includes(item))
       .map((item, index) => ({
         ...item,
         order: index,
       }));
 
-    // TODO: It wont work on listening to postgres msg's
+    // It wont work on listening to postgres msg's
     // I need to broadcast messages to other subscribers here.
     await supabase
       .from('flashcards')
       .delete()
       .in('frontUuid', flashcardsToDelete);
+
+    removeFlashCardsFromSets(flashcardsToDelete);
 
     filteredFlashcards.forEach((item: FlashCard) => {
       flashcardsObject[item.frontUuid] = item;
@@ -252,14 +301,33 @@ export default function AppProvider(props: PropsWithChildren) {
     const flashcardsObject: Record<string, FlashCard> = {};
     const mappedFlashCards: FlashCard[] = flashcards.map(
       (flashCard, index) => ({
+        type: flashCard.type ?? 'index',
         frontUuid: flashCard.frontUuid ?? uuid(),
         order: flashCard.order ?? index + 1,
-        weight: flashCard.weight ?? 1.0,
-        questionAddition: flashCard.questionAddition ?? '',
-        question: flashCard.question ?? '',
-        answer: flashCard.answer ?? '',
-        createdAt: flashCard.createdAt ?? new Date().toISOString(),
+        questionAddition:
+          flashCard.questionAddition ?? defaultFlashCard.questionAddition,
+        question: flashCard.question ?? defaultFlashCard.question,
+        answer: flashCard.answer ?? defaultFlashCard.answer,
+        createdAt: flashCard.createdAt ?? defaultFlashCard.createdAt,
         updatedAt: new Date().toISOString(),
+        spacedRepetition: {
+          interval:
+            flashCard.spacedRepetition?.interval ??
+            defaultFlashCard.spacedRepetition.interval,
+          easeFactor:
+            flashCard.spacedRepetition?.easeFactor ??
+            defaultFlashCard.spacedRepetition.easeFactor,
+          reviews:
+            flashCard.spacedRepetition?.reviews ??
+            defaultFlashCard.spacedRepetition.reviews,
+          lastReviewAt:
+            flashCard.spacedRepetition?.lastReviewAt ??
+            defaultFlashCard.spacedRepetition.lastReviewAt,
+          dueDate:
+            flashCard.spacedRepetition?.dueDate ??
+            defaultFlashCard.spacedRepetition.dueDate,
+        },
+        sets: flashCard.sets ?? [],
       }),
     );
 
@@ -286,23 +354,42 @@ export default function AppProvider(props: PropsWithChildren) {
     );
   };
 
-  const updateFlashCard = async (flashcard: Partial<FlashCard>) => {
+  const updateFlashCard = async (flashCard: Partial<FlashCard>) => {
     const flashcardsObject: Record<string, FlashCard> = {};
-    const updatedFlashcard = {
-      frontUuid: flashcard.frontUuid ?? uuid(),
-      order: flashcard.order ?? flashCardsArray.length + 1,
-      weight: flashcard.weight ?? 1.0,
-      questionAddition: flashcard.questionAddition ?? '',
-      question: flashcard.question ?? '',
-      answer: flashcard.answer ?? '',
-      createdAt: flashcard.createdAt ?? new Date().toISOString(),
+    const updatedFlashCard: FlashCard = {
+      type: flashCard.type ?? ('index' as FlashCardType),
+      frontUuid: flashCard.frontUuid ?? uuid(),
+      order: flashCard.order ?? flashCardsArray.length + 1,
+      questionAddition:
+        flashCard.questionAddition ?? defaultFlashCard.questionAddition,
+      question: flashCard.question ?? defaultFlashCard.question,
+      answer: flashCard.answer ?? defaultFlashCard.answer,
+      createdAt: flashCard.createdAt ?? new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      spacedRepetition: {
+        interval:
+          flashCard.spacedRepetition?.interval ??
+          defaultFlashCard.spacedRepetition.interval,
+        easeFactor:
+          flashCard.spacedRepetition?.easeFactor ??
+          defaultFlashCard.spacedRepetition.easeFactor,
+        reviews:
+          flashCard.spacedRepetition?.reviews ??
+          defaultFlashCard.spacedRepetition.reviews,
+        lastReviewAt:
+          flashCard.spacedRepetition?.lastReviewAt ??
+          defaultFlashCard.spacedRepetition.lastReviewAt,
+        dueDate:
+          flashCard.spacedRepetition?.dueDate ??
+          defaultFlashCard.spacedRepetition.dueDate,
+      },
+      sets: flashCard.sets ?? [],
     };
 
-    const updatedFlashcards = flashCardsArray.map((item) => {
-      if (item.frontUuid === flashcard.frontUuid) {
-        flashcardsObject[item.frontUuid] = updatedFlashcard;
-        return updatedFlashcard;
+    const updatedFlashCards = flashCardsArray.map((item) => {
+      if (item.frontUuid === flashCard.frontUuid) {
+        flashcardsObject[item.frontUuid] = updatedFlashCard as FlashCard;
+        return updatedFlashCard;
       }
 
       flashcardsObject[item.frontUuid] = item;
@@ -310,12 +397,12 @@ export default function AppProvider(props: PropsWithChildren) {
     });
 
     localStorage.setItem('flashcards', JSON.stringify(flashcardsObject));
-    setFlashCardsArray(updatedFlashcards);
+    setFlashCardsArray(updatedFlashCards);
 
     await supabase
       .from('flashcards')
-      .update(updatedFlashcard)
-      .eq('frontUuid', flashcard.frontUuid);
+      .update(updatedFlashCard)
+      .eq('frontUuid', flashCard.frontUuid);
   };
 
   const updateFlashCardsFromWebsocket = (flashcard: FlashCard) => {
@@ -335,8 +422,46 @@ export default function AppProvider(props: PropsWithChildren) {
     });
   };
 
+  const assignFlashCardsToSet = (flashcardUuids: string[], setUuid: string) => {
+    setFlashCardsArray((prev: FlashCard[]) => {
+      const updatedFlashcards: FlashCard[] = prev.map((item) => {
+        if (flashcardUuids.includes(item.frontUuid)) {
+          return { ...item, sets: [...(item?.sets ?? []), setUuid] };
+        } else if (item?.sets?.includes(setUuid)) {
+          return {
+            ...item,
+            sets: item?.sets?.filter((uuid) => uuid !== setUuid) ?? [],
+          };
+        }
+        return item;
+      });
+
+      const object: Record<string, FlashCard> = {};
+
+      updatedFlashcards.forEach((item) => {
+        object[item.frontUuid] = item;
+      });
+      localStorage.setItem('flashcards', JSON.stringify(object));
+
+      return updatedFlashcards;
+    });
+  };
+
+  const removeSetsFromFlashCards = (setUuid: string[]) => {
+    const flashCardsCopy = flashCardsArray.map((item) => ({
+      ...item,
+      sets: item.sets.filter((uuid) => !setUuid.includes(uuid)),
+    }));
+
+    updateFlashCards(flashCardsCopy);
+  };
+
   /////////////////
-  // SETS MANAGEMENT
+  // #endregion FLASHCARDS MANAGEMENT
+  /////////////////
+
+  /////////////////
+  // #region SETS MANAGEMENT
   /////////////////
 
   const addSets = async (sets: Partial<FlashCardSet>[]) => {
@@ -399,17 +524,15 @@ export default function AppProvider(props: PropsWithChildren) {
 
   const removeSets = async (sets: FlashCardSet[]) => {
     const setsObject: Record<string, FlashCardSet> = {};
-    const setsToDelete: string[] = [];
-    const filteredSets = setsArray.filter((item: FlashCardSet) => {
-      if (!sets.some((set) => set.frontUuid === item.frontUuid)) {
-        return true;
-      } else {
-        setsToDelete.push(item.frontUuid);
-        return false;
-      }
-    });
+    const setsToDelete: string[] = sets.map((item) => item.frontUuid);
+    const filteredSets = setsArray.filter(
+      (item: FlashCardSet) =>
+        !sets.some((set) => set.frontUuid === item.frontUuid),
+    );
 
     await supabase.from('sets').delete().in('frontUuid', setsToDelete);
+
+    removeSetsFromFlashCards(setsToDelete);
 
     filteredSets.forEach((item: FlashCardSet) => {
       setsObject[item.frontUuid] = item;
@@ -443,6 +566,17 @@ export default function AppProvider(props: PropsWithChildren) {
         order: index,
       }));
     });
+  };
+
+  const removeFlashCardsFromSets = (flashCardUuids: string[]) => {
+    const sets = setsArray.map((set) => ({
+      ...set,
+      flashCards: set.flashCards.filter(
+        (uuid) => !flashCardUuids.includes(uuid) || uuid === null,
+      ),
+    }));
+
+    updateSets(sets);
   };
 
   const updateSets = async (sets: Partial<FlashCardSet>[]) => {
@@ -525,7 +659,11 @@ export default function AppProvider(props: PropsWithChildren) {
   };
 
   /////////////////
-  // STATS MANAGEMENT
+  // #endregion SETS MANAGEMENT
+  /////////////////
+
+  /////////////////
+  // #region STATS MANAGEMENT
   /////////////////
 
   const updateMetadata = (update: Partial<Metadata>) => {
@@ -536,13 +674,16 @@ export default function AppProvider(props: PropsWithChildren) {
   };
 
   /////////////////
-  // SYNCHRONIZATION
+  // #endregion STATS MANAGEMENT
+  /////////////////
+
+  /////////////////
+  // #region SYNCHRONIZATION
   /////////////////
 
   const applyWebsockets = async () => {
-    if (!isLoggedIn) return;
-    const { data } = await supabase.auth.getUser();
-    const user_channel = supabase.channel(`user-${data.user?.id}`);
+    if (!isLoggedIn || !user) return;
+    const user_channel = supabase.channel(`user-${user.id}`);
     websocketChannel.current = user_channel;
     // FLASHCARDS - UPDATE
     websocketChannel.current
@@ -550,6 +691,7 @@ export default function AppProvider(props: PropsWithChildren) {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'flashcards' },
         (payload) => {
+          console.log('flahcard-update', payload);
           if (payload.new) {
             const updatedFlashcard = payload.new as FlashCard & {
               user_uuid: string;
@@ -567,12 +709,15 @@ export default function AppProvider(props: PropsWithChildren) {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'flashcards' },
         (payload) => {
+          console.log('flahcard-insert', payload);
           if (payload.new) {
             const newFlashcard = payload.new as FlashCard & {
               user_uuid: string;
               id: string;
             };
-            addFlashCardsFromWebsocket(omit(newFlashcard, ['user_uuid', 'id']));
+            addFlashCardsFromWebsocket(
+              omit(newFlashcard, ['user_uuid', 'id']) as FlashCard,
+            );
           }
         },
       )
@@ -592,6 +737,7 @@ export default function AppProvider(props: PropsWithChildren) {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'sets' },
         (payload) => {
+          console.log('set-update', payload);
           if (payload.new) {
             const updatedSet = payload.new as FlashCardSet & {
               user_uuid: string;
@@ -671,9 +817,9 @@ export default function AppProvider(props: PropsWithChildren) {
     );
 
     const responses = await Promise.allSettled([
+      fetchMetadata,
       fetchFlashCards,
       fetchSets,
-      fetchMetadata,
     ]);
 
     responses.forEach((response) => {
@@ -720,42 +866,41 @@ export default function AppProvider(props: PropsWithChildren) {
   };
 
   /////////////////
-  // MIGRATION
+  // #endregion SYNCHRONIZATION
   /////////////////
 
-  const migrateSets = useCallback(() => {
-    setSetsArray((prev) => {
-      const updatedSets = prev.map((set) => ({
-        ...set,
-        flashCards: flashCardsArray.filter((flashCard) =>
-          set.flashCards.includes(flashCard.frontUuid as unknown as FlashCard),
-        ),
+  /////////////////
+  // #region MIGRATION
+  /////////////////
+
+  const migrateFlashCards = useCallback(() => {
+    setFlashCardsArray((prev) => {
+      const updatedFlashCards = prev.map((flashCard) => ({
+        ...flashCard,
+        spacedRepetition: flashCard.spacedRepetition ?? {
+          ...defaultFlashCard.spacedRepetition,
+        },
       }));
-      const setsObject: Record<string, FlashCardSet> = {};
-      updatedSets.forEach((item: FlashCardSet) => {
-        setsObject[item.frontUuid] = item;
+
+      const flashCardsObject: Record<string, FlashCard> = {};
+      updatedFlashCards.forEach((item: FlashCard) => {
+        flashCardsObject[item.frontUuid] = item;
       });
 
-      localStorage.setItem('sets', JSON.stringify(setsObject));
-      return updatedSets;
+      localStorage.setItem('flashcards', JSON.stringify(flashCardsObject));
+      return updatedFlashCards;
     });
   }, [flashCardsArray]);
 
   /////////////////
-  // MUTATIONS
+  // #endregion MIGRATION
+  /////////////////
+
+  /////////////////
+  // #region MUTATIONS
   /////////////////
 
   useEffect(() => {
-    if (
-      setsArray.some(
-        (set) =>
-          set.flashCards.length > 0 &&
-          set.flashCards.at(0)?.frontUuid === undefined,
-      )
-    ) {
-      migrateSets();
-    }
-
     const categoriesTmp = new Set<string>();
     const setsDictionary: DictionaryValue<string>[] = setsArray.map((item) => ({
       label: item.name,
@@ -777,7 +922,23 @@ export default function AppProvider(props: PropsWithChildren) {
 
     setCategories(selectCategoriesAsDictionary);
     setSetsDictionary(setsDictionary);
-  }, [setsArray, migrateSets]);
+  }, [setsArray]);
+
+  useEffect(() => {
+    if (
+      flashCardsArray.some(
+        (flashCard) =>
+          flashCard.spacedRepetition === undefined ||
+          flashCard.spacedRepetition === null,
+      )
+    ) {
+      migrateFlashCards();
+    }
+  }, [flashCardsArray, migrateFlashCards]);
+
+  useEffect(() => {
+    setAvatarSeed(generateHash());
+  }, []);
 
   // useEffect(() => {
   //   if (!metadataInitiated) return;
@@ -811,6 +972,10 @@ export default function AppProvider(props: PropsWithChildren) {
     };
   }, [isLoggedIn]);
 
+  /////////////////
+  // #endregion MUTATIONS
+  /////////////////
+
   return (
     <AppContext.Provider
       value={{
@@ -820,12 +985,14 @@ export default function AppProvider(props: PropsWithChildren) {
         categories,
         metadata: metadata,
         theme: theme,
+        avatarSeed: avatarSeed,
         setTheme,
         setFlashCards,
         addFlashCards,
         removeFlashCards,
         updateFlashCards,
         updateFlashCard,
+        assignFlashCardsToSet,
         setSets,
         addSets,
         removeSets,

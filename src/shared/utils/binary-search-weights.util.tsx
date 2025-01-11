@@ -1,6 +1,6 @@
 export default function binarySearch(
   arrayOfNumbers: number[],
-  randomFloat: number,
+  randomNumber: number,
   start = 0,
   end = arrayOfNumbers.length,
 ): number {
@@ -12,11 +12,11 @@ export default function binarySearch(
 
   const mid = Math.floor((start + end) / 2);
 
-  if (arrayOfNumbers[mid] === randomFloat) {
+  if (arrayOfNumbers[mid] === randomNumber) {
     return mid + 1;
-  } else if (arrayOfNumbers[mid] < randomFloat) {
-    return binarySearch(arrayOfNumbers, randomFloat, mid + 1, end);
+  } else if (arrayOfNumbers[mid] < randomNumber) {
+    return binarySearch(arrayOfNumbers, randomNumber, mid + 1, end);
   } else {
-    return binarySearch(arrayOfNumbers, randomFloat, start, mid);
+    return binarySearch(arrayOfNumbers, randomNumber, start, mid);
   }
 }

@@ -1,7 +1,7 @@
 'use client';
 
-import type { HTMLInputTypeAttribute, InputHTMLAttributes } from 'react';
 import { cn } from '#/shared/utils/cn.util';
+import type { HTMLInputTypeAttribute, InputHTMLAttributes } from 'react';
 
 export type InputValidation =
   | {
@@ -72,7 +72,7 @@ function Input({
             'w-auto pb-2 pl-2 text-sm text-gray-400',
           ])}
         >
-          {`${label}${required ? '*' : ''}`}
+          {`${label}${required ? ' *' : ''}`}
         </span>
       )}
 

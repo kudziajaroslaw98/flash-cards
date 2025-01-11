@@ -24,7 +24,9 @@ export default function DropdownLabel({
           <span>{multipleLabel}</span>
         </span>
       ) : (
-        <span className='text-inherit'>{label}</span>
+        <span className='line-clamp-1 overflow-ellipsis text-inherit'>
+          {label}
+        </span>
       )}
 
       <span className='text-inherit'>

@@ -1,10 +1,8 @@
-import type { FlashCard } from './flash-card.model';
-
 export type FlashCardSet = {
   frontUuid: string;
   name: string;
   description: string;
-  flashCards: FlashCard[];
+  flashCards: string[];
   isFavourite: boolean;
   category?: string;
   hardlink: string;

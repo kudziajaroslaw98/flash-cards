@@ -1,5 +1,5 @@
-import { Inter, Roboto_Mono } from 'next/font/google';
 import type { Metadata } from 'next';
+import { Inter, Roboto_Mono } from 'next/font/google';
 
 import ClientSideProviders from '#/providers/client-side-providers.component';
 import Script from 'next/script';
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
       'Flash Cards by Jarosław Kudzia is the perfect tool for mastering vocabulary and learning words effortlessly.',
     images: [
       {
-        url: 'https://flashcards.finalphase.app/og-image.png',
+        url: 'https://flashcards.finalphase.app/og/og_image.png',
         width: 800,
         height: 600,
       },
@@ -83,7 +83,7 @@ export const metadata: Metadata = {
       'Flash Cards by Jarosław Kudzia is the perfect tool for mastering vocabulary and learning words effortlessly.',
     images: [
       {
-        url: 'https://flashcards.finalphase.app/og-image.png',
+        url: 'https://flashcards.finalphase.app/og/og_image.png',
         width: 800,
         height: 600,
       },
@@ -91,11 +91,11 @@ export const metadata: Metadata = {
   },
   robots: {
     index: true,
-    follow: true,
+    follow: false,
   },
   applicationName: 'Flash Cards - Learning Words Made Easy',
   alternates: {
-    canonical: 'https://flashcards.finalphase.app',
+    canonical: 'https://flashcards.finalphase.app/',
   },
   manifest: '/manifest.json',
 };

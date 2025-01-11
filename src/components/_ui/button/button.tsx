@@ -1,10 +1,10 @@
-import { forwardRef, type ButtonHTMLAttributes } from 'react';
-import { cva, VariantProps } from 'class-variance-authority';
 import { cn } from '#/shared/utils/cn.util';
+import { cva, VariantProps } from 'class-variance-authority';
 import { LoaderCircle } from 'lucide-react';
+import { forwardRef, type ButtonHTMLAttributes } from 'react';
 
 const buttonVariants = cva(
-  `inline-flex w-full max-w-80 items-center text-sm justify-center gap-2 rounded-md border transition active:scale-95 disabled:!border-gray-300 dark:disabled:!border-gray-800 disabled:!bg-transparent disabled:!text-gray-400 dark:disabled:!bg-transparent disabled:opacity-50 disabled:cursor-not-allowed ring-0 outline-0 focus:ring ring-green-400/50`,
+  `group outline has-[:focus]:ring has-[:focus]:ring-green-400/50 inline-flex w-full max-w-80 items-center text-sm justify-center gap-2 rounded-md border transition active:scale-95 disabled:!border-gray-300 dark:disabled:!border-gray-800 disabled:!bg-transparent disabled:!text-gray-400 dark:disabled:!bg-transparent disabled:opacity-50 disabled:cursor-not-allowed ring-0 outline-0 focus:ring ring-green-400/50`,
   {
     variants: {
       variant: {

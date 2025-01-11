@@ -1,15 +1,16 @@
 'use client';
 
+import { useAppContext } from '#/providers/app-context';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { APP_ROUTES } from '#/shared/defaults/app.routes';
-import { useAppContext } from '#/providers/app-context';
-import { Button } from '../_ui/button/button';
 import * as m from 'framer-motion/m';
 import Link from 'next/link';
+import { Button } from '../_ui/button/button';
 
 export const WelcomePage = () => {
   const { user } = useSessionContext();
   const { flashcards, metadata } = useAppContext();
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
     <>
@@ -93,7 +94,14 @@ export const WelcomePage = () => {
               className='text-gray-500'
             >
               📚 You have{' '}
-              {flashcards.filter((flashcard) => flashcard.weight < 1.5).length}{' '}
+              {
+                flashcards.filter(
+                  (flashcard) =>
+                    new Date(flashcard.spacedRepetition.dueDate)
+                      .toISOString()
+                      .slice(0, 10) === today,
+                ).length
+              }{' '}
               that need to be revised.
             </m.div>
 

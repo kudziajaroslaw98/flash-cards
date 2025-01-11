@@ -19,6 +19,44 @@ export const metadata: Metadata = {
     'learn vocabulary',
     'memorization technique',
   ],
+  openGraph: {
+    title: 'Learn with Flash Cards - Interactive Learning',
+    description:
+      'Start learning with our interactive flash card system. Master new concepts through active recall and spaced repetition.',
+    images: [
+      {
+        url: 'https://flashcards.finalphase.app/og/og_image.png',
+        width: 800,
+        height: 600,
+      },
+    ],
+    url: 'https://flashcards.finalphase.app/',
+    siteName: 'Learn with Flash Cards - Interactive Learning',
+    locale: 'en-US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Learn with Flash Cards - Interactive Learning',
+    description:
+      'Start learning with our interactive flash card system. Master new concepts through active recall and spaced repetition.',
+    images: [
+      {
+        url: 'https://flashcards.finalphase.app/og/og_image.png',
+        width: 800,
+        height: 600,
+      },
+    ],
+  },
+  robots: {
+    index: true,
+    follow: false,
+  },
+  applicationName: 'Flash Cards - Learning Words Made Easy',
+  alternates: {
+    canonical: 'https://flashcards.finalphase.app/',
+  },
+  manifest: '/manifest.json',
 };
 
 export default async function LearnPage() {

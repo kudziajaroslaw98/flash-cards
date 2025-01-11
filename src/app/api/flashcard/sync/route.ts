@@ -1,10 +1,10 @@
-import type { FlashCard } from '#/shared/models/flash-card.model';
+import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { isDifferent } from '#/shared/utils/is-different.util';
-import { createClient } from '#/shared/utils/supabase/server';
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { RateLimit } from '#/shared/utils/api-limiter';
 import omit from '#/shared/utils/omit.util';
+import { createClient } from '#/shared/utils/supabase/server';
+import type { FlashCard } from '#/types/flash-card.type';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 type requestBody = {
@@ -33,11 +33,12 @@ async function fetchDataFromDb(
   const flashcards = await supabase
     .from('flashcards')
     .select(
-      'frontUuid, question, questionAddition, answer, weight, order, createdAt, updatedAt',
+      'frontUuid, question, questionAddition, answer, order, createdAt, updatedAt, type, spacedRepetition',
     )
     .eq('user_uuid', userUuid);
   return {
-    flashcards: flashcards.data !== null ? flashcards.data : [],
+    flashcards:
+      flashcards.data !== null ? (flashcards.data as FlashCard[]) : [],
   };
 }
 
@@ -92,14 +93,25 @@ async function validateBody(body: Record<string, unknown>) {
   const validationScheme = z.object({
     flashcards: z.array(
       z.object({
-        question: z.string().min(1),
-        answer: z.string().min(1),
-        questionAddition: z.string().min(1),
+        type: z
+          .string()
+          .includes('index')
+          .or(z.string().includes('single'))
+          .or(z.string().includes('question')),
+        question: z.string().optional(),
+        answer: z.string().optional(),
+        questionAddition: z.string().optional(),
         order: z.number().nonnegative(),
         frontUuid: z.string().uuid(),
-        weight: z.number().nonnegative(),
         createdAt: z.union([z.date(), z.string()]),
         updatedAt: z.union([z.date(), z.string()]),
+        spacedRepetition: z.object({
+          interval: z.number().nonnegative(),
+          easeFactor: z.number().nonnegative(),
+          reviews: z.number().nonnegative(),
+          lastReviewAt: z.union([z.date(), z.string()]),
+          dueDate: z.union([z.date(), z.string()]),
+        }),
       }),
     ),
     lastSyncAt: z.union([z.date(), z.string(), z.null()]),

@@ -2,6 +2,14 @@
 User-agent: *
 Disallow: /api
 
+# Block all crawlers for /api
+User-agent: *
+Disallow: /_next
+
+# Block all crawlers for /api
+User-agent: *
+Disallow: /favicon.ico
+
 # Block all crawlers for /settings
 User-agent: *
 Disallow: /settings
