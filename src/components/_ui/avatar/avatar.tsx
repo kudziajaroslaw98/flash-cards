@@ -1,6 +1,6 @@
 'use client';
 
-import useLocalStorage from '#/hooks/use-local-storage.hook';
+import { useAppContext } from '#/providers/app-context';
 import { cn } from '#/shared/utils/cn.util';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -19,21 +19,6 @@ interface AvatarProps {
   onClick?: () => void;
 }
 
-const generateHash = (text?: string): string => {
-  if (!text) {
-    return Math.random().toString(36);
-  }
-
-  // Use text to create a consistent hash
-  let hash = 0;
-  for (let i = 0; i < text.length; i++) {
-    const char = text.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash; // Convert to 32-bit integer
-  }
-  return Math.abs(hash).toString(36);
-};
-
 export default function AvatarComponent({
   className,
   text,
@@ -42,17 +27,12 @@ export default function AvatarComponent({
   onClick,
 }: AvatarProps) {
   const [avatar, setAvatar] = useState('');
-  const { value: seed } = useLocalStorage({
-    key: 'seed',
-    defaultValue: {
-      seed: generateHash(),
-    },
-  });
+  const { avatarSeed: seed } = useAppContext();
 
   useEffect(() => {
     setAvatar(
       createAvatar(botttsNeutral, {
-        seed: seed.seed.seed,
+        seed: seed,
       }).toDataUri(),
     );
   }, [seed]);

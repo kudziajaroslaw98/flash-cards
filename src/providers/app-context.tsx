@@ -7,6 +7,7 @@ import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { FLASHCARDS_LOCAL_STORAGE_INIT } from '#/shared/defaults/flashcards-local-storage-init';
 import { SETS_LOCAL_STORAGE_INIT } from '#/shared/defaults/sets-local-storage-init';
 import { DEFAULT_METADATA } from '#/shared/defaults/stats.default';
+import { generateHash } from '#/shared/utils/generate-hash';
 import omit from '#/shared/utils/omit.util';
 import { createClient } from '#/shared/utils/supabase/client';
 import uuid from '#/shared/utils/uuid.util';
@@ -33,6 +34,7 @@ export type AppContextType = {
   categories: DictionaryValue<string>[];
   metadata: Metadata;
   theme: 'dark' | 'light';
+  avatarSeed: string;
   setTheme: (theme: 'dark' | 'light') => void;
   setFlashCards: (flashcards: FlashCard[]) => void;
   addFlashCards: (flashcards: Partial<FlashCard>[]) => void;
@@ -55,6 +57,7 @@ export const AppContext = createContext<AppContextType>({
   categories: [],
   metadata: DEFAULT_METADATA,
   theme: 'dark',
+  avatarSeed: '',
   setTheme: () => null,
   setFlashCards: () => null,
   addFlashCards: () => null,
@@ -111,6 +114,7 @@ export default function AppProvider(props: PropsWithChildren) {
   // #region STATE
   /////////////////
 
+  const [avatarSeed, setAvatarSeed] = useState<string>('');
   const [flashCardsArray, setFlashCardsArray] = useState<FlashCard[]>([]);
   const [setsArray, setSetsArray] = useState<FlashCardSet[]>([]);
   const [categories, setCategories] = useState<DictionaryValue<string>[]>([]);
@@ -932,6 +936,10 @@ export default function AppProvider(props: PropsWithChildren) {
     }
   }, [flashCardsArray, migrateFlashCards]);
 
+  useEffect(() => {
+    setAvatarSeed(generateHash());
+  }, []);
+
   // useEffect(() => {
   //   if (!metadataInitiated) return;
 
@@ -977,6 +985,7 @@ export default function AppProvider(props: PropsWithChildren) {
         categories,
         metadata: metadata,
         theme: theme,
+        avatarSeed: avatarSeed,
         setTheme,
         setFlashCards,
         addFlashCards,
