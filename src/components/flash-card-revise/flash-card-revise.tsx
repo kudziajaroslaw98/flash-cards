@@ -87,7 +87,7 @@ export default function FlashCardReviseComponent() {
   };
 
   const changeClicked = (flashCard: FlashCard | undefined, key?: string) => {
-    if (!flashCard) return;
+    if (!flashCard || !revisedCard) return;
 
     if (key) {
       window.umami.track('Answer clicked', { key });
@@ -103,13 +103,14 @@ export default function FlashCardReviseComponent() {
     const clonedStats = { ...metadata };
 
     clonedStats.answers += 1;
+    let spacedItem;
 
-    if (revisedCard?.type === 'single' && correct) {
+    if (revisedCard.type === 'single' && correct) {
       clonedStats.correctAnswers += 1;
-      calculateRepetition(flashCard, 'good');
+      spacedItem = calculateRepetition(revisedCard, 'good');
     } else {
       clonedStats.incorrectAnswers += 1;
-      calculateRepetition(flashCard, 'again');
+      spacedItem = calculateRepetition(revisedCard, 'again');
     }
 
     clonedStats.accuracy = parseFloat(
@@ -117,6 +118,7 @@ export default function FlashCardReviseComponent() {
     );
 
     updateMetadata({ ...clonedStats });
+    updateFlashCard(spacedItem);
     setClickedCard(flashCard);
     setClicked(true);
   };

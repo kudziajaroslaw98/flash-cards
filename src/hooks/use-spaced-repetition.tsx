@@ -219,6 +219,7 @@ export default function useSpacedRepetition<T extends SpaceRepetitionConfig>({
 
       const currentDate = new Date();
       const indexesToFilterOut: number[] = [];
+      const furtherDateItems: WeightedItem<T>[] = [];
       const currentDateItems = reversedWeights.filter((item, index) => {
         const itemDate = new Date(item.spacedRepetition.dueDate);
 
@@ -227,6 +228,7 @@ export default function useSpacedRepetition<T extends SpaceRepetitionConfig>({
           return true;
         }
 
+        furtherDateItems.push(item);
         return false;
       });
 
@@ -244,6 +246,16 @@ export default function useSpacedRepetition<T extends SpaceRepetitionConfig>({
         numberOfItems,
         differentiateBy,
       });
+
+      if (randomItems.length < numberOfItems) {
+        randomItems = [
+          ...randomItems,
+          ...findRandomItem(
+            furtherDateItems,
+            numberOfItems - randomItems.length,
+          ),
+        ];
+      }
 
       return {
         reversedWeights,
@@ -278,23 +290,6 @@ export default function useSpacedRepetition<T extends SpaceRepetitionConfig>({
       differentiateBy,
     });
 
-    newReversedWeights.forEach((item) => {
-      console.log(
-        new Date(item.spacedRepetition.dueDate).getTime(),
-        Date.now(),
-        new Date(item.spacedRepetition.dueDate).getTime() - Date.now(),
-        new Date(item.spacedRepetition.dueDate).getTime() - Date.now() < 0,
-        new Date(item.spacedRepetition.dueDate).getTime() < Date.now(),
-      );
-    });
-
-    console.log(
-      newReversedWeights.filter(
-        (item) =>
-          new Date(item.spacedRepetition.dueDate).getTime() - Date.now() < 0,
-      ).length === 0,
-    );
-
     setTodayItemsEnd(
       newReversedWeights.filter(
         (item) =>
@@ -318,8 +313,8 @@ export default function useSpacedRepetition<T extends SpaceRepetitionConfig>({
   ]);
 
   const reroll = () => {
-    console.log(todayItemsEnd, continueReroll);
     const toFilter: number[] = [];
+    const furtherDateItems: WeightedItem<T>[] = [];
     const currentDateItems = reversedWeights.filter((item, index) => {
       const itemDate = new Date(item.spacedRepetition.dueDate);
 
@@ -328,6 +323,7 @@ export default function useSpacedRepetition<T extends SpaceRepetitionConfig>({
         return true;
       }
 
+      furtherDateItems.push(item);
       return false;
     });
 
@@ -359,6 +355,14 @@ export default function useSpacedRepetition<T extends SpaceRepetitionConfig>({
       numberOfItems,
       differentiateBy,
     });
+
+    if (randomItems.length < numberOfItems) {
+      const remainingItems = findRandomItem(
+        furtherDateItems,
+        numberOfItems - randomItems.length,
+      );
+      randomItems.push(...remainingItems);
+    }
 
     setRandomItems(randomItems);
 
@@ -440,8 +444,6 @@ export default function useSpacedRepetition<T extends SpaceRepetitionConfig>({
         );
         break;
     }
-
-    console.log(sr);
 
     sr.lastReviewAt = currentDate;
     sr.dueDate = new Date(currentDate.getTime() + sr.interval * ONE_DAY_IN_MS);
