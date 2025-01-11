@@ -36,7 +36,6 @@ export default function SettingsPage() {
     localStorage.removeItem('flashcards');
     localStorage.removeItem('sets');
     localStorage.removeItem('metadata');
-    localStorage.removeItem('seed');
     localStorage.removeItem('theme');
     window.location.reload();
   };
