@@ -568,7 +568,7 @@ export default function AppProvider(props: PropsWithChildren) {
     const sets = setsArray.map((set) => ({
       ...set,
       flashCards: set.flashCards.filter(
-        (uuid) => !flashCardUuids.includes(uuid),
+        (uuid) => !flashCardUuids.includes(uuid) || uuid === null,
       ),
     }));
 
@@ -678,9 +678,8 @@ export default function AppProvider(props: PropsWithChildren) {
   /////////////////
 
   const applyWebsockets = async () => {
-    if (!isLoggedIn) return;
-    const { data } = await supabase.auth.getUser();
-    const user_channel = supabase.channel(`user-${data.user?.id}`);
+    if (!isLoggedIn || !user) return;
+    const user_channel = supabase.channel(`user-${user.id}`);
     websocketChannel.current = user_channel;
     // FLASHCARDS - UPDATE
     websocketChannel.current
@@ -688,6 +687,7 @@ export default function AppProvider(props: PropsWithChildren) {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'flashcards' },
         (payload) => {
+          console.log('flahcard-update', payload);
           if (payload.new) {
             const updatedFlashcard = payload.new as FlashCard & {
               user_uuid: string;
@@ -705,6 +705,7 @@ export default function AppProvider(props: PropsWithChildren) {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'flashcards' },
         (payload) => {
+          console.log('flahcard-insert', payload);
           if (payload.new) {
             const newFlashcard = payload.new as FlashCard & {
               user_uuid: string;
@@ -732,6 +733,7 @@ export default function AppProvider(props: PropsWithChildren) {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'sets' },
         (payload) => {
+          console.log('set-update', payload);
           if (payload.new) {
             const updatedSet = payload.new as FlashCardSet & {
               user_uuid: string;
@@ -811,9 +813,9 @@ export default function AppProvider(props: PropsWithChildren) {
     );
 
     const responses = await Promise.allSettled([
+      fetchMetadata,
       fetchFlashCards,
       fetchSets,
-      fetchMetadata,
     ]);
 
     responses.forEach((response) => {

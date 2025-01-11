@@ -44,7 +44,7 @@ export default function SetHardlinkPage() {
     assignFlashCardsToSet,
     sets,
     categories,
-    updateSet,
+    updateSets,
     removeSets,
     metadata,
     updateMetadata,
@@ -77,10 +77,12 @@ export default function SetHardlinkPage() {
       ...prev,
       flashCards: [...prev.flashCards, ...flashCards],
     }));
-    updateSet({
-      ...set,
-      flashCards: flashCards,
-    });
+    updateSets([
+      {
+        ...set,
+        flashCards: flashCards,
+      },
+    ]);
     assignFlashCardsToSet(flashCards, set.frontUuid);
   };
 
@@ -90,7 +92,7 @@ export default function SetHardlinkPage() {
       const hardlink = set[0].name?.replace(/ /g, '-').toLowerCase();
       router.prefetch(`flashcards/sets/${hardlink}`);
 
-      updateSet(set[0]);
+      updateSets([set[0]]);
       setSet(set[0] as FlashCardSet);
 
       router.push(`${hardlink}`);
@@ -179,13 +181,15 @@ export default function SetHardlinkPage() {
 
     if (flashCardsResponse.length > 0) {
       addFlashCards(mappedFlashCards);
-      updateSet({
-        ...set,
-        flashCards: [
-          ...set.flashCards,
-          ...mappedFlashCards.map((f) => f.frontUuid),
-        ],
-      });
+      updateSets([
+        {
+          ...set,
+          flashCards: [
+            ...set.flashCards,
+            ...mappedFlashCards.map((f) => f.frontUuid),
+          ],
+        },
+      ]);
     }
   };
 
@@ -201,13 +205,15 @@ export default function SetHardlinkPage() {
         createdFlashCards: metadata.createdFlashCards + newFlashCards.length,
       });
 
-      updateSet({
-        ...set,
-        flashCards: [
-          ...set.flashCards,
-          ...newFlashCards.map((f) => f.frontUuid),
-        ],
-      });
+      updateSets([
+        {
+          ...set,
+          flashCards: [
+            ...set.flashCards,
+            ...newFlashCards.map((f) => f.frontUuid),
+          ],
+        },
+      ]);
 
       setTimeout(() => {
         window.document.body.scrollIntoView({

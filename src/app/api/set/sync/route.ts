@@ -21,7 +21,6 @@ async function newUserSync(
     body.sets.map((set) => ({
       user_uuid: userUuid,
       ...set,
-      flashCards: set.flashCards,
     })),
     { onConflict: 'frontUuid', ignoreDuplicates: false },
   );
@@ -31,13 +30,6 @@ async function fetchDataFromDb(
   supabase: SupabaseClient,
   userUuid: string,
 ): Promise<{ sets: FlashCardSet[] }> {
-  const flashcards = await supabase
-    .from('flashcards')
-    .select(
-      'frontUuid, question, questionAddition, answer, order, createdAt, updatedAt, type, spacedRepetition',
-    )
-    .eq('user_uuid', userUuid);
-
   const sets = await supabase
     .from('sets')
     .select(
@@ -45,19 +37,8 @@ async function fetchDataFromDb(
     )
     .eq('user_uuid', userUuid);
 
-  let mappedSets = sets.data;
-
-  if (sets.data !== null && flashcards.data !== null) {
-    mappedSets = sets.data?.map((set) => ({
-      ...set,
-      flashCards: set.flashCards.map((flashcard: string) =>
-        flashcards.data?.find((card) => card.frontUuid === flashcard),
-      ),
-    }));
-  }
-
   return {
-    sets: sets.data !== null ? mappedSets! : [],
+    sets: sets.data as FlashCardSet[],
   };
 }
 
@@ -95,13 +76,13 @@ async function upsertDataInDb(
     changedFlashcards.map((set) => ({
       user_uuid: userUuid,
       ...set,
-      flashCards: set.flashCards,
     })),
     { onConflict: 'frontUuid', ignoreDuplicates: false },
   );
 }
 
 async function validateBody(body: Record<string, unknown>) {
+  console.log(body);
   const validationScheme = z.object({
     sets: z.array(
       z.object({
@@ -157,8 +138,6 @@ export async function POST(request: Request) {
 
   try {
     const body: requestBody = await request.json();
-    console.log(body);
-    console.log(body.sets.map((set) => set.flashCards));
     validateBody(body);
 
     const responseBody: ApiSetsSyncResponse = {

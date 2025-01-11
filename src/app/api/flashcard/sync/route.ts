@@ -37,7 +37,8 @@ async function fetchDataFromDb(
     )
     .eq('user_uuid', userUuid);
   return {
-    flashcards: flashcards.data !== null ? flashcards.data : [],
+    flashcards:
+      flashcards.data !== null ? (flashcards.data as FlashCard[]) : [],
   };
 }
 
