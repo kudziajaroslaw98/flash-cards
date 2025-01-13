@@ -55,14 +55,17 @@ export const AssignFlashCardsModal = ({
   const handleDialogSubmit = () => {
     setIsModalOpen(false);
 
-    if (!formValue?.flashCards?.length) return;
+    if (!formValue?.flashCards?.length) {
+      handleSubmit([]);
+    } else {
+      const mappedFlashCards = flashCards
+        .filter((flashCard) =>
+          formValue?.flashCards?.includes(flashCard.frontUuid),
+        )
+        .map((flashCard) => flashCard.frontUuid);
+      handleSubmit(mappedFlashCards);
+    }
 
-    const mappedFlashCards = flashCards
-      .filter((flashCard) =>
-        formValue?.flashCards?.includes(flashCard.frontUuid),
-      )
-      .map((flashCard) => flashCard.frontUuid);
-    handleSubmit(mappedFlashCards);
     setFormValue({ flashCards: [] });
   };
 

@@ -24,7 +24,7 @@ export type DialogProps = {
   onDialogSubmit?: () => void;
   isCloseButtonVisible?: boolean;
   closeOnBackdropClick?: boolean;
-  submitRef?: React.RefObject<HTMLButtonElement>;
+  submitRef?: React.RefObject<HTMLButtonElement | null>;
 } & PropsWithChildren;
 
 export const Dialog = ({

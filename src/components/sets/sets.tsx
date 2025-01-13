@@ -13,8 +13,8 @@ import useLongPress from '#/hooks/use-long-press.hook';
 import { useAppContext } from '#/providers/app-context';
 import { cn } from '#/shared/utils/cn.util';
 import type { FlashCardSet } from '#/types/flash-card-set.type';
-import { AnimatePresence, m } from 'framer-motion';
 import { BadgeCheck, Pencil, Plus, Search, Star, Trash } from 'lucide-react';
+import { AnimatePresence, m } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 

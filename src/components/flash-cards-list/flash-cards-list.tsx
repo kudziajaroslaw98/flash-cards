@@ -8,8 +8,8 @@ import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-c
 import { useAppContext } from '#/providers/app-context';
 import { cn } from '#/shared/utils/cn.util';
 import type { FlashCard } from '#/types/flash-card.type';
-import { AnimatePresence } from 'framer-motion';
 import { Pencil, Plus, Trash } from 'lucide-react';
+import { AnimatePresence } from 'motion/react';
 import { AlertDialog } from '../_ui/alert-dialog/alert-dialog';
 import FlashCardComponent from '../flash-card/flash-card';
 import { FloatingButtons } from '../floating-buttons/floating-buttons';

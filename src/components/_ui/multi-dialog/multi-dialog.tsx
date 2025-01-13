@@ -1,3 +1,8 @@
+import { Trigger } from '#/components/_shared/trigger';
+import { ShortcutList } from '#/components/shortcut-list/shortcut-list';
+import useOutsideAlerter from '#/hooks/use-click-outside.hook';
+import useKeyPress from '#/hooks/use-key-press.hook';
+import DialogProvider from '#/providers/dialog.providers';
 import {
   ArrowBigLeft,
   ArrowBigRight,
@@ -5,15 +10,10 @@ import {
   ArrowRight,
   Plus,
 } from 'lucide-react';
+import * as m from 'motion/react-m';
 import { useCallback, useMemo, useRef, type PropsWithChildren } from 'react';
-import { ShortcutList } from '#/components/shortcut-list/shortcut-list';
-import useOutsideAlerter from '#/hooks/use-click-outside.hook';
-import DialogProvider from '#/providers/dialog.providers';
-import { Trigger } from '#/components/_shared/trigger';
-import useKeyPress from '#/hooks/use-key-press.hook';
-import { Button } from '../button/button';
 import { createPortal } from 'react-dom';
-import * as m from 'framer-motion/m';
+import { Button } from '../button/button';
 
 export type MultiDialogProps = {
   open: boolean;
@@ -23,7 +23,7 @@ export type MultiDialogProps = {
   currentIndex: number;
   maxIndex: number;
   isInEditMode?: boolean;
-  submitRef?: React.RefObject<HTMLButtonElement>;
+  submitRef?: React.RefObject<HTMLButtonElement | null>;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onDialogClose: () => void;
   onDialogSubmit?: () => void;
