@@ -82,7 +82,6 @@ async function upsertDataInDb(
 }
 
 async function validateBody(body: Record<string, unknown>) {
-  console.log(body);
   const validationScheme = z.object({
     sets: z.array(
       z.object({

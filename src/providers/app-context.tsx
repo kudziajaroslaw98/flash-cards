@@ -123,7 +123,7 @@ export default function AppProvider(props: PropsWithChildren) {
   >([]);
   const [metadata, setMetadata] = useState<Metadata>(DEFAULT_METADATA);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const websocketChannel = useRef<ReturnType<typeof supabase.channel>>();
+  const websocketChannel = useRef<ReturnType<typeof supabase.channel>>(undefined);
 
   /////////////////
   // #endregion STATE

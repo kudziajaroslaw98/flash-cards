@@ -3,7 +3,7 @@
 import { useAppContext } from '#/providers/app-context';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { APP_ROUTES } from '#/shared/defaults/app.routes';
-import * as m from 'framer-motion/m';
+import * as m from 'motion/react-m';
 import Link from 'next/link';
 import { Button } from '../_ui/button/button';
 

@@ -1,8 +1,8 @@
 import useLongPress from '#/hooks/use-long-press.hook';
 import { cn } from '#/shared/utils/cn.util';
 import type { FlashCard } from '#/types/flash-card.type';
-import { m } from 'framer-motion';
 import { BadgeCheck } from 'lucide-react';
+import { m } from 'motion/react';
 import { useEffect, useState } from 'react';
 import Card from '../_ui/card/card';
 
@@ -130,7 +130,7 @@ export default function FlashCardComponent({
           )}
 
           {isFlipped && !isInSelectionMode && (
-            <p
+            <div
               className={cn([
                 'scrollbar-hidden relative z-20 flex h-full w-full flex-col overflow-y-auto hyphens-auto py-6 text-gray-500 dark:text-slate-400',
                 size === 'sm' && 'text-xs',
@@ -151,7 +151,7 @@ export default function FlashCardComponent({
                   <div className='absolute -bottom-7 left-0 z-[22] flex h-8 w-full bg-transparent bg-[radial-gradient(transparent_1px,rgba(249_250_251)_1px)] from-transparent via-black via-50% to-black to-100% bg-[size:4px_4px] backdrop-blur-sm mask-image-gradient-to-b dark:bg-[radial-gradient(transparent_1px,rgba(2_6_23)_1px)]' />
                 </div>
               </div>
-            </p>
+            </div>
           )}
         </Card>
       </m.div>

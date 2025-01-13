@@ -10,7 +10,8 @@ export type TriggerProps = {
 } & PropsWithChildren;
 
 export const Trigger = ({ children, trigger }: TriggerProps) => {
-  const triggerWithClick = (element: ReactElement) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const triggerWithClick = (element: ReactElement<any>) =>
     cloneElement(element, {
       onClick: () => {
         element?.props?.onClick?.();
@@ -21,7 +22,8 @@ export const Trigger = ({ children, trigger }: TriggerProps) => {
   return (
     <>
       {Children.map(children, (child) =>
-        triggerWithClick(child as ReactElement),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        triggerWithClick(child as ReactElement<any>),
       )}
     </>
   );

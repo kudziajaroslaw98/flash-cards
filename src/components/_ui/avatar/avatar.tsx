@@ -2,11 +2,7 @@
 
 import { useAppContext } from '#/providers/app-context';
 import { cn } from '#/shared/utils/cn.util';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import { botttsNeutral } from '@dicebear/collection';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import { createAvatar } from '@dicebear/core';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';

@@ -1,5 +1,5 @@
 import { cn } from '#/shared/utils/cn.util';
-import * as m from 'framer-motion/m';
+import * as m from 'motion/react-m';
 import { ReactNode } from 'react';
 
 interface FloatingButtonsProps {

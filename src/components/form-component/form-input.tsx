@@ -8,7 +8,7 @@ import type {
   InputType,
   InternalConstraint,
 } from '#/types/form-scheme.type';
-import * as m from 'framer-motion/m';
+import * as m from 'motion/react-m';
 import type { FormEvent } from 'react';
 import Dropdown from '../_ui/dropdown/dropdown';
 import Input from '../_ui/input/input';

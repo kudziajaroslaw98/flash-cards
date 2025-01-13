@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUp,
+  BookOpenText,
   GraduationCap,
   Languages,
   Layers,
@@ -48,6 +49,13 @@ export default function SidebarComponent() {
       href: APP_ROUTES.dashboard,
       visible: true,
       icon: <LayoutDashboard className={`${iconSize} fill-current`} />,
+    },
+    {
+      type: 'item',
+      label: 'How to use',
+      href: APP_ROUTES.guide,
+      visible: true,
+      icon: <BookOpenText className={`${iconSize} `} />,
     },
     {
       type: 'group',

@@ -1,11 +1,11 @@
 'use client';
-import { Button } from '../_ui/button/button';
 import { cn } from '#/shared/utils/cn.util';
+import * as m from 'motion/react-m';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useReward } from 'react-rewards';
-import * as m from 'framer-motion/m';
+import { Button } from '../_ui/button/button';
 import Card from '../_ui/card/card';
-import Link from 'next/link';
 function Checkout({
   success,
   cancel,

@@ -1,7 +1,7 @@
 'use client';
 
 import type { FormScheme, InternalConstraint } from '#/types/form-scheme.type';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
 import { useMemo, type FormEvent } from 'react';
 import FormInput from './form-input';
 

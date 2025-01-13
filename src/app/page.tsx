@@ -21,7 +21,7 @@ import Badge from '#/components/_ui/badge/badge';
 import LinkComponent from '#/components/_ui/link/link';
 import { ScrollReveal } from '#/components/_ui/scroll-reveal/scroll-reveal';
 import Timeline from '#/components/_ui/timeline/timeline';
-import * as m from 'framer-motion/m';
+import * as m from 'motion/react-m';
 import Image from 'next/image';
 import Link from 'next/link';
 

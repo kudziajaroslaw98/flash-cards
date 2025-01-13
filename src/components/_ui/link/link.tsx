@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '#/shared/utils/cn.util';
-import { m } from 'framer-motion';
+import { m } from 'motion/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { PropsWithChildren, ReactNode } from 'react';
