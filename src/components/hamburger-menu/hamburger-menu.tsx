@@ -41,7 +41,7 @@ export default function HamburgerMenuComponent() {
       type: 'item',
       label: 'Dashboard',
       href: APP_ROUTES.dashboard,
-      visible: true,
+      visible: false,
       icon: <LayoutDashboard className={`${iconSize} fill-current`} />,
     },
     {

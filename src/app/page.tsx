@@ -95,9 +95,11 @@ export default async function Home() {
       body: (
         <ul className='flex flex-col gap-2'>
           {listItem('Generate sets from pdf/txt files')}
-          {listItem('Improved stats page')}
           {listItem('Filters on flashcard list')}
-          {listItem('Community section with shared decks')}
+          {listItem(
+            'More detailed flash card - real-world examples, key points, synonyms, related facts.',
+          )}
+          {listItem('More advanced spaced repetition algorithm')}
         </ul>
       ),
       headline: 'Q1',
@@ -109,8 +111,8 @@ export default async function Home() {
           {listItem(
             'Create more rewarding system for flashcards (e.g. streaks/points)',
           )}
-          {listItem('Export / Import flashcards to / from CSV')}
           {listItem('More customization options for generating with AI')}
+          {listItem('Improved stats page')}
         </ul>
       ),
       headline: 'Q2',
@@ -119,10 +121,11 @@ export default async function Home() {
       active: false,
       body: (
         <ul className='flex flex-col gap-2'>
-          {listItem('More advanced spaced repetition algorithm')}
           {listItem(
             'Chrome extension to add flashcards from the text you read on the web',
           )}
+          {listItem('Export / Import flashcards to / from CSV')}
+          {listItem('Community section with shared decks')}
           <li>More coming soon..</li>
         </ul>
       ),

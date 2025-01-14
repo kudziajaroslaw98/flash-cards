@@ -1,3 +1,5 @@
+'use client';
+
 import useLongPress from '#/hooks/use-long-press.hook';
 import { cn } from '#/shared/utils/cn.util';
 import type { FlashCard } from '#/types/flash-card.type';
