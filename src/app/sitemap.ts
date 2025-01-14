@@ -27,6 +27,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
     {
+      url: 'https://flashcards.finalphase.app/guide',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    },
+    {
       url: 'https://flashcards.finalphase.app/sign-in',
       lastModified: new Date(),
       changeFrequency: 'weekly',
