@@ -57,7 +57,6 @@ export default function SetHardlinkPage() {
     setHardLink.replace(/-/g, ' ').charAt(0)?.toUpperCase() +
       setHardLink.replace(/-/g, ' ').slice(1),
   );
-  const [accuracy] = useState<number>(0);
 
   useEffect(() => {
     setSet(sets.filter((set) => set?.hardlink === setHardLink)[0]);
