@@ -137,10 +137,10 @@ export default function SignInComponent() {
         />
       </div>
 
-      <h4 className='flex items-center justify-center gap-2 text-3xl font-semibold text-green-500'>
+      <h1 className='flex items-center justify-center gap-2 text-3xl font-semibold text-green-500'>
         <span>Sign in</span>
         <Fingerprint className={'size-8'} />
-      </h4>
+      </h1>
 
       <div className='z-20 flex w-full flex-col gap-2'>
         <Suspense

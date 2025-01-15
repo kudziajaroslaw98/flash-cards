@@ -275,12 +275,12 @@ export default async function Home() {
             height={64}
           />
 
-          <span className='flex flex-col items-center gap-4 bg-gradient-to-r from-green-600 to-green-400 bg-clip-text p-2 text-center text-5xl !font-black text-transparent'>
-            <span>Learning words made</span>
+          <h1 className='flex flex-col items-center gap-4 bg-gradient-to-r from-green-600 to-green-400 bg-clip-text p-2 text-center text-5xl !font-black text-transparent'>
+            Learning words made
             <span className='relative inline-block max-w-min px-4 before:absolute before:-inset-1 before:block before:-skew-y-3 before:rounded-sm before:bg-green-400'>
-              <span className='relative z-10  text-slate-950'>easy</span>
+              <span className='relative z-10 text-slate-950'>easy</span>
             </span>
-          </span>
+          </h1>
 
           <div className='flex w-full items-center justify-center gap-4'>
             <p className='text-center text-lg text-slate-200'>
