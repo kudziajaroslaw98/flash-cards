@@ -1,3 +1,5 @@
+import { Button } from '#/components/_ui/button/button';
+import Card from '#/components/_ui/card/card';
 import {
   Activity,
   AppWindow,
@@ -14,14 +16,12 @@ import {
   Smile,
   Sparkles,
 } from 'lucide-react';
-import { Button } from '#/components/_ui/button/button';
-import Card from '#/components/_ui/card/card';
 
+import Badge from '#/components/_ui/badge/badge';
+import LinkComponent from '#/components/_ui/link/link';
 import { ScrollReveal } from '#/components/_ui/scroll-reveal/scroll-reveal';
 import Timeline from '#/components/_ui/timeline/timeline';
-import LinkComponent from '#/components/_ui/link/link';
-import Badge from '#/components/_ui/badge/badge';
-import * as m from 'framer-motion/m';
+import * as m from 'motion/react-m';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -95,9 +95,11 @@ export default async function Home() {
       body: (
         <ul className='flex flex-col gap-2'>
           {listItem('Generate sets from pdf/txt files')}
-          {listItem('Improved stats page')}
           {listItem('Filters on flashcard list')}
-          {listItem('Community section with shared decks')}
+          {listItem(
+            'More detailed flash card - real-world examples, key points, synonyms, related facts.',
+          )}
+          {listItem('More advanced spaced repetition algorithm')}
         </ul>
       ),
       headline: 'Q1',
@@ -109,8 +111,8 @@ export default async function Home() {
           {listItem(
             'Create more rewarding system for flashcards (e.g. streaks/points)',
           )}
-          {listItem('Export / Import flashcards to / from CSV')}
           {listItem('More customization options for generating with AI')}
+          {listItem('Improved stats page')}
         </ul>
       ),
       headline: 'Q2',
@@ -119,10 +121,11 @@ export default async function Home() {
       active: false,
       body: (
         <ul className='flex flex-col gap-2'>
-          {listItem('More advanced spaced repetition algorithm')}
           {listItem(
             'Chrome extension to add flashcards from the text you read on the web',
           )}
+          {listItem('Export / Import flashcards to / from CSV')}
+          {listItem('Community section with shared decks')}
           <li>More coming soon..</li>
         </ul>
       ),
@@ -633,7 +636,7 @@ export default async function Home() {
 
           <div className='flex flex-col items-center justify-center gap-4'>
             <span className='text-center text-slate-400'>
-              © 2024 Flash Cards. All rights reserved.
+              © {new Date().getFullYear()} Flash Cards. All rights reserved.
             </span>
           </div>
 

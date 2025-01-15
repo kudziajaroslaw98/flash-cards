@@ -1,5 +1,13 @@
 'use client';
 
+import { cn } from '#/shared/utils/cn.util';
+import { isDifferent } from '#/shared/utils/is-different.util';
+import {
+  FormScheme,
+  type ExtendedInputType,
+  type InputType,
+  type InputValidation,
+} from '#/types//form-scheme.type';
 import {
   useEffect,
   useRef,
@@ -8,21 +16,22 @@ import {
   type FormEvent,
   type SetStateAction,
 } from 'react';
-import type { SafeParseError, SafeParseSuccess, ZodIssueBase } from 'zod';
-import { isDifferent } from '#/shared/utils/is-different.util';
-import isTextArea from '#/shared/guards/is-text-area.guard';
-import isDropdown from '#/shared/guards/is-dropdown.guard';
-import { FormScheme } from '#/types//form-scheme.type';
-import isInput from '#/shared/guards/is-input.guard';
-import TextArea from '../_ui/text-area/text-area';
-import Input from '#/components/_ui/input/input';
-import Dropdown from '../_ui/dropdown/dropdown';
+import {
+  type SafeParseError,
+  type SafeParseSuccess,
+  type ZodIssueBase,
+} from 'zod';
+import FormInputsComponent from './form-inputs';
 
 export default function FormComponent<T>(props: {
   scheme: FormScheme<T>;
   initialValues?: T;
-  emitFormValid?: Dispatch<SetStateAction<boolean>>;
-  emitFormValue: Dispatch<SetStateAction<Partial<T>>>;
+  emitFormValid?:
+    | Dispatch<SetStateAction<boolean>>
+    | ((value: boolean) => void);
+  emitFormValue:
+    | Dispatch<SetStateAction<Partial<T>>>
+    | ((value: Partial<T>) => void);
   className?: string;
   formValid?: boolean;
   formError?: string;
@@ -32,13 +41,20 @@ export default function FormComponent<T>(props: {
     errors?: boolean;
     values?: boolean;
     touch?: boolean;
+    visibility?: boolean;
   };
 }) {
   const [inputsValidity, setInputsValidity] = useState<Record<string, boolean>>(
     {},
   );
+  const [inputsVisibility, setInputsVisibility] = useState<
+    Record<string, boolean>
+  >({});
   const [inputsErrors, setInputsErrors] = useState<
     Record<string, string | null>
+  >({});
+  const [inputValidations, setInputValidations] = useState<
+    Record<string, InputValidation<T>[]>
   >({});
 
   const [defaultValids, setDefaultValids] = useState<Record<string, boolean>>(
@@ -62,8 +78,45 @@ export default function FormComponent<T>(props: {
       let initialValids: Record<string, boolean> = {};
       let initialErrors: Record<string, string | null> = {};
       let tmpValues: Record<string, string> = {};
+      let initialVisibility: Record<string, boolean> = {};
+      let initialValidations: Record<string, InputValidation<T>[]> = {};
 
-      Object.entries(props.scheme.inputs).forEach(([inputName]) => {
+      const inputs = Object.entries(props.scheme.inputs) as [
+        string,
+        ExtendedInputType<InputType, T>,
+      ][];
+
+      inputs.forEach(([inputName, input]) => {
+        initialVisibility = { ...initialVisibility, [inputName]: true };
+        initialValidations = { ...initialValidations, [inputName]: [] };
+
+        if (input?._internal_constraints) {
+          const showConstraints = input._internal_constraints.filter(
+            ({ type }) => type === 'show',
+          );
+          const validationConstraints = input._internal_constraints.filter(
+            ({ type }) => type === 'validation',
+          );
+
+          initialValidations = {
+            ...initialValidations,
+            [inputName]: validationConstraints,
+          };
+
+          if (showConstraints.length > 0) {
+            const isInvalid = showConstraints.some(
+              ({ key, constraint }) =>
+                !constraint.safeParse(
+                  props.initialValues?.[key] ?? formValues?.[key as string],
+                ).success,
+            );
+
+            if (isInvalid) {
+              initialVisibility = { ...initialVisibility, [inputName]: false };
+            }
+          }
+        }
+
         initialInputs = [...initialInputs, inputName];
         initialValids = { ...initialValids, [inputName]: true };
         initialErrors = { ...initialErrors, [inputName]: null };
@@ -87,6 +140,8 @@ export default function FormComponent<T>(props: {
       setInputsErrors(initialErrors);
       setFormValues(initialValues);
       setDefaultValids(initialValids);
+      setInputsVisibility(initialVisibility);
+      setInputValidations(initialValidations);
       initialValuesRef.current = props.initialValues ?? null;
     }
   }, [props.initialValues, props.scheme.inputs]);
@@ -108,6 +163,10 @@ export default function FormComponent<T>(props: {
       setInputsErrors(initialErrors);
     }
   }, [props.formValid]);
+
+  //////////////
+  // debug log
+  //////////////
 
   useEffect(() => {
     if (props?.debug?.inputs) {
@@ -139,32 +198,63 @@ export default function FormComponent<T>(props: {
     }
   }, [props.debug, touchedInputs]);
 
-  const checkFormValidity = () => {
-    const output: SafeParseSuccess<unknown> | SafeParseError<unknown> =
-      props.scheme.validation.safeParse(formValues);
+  useEffect(() => {
+    if (props?.debug?.visibility) {
+      console.log('form - visibility - ', inputsVisibility);
+    }
+  }, [props.debug, inputsVisibility]);
 
+  //////////////
+  //////////////
+  //////////////
+
+  const checkFormValidity = () => {
+    const inputs = Object.keys(props.scheme.inputs);
     let valids = defaultValids;
     let errors = {};
 
-    if (!output.success) {
-      const issues = output?.error?.issues;
-      const haveErrors = issues?.length > 0;
+    inputs.forEach((inputName) => {
+      const validations = inputValidations[inputName].filter((validation) => {
+        return (
+          validation.whenConstraint &&
+          validation.whenKey &&
+          validation.whenConstraint.safeParse(
+            formValues[validation.whenKey as string],
+          ).success
+        );
+      });
 
-      if (haveErrors) {
-        issues.forEach((issue: ZodIssueBase) => {
-          if (touchedInputs[issue.path[0]]) {
-            valids = { ...valids, [issue.path[0]]: false };
-            errors = { ...errors, [issue.path[0]]: issue.message };
+      const outputs: (SafeParseSuccess<unknown> | SafeParseError<unknown>)[] =
+        validations.map((validation) => {
+          return validation.constraint.safeParse(
+            formValues[validation.key as string],
+          );
+        });
+
+      if (touchedInputs[inputName]) {
+        outputs.forEach((output) => {
+          if (!output.success) {
+            console.log(output);
+            const issues = output?.error?.issues;
+            const haveErrors = issues?.length > 0;
+
+            if (haveErrors) {
+              issues.forEach((issue: ZodIssueBase) => {
+                valids = { ...valids, [inputName]: false };
+                errors = { ...errors, [inputName]: issue.message };
+              });
+            }
           }
         });
       }
-    }
 
-    setInputsErrors(errors);
-    setInputsValidity(valids);
-    if (props.emitFormValid) {
-      props.emitFormValid(Object.values(valids).every((item) => item));
-    }
+      setInputsErrors(errors);
+      setInputsValidity(valids);
+
+      if (props.emitFormValid) {
+        props.emitFormValid(Object.values(valids).every((item) => item));
+      }
+    });
   };
 
   const handleOnInput = (
@@ -205,73 +295,19 @@ export default function FormComponent<T>(props: {
   };
 
   return (
-    <form className={props.className}>
-      {Object.entries(props.scheme.inputs).map(([inputName, inputProps]) => {
-        return (
-          <span key={inputName}>
-            {/* @ts-expect-error We need to have possibility to edit only few attributes from object. Thats why we use Partial, but with it comes the error that the inputProps is unknown.*/}
-
-            {isTextArea(inputProps) && (
-              <TextArea
-                {...inputProps}
-                key={inputName}
-                value={formValues[inputName] as string}
-                valid={
-                  touchedInputs[inputName] ? inputsValidity[inputName] : true
-                }
-                error={
-                  touchedInputs[inputName] ? inputsErrors[inputName] : null
-                }
-                touched={touchedInputs[inputName]}
-                onInput={(e) => handleOnInput(e, inputName)}
-                onFocus={() => handleOnFocus(inputName)}
-                onBlur={handleOnBlur}
-              ></TextArea>
-            )}
-
-            {/* @ts-expect-error We need to have possibility to edit only few attributes from object. Thats why we use Partial, but with it comes the error that the inputProps is unknown.*/}
-
-            {isDropdown(inputProps) && (
-              <Dropdown
-                {...inputProps}
-                key={inputName}
-                value={formValues[inputName]}
-                valid={
-                  touchedInputs[inputName] ? inputsValidity[inputName] : true
-                }
-                error={
-                  touchedInputs[inputName] ? inputsErrors[inputName] : null
-                }
-                touched={touchedInputs[inputName]}
-                onChange={(e) => handleOnChange(e, inputName)}
-                onFocus={() => handleOnFocus(inputName)}
-                onBlur={handleOnBlur}
-              ></Dropdown>
-            )}
-
-            {/* @ts-expect-error We need to have possibility to edit only few attributes from object. Thats why we use Partial, but with it comes the error that the inputProps is unknown.*/}
-
-            {isInput(inputProps) && (
-              <Input
-                {...inputProps}
-                key={inputName}
-                valid={
-                  touchedInputs[inputName] ? inputsValidity[inputName] : true
-                }
-                error={
-                  touchedInputs[inputName] ? inputsErrors[inputName] : null
-                }
-                touched={touchedInputs[inputName]}
-                value={(formValues[inputName] as string) ?? ''}
-                onInput={(e) => handleOnInput(e, inputName)}
-                onFocus={() => handleOnFocus(inputName)}
-                onBlur={handleOnBlur}
-              />
-            )}
-          </span>
-        );
-      })}
-
+    <form className={cn([props.className])}>
+      <FormInputsComponent<T>
+        inputs={props.scheme.inputs}
+        formValues={formValues}
+        inputsValidity={inputsValidity}
+        inputsErrors={inputsErrors}
+        inputsVisibility={inputsVisibility}
+        touchedInputs={touchedInputs}
+        handleOnInput={handleOnInput}
+        handleOnChange={handleOnChange}
+        handleOnBlur={handleOnBlur}
+        handleOnFocus={handleOnFocus}
+      />
       {props.formError && (
         <span
           className={`${

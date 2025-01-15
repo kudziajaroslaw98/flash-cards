@@ -146,6 +146,16 @@ h6 {
   mask: linear-gradient(to bottom, #000, transparent);
 }
 
-.header-mask{
+.header-mask {
   mask: linear-gradient(to bottom, #000 80%, transparent 100%);
+}
+
+.scrollbar-hidden {
+  overflow-y: scroll;
+  scrollbar-width: none; /* for Firefox */
+  -ms-overflow-style: none; /* for IE and Edge */
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none; /* for Chrome, Safari, and Opera */
 }

@@ -1,5 +1,7 @@
 'use client';
 
+import { ToastModel } from '#/hooks/use-toast.hook';
+import { useToastContext } from '#/providers/toast-provider.component';
 import {
   CircleAlert,
   CircleCheck,
@@ -7,9 +9,7 @@ import {
   Info,
   LoaderCircle,
 } from 'lucide-react';
-import { useToastContext } from '#/providers/toast-provider.component';
-import { ToastModel } from '#/hooks/use-toast.hook';
-import { m } from 'framer-motion';
+import { m } from 'motion/react';
 
 export default function ToastsComponent() {
   const { toasts, close } = useToastContext();

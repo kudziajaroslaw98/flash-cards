@@ -1,11 +1,11 @@
-import type { MetadataRoute } from "next/types";
+import type { MetadataRoute } from 'next/types';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: 'https://flashcards.finalphase.app',
+      url: 'https://flashcards.finalphase.app/',
       lastModified: new Date(),
-      changeFrequency: 'monthly',
+      changeFrequency: 'weekly',
       priority: 1,
     },
     {
@@ -27,6 +27,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
     {
+      url: 'https://flashcards.finalphase.app/guide',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    },
+    {
       url: 'https://flashcards.finalphase.app/sign-in',
       lastModified: new Date(),
       changeFrequency: 'weekly',
@@ -37,6 +43,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.6,
-    }
-  ]
+    },
+  ];
 }

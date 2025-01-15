@@ -21,8 +21,12 @@ const signInMiddleware = async (request: NextRequest) => {
     data: { user },
     error,
   } = await supabase.auth.getUser();
+  const searchParams = new URL(request.url).searchParams;
 
   if (user !== null && error === null) {
+    if (searchParams.get('redirect') === 'pricing') {
+      return NextResponse.redirect(new URL('/pricing', request.url));
+    }
     return NextResponse.redirect(new URL('/flashcards/learn', request.url));
   } else {
     return NextResponse.next();
@@ -67,7 +71,7 @@ export async function middleware(request: NextRequest) {
     return settingsMiddleware(request);
   }
 
-  if(request.nextUrl.pathname.startsWith('/sign-in')) {
+  if (request.nextUrl.pathname.startsWith('/sign-in')) {
     return signInMiddleware(request);
   }
 

@@ -1,10 +1,10 @@
-import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
+import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { isDifferent } from '#/shared/utils/is-different.util';
-import { createClient } from '#/shared/utils/supabase/server';
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { RateLimit } from '#/shared/utils/api-limiter';
 import omit from '#/shared/utils/omit.util';
+import { createClient } from '#/shared/utils/supabase/server';
+import type { FlashCardSet } from '#/types/flash-card-set.type';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 type requestBody = {
@@ -21,7 +21,6 @@ async function newUserSync(
     body.sets.map((set) => ({
       user_uuid: userUuid,
       ...set,
-      flashCards: set.flashCards.map((flashcard) => flashcard.frontUuid),
     })),
     { onConflict: 'frontUuid', ignoreDuplicates: false },
   );
@@ -31,13 +30,6 @@ async function fetchDataFromDb(
   supabase: SupabaseClient,
   userUuid: string,
 ): Promise<{ sets: FlashCardSet[] }> {
-  const flashcards = await supabase
-    .from('flashcards')
-    .select(
-      'frontUuid, question, questionAddition, answer, weight, order, createdAt, updatedAt',
-    )
-    .eq('user_uuid', userUuid);
-
   const sets = await supabase
     .from('sets')
     .select(
@@ -45,19 +37,8 @@ async function fetchDataFromDb(
     )
     .eq('user_uuid', userUuid);
 
-  let mappedSets = sets.data;
-
-  if (sets.data !== null && flashcards.data !== null) {
-    mappedSets = sets.data?.map((set) => ({
-      ...set,
-      flashCards: set.flashCards.map((flashcard: string) =>
-        flashcards.data?.find((card) => card.frontUuid === flashcard),
-      ),
-    }));
-  }
-
   return {
-    sets: sets.data !== null ? mappedSets! : [],
+    sets: sets.data as FlashCardSet[],
   };
 }
 
@@ -95,7 +76,6 @@ async function upsertDataInDb(
     changedFlashcards.map((set) => ({
       user_uuid: userUuid,
       ...set,
-      flashCards: set.flashCards.map((flashcard) => flashcard.frontUuid),
     })),
     { onConflict: 'frontUuid', ignoreDuplicates: false },
   );
@@ -113,21 +93,7 @@ async function validateBody(body: Record<string, unknown>) {
         hardlink: z.string().min(1),
         createdAt: z.union([z.date(), z.string()]),
         updatedAt: z.union([z.date(), z.string()]),
-        flashCards: z.array(
-          z.union([
-            z.object({
-              question: z.string().min(1),
-              answer: z.string().min(1),
-              questionAddition: z.string().min(1),
-              order: z.number().nonnegative(),
-              frontUuid: z.string().uuid(),
-              weight: z.number().nonnegative(),
-              createdAt: z.union([z.date(), z.string()]),
-              updatedAt: z.union([z.date(), z.string()]),
-            }),
-            z.null(),
-          ]),
-        ),
+        flashCards: z.array(z.string().uuid()),
       }),
     ),
     lastSyncAt: z.union([z.date(), z.null(), z.string()]),
@@ -171,7 +137,6 @@ export async function POST(request: Request) {
 
   try {
     const body: requestBody = await request.json();
-
     validateBody(body);
 
     const responseBody: ApiSetsSyncResponse = {

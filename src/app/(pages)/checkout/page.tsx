@@ -1,7 +1,7 @@
 import Checkout from '#/components/checkout/checkout';
 
 export default async function CheckoutPage(props: {
-  params: Record<string, string>;
+  params: Promise<Record<string, string>>;
   searchParams: Promise<{
     success?: string;
     cancel?: string;

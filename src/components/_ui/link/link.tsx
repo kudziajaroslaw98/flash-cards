@@ -1,9 +1,10 @@
 'use client';
 
-import type { PropsWithChildren, ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
-import { m } from 'framer-motion';
+import { cn } from '#/shared/utils/cn.util';
+import { m } from 'motion/react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import type { PropsWithChildren, ReactNode } from 'react';
 
 export interface LinkProps {
   href: string;
@@ -39,10 +40,18 @@ export default function LinkComponent({
     <Link
       href={href}
       onClick={handleClick}
-      className={`group relative flex items-center justify-center underline-offset-2 transition-all hover:text-green-500 ${className} ${isPathActive && 'text-green-400'} `}
+      className={cn([
+        'group relative flex items-center justify-center underline-offset-2 outline-none transition-all hover:text-green-500 focus:ring focus:ring-green-400/50',
+        className,
+        isPathActive && 'text-green-400',
+      ])}
     >
       <p
-        className={`flex items-center ${iconOnly ? '' : 'gap-4'} ${iconPosition === 'right' ? 'flex-row-reverse' : ''}`}
+        className={cn([
+          'flex items-center',
+          !iconOnly && 'gap-4',
+          iconPosition === 'right' && 'flex-row-reverse',
+        ])}
       >
         {icon && icon} {label && !iconOnly && label}
         {props?.children}
@@ -51,7 +60,12 @@ export default function LinkComponent({
       {isPathActive && underline && (
         <m.span
           layoutId='link-underline'
-          className={` ${iconOnly ? '-bottom-1 left-[6px] h-1 w-2/3' : '-left-[11px] top-2 h-1/2 w-1'} absolute rounded bg-green-400 group-hover:bg-green-400`}
+          className={cn([
+            iconOnly
+              ? '-bottom-1 left-[6px] h-1 w-2/3'
+              : '-left-[11px] top-2 h-1/2 w-1',
+            'absolute rounded bg-green-400 group-hover:bg-green-400',
+          ])}
         ></m.span>
       )}
     </Link>

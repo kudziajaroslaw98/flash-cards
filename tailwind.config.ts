@@ -154,6 +154,7 @@ const config: Config = {
       )
     }),
     require('@lostisworld/tailwind-mask'),
+    require('@tailwindcss/typography')
   ],
 };
 export default config;

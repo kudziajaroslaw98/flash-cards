@@ -13,6 +13,7 @@
   "rules": {
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": ["error"],
-    "no-restricted-imports": "off"
+    "no-restricted-imports": "off",
+    "react-hooks/exhaustive-deps": "off"
   }
 }

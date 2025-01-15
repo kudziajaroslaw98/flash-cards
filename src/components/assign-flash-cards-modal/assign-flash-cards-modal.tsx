@@ -1,16 +1,16 @@
 import { assignFlashCardsScheme } from '#/shared/validation-schemes/assign-flash-cards-validation.scheme';
-import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import type { FlashCard } from '#/shared/models/flash-card.model';
+import type { FlashCardSet } from '#/types/flash-card-set.type';
+import type { FlashCard } from '#/types/flash-card.type';
 import React, { useMemo, useRef, useState } from 'react';
-import FormComponent from '../form-component/form';
 import { Button } from '../_ui/button/button';
 import { Dialog } from '../_ui/dialog/dialog';
 import Modal from '../_ui/modal/modal';
+import FormComponent from '../form-component/form';
 
 interface AssignFlashCardsModalProps {
-  handleSubmit: (value: FlashCard[]) => void;
+  handleSubmit: (value: string[]) => void;
   flashCards: FlashCard[];
-  setCards: FlashCard[];
+  setCards: string[];
   trigger: React.ReactNode;
 }
 
@@ -31,10 +31,18 @@ export const AssignFlashCardsModal = ({
   const getFormScheme = useMemo(
     () =>
       assignFlashCardsScheme(
-        flashCards?.map((flashCard) => ({
-          label: flashCard?.questionAddition,
-          value: flashCard,
-        })),
+        flashCards?.map((flashCard) => {
+          if (flashCard.type === 'index' || flashCard.type === 'single') {
+            return {
+              label: flashCard.questionAddition,
+              value: flashCard.frontUuid,
+            };
+          }
+          return {
+            label: flashCard.question,
+            value: flashCard.frontUuid,
+          };
+        }),
       ),
     [flashCards],
   );
@@ -47,7 +55,17 @@ export const AssignFlashCardsModal = ({
   const handleDialogSubmit = () => {
     setIsModalOpen(false);
 
-    handleSubmit(formValue?.flashCards ?? []);
+    if (!formValue?.flashCards?.length) {
+      handleSubmit([]);
+    } else {
+      const mappedFlashCards = flashCards
+        .filter((flashCard) =>
+          formValue?.flashCards?.includes(flashCard.frontUuid),
+        )
+        .map((flashCard) => flashCard.frontUuid);
+      handleSubmit(mappedFlashCards);
+    }
+
     setFormValue({ flashCards: [] });
   };
 

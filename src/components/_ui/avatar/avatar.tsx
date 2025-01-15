@@ -1,11 +1,11 @@
 'use client';
 
-import useLocalStorage from '#/hooks/use-local-storage.hook';
+import { useAppContext } from '#/providers/app-context';
+import { cn } from '#/shared/utils/cn.util';
 import { botttsNeutral } from '@dicebear/collection';
 import { createAvatar } from '@dicebear/core';
-import { cn } from '#/shared/utils/cn.util';
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 interface AvatarProps {
   className?: string;
@@ -15,21 +15,6 @@ interface AvatarProps {
   onClick?: () => void;
 }
 
-const generateHash = (text?: string): string => {
-  if (!text) {
-    return Math.random().toString(36);
-  }
-
-  // Use text to create a consistent hash
-  let hash = 0;
-  for (let i = 0; i < text.length; i++) {
-    const char = text.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash; // Convert to 32-bit integer
-  }
-  return Math.abs(hash).toString(36);
-};
-
 export default function AvatarComponent({
   className,
   text,
@@ -38,17 +23,12 @@ export default function AvatarComponent({
   onClick,
 }: AvatarProps) {
   const [avatar, setAvatar] = useState('');
-  const { value: seed } = useLocalStorage({
-    key: 'seed',
-    defaultValue: {
-      seed: generateHash(),
-    },
-  });
+  const { avatarSeed: seed } = useAppContext();
 
   useEffect(() => {
     setAvatar(
       createAvatar(botttsNeutral, {
-        seed: seed.seed.seed,
+        seed: seed,
       }).toDataUri(),
     );
   }, [seed]);
@@ -63,6 +43,7 @@ export default function AvatarComponent({
       onClick={() => onClick && onClick()}
       className={cn([
         'relative flex cursor-pointer items-center justify-center overflow-hidden rounded-full bg-gray-200 text-sm font-semibold text-slate-800 active:focus:scale-95 dark:bg-slate-800 dark:text-gray-100',
+        'outline-none focus:ring focus:ring-green-400/50',
         className,
       ])}
     >

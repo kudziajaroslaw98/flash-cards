@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 export default function useOutsideAlerter(
-  ref: React.RefObject<HTMLElement>,
+  ref: React.RefObject<HTMLElement | null>,
   callback: (...args: unknown[]) => void,
 ) {
   useEffect(() => {

@@ -1,3 +1,4 @@
+import * as m from 'motion/react-m';
 import type { PropsWithChildren } from 'react';
 
 type ScrollRevealProps = {
@@ -13,7 +14,6 @@ type ScrollRevealProps = {
   };
   className?: string;
 } & PropsWithChildren;
-import * as m from 'framer-motion/m';
 export const ScrollReveal = ({ variants, ...props }: ScrollRevealProps) => {
   const defaultVariants = {
     hidden: {

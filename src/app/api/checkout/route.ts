@@ -1,10 +1,10 @@
-import { createClient } from '#/shared/utils/supabase/server';
 import { stripe } from '#/shared/utils/stripe/config';
+import { createClient } from '#/shared/utils/supabase/server';
 
-export const dynamic = 'force-dynamic' // defaults to auto
+export const dynamic = 'force-dynamic'; // defaults to auto
 
 export async function GET() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const {

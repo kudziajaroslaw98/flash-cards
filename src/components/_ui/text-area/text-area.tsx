@@ -1,3 +1,6 @@
+import useDebounce from '#/hooks/use-debounce.hook';
+import { cn } from '#/shared/utils/cn.util';
+import { Sparkles } from 'lucide-react';
 import {
   FormEvent,
   TextareaHTMLAttributes,
@@ -5,10 +8,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import useDebounce from '#/hooks/use-debounce.hook';
-import { cn } from '#/shared/utils/cn.util';
 import { Button } from '../button/button';
-import { Sparkles } from 'lucide-react';
 
 export type TextAreaProps = {
   type?: 'textarea';
@@ -125,7 +125,7 @@ export default function TextArea({
             'w-auto pb-2 pl-2 text-sm  text-gray-400 dark:text-slate-500',
           ])}
         >
-          {`${label}${required ? '*' : ''}`}
+          {`${label}${required ? ' *' : ' (optional)'}`}
         </span>
       )}
       <span className='relative'>

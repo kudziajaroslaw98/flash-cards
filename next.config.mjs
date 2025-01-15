@@ -1,5 +1,9 @@
+import withPWAInit from '@ducanh2912/next-pwa';
+import NextBundleAnalyzer from '@next/bundle-analyzer';
+import createMDX from '@next/mdx';
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
-const withPWA = require('@ducanh2912/next-pwa').default({
+const withPWA = withPWAInit({
   dest: 'public',
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
@@ -12,9 +16,12 @@ const withPWA = require('@ducanh2912/next-pwa').default({
 });
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
+const withBundleAnalyzer = NextBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+const withMDX = createMDX();
 
 const cspHeader = `
     default-src 'self' https://umami.finalphase.app https://supabase.finalphase.app wss://supabase.finalphase.app;
@@ -69,7 +76,8 @@ const nextConfig = {
       },
     ],
   },
+  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
 };
-module.exports = process.env.TURBO
-  ? nextConfig
-  : withBundleAnalyzer(withPWA(nextConfig));
+export default process.env.TURBO
+  ? withMDX(nextConfig)
+  : withMDX(withBundleAnalyzer(withPWA(nextConfig)));

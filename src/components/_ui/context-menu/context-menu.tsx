@@ -1,5 +1,9 @@
 'use client';
 
+import MenuItem from '#/components/_ui/context-menu/menu-item';
+import useOutsideAlerter from '#/hooks/use-click-outside.hook';
+import { cn } from '#/shared/utils/cn.util';
+import { cva, VariantProps } from 'class-variance-authority';
 import {
   useEffect,
   useRef,
@@ -8,11 +12,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from 'react';
-import MenuItem from '#/components/_ui/context-menu/menu-item';
-import useOutsideAlerter from '#/hooks/use-click-outside.hook';
-import { cva, VariantProps } from 'class-variance-authority';
 import MenuGroupItem from './menu-group-item';
-import { cn } from '#/shared/utils/cn.util';
 
 const contextMenuVariants = cva(
   `absolute w-64 opacity-0 overflow-clip rounded border border-gray-200 dark:border-slate-800 md:w-52`,
@@ -113,32 +113,29 @@ export default function ContextMenu({
               </MenuItem>
             )}
 
-            {props.menuItems.map((item: ContextMenuItem, index) => (
-              <>
-                {item.type === 'group' && (
-                  <MenuGroupItem
-                    key={`group-${item.label}-${index}`}
-                    className='group'
-                    visible={item.visible}
-                    items={item.items || []}
-                  >
-                    {item.icon && item.icon} {item.label}
-                  </MenuGroupItem>
-                )}
-                {item.type === 'item' && (
-                  <MenuItem
-                    key={`item-${item.label}-${index}`}
-                    active={item.active}
-                    visible={item.visible}
-                    onClick={() => {
-                      item.onClick();
-                    }}
-                  >
-                    {item.icon && item.icon} {item.label}
-                  </MenuItem>
-                )}
-              </>
-            ))}
+            {props.menuItems.map((item: ContextMenuItem, index) =>
+              item.type === 'group' ? (
+                <MenuGroupItem
+                  key={`group-${item.label}-${index}`}
+                  className='group'
+                  visible={item.visible}
+                  items={item.items || []}
+                >
+                  {item.icon && item.icon} {item.label}
+                </MenuGroupItem>
+              ) : (
+                <MenuItem
+                  key={`item-${item.label}-${index}`}
+                  active={item.active}
+                  visible={item.visible}
+                  onClick={() => {
+                    item.onClick();
+                  }}
+                >
+                  {item.icon && item.icon} {item.label}
+                </MenuItem>
+              ),
+            )}
 
             {!!props.afterMenuItems && (
               <MenuItem

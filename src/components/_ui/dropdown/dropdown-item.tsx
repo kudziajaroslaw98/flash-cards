@@ -27,19 +27,19 @@ export default function DropdownItem<T>({
 
   return (
     <div
-      className={`${isSelected && 'text-green-400'} flex h-11 w-full cursor-pointer items-center gap-4 px-4 py-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700  dark:border-slate-700 dark:hover:bg-slate-900 dark:hover:text-gray-300`}
+      className={`${isSelected && 'text-green-400'} flex h-auto w-full cursor-pointer items-center gap-4 rounded-md px-4 py-2 text-gray-500 !outline-none transition hover:bg-gray-200 hover:text-gray-700 focus:bg-gray-100 focus:ring  focus:ring-green-400/50 dark:border-slate-700 dark:hover:bg-slate-900 dark:hover:text-gray-300 dark:focus:bg-slate-900`}
       onClick={() => changePickedItem(item)}
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
       {selectable && (
         <span
-          className={`${isSelected ? 'border-green-500 bg-green-400 text-gray-50 dark:text-slate-900' : 'border-gray-300 bg-gray-200 dark:border-slate-800 dark:bg-slate-900'} flex h-5 w-5 items-center justify-center rounded-md border text-sm `}
+          className={`${isSelected ? 'border-green-500 bg-green-400 text-gray-50 dark:text-slate-900' : 'border-gray-300 bg-gray-200 dark:border-slate-800 dark:bg-slate-900'} flex h-5 min-h-5 w-5 min-w-5 items-center justify-center rounded-md border text-sm `}
         >
           {isSelected && '✓'}
         </span>
       )}
-      <span>{item.label}</span>
+      <span className='h-auto'>{item.label}</span>
     </div>
   );
 }

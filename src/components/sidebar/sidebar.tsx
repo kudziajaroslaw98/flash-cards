@@ -1,9 +1,14 @@
 'use client';
 
+import { useSessionContext } from '#/providers/session-provider.component';
+import { APP_ROUTES } from '#/shared/defaults/app.routes';
+import { NavigationGroup } from '#/types//navigation-group.type';
+import { NavigationItem } from '#/types//navigation-item.type';
 import {
   ArrowLeft,
   ArrowRight,
   ArrowUp,
+  BookOpenText,
   GraduationCap,
   Languages,
   Layers,
@@ -14,20 +19,16 @@ import {
   UserRound,
   Zap,
 } from 'lucide-react';
-import { useSessionContext } from '#/providers/session-provider.component';
-import NavigationGroupComponent from '../_ui/navigation/navigation-group';
-import NavigationItemComponent from '../_ui/navigation/navigation-item';
-import { NavigationGroup } from '#/types//navigation-group.type';
-import ThemeSwitchComponent from '../theme-switch/theme-switch';
-import { NavigationItem } from '#/types//navigation-item.type';
-import ContextMenu from '../_ui/context-menu/context-menu';
-import { APP_ROUTES } from '#/shared/defaults/app.routes';
-import AvatarComponent from '../_ui/avatar/avatar';
-import { Button } from '../_ui/button/button';
-import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useRef, useState } from 'react';
+import AvatarComponent from '../_ui/avatar/avatar';
+import { Button } from '../_ui/button/button';
+import ContextMenu from '../_ui/context-menu/context-menu';
+import NavigationGroupComponent from '../_ui/navigation/navigation-group';
+import NavigationItemComponent from '../_ui/navigation/navigation-item';
+import ThemeSwitchComponent from '../theme-switch/theme-switch';
 
 export default function SidebarComponent() {
   const [expanded, toggleExpand] = useState<boolean>(true);
@@ -46,8 +47,15 @@ export default function SidebarComponent() {
       type: 'item',
       label: 'Dashboard',
       href: APP_ROUTES.dashboard,
-      visible: true,
+      visible: false,
       icon: <LayoutDashboard className={`${iconSize} fill-current`} />,
+    },
+    {
+      type: 'item',
+      label: 'How to use',
+      href: APP_ROUTES.guide,
+      visible: true,
+      icon: <BookOpenText className={`${iconSize} `} />,
     },
     {
       type: 'group',
@@ -99,7 +107,7 @@ export default function SidebarComponent() {
     window.umami.track('Upgrade plan clicked');
 
     if (!isLoggedIn) {
-      router.push(APP_ROUTES.signIn);
+      router.push(APP_ROUTES.signIn + '?redirect=pricing');
       return;
     } else {
       router.push(APP_ROUTES.pricing);
@@ -117,7 +125,7 @@ export default function SidebarComponent() {
       >
         <Link
           href={'/'}
-          className={`flex items-center font-thin tracking-wider ${expanded && 'gap-4'}`}
+          className={`flex items-center font-thin tracking-wider outline-none focus:ring focus:ring-green-400/50 ${expanded && 'gap-4'}`}
         >
           <Image
             width={24}

@@ -1,4 +1,24 @@
 'use client';
+import Badge from '#/components/_ui/badge/badge';
+import { Button } from '#/components/_ui/button/button';
+import ContextMenu, {
+  ContextMenuItem,
+} from '#/components/_ui/context-menu/context-menu';
+import LinkComponent from '#/components/_ui/link/link';
+import { AssignFlashCardsModal } from '#/components/assign-flash-cards-modal/assign-flash-cards-modal';
+import FlashCardComponent from '#/components/flash-card/flash-card';
+import { FloatingButtons } from '#/components/floating-buttons/floating-buttons';
+import { NewFlashCardModal } from '#/components/new-flash-card-modal/new-flash-card-modal';
+import { NewSetModal } from '#/components/new-set-modal/new-set-modal';
+import useFetch from '#/hooks/use-fetch.hook';
+import { useAppContext } from '#/providers/app-context';
+import { useSessionContext } from '#/providers/session-provider.component';
+import { API_ROUTES } from '#/shared/defaults/api-routes';
+import { cn } from '#/shared/utils/cn.util';
+import uuid from '#/shared/utils/uuid.util';
+import type { ApiResponse } from '#/types/api-response.type';
+import type { FlashCardSet } from '#/types/flash-card-set.type';
+import type { FlashCard } from '#/types/flash-card.type';
 import {
   ArrowLeft,
   CopyCheck,
@@ -10,35 +30,9 @@ import {
   Trash,
   Upload,
 } from 'lucide-react';
-import { AssignFlashCardsModal } from '#/components/assign-flash-cards-modal/assign-flash-cards-modal';
-import ContextMenu, {
-  ContextMenuItem,
-} from '#/components/_ui/context-menu/context-menu';
-import { NewFlashCardModal } from '#/components/new-flash-card-modal/new-flash-card-modal';
-import { FloatingButtons } from '#/components/floating-buttons/floating-buttons';
-import { useSessionContext } from '#/providers/session-provider.component';
-import type { FlashCardSet } from '#/shared/models/flash-card-set.model';
-import FlashCardComponent from '#/components/flash-card/flash-card';
-import type { FlashCard } from '#/shared/models/flash-card.model';
-import type { ApiResponse } from '#/types/api-response.type';
-import { API_ROUTES } from '#/shared/defaults/api-routes';
-import { Button } from '#/components/_ui/button/button';
-import { useAppContext } from '#/providers/app-context';
-import LinkComponent from '#/components/_ui/link/link';
 import { useParams, useRouter } from 'next/navigation';
-import useFetch from '#/hooks/use-fetch.hook';
-import uuid from '#/shared/utils/uuid.util';
-import { cn } from '#/shared/utils/cn.util';
-import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
+import { useEffect, useMemo, useState } from 'react';
 
-const NewSetModal = dynamic(() =>
-  import('#/components/new-set-modal/new-set-modal').then((x) => x.NewSetModal),
-);
-
-const Badge = dynamic(() => import('#/components/_ui/badge/badge'));
-
-// eslint-disable-next-line @next/next/no-async-client-component
 export default function SetHardlinkPage() {
   const setHardLink = useParams()?.hardlink as string;
   const router = useRouter();
@@ -47,9 +41,10 @@ export default function SetHardlinkPage() {
   const {
     flashcards,
     addFlashCards,
+    assignFlashCardsToSet,
     sets,
     categories,
-    updateSet,
+    updateSets,
     removeSets,
     metadata,
     updateMetadata,
@@ -62,22 +57,32 @@ export default function SetHardlinkPage() {
     setHardLink.replace(/-/g, ' ').charAt(0)?.toUpperCase() +
       setHardLink.replace(/-/g, ' ').slice(1),
   );
-  const [accuracy] = useState<number>(0);
 
   useEffect(() => {
     setSet(sets.filter((set) => set?.hardlink === setHardLink)[0]);
   }, [sets, setHardLink]);
 
-  const handleAssignCards = (flashCards: FlashCard[]) => {
+  const setFlashCards = useMemo(
+    () =>
+      flashcards.filter((flashcard) =>
+        set?.flashCards?.includes(flashcard.frontUuid),
+      ),
+    [flashcards, set],
+  );
+
+  const handleAssignCards = (flashCards: string[]) => {
     window.umami.track('Flash card assigned to set');
     setSet((prev) => ({
       ...prev,
-      flashCards,
+      flashCards: [...prev.flashCards, ...flashCards],
     }));
-    updateSet({
-      ...set,
-      flashCards,
-    });
+    updateSets([
+      {
+        ...set,
+        flashCards: flashCards,
+      },
+    ]);
+    assignFlashCardsToSet(flashCards, set.frontUuid);
   };
 
   const handleEditSet = (set: Partial<FlashCardSet>[]) => {
@@ -86,7 +91,7 @@ export default function SetHardlinkPage() {
       const hardlink = set[0].name?.replace(/ /g, '-').toLowerCase();
       router.prefetch(`flashcards/sets/${hardlink}`);
 
-      updateSet(set[0]);
+      updateSets([set[0]]);
       setSet(set[0] as FlashCardSet);
 
       router.push(`${hardlink}`);
@@ -138,7 +143,7 @@ export default function SetHardlinkPage() {
         method: 'POST',
         body: JSON.stringify({
           flashCards:
-            set.flashCards.map((flashCard) => flashCard.questionAddition) ?? [],
+            setFlashCards.map((flashCard) => flashCard.questionAddition) ?? [],
           setName: set?.name ?? '',
         }),
       },
@@ -152,38 +157,45 @@ export default function SetHardlinkPage() {
     const flashCardsResponse: Record<'word' | 'definition', string>[] =
       response as Record<'word' | 'definition', string>[];
 
-    const mappedFlashCards = flashCardsResponse.map((flashCard, index) => ({
-      question: 'What is the definition of word below?',
-      questionAddition: flashCard.word,
-      answer: flashCard.definition,
-      frontUuid: uuid(),
-      weight: 1.0,
-      order: flashcards.length + index,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }));
+    const mappedFlashCards = flashCardsResponse.map(
+      (flashCard, index) =>
+        ({
+          type: 'single',
+          question: 'What is the definition of word below?',
+          questionAddition: flashCard.word,
+          answer: flashCard.definition,
+          frontUuid: uuid(),
+          order: flashcards.length + index,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          spacedRepetition: {
+            interval: 1 * 24 * 60,
+            easeFactor: 1.3,
+            lastReviewAt: new Date().toISOString(),
+            dueDate: new Date().toISOString(),
+            reviews: 0,
+          },
+        }) as const,
+    );
 
     if (flashCardsResponse.length > 0) {
       addFlashCards(mappedFlashCards);
-      updateSet({
-        ...set,
-        flashCards: [...set.flashCards, ...mappedFlashCards],
-      });
+      updateSets([
+        {
+          ...set,
+          flashCards: [
+            ...set.flashCards,
+            ...mappedFlashCards.map((f) => f.frontUuid),
+          ],
+        },
+      ]);
     }
   };
 
-  const handleNewFlashCards = (
-    newFlashCards: Omit<FlashCard, 'weight' | 'order'>[],
-  ) => {
+  const handleNewFlashCards = (newFlashCards: Omit<FlashCard, 'order'>[]) => {
     window.umami.track('Add flash cards');
 
     if (newFlashCards.length > 0) {
-      const flashcardUuids = newFlashCards.map((flashcard, index) => ({
-        ...flashcard,
-        weight: 1.0,
-        order: flashcards.length + index + 1,
-      }));
-
       window.umami.track('Add flash cards', { count: newFlashCards.length });
       addFlashCards(newFlashCards);
 
@@ -192,10 +204,15 @@ export default function SetHardlinkPage() {
         createdFlashCards: metadata.createdFlashCards + newFlashCards.length,
       });
 
-      updateSet({
-        ...set,
-        flashCards: [...set.flashCards, ...flashcardUuids],
-      });
+      updateSets([
+        {
+          ...set,
+          flashCards: [
+            ...set.flashCards,
+            ...newFlashCards.map((f) => f.frontUuid),
+          ],
+        },
+      ]);
 
       setTimeout(() => {
         window.document.body.scrollIntoView({
@@ -258,13 +275,7 @@ export default function SetHardlinkPage() {
             </>
           )}
 
-          {/* <span>Created by:</span>
-          <span className='text-gray-200'>|</span>
-          <span>Created:{set?.createdAt}</span>
-          <span className='text-gray-200'>|</span> */}
           <span>{set?.flashCards?.length} cards assigned</span>
-          <span className='text-gray-200'>|</span>
-          <span>{accuracy}% average accuracy</span>
         </span>
       </div>
 
@@ -282,19 +293,17 @@ export default function SetHardlinkPage() {
         <div
           className={cn([
             'grid w-full justify-center gap-4 md:justify-start',
-            // 'm-[0 auto] inline-flex w-full flex-wrap gap-4',
             'grid-cols-[repeat(auto-fit,11rem)]',
           ])}
         >
-          {set?.flashCards &&
-            set?.flashCards.map((flashCard) => (
-              <div key={`flashcard-${flashCard.frontUuid}`}>
-                <FlashCardComponent
-                  flashCard={flashCard}
-                  size={'sm'}
-                />
-              </div>
-            ))}
+          {setFlashCards.map((flashCard) => (
+            <div key={`flashcard-${flashCard.frontUuid}`}>
+              <FlashCardComponent
+                flashCard={flashCard}
+                size={'sm'}
+              />
+            </div>
+          ))}
         </div>
 
         <FloatingButtons>
@@ -321,7 +330,7 @@ export default function SetHardlinkPage() {
             }
             handleSubmit={handleAssignCards}
             flashCards={flashcards}
-            setCards={set?.flashCards ?? []}
+            setCards={setFlashCards.map((f) => f.frontUuid) ?? []}
           />
 
           <NewSetModal

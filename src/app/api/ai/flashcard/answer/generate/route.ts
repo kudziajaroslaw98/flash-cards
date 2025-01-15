@@ -1,5 +1,5 @@
-import { createClient } from '#/shared/utils/supabase/server';
 import { RateLimit } from '#/shared/utils/api-limiter';
+import { createClient } from '#/shared/utils/supabase/server';
 import { createOpenAI } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
   });
 
   const result = streamText({
-    model: openai('gpt-3.5-turbo-0125'),
+    model: openai('gpt-3.5-turbo-1106'),
     system:
       'You are expert in english vocabulary, you are generating descriptiops for texts. You always give unique and fitting descriptions. Do not use words from prompt to not give hints. ',
     prompt: prompt,

@@ -2,8 +2,8 @@
 
 import { Button } from '#/components/_ui/button/button';
 import { createClient } from '#/shared/utils/supabase/client';
-import { m } from 'framer-motion';
 import { ArrowLeftIcon, Fingerprint, Github } from 'lucide-react';
+import { m } from 'motion/react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';

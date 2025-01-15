@@ -2,29 +2,18 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter';
-import type { FlashCard } from '#/shared/models/flash-card.model';
 import { Button } from '#/components/_ui/button/button';
+import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter';
 
-import { FloatingButtons } from '../floating-buttons/floating-buttons';
-import FlashCardComponent from '../flash-card/flash-card';
 import { useAppContext } from '#/providers/app-context';
-import { Pencil, Plus, Trash } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
 import { cn } from '#/shared/utils/cn.util';
-import dynamic from 'next/dynamic';
-
-const NewFlashCardModal = dynamic(() =>
-  import('#/components/new-flash-card-modal/new-flash-card-modal').then(
-    (x) => x.NewFlashCardModal,
-  ),
-);
-
-const AlertDialog = dynamic(() =>
-  import('#/components/_ui/alert-dialog/alert-dialog').then(
-    (x) => x.AlertDialog,
-  ),
-);
+import type { FlashCard } from '#/types/flash-card.type';
+import { Pencil, Plus, Trash } from 'lucide-react';
+import { AnimatePresence } from 'motion/react';
+import { AlertDialog } from '../_ui/alert-dialog/alert-dialog';
+import FlashCardComponent from '../flash-card/flash-card';
+import { FloatingButtons } from '../floating-buttons/floating-buttons';
+import { NewFlashCardModal } from '../new-flash-card-modal/new-flash-card-modal';
 
 export default function FlashCardsList() {
   const {
@@ -120,8 +109,8 @@ export default function FlashCardsList() {
             className={cn([
               'grid w-full justify-center gap-4',
               tileSize === 'sm' && 'grid-cols-[repeat(auto-fit,11rem)]',
-              tileSize === 'md' && 'grid-cols-[repeat(auto-fit,16rem)]',
-              tileSize === 'lg' && 'grid-cols-[repeat(auto-fit,20rem)]',
+              tileSize === 'md' && 'grid-cols-[repeat(auto-fit,11rem)]',
+              tileSize === 'lg' && 'grid-cols-[repeat(auto-fit,16rem)]',
             ])}
           >
             <AnimatePresence mode='popLayout'>

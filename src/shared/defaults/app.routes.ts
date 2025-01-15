@@ -1,4 +1,5 @@
 export const APP_ROUTES = {
+  guide: '/guide',
   dashboard: '/dashboard',
   flashcards: {
     learn: '/flashcards/learn',

@@ -1,16 +1,7 @@
 import type { DictionaryValue } from '#/types/dictionary-value.type';
-import type { FlashCardSet } from '../models/flash-card-set.model';
 import type { FormScheme } from '#/types/form-scheme.type';
 import { z } from 'zod';
-
-export const newSetValidationScheme = z.object({
-  name: z.string().min(1, 'Name is required'),
-  description: z
-    .string()
-    .min(1, 'Description is required')
-    .max(255, 'Description is too long'),
-  category: z.string().optional(),
-});
+import type { FlashCardSet } from '../../types/flash-card-set.type';
 
 export const newSetFormScheme = (
   dictionaryItems: DictionaryValue<string>[],
@@ -26,26 +17,52 @@ export const newSetFormScheme = (
       name: 'name',
       label: 'Set name',
       placeholder: 'Wild Animals',
+      _internal_constraints: [
+        {
+          type: 'validation',
+          key: 'name',
+          constraint: z.string().min(1, 'Name is required'),
+        },
+      ],
+      required: true,
     },
     description: {
+      _internal_constraints: [
+        {
+          type: 'validation',
+          key: 'description',
+          constraint: z
+            .string()
+            .min(1, 'Description is required')
+            .max(255, 'Description is too long'),
+        },
+      ],
       type: 'textarea',
       name: 'description',
       label: 'Description',
       placeholder: 'Set description',
+      required: true,
       handleGenerate: handleGenerate,
       loadingGenerate: loadingGenerate,
       blockGenerate: !isLoggedIn || !isPlanActive,
     },
     category: {
+      _internal_constraints: [
+        {
+          type: 'validation',
+          key: 'category',
+          constraint: z.string().optional(),
+        },
+      ],
       type: 'dropdown',
       multiple: false,
       label: 'Category',
       controlLabel: 'Category',
+      required: false,
       config: dictionaryItems,
       addNew: true,
       clearAll: true,
       onAddNew,
     },
   },
-  validation: newSetValidationScheme,
 });
