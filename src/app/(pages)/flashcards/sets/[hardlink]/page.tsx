@@ -277,8 +277,6 @@ export default function SetHardlinkPage() {
           )}
 
           <span>{set?.flashCards?.length} cards assigned</span>
-          <span className='text-gray-200'>|</span>
-          <span>{accuracy}% average accuracy</span>
         </span>
       </div>
 

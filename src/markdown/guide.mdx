@@ -1,7 +1,16 @@
 import { Button } from '#/components/_ui/button/button';
 import FlashCardComponent from '#/components/flash-card/flash-card';
 import FlashCardSelectExample from '#/components/guide-examples/flash-card-select-example';
-import { Pencil, Plus, Trash } from 'lucide-react';
+import {
+  ArrowRight,
+  CopyCheck,
+  Pencil,
+  Plus,
+  Settings,
+  Sparkles,
+  Trash,
+} from 'lucide-react';
+import Link from 'next/link';
 
 import Image from 'next/image';
 
@@ -23,8 +32,20 @@ Below, we cover the main sections of the app and the methodology behind each fea
 
 - [What are flash cards?](#what-are-flash-cards)
 - [Learn](#learn)
+  - Types Of Flash Cards
+  - Flash Cards Management Options
+  - How To Select Items
+  - Best Practices
 - [Sets](#sets)
+  - Add a New Sets
+  - Set Management Options
+  - Search and filter
+  - Actions Within a Set
+  - Best Practices
 - [Revise](#revise)
+  - How To Revise
+  - When You Revise It All
+  - Best Practices
 - [Methodology](#methodology)
 
 ---
@@ -85,6 +106,8 @@ The "Learn" section is designed to help you study flash cards interactively by
     alt='learn page view'
   />
 </div>
+
+### Types Of Flash Cards:
 
 There are **3 types of flash cards** that are currently available:
 
@@ -258,11 +281,42 @@ This flash card is designed to provide more **in-depth learning**. The front sid
   <span className='text-sm'>Click on flash card to flip it</span>
 </div>
 
+### Flash Cards Management Options:
+
 On the bottom there is **panel with controls** that can:
 
 - Add flash cards,
+
+  <div className='flex w-full justify-center'>
+    <Button
+      icon={<Plus className='h-4 w-4' />}
+      size={'icon-square'}
+    />
+  </div>
+
 - Edit flash cards,
+
+  <div className='flex w-full justify-center'>
+    <Button
+      icon={<Pencil className='h-4 w-4' />}
+      size={'icon-square'}
+      variant={'secondary'}
+    />
+  </div>
+
 - Delete flash cards
+
+  <div className='flex w-full justify-center'>
+    <Button
+      icon={<Trash className='h-4 w-4' />}
+      size={'icon-square'}
+      variant={'destructive'}
+    />
+  </div>
+
+<a name='select-example' />
+
+### How To Select Items:
 
 **To edit and delete** flash cards you first need to **select** them.
 
@@ -285,15 +339,135 @@ You can try it now in below's example.
 
 ## Sets
 
-The "Sets" section is where you organize your flashcards into collections based
+<div className='flex w-full justify-center'>
+  <Image
+    src='/images/guide/learn-9.png'
+    width={480}
+    height={240}
+    className='rounded-md'
+    alt='learn page view'
+  />
+</div>
+
+The "Sets" section is where you **organize your flashcards** into collections based
 on topics, subjects, or categories.
 
-Think of these as decks of cards that help you focus on specific areas of study.
+Sets are displayed in a **grid format**, with each set showing its **name**, a brief **description**, and the **number of cards** it contains.
+
+Think of these as **decks of cards** that help you **focus on specific areas** of study.
+
+### Add a New Sets:
+
+- To **Add New Set** click this **button**
+
+  <div className='flex w-full justify-center'>
+    <Button
+      icon={<Plus className='h-4 w-4' />}
+      size={'icon-square'}
+    />
+  </div>
+
+This allows you to **create a new set** by giving it a name, description, and adding cards to it.
+
+### Set Management Options:
+
+- **Edit Sets:** Modify the name, description, or contents of a set.
+
+  <div className='flex w-full justify-center'>
+    <Button
+      icon={<Pencil className='h-4 w-4' />}
+      size={'icon-square'}
+      variant={'secondary'}
+    />
+  </div>
+
+- **Delete Sets:** Remove a set you no longer need.
+
+  <div className='flex w-full justify-center'>
+    <Button
+      variant={'destructive'}
+      icon={<Trash className='h-4 w-4' />}
+      size={'icon-square'}
+    />
+  </div>
+
+- **View Set Details:** Clicking on a set takes you to its details, where you can review and manage the flashcards within it.
+
+To **edit and delete** sets you need to select them. [See how to select items](#select-example)
+
+### Search and filter:
+
+A **search bar** and filters are present to help you quickly **find specific sets**, show only **favorites sets** or categorize them based on their contents.
+
+### Actions Within a Set:
+
+<div className='flex w-full justify-center'>
+  <Image
+    src='/images/guide/learn-8.png'
+    width={480}
+    height={240}
+    className='rounded-md'
+    alt='learn page view'
+  />
+</div>
+
+Once you get **inside a set** by **clicking on set card**, you can:
+
+- **Add new flash cards**.
+
+  <div className='flex w-full justify-center gap-4'>
+    <Button
+      icon={<Plus className='h-4 w-4' />}
+      size={'icon-square'}
+      variant={'primary'}
+    />
+  </div>
+
+- **Edit set**.
+
+  <div className='flex w-full justify-center gap-4'>
+    <Button
+      icon={<Pencil className='h-4 w-4' />}
+      size={'icon-square'}
+      variant={'secondary'}
+    />
+  </div>
+
+- **Assign flash cards** to set that already existing
+
+  <div className='flex w-full justify-center gap-4'>
+    <Button
+      icon={<CopyCheck className='size-4' />}
+      size={'icon-square'}
+      variant={'primary'}
+    />
+  </div>
+
+- **Generate new flash cards** based of the ones that are already **assigned to set** (Paid feature).
+
+  <div className='flex w-full justify-center gap-4'>
+    <Button
+      icon={<Sparkles className='size-4' />}
+      size={'icon-square'}
+      variant={'secondary-outline'}
+    />
+  </div>
+
+- To **delete set** while being inside you need to **click** this **context menu**
+
+  <div className='flex w-full justify-center gap-4'>
+    <Button
+      icon={<Settings className='h-4 w-4' />}
+      size={'icon-square'}
+      variant={'primary-outline'}
+    />
+  </div>
 
 ### Best Practices:
 
-- Create sets based on your study goals, e.g., "Everyday Vocabulary" or "History Terms."
-- Keep each set focused to make studying manageable.
+- Organize your flashcards into distinct sets for better focus and clarity.
+- Use meaningful set names and descriptions to quickly identify their purpose.
+- Regularly review and update your sets to align with your learning goals.
 
 ---
 
@@ -301,11 +475,21 @@ Think of these as decks of cards that help you focus on specific areas of study.
 
 ## Revise
 
+<div className='flex w-full justify-center'>
+  <Image
+    src='/images/guide/learn-10.png'
+    width={480}
+    height={240}
+    className='rounded-md'
+    alt='learn page view'
+  />
+</div>
+
 The "Revise" section **leverages spaced repetition** to help you retain
 knowledge effectively. This feature prioritizes cards based on how well you
 remember them.
 
-### How to Use:
+### How To Revise:
 
 **Start Revising:**
 
@@ -389,6 +573,8 @@ By default selecting **correct answer** (green background and border on picked a
   />
 </div>
 
+### When You Revise It All:
+
 After revising all cards you will be asked to continue revising as it is optional.
 If you continue you will revise all cards from the pool.
 
@@ -419,3 +605,14 @@ The Flashcards app is built on **evidence-based learning** techniques to **maxim
 ---
 
 By following this guide and consistently using the app, you can make **learning more efficient and enjoyable**. Happy studying!
+
+<div className='flex w-full justify-center py-24'>
+  <Link href='/flashcards/learn'>
+    <Button
+      label={'Start Learning Now'}
+      icon={<ArrowRight className='h-4 w-4' />}
+      variant={'primary'}
+      iconPosition='right'
+    />
+  </Link>
+</div>
