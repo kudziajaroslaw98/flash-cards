@@ -71,8 +71,9 @@ export default function GuidePageMDX() {
     <div className='flex h-full w-full flex-col items-center gap-16 px-4 py-24'>
       <div
         className={cn([
-          'prose text-gray-600 prose-headings:mt-8 prose-headings:font-bold prose-h1:text-5xl prose-h1:text-green-400 prose-h2:text-4xl prose-h2:text-gray-800 prose-h3:text-xl prose-h3:font-extrabold prose-h3:text-gray-600 prose-strong:text-green-400',
-          'dark:text-slate-400 dark:prose-headings:text-slate-200',
+          'prose prose-headings:mt-8 prose-headings:font-bold prose-h1:text-5xl prose-h2:text-4xl prose-h2:font-extrabold prose-h3:text-xl prose-h3:font-bold',
+          'text-gray-600 prose-h1:text-green-400 prose-h2:text-gray-800 prose-h3:text-gray-600 prose-strong:text-green-400',
+          'dark:text-slate-400 dark:prose-h1:text-green-400 dark:prose-h2:text-slate-200 dark:prose-h3:text-slate-400 dark:prose-a:text-slate-400',
         ])}
       >
         <Guide />
