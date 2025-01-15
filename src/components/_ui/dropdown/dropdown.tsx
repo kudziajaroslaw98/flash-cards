@@ -279,7 +279,7 @@ export default function Dropdown<T>({
             'w-auto pb-2  pl-2 text-sm text-gray-400',
           ])}
         >
-          {`${controlLabel}${required ? ' *' : ''}`}
+          {`${controlLabel}${required ? ' *' : ' (optional)'}`}
         </span>
       )}
       <div className='w-full'>

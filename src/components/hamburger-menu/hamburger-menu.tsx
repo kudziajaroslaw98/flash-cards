@@ -12,6 +12,7 @@ import { NavigationItem } from '#/types//navigation-item.type';
 import type { NavigationGroup } from '#/types/navigation-group.type';
 import {
   ArrowUp,
+  BookOpenText,
   GraduationCap,
   Languages,
   Layers,
@@ -43,6 +44,13 @@ export default function HamburgerMenuComponent() {
       href: APP_ROUTES.dashboard,
       visible: false,
       icon: <LayoutDashboard className={`${iconSize} fill-current`} />,
+    },
+    {
+      type: 'item',
+      label: 'How to use',
+      href: APP_ROUTES.guide,
+      visible: true,
+      icon: <BookOpenText className={`${iconSize} `} />,
     },
     {
       type: 'group',

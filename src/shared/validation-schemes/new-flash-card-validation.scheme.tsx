@@ -19,8 +19,8 @@ export const newFlashCardScheme = (
       label: 'Flash Card Type',
       config: [
         { value: 'index', label: 'Index Flash Card' },
-        { value: 'single', label: 'Detailed Flash Card' },
         { value: 'question', label: 'Question with answer' },
+        { value: 'single', label: 'Detailed Flash Card' },
       ],
       required: true,
     },

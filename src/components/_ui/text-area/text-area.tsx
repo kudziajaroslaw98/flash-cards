@@ -125,7 +125,7 @@ export default function TextArea({
             'w-auto pb-2 pl-2 text-sm  text-gray-400 dark:text-slate-500',
           ])}
         >
-          {`${label}${required ? ' *' : ''}`}
+          {`${label}${required ? ' *' : ' (optional)'}`}
         </span>
       )}
       <span className='relative'>

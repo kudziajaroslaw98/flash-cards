@@ -7,9 +7,9 @@ import Image from 'next/image';
 
 # Guide to Using the Flashcards App
 
-**Welcome to the Flashcards app!**
+**Welcome to the Flashcards App!**
 
-This guide is dedicated to complete beginners both in learning applications and this flashcards app, who want to enrich their learning with digital flash cards.
+This guide is dedicated to complete beginners both in learning applications and this Flashcards App, who want to enrich their learning with digital flash cards.
 
 People familiar with modern applications should feel comfortable using it.
 
@@ -21,14 +21,14 @@ Below, we cover the main sections of the app and the methodology behind each fea
 
 ## **1. What are flash cards?**
 
-Before we cover this app functionalities it's important for you to understand what flash cards are.
+Before we cover this app functionalities it's important for you to understand **what flash cards are**.
 
-Flash cards are small cards with information written on them.
-On one side, there is a question or word, and on the other side, there is the answer or explanation.
+Flash cards are **small cards** with information written on them.
+On one side, there is a **question or word**, and on the other side, there is the **answer or explanation**.
 
-You can use them to learn and remember things.
+You can use them to **learn and remember things**.
 
-For example, you can use flash cards to study new words, math facts, or anything else you want to learn.
+For example, you can use flash cards to **study new words**, math facts, or anything else you want to **learn**.
 
 Here are some simple things to remember when creating flash cards:
 
@@ -58,7 +58,7 @@ Now let's talk about the app.
 
 ## **2. Learn**
 
-The "Learn" section is designed to help you study flash cards interactively by presenting terms and testing your recall.
+The "Learn" section is designed to help you study flash cards interactively by **presenting terms and testing your recall**.
 
 <div className='flex w-full justify-center'>
   <Image
@@ -70,7 +70,7 @@ The "Learn" section is designed to help you study flash cards interactively by p
   />
 </div>
 
-There are 3 types of flash cards that are currently available:
+There are **3 types of flash cards** that are currently available:
 
 <div className='w-full flex justify-center flex-wrap gap-4 py-8 not-prose'>
 <FlashCardComponent
@@ -146,9 +146,9 @@ There are 3 types of flash cards that are currently available:
 />
 </div>
 
-- Index Flash Card
+- **Index Flash Card**
 
-This flash card is only having one side. It contain only highlighted word / sentence. You can use it as a quick add that you can edit later on.
+This flash card is only having **one side**. It contain only highlighted word / sentence. You can use it as a quick add that you can edit later on.
 
 <div className='not-prose flex w-full flex-col items-center'>
   <FlashCardComponent
@@ -176,9 +176,9 @@ This flash card is only having one side. It contain only highlighted word / sent
   />
 </div>
 
-- Question Flash Card
+- **Question Flash Card**
 
-This flash card is used to test your knowledge. On one side, there is a question, and on the other side, there is the answer. The question side helps you think and recall information, while the answer side lets you check if you got it right.
+This flash card is used to test your knowledge. On one side, there is a **question**, and on the other side, there is the **answer**. The question side helps you think and recall information, while the answer side lets you check if you got it right.
 
 <div className='flex w-full flex-col items-center not-prose gap-4'>
 
@@ -211,9 +211,9 @@ Click on flash card to flip it
 </span>
 </div>
 
-- Detailed Flash Card
+- **Detailed Flash Card**
 
-This flash card is designed to provide more in-depth learning. The front side usually asks a question or introduces a topic (e.g., a word, concept, or problem), while the back side gives a detailed explanation.
+This flash card is designed to provide more **in-depth learning**. The front side usually asks a **question** or introduces a topic (e.g., a word, concept, or problem), while the back side gives a **detailed explanation**.
 
 <div className='not-prose flex w-full flex-col items-center gap-4'>
   <FlashCardComponent
@@ -242,7 +242,7 @@ This flash card is designed to provide more in-depth learning. The front side us
   <span className='text-sm'>Click on flash card to flip it</span>
 </div>
 
-On the bottom there is panel with controls that can:
+On the bottom there is **panel with controls** that can:
 
 - Add flash cards,
 - Edit flash cards,
@@ -250,13 +250,18 @@ On the bottom there is panel with controls that can:
 
 **To edit and delete** flash cards you first need to **select** them.
 
-To do this just **click and hold** flash card. **Only first** flash card needs to be **clicked and hold**, next flash cards can be selected just by clicking.
+To do this just **click and hold** flash card. **Only first** flash card needs to be **clicked and hold**, next flash cards can be **selected just by clicking**.
 
 You can try it now in below's example.
 
 <div className='not-prose'>
   <FlashCardSelectExample />
 </div>
+
+### Best Practices:
+
+- Avoid distractions while using this mode to fully engage with the material.
+- Focus on understanding the terms rather than just memorizing.
 
 ---
 
@@ -275,13 +280,13 @@ Think of these as decks of cards that help you focus on specific areas of study.
 
 ## **4. Revise**
 
-The "Revise" section leverages spaced repetition to help you retain knowledge effectively. This feature prioritizes cards based on how well you remember them.
+The "Revise" section **leverages spaced repetition** to help you retain knowledge effectively. This feature prioritizes cards based on how well you remember them.
 
 ### How to Use:
 
 **Start Revising:**
 
-1. Select a set (all flash cards by default) to revise (optional).
+1. **(optional)** Select a set (all flash cards by default) to revise.
 2. The app will present cards that needs to be revised.
 3. Choose one of the four options:
 
@@ -344,14 +349,7 @@ By default selecting **correct answer** (green background and border on picked a
     src='/images/guide/learn-7.png'
     width={480}
     height={240}
-    className='flex rounded-md dark:hidden'
-    alt='learn page view'
-  />
-  <Image
-    src='/images/guide/learn-dark-7.png'
-    width={480}
-    height={240}
-    className='hidden rounded-md dark:flex'
+    className='rounded-md'
     alt='learn page view'
   />
 </div>
@@ -384,7 +382,7 @@ Picking options **'Good'** or **'Easy' won't affect the revise date** to avoid s
 
 ## **Methodology**
 
-The Flashcards app is built on evidence-based learning techniques to maximize retention and understanding:
+The Flashcards app is built on **evidence-based learning** techniques to **maximize retention** and understanding:
 
 1. **Spaced Repetition:**
    - Revisit information at increasing intervals to strengthen memory.
@@ -395,4 +393,4 @@ The Flashcards app is built on evidence-based learning techniques to maximize re
 
 ---
 
-By following this guide and consistently using the app, you can make learning more efficient and enjoyable. Happy studying!
+By following this guide and consistently using the app, you can make **learning more efficient and enjoyable**. Happy studying!

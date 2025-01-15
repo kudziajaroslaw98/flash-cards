@@ -72,7 +72,7 @@ function Input({
             'w-auto pb-2 pl-2 text-sm text-gray-400',
           ])}
         >
-          {`${label}${required ? ' *' : ''}`}
+          {`${label}${required ? ' *' : ' (optional)'}`}
         </span>
       )}
 

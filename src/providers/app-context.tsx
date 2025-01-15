@@ -18,7 +18,6 @@ import type { FlashCard, FlashCardType } from '#/types/flash-card.type';
 import type { Metadata } from '#/types/metadata.type';
 import {
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -94,6 +93,18 @@ export default function AppProvider(props: PropsWithChildren) {
     sets: [],
   } as const;
 
+  const defaultSet: FlashCardSet = {
+    frontUuid: uuid(),
+    name: '',
+    description: '',
+    category: '',
+    isFavourite: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    flashCards: [],
+    hardlink: '',
+  } as const;
+
   /////////////////
   // #endregion DEFAULTS
   /////////////////
@@ -115,6 +126,11 @@ export default function AppProvider(props: PropsWithChildren) {
   /////////////////
 
   const [avatarSeed, setAvatarSeed] = useState<string>('');
+  const [migration, setMigration] = useState<{
+    flashcards: string | null;
+    sets: string | null;
+  }>({ flashcards: null, sets: null });
+  const [appVersion, setAppVersion] = useState<string>('');
   const [flashCardsArray, setFlashCardsArray] = useState<FlashCard[]>([]);
   const [setsArray, setSetsArray] = useState<FlashCardSet[]>([]);
   const [categories, setCategories] = useState<DictionaryValue<string>[]>([]);
@@ -123,7 +139,8 @@ export default function AppProvider(props: PropsWithChildren) {
   >([]);
   const [metadata, setMetadata] = useState<Metadata>(DEFAULT_METADATA);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const websocketChannel = useRef<ReturnType<typeof supabase.channel>>(undefined);
+  const websocketChannel =
+    useRef<ReturnType<typeof supabase.channel>>(undefined);
 
   /////////////////
   // #endregion STATE
@@ -152,6 +169,16 @@ export default function AppProvider(props: PropsWithChildren) {
     key: 'theme',
     defaultValue: 'dark',
     setValue: setTheme,
+  });
+  useLocalStorage({
+    key: 'appVersion',
+    defaultValue: '1.0.0',
+    setValue: setAppVersion,
+  });
+  useLocalStorage({
+    key: 'migrations',
+    defaultValue: { flashcards: '', sets: '' },
+    setValue: setMigration,
   });
 
   /////////////////
@@ -691,7 +718,6 @@ export default function AppProvider(props: PropsWithChildren) {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'flashcards' },
         (payload) => {
-          console.log('flahcard-update', payload);
           if (payload.new) {
             const updatedFlashcard = payload.new as FlashCard & {
               user_uuid: string;
@@ -709,7 +735,6 @@ export default function AppProvider(props: PropsWithChildren) {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'flashcards' },
         (payload) => {
-          console.log('flahcard-insert', payload);
           if (payload.new) {
             const newFlashcard = payload.new as FlashCard & {
               user_uuid: string;
@@ -737,7 +762,6 @@ export default function AppProvider(props: PropsWithChildren) {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'sets' },
         (payload) => {
-          console.log('set-update', payload);
           if (payload.new) {
             const updatedSet = payload.new as FlashCardSet & {
               user_uuid: string;
@@ -873,24 +897,122 @@ export default function AppProvider(props: PropsWithChildren) {
   // #region MIGRATION
   /////////////////
 
-  const migrateFlashCards = useCallback(() => {
-    setFlashCardsArray((prev) => {
-      const updatedFlashCards = prev.map((flashCard) => ({
-        ...flashCard,
-        spacedRepetition: flashCard.spacedRepetition ?? {
-          ...defaultFlashCard.spacedRepetition,
-        },
-      }));
+  const migrateFlashCards = () => {
+    if (!appVersion) return;
+    if (
+      appVersion === '1.0.0' &&
+      migration.flashcards !== null &&
+      migration.flashcards !== '1.0.0'
+    ) {
+      setFlashCardsArray((prev) => {
+        const flashCardsObject: Record<string, FlashCard> = {};
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const unknownFlashCards = prev as any[];
 
-      const flashCardsObject: Record<string, FlashCard> = {};
-      updatedFlashCards.forEach((item: FlashCard) => {
-        flashCardsObject[item.frontUuid] = item;
+        const updatedFlashCards = unknownFlashCards.map((flashCard) => {
+          const migratedFlashCard: FlashCard = {
+            type: flashCard?.type ?? ('index' as FlashCardType),
+            frontUuid: flashCard?.frontUuid ?? uuid(),
+            question: flashCard?.question ?? defaultFlashCard.question,
+            questionAddition:
+              flashCard?.questionAddition ?? defaultFlashCard.questionAddition,
+            answer: flashCard?.answer ?? defaultFlashCard.answer,
+            order: flashCard?.order ?? flashCardsArray.length + 1,
+            createdAt: flashCard?.createdAt ?? new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            spacedRepetition: {
+              interval:
+                flashCard?.spacedRepetition?.interval ??
+                defaultFlashCard.spacedRepetition.interval,
+              easeFactor:
+                flashCard?.spacedRepetition?.easeFactor ??
+                defaultFlashCard.spacedRepetition.easeFactor,
+              reviews:
+                flashCard?.spacedRepetition?.reviews ??
+                defaultFlashCard.spacedRepetition.reviews,
+              lastReviewAt:
+                flashCard?.spacedRepetition?.lastReviewAt ??
+                defaultFlashCard.spacedRepetition.lastReviewAt,
+              dueDate:
+                flashCard?.spacedRepetition?.dueDate ??
+                defaultFlashCard.spacedRepetition.dueDate,
+            },
+            sets: flashCard?.sets ?? [],
+          };
+
+          flashCardsObject[migratedFlashCard.frontUuid] = migratedFlashCard;
+          return migratedFlashCard;
+        });
+
+        setMigration((prev) => {
+          localStorage.setItem(
+            'migrations',
+            JSON.stringify({ ...prev, flashcards: '1.0.0' }),
+          );
+
+          return { ...prev, flashcards: '1.0.0' };
+        });
+        localStorage.setItem('flashcards', JSON.stringify(flashCardsObject));
+
+        return updatedFlashCards;
       });
+    }
+  };
 
-      localStorage.setItem('flashcards', JSON.stringify(flashCardsObject));
-      return updatedFlashCards;
-    });
-  }, [flashCardsArray]);
+  const migrateSets = () => {
+    if (!appVersion) return;
+    if (
+      appVersion === '1.0.0' &&
+      migration.sets !== null &&
+      migration.sets !== '1.0.0'
+    ) {
+      setSetsArray((prev) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const unknownSets = prev as any[];
+        const setsObject: Record<string, FlashCardSet> = {};
+        const updatedSets = unknownSets.map((set) => {
+          const setFlashCards = set?.flashcards ?? [];
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const updatedFlashCards = setFlashCards?.map((flashCard: any) => {
+            if (typeof flashCard === 'string') {
+              return flashCard;
+            } else {
+              return flashCard.frontUuid;
+            }
+          });
+          const migratedSet: FlashCardSet = {
+            frontUuid: set?.frontUuid ?? uuid(),
+            name: set?.name ?? defaultSet.name,
+            description: set?.description ?? defaultSet.description,
+            category: set?.category ?? defaultSet.category,
+            isFavourite: set?.isFavourite ?? defaultSet.isFavourite,
+            createdAt: set?.createdAt ?? new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            hardlink:
+              set?.hardlink ??
+              (set?.name as string)?.replace(/ /g, '-')?.toLowerCase() ??
+              '',
+            flashCards: updatedFlashCards,
+          };
+
+          setsObject[migratedSet.frontUuid] = migratedSet;
+          return migratedSet;
+        });
+
+        setMigration((prev) => {
+          localStorage.setItem(
+            'migrations',
+            JSON.stringify({ ...prev, sets: '1.0.0' }),
+          );
+
+          return { ...prev, sets: '1.0.0' };
+        });
+        localStorage.setItem('sets', JSON.stringify(setsObject));
+
+        return updatedSets;
+      });
+    }
+  };
 
   /////////////////
   // #endregion MIGRATION
@@ -925,40 +1047,27 @@ export default function AppProvider(props: PropsWithChildren) {
   }, [setsArray]);
 
   useEffect(() => {
-    if (
-      flashCardsArray.some(
-        (flashCard) =>
-          flashCard.spacedRepetition === undefined ||
-          flashCard.spacedRepetition === null,
-      )
-    ) {
+    if (appVersion === '1.0.0' && migration.flashcards !== '1.0.0') {
       migrateFlashCards();
     }
-  }, [flashCardsArray, migrateFlashCards]);
+
+    if (appVersion === '1.0.0' && migration.sets !== '1.0.0') {
+      migrateSets();
+    }
+  }, [
+    appVersion,
+    migration,
+    flashCardsArray,
+    setsArray,
+    migrateFlashCards,
+    migrateSets,
+    setFlashCardsArray,
+    setSetsArray,
+  ]);
 
   useEffect(() => {
     setAvatarSeed(generateHash());
   }, []);
-
-  // useEffect(() => {
-  //   if (!metadataInitiated) return;
-
-  //   if (metadata.lastSyncAt) {
-  //     const now = new Date();
-  //     const lastSyncAt = new Date(metadata.lastSyncAt);
-
-  //     const dayNow = now.getDate();
-  //     const dayLastSyncAt = lastSyncAt.getDate();
-
-  //     const isNewDay = dayNow !== dayLastSyncAt;
-
-  //     setMetadata((prev) => ({
-  //       ...prev,
-  //       streak: isNewDay ? prev.streak + 1 : prev.streak,
-  //     }));
-  //     localStorage.setItem('metadata', JSON.stringify(metadata));
-  //   }
-  // }, [metadataInitiated]);
 
   useEffect(() => {
     if (!isLoggedIn) return;

@@ -1,4 +1,5 @@
 import Guide from '#/markdown/guide.mdx';
+import { cn } from '#/shared/utils/cn.util';
 import type { Metadata } from 'next';
 export const metadata: Metadata = {
   authors: [
@@ -68,7 +69,12 @@ export const metadata: Metadata = {
 export default function GuidePageMDX() {
   return (
     <div className='flex h-full w-full flex-col items-center gap-16 px-4 py-24'>
-      <div className='prose prose-headings:mt-8 prose-headings:font-semibold prose-headings:text-black prose-h1:text-5xl prose-h2:text-4xl prose-h3:text-3xl prose-h4:text-2xl prose-h5:text-xl prose-h6:text-lg dark:prose-headings:text-white'>
+      <div
+        className={cn([
+          'prose text-gray-600 prose-headings:mt-8 prose-headings:font-bold prose-h1:text-5xl prose-h1:text-green-400 prose-h2:text-4xl prose-h2:text-gray-800 prose-h3:text-xl prose-h3:font-extrabold prose-h3:text-gray-600 prose-strong:text-green-400',
+          'dark:text-slate-400 dark:prose-headings:text-slate-200',
+        ])}
+      >
         <Guide />
       </div>
     </div>
