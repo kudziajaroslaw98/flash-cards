@@ -125,7 +125,7 @@ h6 {
   position: absolute;
   content: '';
 
-  background-image: url('/images/flashcards-screenshot.png');
+  background-image: url('/images/flashcards-screenshot.webp');
   background-size: cover;
   background-position: center;
   width: calc(100% - 4px);
