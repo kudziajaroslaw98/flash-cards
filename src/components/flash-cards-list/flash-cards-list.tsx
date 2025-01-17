@@ -118,7 +118,7 @@ export default function FlashCardsList() {
       )
       .filter(
         (flashcard) =>
-          flashcard.sets.extendedIncludes(searchedSets) ||
+          flashcard?.sets?.extendedIncludes(searchedSets) ||
           searchedSets.length === 0,
       )
       .filter(
