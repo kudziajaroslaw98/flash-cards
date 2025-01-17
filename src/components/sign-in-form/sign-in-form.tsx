@@ -80,6 +80,7 @@ function AuthButtons({
         iconPosition='left'
         label='Github'
         size={'full'}
+        alt='Sign in with Github'
       ></Button>
 
       <Button
@@ -92,6 +93,7 @@ function AuthButtons({
         label='Google'
         size={'full'}
         className='group'
+        alt='Sign in with Google'
       ></Button>
     </>
   );
@@ -134,13 +136,14 @@ export default function SignInComponent() {
           label='Back'
           onClick={() => handleBackButton()}
           variant={'primary-text'}
+          alt='Back'
         />
       </div>
 
-      <h4 className='flex items-center justify-center gap-2 text-3xl font-semibold text-green-500'>
+      <h1 className='flex items-center justify-center gap-2 text-3xl font-semibold text-green-500'>
         <span>Sign in</span>
         <Fingerprint className={'size-8'} />
-      </h4>
+      </h1>
 
       <div className='z-20 flex w-full flex-col gap-2'>
         <Suspense
@@ -153,6 +156,7 @@ export default function SignInComponent() {
                 iconPosition='left'
                 label='Github'
                 size={'full'}
+                alt='Github'
               ></Button>
 
               <Button
@@ -163,6 +167,7 @@ export default function SignInComponent() {
                 label='Google'
                 size={'full'}
                 className='group'
+                alt='Google'
               ></Button>
             </>
           }
@@ -187,6 +192,7 @@ export default function SignInComponent() {
             iconPosition='left'
             label='Continue as guest'
             size={'full'}
+            alt='Continue as guest'
           ></Button>
         </Link>
 
@@ -205,6 +211,7 @@ export default function SignInComponent() {
               iconPosition='left'
               label='password'
               size={'full'}
+              alt='password'
             ></Button>
 
             <Button
@@ -220,6 +227,7 @@ export default function SignInComponent() {
               iconPosition='left'
               label='password 2'
               size={'full'}
+              alt='password 2'
             ></Button>
           </>
         )}

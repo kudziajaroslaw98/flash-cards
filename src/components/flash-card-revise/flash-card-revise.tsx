@@ -229,6 +229,7 @@ export default function FlashCardReviseComponent() {
               label='Continue'
               size={'sm'}
               onClick={continueRerollClick}
+              alt='Continue reshuffling'
             />
           </AllRevised>
         )}
@@ -244,6 +245,7 @@ export default function FlashCardReviseComponent() {
             size={'xlg'}
             className='!w-full !max-w-xs'
             disabled={!clicked}
+            alt='Reshuffle flash cards'
           />
 
           <Dropdown

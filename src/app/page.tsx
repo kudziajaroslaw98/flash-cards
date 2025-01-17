@@ -257,6 +257,7 @@ export default async function Home() {
                   className='group mx-auto min-w-36 font-semibold'
                   icon={animatedPlayIcon}
                   iconPosition='right'
+                  alt='Redirect to sign in page'
                 />
               </Link>
             </li>
@@ -276,9 +277,9 @@ export default async function Home() {
           />
 
           <h1 className='flex flex-col items-center gap-4 bg-gradient-to-r from-green-600 to-green-400 bg-clip-text p-2 text-center text-5xl !font-black text-transparent'>
-            <span>Learning words made</span>
+            Learning words made
             <span className='relative inline-block max-w-min px-4 before:absolute before:-inset-1 before:block before:-skew-y-3 before:rounded-sm before:bg-green-400'>
-              <span className='relative z-10  text-slate-950'>easy</span>
+              <span className='relative z-10 text-slate-950'>easy</span>
             </span>
           </h1>
 
@@ -295,6 +296,7 @@ export default async function Home() {
               className='group mx-auto mt-8 min-w-36 font-semibold'
               icon={animatedPlayIcon}
               iconPosition='right'
+              alt='Redirect to sign in page'
             />
           </Link>
 
@@ -385,6 +387,7 @@ export default async function Home() {
                 className='group mx-auto mt-8 min-w-36 font-semibold'
                 icon={animatedPlayIcon}
                 iconPosition='right'
+                alt='Redirect to sign in page'
               />
             </Link>
           </ScrollReveal>
@@ -440,6 +443,7 @@ export default async function Home() {
                       label={'Get started'}
                       variant={'primary-outline'}
                       className='font-bold'
+                      alt='Redirect to pricing in page'
                     />
                   </Link>
 
@@ -512,6 +516,7 @@ export default async function Home() {
                       variant={'primary-outline'}
                       className='font-bold'
                       type='submit'
+                      alt='Redirect to pricing in page'
                     />
                   </Link>
 

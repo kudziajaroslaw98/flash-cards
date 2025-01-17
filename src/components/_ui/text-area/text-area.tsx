@@ -161,6 +161,7 @@ export default function TextArea({
             icon={<Sparkles className='size-3' />}
             loading={loadingGenerate}
             disabled={blockGenerate}
+            alt='Generate'
           />
         )}
       </span>

@@ -252,6 +252,7 @@ export default function SetHardlinkPage() {
                   size={'icon'}
                   variant={'primary-outline'}
                   onClick={() => window.umami.track('Set options clicked')}
+                  alt='Set options'
                 />
               }
               menuItems={contextMenuActions}
@@ -313,6 +314,7 @@ export default function SetHardlinkPage() {
                 icon={<Plus className='size-4' />}
                 size={'icon-square'}
                 variant={'primary'}
+                alt='Add flash card'
               />
             }
             handleNewFlashCard={handleNewFlashCards}
@@ -326,6 +328,7 @@ export default function SetHardlinkPage() {
                 icon={<CopyCheck className='size-4' />}
                 size={'icon-square'}
                 variant={'primary'}
+                alt='Assign flash cards'
               />
             }
             handleSubmit={handleAssignCards}
@@ -343,6 +346,7 @@ export default function SetHardlinkPage() {
                 icon={<Pencil className='size-4' />}
                 size={'icon-square'}
                 variant={'secondary'}
+                alt='Edit set'
               />
             }
           />
@@ -354,6 +358,7 @@ export default function SetHardlinkPage() {
             variant={'secondary-outline'}
             onClick={handleGenerateFlashCards}
             loading={isLoading}
+            alt='Generate flash cards'
           />
         </FloatingButtons>
       </div>

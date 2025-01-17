@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   },
   applicationName: 'Flash Cards - Learning Words Made Easy',
   alternates: {
-    canonical: 'https://flashcards.finalphase.app/flashcards/',
+    canonical: 'https://flashcards.finalphase.app/',
   },
   manifest: '/manifest.json',
 };

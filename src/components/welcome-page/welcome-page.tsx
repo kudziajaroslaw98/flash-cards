@@ -121,7 +121,10 @@ export const WelcomePage = () => {
             transition={{ delay: 6, duration: 0.7, ease: 'easeOut' }}
             className='mt-8 flex flex-col items-center justify-center gap-4'
           >
-            <Button label='Continue' />
+            <Button
+              label='Continue'
+              alt='Continue'
+            />
 
             <span>or</span>
 
@@ -129,6 +132,7 @@ export const WelcomePage = () => {
               <Button
                 variant={'primary-text'}
                 label='Revise more flashcards'
+                alt='Revise more flashcards'
               />
             </Link>
           </m.div>

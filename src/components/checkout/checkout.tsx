@@ -141,6 +141,7 @@ function Checkout({
                 variant={'primary'}
                 size={'full'}
                 label={'Back to Checkout'}
+                alt='Redirect to checkout page'
               />
             </form>
           )}
@@ -155,6 +156,7 @@ function Checkout({
               size={'full'}
               label={'Continue Learning'}
               onClick={() => setIsRedirecting(true)}
+              alt='Redirect to flashcards page'
             />
           </Link>
         </div>

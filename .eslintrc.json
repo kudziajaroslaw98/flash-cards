@@ -1,12 +1,14 @@
 {
   "parser": "@typescript-eslint/parser",
   "extends": [
+    "eslint-config-next",
     "plugin:@typescript-eslint/recommended",
     "next",
+    "plugin:@next/next/recommended",
     "next/core-web-vitals",
     "eslint:recommended"
   ],
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "@next/eslint-plugin-next"],
   "globals": {
     "React": "readonly"
   },
