@@ -92,7 +92,7 @@ export const metadata: Metadata = {
   },
   robots: {
     index: true,
-    follow: false,
+    follow: true,
   },
   applicationName: 'Flash Cards - Learning Words Made Easy',
   alternates: {
