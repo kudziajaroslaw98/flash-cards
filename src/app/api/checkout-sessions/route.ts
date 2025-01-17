@@ -1,10 +1,10 @@
-import type { SupabaseClient, User } from '@supabase/supabase-js';
-import { createClient } from '#/shared/utils/supabase/server';
 import { stripe } from '#/shared/utils/stripe/config';
+import { createClient } from '#/shared/utils/supabase/server';
+import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
-export const dynamic = 'force-dynamic' // defaults to auto
+export const dynamic = 'force-dynamic'; // defaults to auto
 
 const validationScheme = z.union([
   z.string().max(4).toLowerCase().includes('free'),
@@ -104,7 +104,10 @@ const createOrRetrieveCheckoutSession = async (
     customer: customerId,
     line_items: [
       {
-        price: process.env.NODE_ENV === 'production' ? 'price_1QTmyMDKMh5G3jeEjRhDFjXH' : 'price_1QUDAGDKMh5G3jeEEXb0W0tg',
+        price:
+          process.env.NODE_ENV === 'production'
+            ? 'price_1QTmyMDKMh5G3jeEjRhDFjXH'
+            : 'price_1QUDAGDKMh5G3jeEEXb0W0tg',
         quantity: 1,
       },
     ],
@@ -119,9 +122,6 @@ const createOrRetrieveCheckoutSession = async (
     mode: 'subscription',
     cancel_url: `${request.headers.get('origin')}/checkout?cancel=true`,
     success_url: `${request.headers.get('origin')}/checkout?success=true`,
-    customer_update: {
-      address: 'auto',
-    },
   });
 
   console.log(
