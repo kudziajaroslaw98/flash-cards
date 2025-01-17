@@ -34,6 +34,7 @@ export type AppContextType = {
   metadata: Metadata;
   theme: 'dark' | 'light';
   avatarSeed: string;
+  flashCardTypeDictionaries: DictionaryValue<FlashCardType>[];
   setTheme: (theme: 'dark' | 'light') => void;
   setFlashCards: (flashcards: FlashCard[]) => void;
   addFlashCards: (flashcards: Partial<FlashCard>[]) => void;
@@ -57,6 +58,7 @@ export const AppContext = createContext<AppContextType>({
   metadata: DEFAULT_METADATA,
   theme: 'dark',
   avatarSeed: '',
+  flashCardTypeDictionaries: [],
   setTheme: () => null,
   setFlashCards: () => null,
   addFlashCards: () => null,
@@ -141,6 +143,11 @@ export default function AppProvider(props: PropsWithChildren) {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const websocketChannel =
     useRef<ReturnType<typeof supabase.channel>>(undefined);
+  const flashCardTypeDictionaries: DictionaryValue<FlashCardType>[] = [
+    { value: 'index', label: 'Index Flash Card' },
+    { value: 'question', label: 'Question with answer' },
+    { value: 'single', label: 'Detailed Flash Card' },
+  ];
 
   /////////////////
   // #endregion STATE
@@ -1095,6 +1102,7 @@ export default function AppProvider(props: PropsWithChildren) {
         metadata: metadata,
         theme: theme,
         avatarSeed: avatarSeed,
+        flashCardTypeDictionaries,
         setTheme,
         setFlashCards,
         addFlashCards,

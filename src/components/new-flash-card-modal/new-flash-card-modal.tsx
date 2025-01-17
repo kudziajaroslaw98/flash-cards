@@ -223,6 +223,7 @@ export const NewFlashCardModal = ({
               onClick={handleDialogSubmit}
               size={'sm'}
               variant={'primary-text'}
+              alt='Create new flash card'
             ></Button>
           </Modal.Footer>
         </Modal>

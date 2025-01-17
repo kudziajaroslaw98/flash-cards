@@ -64,6 +64,7 @@ export interface ButtonProps
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
   loading?: boolean;
+  alt: string;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(

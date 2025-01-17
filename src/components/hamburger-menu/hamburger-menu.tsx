@@ -174,6 +174,7 @@ export default function HamburgerMenuComponent() {
               toggle(!toggled);
             }}
             toggled={toggled}
+            alt='Hamburger menu'
           />
         }
         afterMenuItems={
@@ -185,6 +186,7 @@ export default function HamburgerMenuComponent() {
                 label={'Upgrade Plan'}
                 size={'default'}
                 variant={'secondary-text'}
+                alt='Upgrade plan'
               />
             )}
             <ThemeSwitchComponent showLabel />
@@ -214,6 +216,7 @@ export default function HamburgerMenuComponent() {
                   }}
                   color='red'
                   label='Log out'
+                  alt='Log out'
                 />
               </div>
             )}

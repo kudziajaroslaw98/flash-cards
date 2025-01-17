@@ -119,6 +119,7 @@ export default function FlashCardSelectExample() {
         <Button
           icon={<Plus className='h-4 w-4' />}
           size={'icon-square'}
+          alt='Add Flash Card'
         />
 
         <Button
@@ -126,6 +127,7 @@ export default function FlashCardSelectExample() {
           size={'icon-square'}
           disabled={selected.length === 0}
           variant={'secondary'}
+          alt='Edit Flash Card'
         />
 
         <Button
@@ -133,6 +135,7 @@ export default function FlashCardSelectExample() {
           variant={'destructive'}
           icon={<Trash className='h-4 w-4' />}
           size={'icon-square'}
+          alt='Delete Flash Card'
         />
       </div>
 

@@ -1,11 +1,11 @@
 'use client';
 
-import { useSessionContext } from '#/providers/session-provider.component';
-import { Button } from '#/components/_ui/button/button';
-import LinkComponent from '#/components/_ui/link/link';
-import { DollarSign, MailIcon } from 'lucide-react';
 import Badge from '#/components/_ui/badge/badge';
+import { Button } from '#/components/_ui/button/button';
 import Card from '#/components/_ui/card/card';
+import LinkComponent from '#/components/_ui/link/link';
+import { useSessionContext } from '#/providers/session-provider.component';
+import { DollarSign, MailIcon } from 'lucide-react';
 
 export default function PricingPage() {
   const { isLoggedIn, pickedPlan, isPlanActive } = useSessionContext();
@@ -50,6 +50,7 @@ export default function PricingPage() {
                 label={pickedPlan === null ? 'Active' : 'Get started'}
                 variant={'primary-outline'}
                 className='font-bold'
+                alt='Get started'
               />
 
               <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800'></div>
@@ -130,6 +131,7 @@ export default function PricingPage() {
                   variant={'primary-outline'}
                   className='font-bold'
                   type='submit'
+                  alt='Get started'
                 />
 
                 <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800'></div>

@@ -1,3 +1,4 @@
+import '#/shared/utils/polyfills';
 import type { Metadata } from 'next';
 import { Inter, Roboto_Mono } from 'next/font/google';
 
@@ -91,7 +92,7 @@ export const metadata: Metadata = {
   },
   robots: {
     index: true,
-    follow: false,
+    follow: true,
   },
   applicationName: 'Flash Cards - Learning Words Made Easy',
   alternates: {

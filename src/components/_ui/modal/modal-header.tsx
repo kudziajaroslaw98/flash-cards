@@ -1,10 +1,10 @@
 import { DialogContext } from '#/providers/dialog.providers';
-import { VariantProps } from 'class-variance-authority';
-import { modalHeaderVariants } from './modal.variants';
-import { ReactNode, useContext } from 'react';
 import { cn } from '#/shared/utils/cn.util';
-import { Button } from '../button/button';
+import { VariantProps } from 'class-variance-authority';
 import { X } from 'lucide-react';
+import { ReactNode, useContext } from 'react';
+import { Button } from '../button/button';
+import { modalHeaderVariants } from './modal.variants';
 
 interface ModalHeaderProps extends VariantProps<typeof modalHeaderVariants> {
   children: ReactNode;
@@ -31,6 +31,7 @@ export const ModalHeader = ({
           size='icon-sm'
           icon={<X className='h-4 w-4' />}
           onClick={onDialogClose}
+          alt='Close'
         />
       )}
     </div>

@@ -104,6 +104,7 @@ export const AssignFlashCardsModal = ({
               onClick={handleDialogSubmit}
               size={'sm'}
               variant={'primary-text'}
+              alt='Assign flash cards'
             ></Button>
           </Modal.Footer>
         </Modal>

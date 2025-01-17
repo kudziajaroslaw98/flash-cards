@@ -1,7 +1,7 @@
-import { Dialog, type DialogProps } from '../dialog/dialog';
-import { Button } from '../button/button';
-import Modal from '../modal/modal';
 import { useState } from 'react';
+import { Button } from '../button/button';
+import { Dialog, type DialogProps } from '../dialog/dialog';
+import Modal from '../modal/modal';
 
 export type AlertDialogProps = {
   trigger: React.ReactNode;
@@ -62,12 +62,14 @@ export const AlertDialog = ({
             variant={'secondary-outline'}
             size={'full'}
             label='Cancel'
+            alt='Cancel'
           />
           <Button
             onClick={handleAccept}
             variant={'destructive'}
             size={'full'}
             label='Confirm'
+            alt='Confirm'
           />
         </Modal.Footer>
       </Modal>
