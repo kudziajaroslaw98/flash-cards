@@ -229,7 +229,7 @@ export default function AppProvider(props: PropsWithChildren) {
           dueDate: new Date(Date.now()).toISOString(),
           reviews: 0,
         },
-        sets: flashCard.sets ?? [],
+        sets: flashCard?.sets ?? [],
       };
     });
 
@@ -361,7 +361,7 @@ export default function AppProvider(props: PropsWithChildren) {
             flashCard.spacedRepetition?.dueDate ??
             defaultFlashCard.spacedRepetition.dueDate,
         },
-        sets: flashCard.sets ?? [],
+        sets: flashCard?.sets ?? [],
       }),
     );
 
@@ -417,7 +417,7 @@ export default function AppProvider(props: PropsWithChildren) {
           flashCard.spacedRepetition?.dueDate ??
           defaultFlashCard.spacedRepetition.dueDate,
       },
-      sets: flashCard.sets ?? [],
+      sets: flashCard?.sets ?? [],
     };
 
     const updatedFlashCards = flashCardsArray.map((item) => {
@@ -484,7 +484,7 @@ export default function AppProvider(props: PropsWithChildren) {
   const removeSetsFromFlashCards = (setUuid: string[]) => {
     const flashCardsCopy = flashCardsArray.map((item) => ({
       ...item,
-      sets: item.sets.filter((uuid) => !setUuid.includes(uuid)),
+      sets: item.sets?.filter((uuid) => !setUuid.includes(uuid)),
     }));
 
     updateFlashCards(flashCardsCopy);
@@ -799,11 +799,11 @@ export default function AppProvider(props: PropsWithChildren) {
       // SETS - DELETE
       .on('broadcast', { event: 'sets_delete' }, ({ payload }) => {
         if (
-          payload.sets &&
-          payload.sets.length >= 0 &&
-          Array.isArray(payload.sets)
+          payload?.sets &&
+          payload?.sets.length >= 0 &&
+          Array.isArray(payload?.sets)
         ) {
-          removeSetsByUuid(payload.sets);
+          removeSetsByUuid(payload?.sets);
         }
       })
       .subscribe();
@@ -871,10 +871,10 @@ export default function AppProvider(props: PropsWithChildren) {
               JSON.stringify(flashCardsObject),
             );
           } else if ('sets' in value) {
-            setSetsArray(value.sets);
+            setSetsArray(value?.sets);
             const setsObject: Record<string, FlashCardSet> = {};
 
-            value.sets.forEach((item: FlashCardSet) => {
+            value?.sets?.forEach((item: FlashCardSet) => {
               setsObject[item.frontUuid] = item;
             });
 
@@ -970,8 +970,8 @@ export default function AppProvider(props: PropsWithChildren) {
     if (!appVersion) return;
     if (
       appVersion === '1.0.0' &&
-      migration.sets !== null &&
-      migration.sets !== '1.0.0'
+      migration?.sets !== null &&
+      migration?.sets !== '1.0.0'
     ) {
       setSetsArray((prev) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1058,7 +1058,7 @@ export default function AppProvider(props: PropsWithChildren) {
       migrateFlashCards();
     }
 
-    if (appVersion === '1.0.0' && migration.sets !== '1.0.0') {
+    if (appVersion === '1.0.0' && migration?.sets !== '1.0.0') {
       migrateSets();
     }
   }, [
