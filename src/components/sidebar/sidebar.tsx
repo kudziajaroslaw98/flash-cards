@@ -153,6 +153,7 @@ export default function SidebarComponent() {
             )
           }
           onClick={handleToggle}
+          alt='Toggle Navigation'
         />
       </div>
 
@@ -196,6 +197,7 @@ export default function SidebarComponent() {
                   label={expanded ? 'Upgrade Plan' : ''}
                   size={expanded ? 'default' : 'icon'}
                   variant={'secondary-text'}
+                  alt='Upgrade Plan'
                 />
               )}
             </div>

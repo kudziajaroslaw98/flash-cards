@@ -175,6 +175,7 @@ export default function Sets() {
               activeIcon={<Star className='h-4 w-4 fill-current' />}
               inactiveIcon={<Star className='h-4 w-4' />}
               size={'icon'}
+              alt='Toggle favourite'
             />
           </span>
         </div>
@@ -240,6 +241,7 @@ export default function Sets() {
                       size={'icon-sm'}
                       toggleVariant='text'
                       className='toggle-button z-30'
+                      alt='Toggle favourite'
                     />
                   </div>
                 </Card>
@@ -257,6 +259,7 @@ export default function Sets() {
                 }}
                 icon={<Plus className='h-4 w-4' />}
                 size={'icon-square'}
+                alt='Add new set'
               />
             }
             handleNew={handleNewSets}
@@ -276,6 +279,7 @@ export default function Sets() {
                 size={'icon-square'}
                 disabled={selected.length === 0}
                 variant={'secondary'}
+                alt='Edit set'
               />
             }
             handleNew={handleNewSets}
@@ -297,6 +301,7 @@ export default function Sets() {
                 variant={'destructive'}
                 icon={<Trash className='h-4 w-4' />}
                 size={'icon-square'}
+                alt='Remove set'
               />
             }
             onAccept={removeSelected}

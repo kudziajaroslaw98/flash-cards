@@ -226,6 +226,7 @@ export const NewSetModal = ({
               onClick={handleDialogSubmit}
               size={'sm'}
               variant={'primary-text'}
+              alt='Submit button'
             ></Button>
           </Modal.Footer>
         </Modal>

@@ -257,6 +257,7 @@ export default async function Home() {
                   className='group mx-auto min-w-36 font-semibold'
                   icon={animatedPlayIcon}
                   iconPosition='right'
+                  alt='Redirect to sign in page'
                 />
               </Link>
             </li>
@@ -295,6 +296,7 @@ export default async function Home() {
               className='group mx-auto mt-8 min-w-36 font-semibold'
               icon={animatedPlayIcon}
               iconPosition='right'
+              alt='Redirect to sign in page'
             />
           </Link>
 
@@ -385,6 +387,7 @@ export default async function Home() {
                 className='group mx-auto mt-8 min-w-36 font-semibold'
                 icon={animatedPlayIcon}
                 iconPosition='right'
+                alt='Redirect to sign in page'
               />
             </Link>
           </ScrollReveal>
@@ -440,6 +443,7 @@ export default async function Home() {
                       label={'Get started'}
                       variant={'primary-outline'}
                       className='font-bold'
+                      alt='Redirect to pricing in page'
                     />
                   </Link>
 
@@ -512,6 +516,7 @@ export default async function Home() {
                       variant={'primary-outline'}
                       className='font-bold'
                       type='submit'
+                      alt='Redirect to pricing in page'
                     />
                   </Link>
 

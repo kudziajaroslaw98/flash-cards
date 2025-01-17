@@ -231,6 +231,7 @@ export default function FlashCardsList() {
                 onClick={handleAddButtonClick}
                 icon={<Plus className='h-4 w-4' />}
                 size={'icon-square'}
+                alt='Add new flash cards'
               />
             }
           />
@@ -249,6 +250,7 @@ export default function FlashCardsList() {
                     size={'icon-square'}
                     disabled={selected.length === 0}
                     variant={'secondary'}
+                    alt='Edit flash cards'
                   />
                 }
               />
@@ -264,6 +266,7 @@ export default function FlashCardsList() {
                     variant={'destructive'}
                     icon={<Trash className='h-4 w-4' />}
                     size={'icon-square'}
+                    alt='Remove flash cards'
                   />
                 }
                 onAccept={removeSelected}

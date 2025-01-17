@@ -91,6 +91,7 @@ export default function SettingsPage() {
               label='Change Plan'
               size='full'
               className='max-w-full'
+              alt='Change plan'
             ></Button>
           </Link>
         </section>
