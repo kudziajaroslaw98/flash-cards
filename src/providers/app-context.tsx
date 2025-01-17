@@ -20,7 +20,6 @@ import {
   createContext,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
   type PropsWithChildren,
@@ -144,15 +143,11 @@ export default function AppProvider(props: PropsWithChildren) {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const websocketChannel =
     useRef<ReturnType<typeof supabase.channel>>(undefined);
-  const flashCardTypeDictionaries: DictionaryValue<FlashCardType>[] =
-    useMemo(() => {
-      return (['index', 'question', 'answer'] as FlashCardType[]).map(
-        (type: FlashCardType) => ({
-          value: type,
-          label: type.charAt(0).toUpperCase() + type.slice(1),
-        }),
-      );
-    }, []);
+  const flashCardTypeDictionaries: DictionaryValue<FlashCardType>[] = [
+    { value: 'index', label: 'Index Flash Card' },
+    { value: 'question', label: 'Question with answer' },
+    { value: 'single', label: 'Detailed Flash Card' },
+  ];
 
   /////////////////
   // #endregion STATE
