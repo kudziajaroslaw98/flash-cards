@@ -120,6 +120,7 @@ export const MultiDialog = ({
       disabled={currentIndex === 0}
       icon={<ArrowLeft className='h-4 w-4' />}
       onClick={handleLeftButtonClick}
+      alt='Left button (back) for multi dialog'
     />
   );
 
@@ -136,6 +137,7 @@ export const MultiDialog = ({
         )
       }
       onClick={handleRightButtonClick}
+      alt='Right button ( next/add ) for multi dialog'
     />
   );
 

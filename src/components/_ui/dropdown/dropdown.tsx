@@ -414,6 +414,7 @@ export default function Dropdown<T>({
                     variant={'destructive-outline'}
                     size={'sm'}
                     className='!w-full'
+                    alt='Cancel'
                   />
 
                   <Button
@@ -425,6 +426,7 @@ export default function Dropdown<T>({
                     variant={'primary'}
                     size={'sm'}
                     className='!w-full'
+                    alt='Add new element'
                   />
                 </div>
               </div>
