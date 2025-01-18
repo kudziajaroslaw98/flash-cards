@@ -15,7 +15,7 @@ import {
 import MenuGroupItem from './menu-group-item';
 
 const contextMenuVariants = cva(
-  `absolute w-64 opacity-0 overflow-clip rounded border border-gray-200 dark:border-slate-800 md:w-52`,
+  `absolute w-64 opacity-0 overflow-clip rounded border border-gray-200 dark:border-slate-800 md:w-52 z-20`,
   {
     variants: {
       contextPosition: {
