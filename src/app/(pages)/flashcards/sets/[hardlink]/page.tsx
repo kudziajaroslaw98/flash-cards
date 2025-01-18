@@ -22,6 +22,7 @@ import type { FlashCard } from '#/types/flash-card.type';
 import {
   ArrowLeft,
   CopyCheck,
+  CopyMinus,
   Download,
   Pencil,
   Plus,
@@ -30,8 +31,10 @@ import {
   Trash,
   Upload,
 } from 'lucide-react';
+import { AnimatePresence } from 'motion/react';
+import * as m from 'motion/react-m';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export default function SetHardlinkPage() {
   const setHardLink = useParams()?.hardlink as string;
@@ -53,14 +56,7 @@ export default function SetHardlinkPage() {
   const [set, setSet] = useState<FlashCardSet>(
     sets.filter((set) => set?.hardlink === setHardLink)[0],
   );
-  const [capitalizedName] = useState<string>(
-    setHardLink.replace(/-/g, ' ').charAt(0)?.toUpperCase() +
-      setHardLink.replace(/-/g, ' ').slice(1),
-  );
-
-  useEffect(() => {
-    setSet(sets.filter((set) => set?.hardlink === setHardLink)[0]);
-  }, [sets, setHardLink]);
+  const [selected, setSelected] = useState<FlashCard[]>([]);
 
   const setFlashCards = useMemo(
     () =>
@@ -74,7 +70,7 @@ export default function SetHardlinkPage() {
     window.umami.track('Flash card assigned to set');
     setSet((prev) => ({
       ...prev,
-      flashCards: [...prev.flashCards, ...flashCards],
+      flashCards: [...flashCards],
     }));
     updateSets([
       {
@@ -223,6 +219,42 @@ export default function SetHardlinkPage() {
     }
   };
 
+  const handleUnassignFlashCards = () => {
+    window.umami.track('Unassign flash cards');
+    const filteredFlashCards = setFlashCards.filter(
+      (f) => !selected.includes(f),
+    );
+    handleAssignCards(filteredFlashCards.map((f) => f.frontUuid));
+    setSelected([]);
+  };
+
+  const isSelected = useCallback(
+    (flashCard: FlashCard) => {
+      return (
+        selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
+        -1
+      );
+    },
+    [selected],
+  );
+
+  const toggleSelected = useCallback(
+    (flashCard: FlashCard) => {
+      if (isSelected(flashCard)) {
+        setSelected((prev) =>
+          prev.filter((item) => flashCard.frontUuid !== item.frontUuid),
+        );
+      } else {
+        setSelected((prev) => [...prev, flashCard]);
+      }
+    },
+    [isSelected],
+  );
+
+  useEffect(() => {
+    setSet(sets.filter((set) => set?.hardlink === setHardLink)[0]);
+  }, [sets, setHardLink]);
+
   return (
     <div className='flex h-full w-full grow flex-col items-center gap-8 md:pb-24'>
       <div className='flex w-full flex-col justify-start gap-4'>
@@ -240,7 +272,7 @@ export default function SetHardlinkPage() {
 
         <div className='flex justify-between'>
           <h4 className='line-clamp-2 flex w-full max-w-md items-center gap-4 text-green-400'>
-            {capitalizedName}
+            {set?.name}
           </h4>
 
           <div className='flex gap-4'>
@@ -297,14 +329,19 @@ export default function SetHardlinkPage() {
             'grid-cols-[repeat(auto-fit,11rem)]',
           ])}
         >
-          {setFlashCards.map((flashCard) => (
-            <div key={`flashcard-${flashCard.frontUuid}`}>
-              <FlashCardComponent
-                flashCard={flashCard}
-                size={'sm'}
-              />
-            </div>
-          ))}
+          <AnimatePresence mode='popLayout'>
+            {setFlashCards.map((flashCard) => (
+              <div key={`flashcard-${flashCard.frontUuid}`}>
+                <FlashCardComponent
+                  flashCard={flashCard}
+                  isSelected={isSelected(flashCard)}
+                  onSelect={toggleSelected}
+                  isInSelectionMode={selected.length > 0}
+                  size={'sm'}
+                />
+              </div>
+            ))}
+          </AnimatePresence>
         </div>
 
         <FloatingButtons>
@@ -322,19 +359,43 @@ export default function SetHardlinkPage() {
             handleEditFlashCard={() => {}}
           />
 
-          <AssignFlashCardsModal
-            trigger={
+          {selected.length === 0 && (
+            <AssignFlashCardsModal
+              trigger={
+                <m.div
+                  key='flashcards-assign-button'
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <Button
+                    icon={<CopyCheck className='size-4' />}
+                    size={'icon-square'}
+                    variant={'primary'}
+                    alt='Assign flash cards'
+                  />
+                </m.div>
+              }
+              handleSubmit={handleAssignCards}
+              flashCards={flashcards}
+              setCards={setFlashCards.map((f) => f.frontUuid) ?? []}
+            />
+          )}
+
+          {selected.length > 0 && (
+            <m.div
+              key='flashcards-unassign-button'
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
               <Button
-                icon={<CopyCheck className='size-4' />}
+                onClick={handleUnassignFlashCards}
+                icon={<CopyMinus className='size-4' />}
                 size={'icon-square'}
-                variant={'primary'}
+                variant={'destructive'}
                 alt='Assign flash cards'
               />
-            }
-            handleSubmit={handleAssignCards}
-            flashCards={flashcards}
-            setCards={setFlashCards.map((f) => f.frontUuid) ?? []}
-          />
+            </m.div>
+          )}
 
           <NewSetModal
             handleEdit={handleEditSet}
