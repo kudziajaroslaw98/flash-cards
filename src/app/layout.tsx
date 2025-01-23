@@ -19,9 +19,9 @@ const roboto_mono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Flash Cards - Learning Words Made Easy',
+  title: 'Flashcards - Learning Words Made Easy',
   description:
-    'Flash Cards by Jarosław Kudzia is the perfect tool for mastering vocabulary and learning words effortlessly.',
+    'Flashcards by Jarosław Kudzia is the perfect tool for mastering vocabulary and learning words effortlessly.',
   authors: [
     { name: 'Final Phase', url: 'https://finalphase.app' },
     { name: 'Jarosław Kudzia', url: 'https://github.com/kudziajaroslaw98' },
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   creator: 'Jarosław Kudzia',
   keywords: [
     // high importance keywords for search engines
-    'flash cards',
+    'flashcards',
     'flashcards app',
     'learning words made easy',
     'study tool',
@@ -62,9 +62,9 @@ export const metadata: Metadata = {
     'learning apps for vocabulary building',
   ],
   openGraph: {
-    title: 'Flash Cards - Learning Words Made Easy',
+    title: 'Flashcards - Learning Words Made Easy',
     description:
-      'Flash Cards by Jarosław Kudzia is the perfect tool for mastering vocabulary and learning words effortlessly.',
+      'Flashcards by Jarosław Kudzia is the perfect tool for mastering vocabulary and learning words effortlessly.',
     images: [
       {
         url: 'https://flashcards.finalphase.app/og/og_image.png',
@@ -73,15 +73,15 @@ export const metadata: Metadata = {
       },
     ],
     url: 'https://flashcards.finalphase.app',
-    siteName: 'Flash Cards - Learning Words Made Easy',
+    siteName: 'Flashcards - Learning Words Made Easy',
     locale: 'en-US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Flash Cards - Learning Words Made Easy',
+    title: 'Flashcards - Learning Words Made Easy',
     description:
-      'Flash Cards by Jarosław Kudzia is the perfect tool for mastering vocabulary and learning words effortlessly.',
+      'Flashcards by Jarosław Kudzia is the perfect tool for mastering vocabulary and learning words effortlessly.',
     images: [
       {
         url: 'https://flashcards.finalphase.app/og/og_image.png',
@@ -94,7 +94,7 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  applicationName: 'Flash Cards - Learning Words Made Easy',
+  applicationName: 'Flashcards - Learning Words Made Easy',
   alternates: {
     canonical: 'https://flashcards.finalphase.app/',
   },

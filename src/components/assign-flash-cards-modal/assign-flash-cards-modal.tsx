@@ -80,7 +80,7 @@ export const AssignFlashCardsModal = ({
         submitRef={submitRef}
       >
         <Modal className='w-full max-w-96'>
-          <Modal.Header variant='form'>Assign flash cards</Modal.Header>
+          <Modal.Header variant='form'>Assign flashcards</Modal.Header>
 
           <Modal.Body
             variant='form'
@@ -104,7 +104,7 @@ export const AssignFlashCardsModal = ({
               onClick={handleDialogSubmit}
               size={'sm'}
               variant={'primary-text'}
-              alt='Assign flash cards'
+              alt='Assign flashcards'
             ></Button>
           </Modal.Footer>
         </Modal>

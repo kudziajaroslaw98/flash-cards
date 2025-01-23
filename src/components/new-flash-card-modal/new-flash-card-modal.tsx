@@ -93,14 +93,14 @@ export const NewFlashCardModal = ({
   }, [completion]);
 
   const handleDialogClose = () => {
-    window.umami.track('Flash card dialog - closed', { isInEditMode });
+    window.umami.track('Flashcard dialog - closed', { isInEditMode });
     setIsModalOpen(false);
     setCurrentIndex(0);
     clearInitialValues();
   };
 
   const handleDialogSubmit = () => {
-    window.umami.track('Flash card dialog - submitted', { isInEditMode });
+    window.umami.track('Flashcard dialog - submitted', { isInEditMode });
     setIsModalOpen(false);
 
     const mappedFlashCards = flashCards.map((flashCard) => ({
@@ -122,7 +122,7 @@ export const NewFlashCardModal = ({
   };
 
   const handleRightButtonClick = () => {
-    window.umami.track('Flash card dialog - right button clicked');
+    window.umami.track('Flashcard dialog - right button clicked');
     if (currentIndex < flashCards.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
@@ -141,7 +141,7 @@ export const NewFlashCardModal = ({
   };
 
   const handleLeftButtonClick = () => {
-    window.umami.track('Flash card dialog - left button clicked');
+    window.umami.track('Flashcard dialog - left button clicked');
     if (currentIndex > 0) {
       setFlashCards((prev) =>
         prev.map((item) =>
@@ -198,7 +198,7 @@ export const NewFlashCardModal = ({
       >
         <Modal className='w-full'>
           <Modal.Header variant={'form'}>
-            {isInEditMode ? 'Edit flash card' : 'Create new flash card'}
+            {isInEditMode ? 'Edit flashcard' : 'Create new flashcard'}
           </Modal.Header>
 
           <Modal.Body
@@ -223,7 +223,7 @@ export const NewFlashCardModal = ({
               onClick={handleDialogSubmit}
               size={'sm'}
               variant={'primary-text'}
-              alt='Create new flash card'
+              alt='Create new flashcard'
             ></Button>
           </Modal.Footer>
         </Modal>

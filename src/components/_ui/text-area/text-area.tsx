@@ -1,4 +1,3 @@
-import useDebounce from '#/hooks/use-debounce.hook';
 import { cn } from '#/shared/utils/cn.util';
 import { Sparkles } from 'lucide-react';
 import {
@@ -51,33 +50,6 @@ export default function TextArea({
 }: TextAreaProps) {
   const [value, setValue] = useState(props.value);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-
-  const adjustHeight = useDebounce(() => {
-    if (textAreaRef.current) {
-      const minHeight = 40;
-
-      textAreaRef.current.style.height = 'auto';
-      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight >= minHeight ? textAreaRef.current.scrollHeight : minHeight}px`;
-    }
-  }, 75);
-
-  useEffect(() => {
-    adjustHeight();
-
-    window.addEventListener('resize', () => {
-      adjustHeight();
-    });
-
-    return () => {
-      window.removeEventListener('resize', () => {
-        adjustHeight();
-      });
-    };
-  }, [adjustHeight]);
-
-  useEffect(() => {
-    adjustHeight();
-  }, [value, adjustHeight]);
 
   useEffect(() => {
     setValue(props.value);
@@ -136,7 +108,7 @@ export default function TextArea({
             touched && !valid ? '!border-red-400' : '',
             touched && valid ? '!border-green-400' : '',
             'relative flex w-full items-center gap-4 rounded-md border border-gray-300 bg-gray-100 p-2 px-4 dark:border-slate-800 dark:bg-slate-900',
-            'h-10 resize-none text-sm outline-none ring-green-400/50 transition-all focus:ring',
+            'h-auto resize-y text-sm outline-none ring-green-400/50 transition-all focus:ring',
             label
               ? 'placeholder:text-gray-400  dark:placeholder:text-slate-700'
               : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',

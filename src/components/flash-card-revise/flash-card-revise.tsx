@@ -48,7 +48,7 @@ export default function FlashCardReviseComponent() {
     },
   ] as const;
 
-  const defaultSet = { value: 'default', label: 'All flash cards' };
+  const defaultSet = { value: 'default', label: 'All flashcards' };
   const [revisedCard, setRevisedCard] = useState<FlashCard>();
   const [revisedSet, setRevisedSet] = useState<string>(defaultSet.value);
   const [clickedCard, setClickedCard] = useState<FlashCard>();
@@ -124,7 +124,7 @@ export default function FlashCardReviseComponent() {
   };
 
   const reshuffleFlashCards = () => {
-    window.umami.track('Reshuffle flash cards', { key: null, clicked });
+    window.umami.track('Reshuffle flashcards', { key: null, clicked });
 
     setClickedCard(undefined);
     setRevisedCard(undefined);
@@ -135,7 +135,7 @@ export default function FlashCardReviseComponent() {
   };
 
   const reshuffleFlashCardsWithKey = (key: string) => {
-    window.umami.track('Reshuffle flash cards', { key, clicked });
+    window.umami.track('Reshuffle flashcards', { key, clicked });
     if (!clicked) return;
 
     setClickedCard(undefined);
@@ -245,7 +245,7 @@ export default function FlashCardReviseComponent() {
             size={'xlg'}
             className='!w-full !max-w-xs'
             disabled={!clicked}
-            alt='Reshuffle flash cards'
+            alt='Reshuffle flashcards'
           />
 
           <Dropdown

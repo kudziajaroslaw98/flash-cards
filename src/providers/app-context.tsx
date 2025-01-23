@@ -144,9 +144,9 @@ export default function AppProvider(props: PropsWithChildren) {
   const websocketChannel =
     useRef<ReturnType<typeof supabase.channel>>(undefined);
   const flashCardTypeDictionaries: DictionaryValue<FlashCardType>[] = [
-    { value: 'index', label: 'Index Flash Card' },
+    { value: 'index', label: 'Index Flashcard' },
     { value: 'question', label: 'Question with answer' },
-    { value: 'single', label: 'Detailed Flash Card' },
+    { value: 'single', label: 'Detailed Flashcard' },
   ];
 
   /////////////////

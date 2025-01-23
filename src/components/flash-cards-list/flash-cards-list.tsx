@@ -64,13 +64,13 @@ export default function FlashCardsList() {
   );
 
   const removeSelected = () => {
-    window.umami.track('Remove flash cards', { count: selected.length });
+    window.umami.track('Remove flashcards', { count: selected.length });
     removeFlashCards(selected);
     setSelected([]);
   };
 
   const addNewRecord = (flashCards: Partial<FlashCard>[]) => {
-    window.umami.track('Add flash cards', { count: flashCards.length });
+    window.umami.track('Add flashcards', { count: flashCards.length });
     addFlashCards(flashCards);
 
     updateMetadata({
@@ -87,7 +87,7 @@ export default function FlashCardsList() {
   };
 
   const editSelectedRecords = (editRecords: Partial<FlashCard>[]) => {
-    window.umami.track('Edit flash cards', { count: editRecords.length });
+    window.umami.track('Edit flashcards', { count: editRecords.length });
     updateFlashCards(editRecords);
   };
 
@@ -231,7 +231,7 @@ export default function FlashCardsList() {
                 onClick={handleAddButtonClick}
                 icon={<Plus className='h-4 w-4' />}
                 size={'icon-square'}
-                alt='Add new flash cards'
+                alt='Add new flashcards'
               />
             }
           />
@@ -250,23 +250,23 @@ export default function FlashCardsList() {
                     size={'icon-square'}
                     disabled={selected.length === 0}
                     variant={'secondary'}
-                    alt='Edit flash cards'
+                    alt='Edit flashcards'
                   />
                 }
               />
               <AlertDialog
                 onCancel={() => {
-                  window.umami.track('Cancel remove flash cards');
+                  window.umami.track('Cancel remove flashcards');
                 }}
                 headerText='Are you absolutely sure?'
-                bodyText='This action cannot be undone. This will permanently delete your flash cards.'
+                bodyText='This action cannot be undone. This will permanently delete your flashcards.'
                 trigger={
                   <Button
                     disabled={selected.length === 0}
                     variant={'destructive'}
                     icon={<Trash className='h-4 w-4' />}
                     size={'icon-square'}
-                    alt='Remove flash cards'
+                    alt='Remove flashcards'
                   />
                 }
                 onAccept={removeSelected}

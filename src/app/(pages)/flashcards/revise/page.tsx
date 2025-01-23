@@ -7,11 +7,11 @@ export const metadata: Metadata = {
     { name: 'Jarosław Kudzia', url: 'https://github.com/kudziajaroslaw98' },
   ],
   creator: 'Jarosław Kudzia',
-  title: 'Revise Flash Cards - Review and Remember',
+  title: 'Revise Flashcards - Review and Remember',
   description:
-    'Review your flash cards with our advanced revision system. Strengthen your memory and track your progress.',
+    'Review your flashcards with our advanced revision system. Strengthen your memory and track your progress.',
   keywords: [
-    'flash card revision',
+    'flashcard revision',
     'review system',
     'memory improvement',
     'progress tracking',
@@ -20,9 +20,9 @@ export const metadata: Metadata = {
     'memory reinforcement',
   ],
   openGraph: {
-    title: 'Revise Flash Cards - Review and Remember',
+    title: 'Revise Flashcards - Review and Remember',
     description:
-      'Review your flash cards with our advanced revision system. Strengthen your memory and track your progress.',
+      'Review your flashcards with our advanced revision system. Strengthen your memory and track your progress.',
     images: [
       {
         url: 'https://flashcards.finalphase.app/og/og_image.png',
@@ -31,15 +31,15 @@ export const metadata: Metadata = {
       },
     ],
     url: 'https://flashcards.finalphase.app/',
-    siteName: 'Revise Flash Cards - Review and Remember',
+    siteName: 'Revise Flashcards - Review and Remember',
     locale: 'en-US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Revise Flash Cards - Review and Remember',
+    title: 'Revise Flashcards - Review and Remember',
     description:
-      'Review your flash cards with our advanced revision system. Strengthen your memory and track your progress.',
+      'Review your flashcards with our advanced revision system. Strengthen your memory and track your progress.',
     images: [
       {
         url: 'https://flashcards.finalphase.app/og/og_image.png',
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     index: true,
     follow: false,
   },
-  applicationName: 'Flash Cards - Learning Words Made Easy',
+  applicationName: 'Flashcards - Learning Words Made Easy',
   alternates: {
     canonical: 'https://flashcards.finalphase.app/',
   },

@@ -7,18 +7,18 @@ export const metadata: Metadata = {
     { name: 'Jarosław Kudzia', url: 'https://github.com/kudziajaroslaw98' },
   ],
   creator: 'Jarosław Kudzia',
-  title: 'Dashboard - Flash Cards',
+  title: 'Dashboard - Flashcards',
   description:
     'View your learning progress, recent sets, and study statistics in one place.',
   keywords: [
-    'flash cards dashboard',
+    'flashcards dashboard',
     'learning progress',
     'study statistics',
     'flashcards overview',
     'learning dashboard',
   ],
   openGraph: {
-    title: 'Dashboard - Flash Cards',
+    title: 'Dashboard - Flashcards',
     description:
       'View your learning progress, recent sets, and study statistics in one place.',
     images: [
@@ -29,13 +29,13 @@ export const metadata: Metadata = {
       },
     ],
     url: 'https://flashcards.finalphase.app/',
-    siteName: 'Dashboard - Flash Cards',
+    siteName: 'Dashboard - Flashcards',
     locale: 'en-US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Dashboard - Flash Cards',
+    title: 'Dashboard - Flashcards',
     description:
       'View your learning progress, recent sets, and study statistics in one place.',
     images: [
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     index: true,
     follow: false,
   },
-  applicationName: 'Flash Cards - Learning Words Made Easy',
+  applicationName: 'Flashcards - Learning Words Made Easy',
   alternates: {
     canonical: 'https://flashcards.finalphase.app/',
   },

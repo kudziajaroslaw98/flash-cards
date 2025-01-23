@@ -7,11 +7,11 @@ export const metadata: Metadata = {
     { name: 'Jarosław Kudzia', url: 'https://github.com/kudziajaroslaw98' },
   ],
   creator: 'Jarosław Kudzia',
-  title: 'Sign In - Flash Cards',
+  title: 'Sign In - Flashcards',
   description:
-    'Sign in to your Flash Cards account to access your personalized study materials and track your progress.',
+    'Sign in to your Flashcards account to access your personalized study materials and track your progress.',
   keywords: [
-    'flash cards login',
+    'flashcards login',
     'sign in',
     'user account',
     'access flashcards',
@@ -19,9 +19,9 @@ export const metadata: Metadata = {
     'learning account',
   ],
   openGraph: {
-    title: 'Flash Cards - Learning Words Made Easy',
+    title: 'Flashcards - Learning Words Made Easy',
     description:
-      'Sign in to your Flash Cards account to access your personalized study materials and track your progress.',
+      'Sign in to your Flashcards account to access your personalized study materials and track your progress.',
     images: [
       {
         url: 'https://flashcards.finalphase.app/og/og_image.png',
@@ -30,15 +30,15 @@ export const metadata: Metadata = {
       },
     ],
     url: 'https://flashcards.finalphase.app',
-    siteName: 'Flash Cards - Learning Words Made Easy',
+    siteName: 'Flashcards - Learning Words Made Easy',
     locale: 'en-US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Flash Cards - Learning Words Made Easy',
+    title: 'Flashcards - Learning Words Made Easy',
     description:
-      'Sign in to your Flash Cards account to access your personalized study materials and track your progress.',
+      'Sign in to your Flashcards account to access your personalized study materials and track your progress.',
     images: [
       {
         url: 'https://flashcards.finalphase.app/og/og_image.png',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     index: true,
     follow: false,
   },
-  applicationName: 'Flash Cards - Learning Words Made Easy',
+  applicationName: 'Flashcards - Learning Words Made Easy',
   alternates: {
     canonical: 'https://flashcards.finalphase.app/',
   },

@@ -67,7 +67,7 @@ export default function SetHardlinkPage() {
   );
 
   const handleAssignCards = (flashCards: string[]) => {
-    window.umami.track('Flash card assigned to set');
+    window.umami.track('flashcard assigned to set');
     setSet((prev) => ({
       ...prev,
       flashCards: [...flashCards],
@@ -128,7 +128,7 @@ export default function SetHardlinkPage() {
   ];
 
   const handleGenerateFlashCards = async () => {
-    window.umami.track('Generate flash cards');
+    window.umami.track('Generate flashcards');
     if (!isLoggedIn || !isPlanActive) return;
 
     const response:
@@ -189,10 +189,10 @@ export default function SetHardlinkPage() {
   };
 
   const handleNewFlashCards = (newFlashCards: Omit<FlashCard, 'order'>[]) => {
-    window.umami.track('Add flash cards');
+    window.umami.track('Add flashcards');
 
     if (newFlashCards.length > 0) {
-      window.umami.track('Add flash cards', { count: newFlashCards.length });
+      window.umami.track('Add flashcards', { count: newFlashCards.length });
       addFlashCards(newFlashCards);
 
       updateMetadata({
@@ -220,7 +220,7 @@ export default function SetHardlinkPage() {
   };
 
   const handleUnassignFlashCards = () => {
-    window.umami.track('Unassign flash cards');
+    window.umami.track('Unassign flashcards');
     const filteredFlashCards = setFlashCards.filter(
       (f) => !selected.includes(f),
     );
@@ -351,7 +351,7 @@ export default function SetHardlinkPage() {
                 icon={<Plus className='size-4' />}
                 size={'icon-square'}
                 variant={'primary'}
-                alt='Add flash card'
+                alt='Add flashcard'
               />
             }
             handleNewFlashCard={handleNewFlashCards}
@@ -371,7 +371,7 @@ export default function SetHardlinkPage() {
                     icon={<CopyCheck className='size-4' />}
                     size={'icon-square'}
                     variant={'primary'}
-                    alt='Assign flash cards'
+                    alt='Assign flashcards'
                   />
                 </m.div>
               }
@@ -392,7 +392,7 @@ export default function SetHardlinkPage() {
                 icon={<CopyMinus className='size-4' />}
                 size={'icon-square'}
                 variant={'destructive'}
-                alt='Assign flash cards'
+                alt='Assign flashcards'
               />
             </m.div>
           )}
@@ -419,7 +419,7 @@ export default function SetHardlinkPage() {
             variant={'secondary-outline'}
             onClick={handleGenerateFlashCards}
             loading={isLoading}
-            alt='Generate flash cards'
+            alt='Generate flashcards'
           />
         </FloatingButtons>
       </div>

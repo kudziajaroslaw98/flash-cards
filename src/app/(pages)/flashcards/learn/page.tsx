@@ -7,11 +7,11 @@ export const metadata: Metadata = {
     { name: 'Jarosław Kudzia', url: 'https://github.com/kudziajaroslaw98' },
   ],
   creator: 'Jarosław Kudzia',
-  title: 'Learn with Flash Cards - Interactive Learning',
+  title: 'Learn with Flashcards - Interactive Learning',
   description:
-    'Start learning with our interactive flash card system. Master new concepts through active recall and spaced repetition.',
+    'Start learning with our interactive flashcard system. Master new concepts through active recall and spaced repetition.',
   keywords: [
-    'flash card learning',
+    'flashcard learning',
     'interactive learning',
     'spaced repetition',
     'active recall',
@@ -20,9 +20,9 @@ export const metadata: Metadata = {
     'memorization technique',
   ],
   openGraph: {
-    title: 'Learn with Flash Cards - Interactive Learning',
+    title: 'Learn with Flashcards - Interactive Learning',
     description:
-      'Start learning with our interactive flash card system. Master new concepts through active recall and spaced repetition.',
+      'Start learning with our interactive flashcard system. Master new concepts through active recall and spaced repetition.',
     images: [
       {
         url: 'https://flashcards.finalphase.app/og/og_image.png',
@@ -31,15 +31,15 @@ export const metadata: Metadata = {
       },
     ],
     url: 'https://flashcards.finalphase.app/',
-    siteName: 'Learn with Flash Cards - Interactive Learning',
+    siteName: 'Learn with Flashcards - Interactive Learning',
     locale: 'en-US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Learn with Flash Cards - Interactive Learning',
+    title: 'Learn with Flashcards - Interactive Learning',
     description:
-      'Start learning with our interactive flash card system. Master new concepts through active recall and spaced repetition.',
+      'Start learning with our interactive flashcard system. Master new concepts through active recall and spaced repetition.',
     images: [
       {
         url: 'https://flashcards.finalphase.app/og/og_image.png',
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     index: true,
     follow: false,
   },
-  applicationName: 'Flash Cards - Learning Words Made Easy',
+  applicationName: 'Flashcards - Learning Words Made Easy',
   alternates: {
     canonical: 'https://flashcards.finalphase.app/',
   },
