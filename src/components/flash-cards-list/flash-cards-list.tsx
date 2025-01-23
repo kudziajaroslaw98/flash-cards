@@ -198,7 +198,7 @@ export default function FlashCardsList() {
         {flashcards.length > 0 && (
           <div
             className={cn([
-              'grid w-full justify-center gap-4 lg:justify-between',
+              'grid w-full justify-center gap-4 xl:justify-between',
               tileSize === 'sm' && 'grid-cols-[repeat(auto-fit,11rem)]',
               tileSize === 'md' && 'grid-cols-[repeat(auto-fit,11rem)]',
               tileSize === 'lg' && 'grid-cols-[repeat(auto-fit,16rem)]',
