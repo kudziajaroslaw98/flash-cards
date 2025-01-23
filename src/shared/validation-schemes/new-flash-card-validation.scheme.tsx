@@ -1,4 +1,4 @@
-import type { FlashCard } from '#/types/flash-card.type';
+import type { Flashcard } from '#/types/flash-card.type';
 import type { FormScheme } from '#/types/form-scheme.type';
 import { z } from 'zod';
 
@@ -8,7 +8,7 @@ export const newFlashCardScheme = (
   isLoggedIn: boolean,
   isPlanActive: boolean,
 ): FormScheme<
-  Pick<FlashCard, 'question' | 'questionAddition' | 'answer' | 'type'>
+  Pick<Flashcard, 'question' | 'questionAddition' | 'answer' | 'type'>
 > => ({
   inputs: {
     type: {

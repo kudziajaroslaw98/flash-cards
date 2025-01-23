@@ -1,15 +1,15 @@
 import { cn } from '#/shared/utils/cn.util';
-import type { FlashCard } from '#/types/flash-card.type';
+import type { Flashcard } from '#/types/flash-card.type';
 import { useEffect, useState } from 'react';
 
 type ReviseOptionsProps = {
   clicked: boolean;
-  revisedCard: FlashCard | undefined;
+  revisedCard: Flashcard | undefined;
   clickedOption: string | undefined;
   spaceRepetitionClick: (value: 'again' | 'hard' | 'good' | 'easy') => void;
-  clickedCard: FlashCard | undefined;
-  randomItems: FlashCard[] | null;
-  changeClicked: (flashCard: FlashCard, key?: string) => void;
+  clickedCard: Flashcard | undefined;
+  randomItems: Flashcard[] | null;
+  changeClicked: (flashCard: Flashcard, key?: string) => void;
 };
 
 export function ReviseOptions({
@@ -44,7 +44,7 @@ export function ReviseOptions({
     },
   ] as const;
 
-  const [randomItemsOptions, setRandomItemsOptions] = useState<FlashCard[]>([]);
+  const [randomItemsOptions, setRandomItemsOptions] = useState<Flashcard[]>([]);
 
   useEffect(() => {
     if (!randomItems) return;

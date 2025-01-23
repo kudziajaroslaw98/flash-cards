@@ -1,6 +1,6 @@
 'use client';
 
-import type { FlashCard } from '#/types/flash-card.type';
+import type { Flashcard } from '#/types/flash-card.type';
 import { Pencil, Plus, Trash } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from '../_ui/button/button';
@@ -63,13 +63,13 @@ export default function FlashCardSelectExample() {
       },
       sets: [],
     },
-  ] as FlashCard[];
+  ] as Flashcard[];
 
-  const [selected, setSelected] = useState<FlashCard[]>([]);
+  const [selected, setSelected] = useState<Flashcard[]>([]);
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
 
   const isSelected = useCallback(
-    (flashCard: FlashCard) => {
+    (flashCard: Flashcard) => {
       return (
         selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
         -1
@@ -79,7 +79,7 @@ export default function FlashCardSelectExample() {
   );
 
   const toggleSelected = useCallback(
-    (flashCard: FlashCard) => {
+    (flashCard: Flashcard) => {
       if (isSelected(flashCard)) {
         setSelected((prev) =>
           prev.filter((item) => flashCard.frontUuid !== item.frontUuid),

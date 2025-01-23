@@ -6,7 +6,7 @@ import { Button } from '#/components/_ui/button/button';
 import useKeyPress from '#/hooks/use-key-press.hook';
 import useSpacedRepetition from '#/hooks/use-spaced-repetition';
 import { useAppContext } from '#/providers/app-context';
-import type { FlashCard } from '#/types/flash-card.type';
+import type { Flashcard } from '#/types/flash-card.type';
 import { ArrowRight, RefreshCw } from 'lucide-react';
 import Dropdown from '../_ui/dropdown/dropdown';
 import LinkComponent from '../_ui/link/link';
@@ -49,9 +49,9 @@ export default function FlashCardReviseComponent() {
   ] as const;
 
   const defaultSet = { value: 'default', label: 'All flashcards' };
-  const [revisedCard, setRevisedCard] = useState<FlashCard>();
+  const [revisedCard, setRevisedCard] = useState<Flashcard>();
   const [revisedSet, setRevisedSet] = useState<string>(defaultSet.value);
-  const [clickedCard, setClickedCard] = useState<FlashCard>();
+  const [clickedCard, setClickedCard] = useState<Flashcard>();
   const [clickedOption, setClickedOption] = useState<string>();
   const [clicked, setClicked] = useState(false);
 
@@ -69,7 +69,7 @@ export default function FlashCardReviseComponent() {
     setContinueReroll,
     todayItemsEnd,
   } = useSpacedRepetition({
-    array: flashcards as FlashCard[],
+    array: flashcards as Flashcard[],
     setArray: revisedSet === defaultSet.value ? undefined : setFlashCards,
     differentiateBy: 'type',
   });
@@ -86,7 +86,7 @@ export default function FlashCardReviseComponent() {
     updateFlashCard(spacedItem);
   };
 
-  const changeClicked = (flashCard: FlashCard | undefined, key?: string) => {
+  const changeClicked = (flashCard: Flashcard | undefined, key?: string) => {
     if (!flashCard || !revisedCard) return;
 
     if (key) {

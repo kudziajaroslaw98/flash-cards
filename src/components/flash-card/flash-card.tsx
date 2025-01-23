@@ -2,17 +2,17 @@
 
 import useLongPress from '#/hooks/use-long-press.hook';
 import { cn } from '#/shared/utils/cn.util';
-import type { FlashCard } from '#/types/flash-card.type';
+import type { Flashcard } from '#/types/flash-card.type';
 import { BadgeCheck } from 'lucide-react';
 import { m } from 'motion/react';
 import { useEffect, useState } from 'react';
 import Card from '../_ui/card/card';
 
 interface FlashCardProps {
-  flashCard: FlashCard;
+  flashCard: Flashcard;
   size?: 'sm' | 'md' | 'lg';
   isSelected?: boolean;
-  onSelect?: (flashCard: FlashCard) => void;
+  onSelect?: (flashCard: Flashcard) => void;
   isInSelectionMode?: boolean;
   flipBlocked?: boolean;
 }
@@ -28,7 +28,7 @@ export default function FlashCardComponent({
 }: Readonly<FlashCardProps>) {
   const [isFlipped, setIsFlipped] = useState(false);
 
-  const [onStart, onEnd, onMove] = useLongPress<FlashCard>(
+  const [onStart, onEnd, onMove] = useLongPress<Flashcard>(
     (flashcard) => {
       window.umami.track('Flashcard long pressed');
       if (onSelect) {

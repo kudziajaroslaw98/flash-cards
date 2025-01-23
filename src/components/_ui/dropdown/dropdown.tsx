@@ -17,13 +17,13 @@ const DropdownVariants = cva(
   {
     variants: {
       contextPosition: {
-        top: 'left-0 -top-2 data-[open=true]:z-30 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+        top: 'left-0 -top-2 data-[open=true]:z-50 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
         'top-right':
-          'right-0 -top-2 data-[open=true]:z-30 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+          'right-0 -top-2 data-[open=true]:z-50 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
         'top-left':
-          'left-0 -top-2 data-[open=true]:z-30 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
+          'left-0 -top-2 data-[open=true]:z-50 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
         bottom:
-          'left-0 -bottom-2 data-[open=true]:!z-30 data-[open=true]:animate-fade-in-to-bottom data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-top',
+          'left-0 -bottom-2 data-[open=true]:!z-50 data-[open=true]:animate-fade-in-to-bottom data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-top',
       },
     },
     defaultVariants: {
@@ -266,9 +266,10 @@ export default function Dropdown<T>({
     <div
       ref={dropdownWrapperRef}
       className={cn([
-        'group relative z-40 flex w-full max-w-md flex-col',
+        'group relative flex w-full max-w-md flex-col',
         controlLabel ? 'pt-2' : '',
         labelClassName ?? '',
+        visible ? 'z-50' : 'z-40',
       ])}
     >
       {controlLabel && (
@@ -285,7 +286,7 @@ export default function Dropdown<T>({
       <div className='w-full'>
         <div
           className={cn([
-            'group relative z-10 flex h-10 cursor-pointer items-center justify-center rounded-md border text-sm outline-none focus:ring focus:ring-green-400/50',
+            'group relative flex h-10 cursor-pointer items-center justify-center rounded-md border text-sm outline-none focus:ring focus:ring-green-400/50',
             'transition',
             selected.length > 0
               ? 'border-green-500 text-green-500'

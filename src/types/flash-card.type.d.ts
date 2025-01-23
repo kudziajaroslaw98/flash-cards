@@ -1,4 +1,4 @@
-type BaseFlashCard = {
+type BaseFlashcard = {
   frontUuid: string;
   order: number;
   createdAt: string;
@@ -17,7 +17,7 @@ export type SpacedRepetition = {
 
 export type FlashCardType = 'index' | 'single' | 'question';
 
-export type FlashCard = BaseFlashCard &
+export type Flashcard = BaseFlashcard &
   (
     | {
         type: 'index';

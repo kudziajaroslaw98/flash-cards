@@ -1,6 +1,6 @@
 import { assignFlashCardsScheme } from '#/shared/validation-schemes/assign-flash-cards-validation.scheme';
 import type { FlashCardSet } from '#/types/flash-card-set.type';
-import type { FlashCard } from '#/types/flash-card.type';
+import type { Flashcard } from '#/types/flash-card.type';
 import React, { useMemo, useRef, useState } from 'react';
 import { Button } from '../_ui/button/button';
 import { Dialog } from '../_ui/dialog/dialog';
@@ -9,7 +9,7 @@ import FormComponent from '../form-component/form';
 
 interface AssignFlashCardsModalProps {
   handleSubmit: (value: string[]) => void;
-  flashCards: FlashCard[];
+  flashCards: Flashcard[];
   setCards: string[];
   trigger: React.ReactNode;
 }

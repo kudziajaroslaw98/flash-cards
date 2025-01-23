@@ -14,7 +14,7 @@ import uuid from '#/shared/utils/uuid.util';
 import type { ApiResponse } from '#/types/api-response.type';
 import type { DictionaryValue } from '#/types/dictionary-value.type';
 import type { FlashCardSet } from '#/types/flash-card-set.type';
-import type { FlashCard, FlashCardType } from '#/types/flash-card.type';
+import type { Flashcard, FlashCardType } from '#/types/flash-card.type';
 import type { Metadata } from '#/types/metadata.type';
 import {
   createContext,
@@ -27,7 +27,7 @@ import {
 import { useSessionContext } from './session-provider.component';
 
 export type AppContextType = {
-  flashcards: FlashCard[];
+  flashcards: Flashcard[];
   sets: FlashCardSet[];
   setsDictionary: DictionaryValue<string>[];
   categories: DictionaryValue<string>[];
@@ -36,11 +36,11 @@ export type AppContextType = {
   avatarSeed: string;
   flashCardTypeDictionaries: DictionaryValue<FlashCardType>[];
   setTheme: (theme: 'dark' | 'light') => void;
-  setFlashCards: (flashcards: FlashCard[]) => void;
-  addFlashCards: (flashcards: Partial<FlashCard>[]) => void;
-  removeFlashCards: (flashcards: FlashCard[]) => void;
-  updateFlashCards: (flashcards: Partial<FlashCard>[]) => void;
-  updateFlashCard: (flashcard: Partial<FlashCard>) => void;
+  setFlashCards: (flashcards: Flashcard[]) => void;
+  addFlashCards: (flashcards: Partial<Flashcard>[]) => void;
+  removeFlashCards: (flashcards: Flashcard[]) => void;
+  updateFlashCards: (flashcards: Partial<Flashcard>[]) => void;
+  updateFlashCard: (flashcard: Partial<Flashcard>) => void;
   assignFlashCardsToSet: (flashcardUuids: string[], setUuid: string) => void;
   setSets: (sets: FlashCardSet[]) => void;
   addSets: (set: Partial<FlashCardSet>[]) => void;
@@ -133,7 +133,7 @@ export default function AppProvider(props: PropsWithChildren) {
     sets: string | null;
   }>({ flashcards: null, sets: null });
   const [appVersion, setAppVersion] = useState<string>('');
-  const [flashCardsArray, setFlashCardsArray] = useState<FlashCard[]>([]);
+  const [flashCardsArray, setFlashCardsArray] = useState<Flashcard[]>([]);
   const [setsArray, setSetsArray] = useState<FlashCardSet[]>([]);
   const [categories, setCategories] = useState<DictionaryValue<string>[]>([]);
   const [setsDictionary, setSetsDictionary] = useState<
@@ -196,21 +196,21 @@ export default function AppProvider(props: PropsWithChildren) {
   // #region FLASHCARDS MANAGEMENT
   /////////////////
 
-  const setFlashCards = (flashcards: FlashCard[]) => {
-    const flashcardsObject: Record<string, FlashCard> = {};
+  const setFlashCards = (flashcards: Flashcard[]) => {
+    const flashcardsObject: Record<string, Flashcard> = {};
 
-    flashcards.forEach((item: FlashCard) => {
+    flashcards.forEach((item: Flashcard) => {
       flashcardsObject[item.frontUuid] = item;
     });
     localStorage.setItem('flashcards', JSON.stringify(flashcardsObject));
     setFlashCardsArray(flashcards);
   };
 
-  const addFlashCards = async (flashcards: Partial<FlashCard>[]) => {
-    const flashcardsObject: Record<string, FlashCard> = {};
+  const addFlashCards = async (flashcards: Partial<Flashcard>[]) => {
+    const flashcardsObject: Record<string, Flashcard> = {};
     const flashcardSize = flashCardsArray.length;
 
-    const mappedFlashCards: FlashCard[] = flashcards.map((flashCard, index) => {
+    const mappedFlashCards: Flashcard[] = flashcards.map((flashCard, index) => {
       const flashCardUuid = flashCard.frontUuid ?? uuid();
       return {
         type: flashCard.type ?? 'index',
@@ -239,7 +239,7 @@ export default function AppProvider(props: PropsWithChildren) {
         order: index,
       }),
     );
-    flashcardsOutput.forEach((item: FlashCard) => {
+    flashcardsOutput.forEach((item: Flashcard) => {
       flashcardsObject[item.frontUuid] = item;
     });
 
@@ -253,7 +253,7 @@ export default function AppProvider(props: PropsWithChildren) {
       );
   };
 
-  const addFlashCardsFromWebsocket = (flashcard: FlashCard) => {
+  const addFlashCardsFromWebsocket = (flashcard: Flashcard) => {
     setFlashCardsArray((prev) => {
       const exists = prev.some(
         (item) => item.frontUuid === flashcard.frontUuid,
@@ -266,7 +266,7 @@ export default function AppProvider(props: PropsWithChildren) {
           ...item,
           order: index,
         }));
-        const object: Record<string, FlashCard> = {};
+        const object: Record<string, Flashcard> = {};
         array.forEach((item) => {
           object[item.frontUuid] = item;
         });
@@ -276,13 +276,13 @@ export default function AppProvider(props: PropsWithChildren) {
     });
   };
 
-  const removeFlashCards = async (flashcards: FlashCard[]) => {
-    const flashcardsObject: Record<string, FlashCard> = {};
+  const removeFlashCards = async (flashcards: Flashcard[]) => {
+    const flashcardsObject: Record<string, Flashcard> = {};
     const flashcardsToDelete: string[] = flashcards.map(
       (item) => item.frontUuid,
     );
     const filteredFlashcards = flashCardsArray
-      .filter((item: FlashCard) => !flashcards.includes(item))
+      .filter((item: Flashcard) => !flashcards.includes(item))
       .map((item, index) => ({
         ...item,
         order: index,
@@ -297,7 +297,7 @@ export default function AppProvider(props: PropsWithChildren) {
 
     removeFlashCardsFromSets(flashcardsToDelete);
 
-    filteredFlashcards.forEach((item: FlashCard) => {
+    filteredFlashcards.forEach((item: Flashcard) => {
       flashcardsObject[item.frontUuid] = item;
     });
 
@@ -313,13 +313,13 @@ export default function AppProvider(props: PropsWithChildren) {
 
   const removeFlashCardsByUuid = async (uuids: string[]) => {
     setFlashCardsArray((prev) => {
-      const filteredFlashcards = prev.filter((item: FlashCard) => {
+      const filteredFlashcards = prev.filter((item: Flashcard) => {
         if (!uuids.includes(item.frontUuid)) {
           return true;
         }
         return false;
       });
-      const object: Record<string, FlashCard> = {};
+      const object: Record<string, Flashcard> = {};
       filteredFlashcards.forEach((item) => {
         object[item.frontUuid] = item;
       });
@@ -331,9 +331,9 @@ export default function AppProvider(props: PropsWithChildren) {
     });
   };
 
-  const updateFlashCards = async (flashcards: Partial<FlashCard>[]) => {
-    const flashcardsObject: Record<string, FlashCard> = {};
-    const mappedFlashCards: FlashCard[] = flashcards.map(
+  const updateFlashCards = async (flashcards: Partial<Flashcard>[]) => {
+    const flashcardsObject: Record<string, Flashcard> = {};
+    const mappedFlashCards: Flashcard[] = flashcards.map(
       (flashCard, index) => ({
         type: flashCard.type ?? 'index',
         frontUuid: flashCard.frontUuid ?? uuid(),
@@ -388,9 +388,9 @@ export default function AppProvider(props: PropsWithChildren) {
     );
   };
 
-  const updateFlashCard = async (flashCard: Partial<FlashCard>) => {
-    const flashcardsObject: Record<string, FlashCard> = {};
-    const updatedFlashCard: FlashCard = {
+  const updateFlashCard = async (flashCard: Partial<Flashcard>) => {
+    const flashcardsObject: Record<string, Flashcard> = {};
+    const updatedFlashCard: Flashcard = {
       type: flashCard.type ?? ('index' as FlashCardType),
       frontUuid: flashCard.frontUuid ?? uuid(),
       order: flashCard.order ?? flashCardsArray.length + 1,
@@ -422,7 +422,7 @@ export default function AppProvider(props: PropsWithChildren) {
 
     const updatedFlashCards = flashCardsArray.map((item) => {
       if (item.frontUuid === flashCard.frontUuid) {
-        flashcardsObject[item.frontUuid] = updatedFlashCard as FlashCard;
+        flashcardsObject[item.frontUuid] = updatedFlashCard as Flashcard;
         return updatedFlashCard;
       }
 
@@ -439,7 +439,7 @@ export default function AppProvider(props: PropsWithChildren) {
       .eq('frontUuid', flashCard.frontUuid);
   };
 
-  const updateFlashCardsFromWebsocket = (flashcard: FlashCard) => {
+  const updateFlashCardsFromWebsocket = (flashcard: Flashcard) => {
     setFlashCardsArray((prev) => {
       const updatedFlashcards = prev.map((item) => {
         if (item.frontUuid === flashcard.frontUuid) {
@@ -447,7 +447,7 @@ export default function AppProvider(props: PropsWithChildren) {
         }
         return item;
       });
-      const object: Record<string, FlashCard> = {};
+      const object: Record<string, Flashcard> = {};
       updatedFlashcards.forEach((item) => {
         object[item.frontUuid] = item;
       });
@@ -457,8 +457,8 @@ export default function AppProvider(props: PropsWithChildren) {
   };
 
   const assignFlashCardsToSet = (flashcardUuids: string[], setUuid: string) => {
-    setFlashCardsArray((prev: FlashCard[]) => {
-      const updatedFlashcards: FlashCard[] = prev.map((item) => {
+    setFlashCardsArray((prev: Flashcard[]) => {
+      const updatedFlashcards: Flashcard[] = prev.map((item) => {
         if (flashcardUuids.includes(item.frontUuid)) {
           return { ...item, sets: [...(item?.sets ?? []), setUuid] };
         } else if (item?.sets?.includes(setUuid)) {
@@ -470,7 +470,7 @@ export default function AppProvider(props: PropsWithChildren) {
         return item;
       });
 
-      const object: Record<string, FlashCard> = {};
+      const object: Record<string, Flashcard> = {};
 
       updatedFlashcards.forEach((item) => {
         object[item.frontUuid] = item;
@@ -726,12 +726,12 @@ export default function AppProvider(props: PropsWithChildren) {
         { event: 'UPDATE', schema: 'public', table: 'flashcards' },
         (payload) => {
           if (payload.new) {
-            const updatedFlashcard = payload.new as FlashCard & {
+            const updatedFlashcard = payload.new as Flashcard & {
               user_uuid: string;
               id: string;
             };
             updateFlashCardsFromWebsocket(
-              omit(updatedFlashcard, ['user_uuid', 'id']) as FlashCard,
+              omit(updatedFlashcard, ['user_uuid', 'id']) as Flashcard,
             );
           }
         },
@@ -743,12 +743,12 @@ export default function AppProvider(props: PropsWithChildren) {
         { event: 'INSERT', schema: 'public', table: 'flashcards' },
         (payload) => {
           if (payload.new) {
-            const newFlashcard = payload.new as FlashCard & {
+            const newFlashcard = payload.new as Flashcard & {
               user_uuid: string;
               id: string;
             };
             addFlashCardsFromWebsocket(
-              omit(newFlashcard, ['user_uuid', 'id']) as FlashCard,
+              omit(newFlashcard, ['user_uuid', 'id']) as Flashcard,
             );
           }
         },
@@ -860,9 +860,9 @@ export default function AppProvider(props: PropsWithChildren) {
 
           if ('flashcards' in value) {
             setFlashCardsArray(value.flashcards);
-            const flashCardsObject: Record<string, FlashCard> = {};
+            const flashCardsObject: Record<string, Flashcard> = {};
 
-            value.flashcards.forEach((item: FlashCard) => {
+            value.flashcards.forEach((item: Flashcard) => {
               flashCardsObject[item.frontUuid] = item;
             });
 
@@ -912,12 +912,12 @@ export default function AppProvider(props: PropsWithChildren) {
       migration.flashcards !== '1.0.0'
     ) {
       setFlashCardsArray((prev) => {
-        const flashCardsObject: Record<string, FlashCard> = {};
+        const flashCardsObject: Record<string, Flashcard> = {};
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const unknownFlashCards = prev as any[];
 
         const updatedFlashCards = unknownFlashCards.map((flashCard) => {
-          const migratedFlashCard: FlashCard = {
+          const migratedFlashCard: Flashcard = {
             type: flashCard?.type ?? ('index' as FlashCardType),
             frontUuid: flashCard?.frontUuid ?? uuid(),
             question: flashCard?.question ?? defaultFlashCard.question,

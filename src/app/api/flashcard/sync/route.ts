@@ -3,12 +3,12 @@ import checkValidity from '#/shared/utils/check-validity.util';
 import { isDifferent } from '#/shared/utils/is-different.util';
 import omit from '#/shared/utils/omit.util';
 import { createClient } from '#/shared/utils/supabase/server';
-import type { FlashCard } from '#/types/flash-card.type';
+import type { Flashcard } from '#/types/flash-card.type';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 type requestBody = {
-  flashcards: FlashCard[];
+  flashcards: Flashcard[];
   lastSyncAt: Date;
 };
 
@@ -29,7 +29,7 @@ async function newUserSync(
 async function fetchDataFromDb(
   supabase: SupabaseClient,
   userUuid: string,
-): Promise<{ flashcards: FlashCard[] }> {
+): Promise<{ flashcards: Flashcard[] }> {
   const flashcards = await supabase
     .from('flashcards')
     .select(
@@ -38,7 +38,7 @@ async function fetchDataFromDb(
     .eq('user_uuid', userUuid);
   return {
     flashcards:
-      flashcards.data !== null ? (flashcards.data as FlashCard[]) : [],
+      flashcards.data !== null ? (flashcards.data as Flashcard[]) : [],
   };
 }
 
@@ -74,7 +74,7 @@ async function upsertDataInDb(
       omit(
         flashcards.find(
           (f) => f.frontUuid === flashcard.frontUuid,
-        ) as FlashCard,
+        ) as Flashcard,
         ['createdAt', 'updatedAt'],
       ),
     ),
@@ -125,7 +125,7 @@ async function validateBody(body: Record<string, unknown>) {
 }
 
 export type ApiFlashcardsSyncResponse = {
-  flashcards: FlashCard[];
+  flashcards: Flashcard[];
 };
 const rateLimit = new RateLimit(1, 10, '[flashcard/sync]');
 

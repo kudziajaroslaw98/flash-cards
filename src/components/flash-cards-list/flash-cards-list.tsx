@@ -14,7 +14,7 @@ import { NewFlashCardModal } from '#/components/new-flash-card-modal/new-flash-c
 
 import { useAppContext } from '#/providers/app-context';
 import { cn } from '#/shared/utils/cn.util';
-import type { FlashCard, FlashCardType } from '#/types/flash-card.type';
+import type { Flashcard, FlashCardType } from '#/types/flash-card.type';
 
 import { Pencil, Plus, Search, Trash } from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
@@ -31,17 +31,17 @@ export default function FlashCardsList() {
     updateMetadata,
   } = useAppContext();
 
-  const [selected, setSelected] = useState<FlashCard[]>([]);
+  const [selected, setSelected] = useState<Flashcard[]>([]);
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
   const [isInEditMode, setIsInEditMode] = useState(false);
   const [tileSize] = useState<'sm' | 'md' | 'lg'>('sm');
   const [searchedText, setSearchedText] = useState('');
   const [searchedSets, setSearchedSets] = useState<Array<string>>([]);
-  const [searchedType, setSearchedType] = useState<FlashCard['type'][]>([]);
-  const [filteredFlashCards, setFilteredFlashCards] = useState<FlashCard[]>([]);
+  const [searchedType, setSearchedType] = useState<Flashcard['type'][]>([]);
+  const [filteredFlashCards, setFilteredFlashCards] = useState<Flashcard[]>([]);
 
   const isSelected = useCallback(
-    (flashCard: FlashCard) => {
+    (flashCard: Flashcard) => {
       return (
         selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
         -1
@@ -51,7 +51,7 @@ export default function FlashCardsList() {
   );
 
   const toggleSelected = useCallback(
-    (flashCard: FlashCard) => {
+    (flashCard: Flashcard) => {
       if (isSelected(flashCard)) {
         setSelected((prev) =>
           prev.filter((item) => flashCard.frontUuid !== item.frontUuid),
@@ -69,7 +69,7 @@ export default function FlashCardsList() {
     setSelected([]);
   };
 
-  const addNewRecord = (flashCards: Partial<FlashCard>[]) => {
+  const addNewRecord = (flashCards: Partial<Flashcard>[]) => {
     window.umami.track('Add flashcards', { count: flashCards.length });
     addFlashCards(flashCards);
 
@@ -86,7 +86,7 @@ export default function FlashCardsList() {
     }, 1);
   };
 
-  const editSelectedRecords = (editRecords: Partial<FlashCard>[]) => {
+  const editSelectedRecords = (editRecords: Partial<Flashcard>[]) => {
     window.umami.track('Edit flashcards', { count: editRecords.length });
     updateFlashCards(editRecords);
   };
@@ -163,7 +163,7 @@ export default function FlashCardsList() {
             type='text'
             value={searchedText}
             valid={true}
-            placeholder='Search in decks...'
+            placeholder='Search in flashcards...'
             for='search'
             icon={<Search className='h-4 w-4' />}
             className='!w-full !max-w-80 sm:!w-56'

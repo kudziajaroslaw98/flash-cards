@@ -18,7 +18,7 @@ import { cn } from '#/shared/utils/cn.util';
 import uuid from '#/shared/utils/uuid.util';
 import type { ApiResponse } from '#/types/api-response.type';
 import type { FlashCardSet } from '#/types/flash-card-set.type';
-import type { FlashCard } from '#/types/flash-card.type';
+import type { Flashcard } from '#/types/flash-card.type';
 import {
   ArrowLeft,
   CopyCheck,
@@ -56,7 +56,7 @@ export default function SetHardlinkPage() {
   const [set, setSet] = useState<FlashCardSet>(
     sets.filter((set) => set?.hardlink === setHardLink)[0],
   );
-  const [selected, setSelected] = useState<FlashCard[]>([]);
+  const [selected, setSelected] = useState<Flashcard[]>([]);
 
   const setFlashCards = useMemo(
     () =>
@@ -188,7 +188,7 @@ export default function SetHardlinkPage() {
     }
   };
 
-  const handleNewFlashCards = (newFlashCards: Omit<FlashCard, 'order'>[]) => {
+  const handleNewFlashCards = (newFlashCards: Omit<Flashcard, 'order'>[]) => {
     window.umami.track('Add flashcards');
 
     if (newFlashCards.length > 0) {
@@ -229,7 +229,7 @@ export default function SetHardlinkPage() {
   };
 
   const isSelected = useCallback(
-    (flashCard: FlashCard) => {
+    (flashCard: Flashcard) => {
       return (
         selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
         -1
@@ -239,7 +239,7 @@ export default function SetHardlinkPage() {
   );
 
   const toggleSelected = useCallback(
-    (flashCard: FlashCard) => {
+    (flashCard: Flashcard) => {
       if (isSelected(flashCard)) {
         setSelected((prev) =>
           prev.filter((item) => flashCard.frontUuid !== item.frontUuid),
