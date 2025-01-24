@@ -295,7 +295,12 @@ export default function FormComponent<T>(props: {
   };
 
   return (
-    <form className={cn([props.className])}>
+    <form
+      className={cn([
+        'h-full overflow-x-visible overflow-y-scroll p-4',
+        props.className,
+      ])}
+    >
       <FormInputsComponent<T>
         inputs={props.scheme.inputs}
         formValues={formValues}

@@ -8,7 +8,17 @@ export const newFlashcardScheme = (
   isLoggedIn: boolean,
   isPlanActive: boolean,
 ): FormScheme<
-  Pick<Flashcard, 'query' | 'context' | 'definition' | 'type'>
+  Pick<
+    Flashcard,
+    | 'query'
+    | 'context'
+    | 'definition'
+    | 'examples'
+    | 'keyPoints'
+    | 'synonyms'
+    | 'relatedFacts'
+    | 'type'
+  >
 > => ({
   inputs: {
     type: {
@@ -51,43 +61,6 @@ export const newFlashcardScheme = (
       placeholder: 'Prowess',
       required: true,
     },
-    query: {
-      _internal_constraints: [
-        {
-          type: 'show',
-          key: 'type',
-          constraint: z
-            .string()
-            .includes('single')
-            .or(z.string().includes('question')),
-        },
-        {
-          type: 'prop',
-          propName: 'required',
-          propValue: false,
-          key: 'type',
-          constraint: z.string().includes('single'),
-        },
-        {
-          type: 'prop',
-          propName: 'required',
-          propValue: true,
-          key: 'type',
-          constraint: z.string().includes('question'),
-        },
-        {
-          type: 'validation',
-          key: 'query',
-          constraint: z.string().min(1, 'Question is required'),
-          whenKey: 'type',
-          whenConstraint: z.string().includes('question'),
-        },
-      ],
-      type: 'textarea',
-      name: 'question',
-      label: 'Question',
-      placeholder: 'What is the definition of word below?',
-    },
     definition: {
       _internal_constraints: [
         {
@@ -126,6 +99,126 @@ export const newFlashcardScheme = (
       handleGenerate: handleGenerate,
       loadingGenerate,
       blockGenerate: !isLoggedIn || !isPlanActive,
+    },
+    query: {
+      _internal_constraints: [
+        {
+          type: 'show',
+          key: 'type',
+          constraint: z
+            .string()
+            .includes('single')
+            .or(z.string().includes('question')),
+        },
+        {
+          type: 'prop',
+          propName: 'required',
+          propValue: false,
+          key: 'type',
+          constraint: z.string().includes('single'),
+        },
+        {
+          type: 'prop',
+          propName: 'required',
+          propValue: true,
+          key: 'type',
+          constraint: z.string().includes('question'),
+        },
+        {
+          type: 'validation',
+          key: 'query',
+          constraint: z.string().min(1, 'Question is required'),
+          whenKey: 'type',
+          whenConstraint: z.string().includes('question'),
+        },
+      ],
+      type: 'textarea',
+      name: 'question',
+      label: 'Question',
+      placeholder: 'What is the definition of word below?',
+    },
+    examples: {
+      type: 'textarea',
+      name: 'examples',
+      label: 'Examples',
+      placeholder:
+        'Enter examples of usage of the term, separated by semicolons ( ; )',
+      _internal_constraints: [
+        {
+          type: 'show',
+          key: 'type',
+          constraint: z.string().includes('single'),
+        },
+        {
+          type: 'prop',
+          propName: 'required',
+          propValue: false,
+          key: 'type',
+          constraint: z.string().includes('single'),
+        },
+      ],
+    },
+    synonyms: {
+      type: 'textarea',
+      name: 'synonyms',
+      label: 'Synonyms',
+      placeholder: 'Enter synonyms to the term, separated by semicolons ( ; )',
+      _internal_constraints: [
+        {
+          type: 'show',
+          key: 'type',
+          constraint: z.string().includes('single'),
+        },
+        {
+          type: 'prop',
+          propName: 'required',
+          propValue: false,
+          key: 'type',
+          constraint: z.string().includes('single'),
+        },
+      ],
+    },
+    keyPoints: {
+      type: 'textarea',
+      name: 'keyPoints',
+      label: 'Key Points',
+      placeholder:
+        'Enter key points about the term, separated by semicolons ( ; )',
+      _internal_constraints: [
+        {
+          type: 'show',
+          key: 'type',
+          constraint: z.string().includes('single'),
+        },
+        {
+          type: 'prop',
+          propName: 'required',
+          propValue: false,
+          key: 'type',
+          constraint: z.string().includes('single'),
+        },
+      ],
+    },
+    relatedFacts: {
+      type: 'textarea',
+      name: 'relatedFacts',
+      label: 'Related Facts',
+      placeholder:
+        'Enter related facts about the term, separated by semicolons ( ; )',
+      _internal_constraints: [
+        {
+          type: 'show',
+          key: 'type',
+          constraint: z.string().includes('single'),
+        },
+        {
+          type: 'prop',
+          propName: 'required',
+          propValue: false,
+          key: 'type',
+          constraint: z.string().includes('single'),
+        },
+      ],
     },
   },
 });

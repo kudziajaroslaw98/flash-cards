@@ -146,7 +146,84 @@ export default function FlashcardComponent({
                 </div>
               </div>
 
-              {flashcard.definition}
+              <div className='flex flex-col gap-1'>
+                <span className='text-gray-400'>Definition:</span>
+                <span>{flashcard?.definition}</span>
+              </div>
+
+              {flashcard?.examples && (
+                <>
+                  <span className='my-2 h-[4px] w-full bg-gray-200'></span>
+                  <div className='flex flex-col gap-1'>
+                    <span className='text-gray-400'>Examples:</span>
+                    <ul className='flex list-inside !list-disc flex-col gap-1 '>
+                      {flashcard?.examples.split(';').map((example) => (
+                        <li
+                          className='list-item decoration-gray-600'
+                          key={example.trim()}
+                        >
+                          {example.trim()}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              )}
+              {flashcard?.synonyms && (
+                <>
+                  <span className='my-2 h-[4px] w-full bg-gray-200'></span>
+                  <div className='flex flex-col gap-1'>
+                    <span className='text-gray-400'>Synonyms:</span>
+                    <ul className='flex list-inside !list-disc flex-col gap-1 '>
+                      {flashcard?.synonyms.split(';').map((synonym) => (
+                        <li
+                          className='list-item decoration-gray-600'
+                          key={synonym.trim()}
+                        >
+                          {synonym.trim()}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              )}
+              {flashcard?.keyPoints && (
+                <>
+                  <span className='my-2 h-[4px] w-full bg-gray-200'></span>
+                  <div className='flex flex-col gap-1'>
+                    <span className='text-gray-400'>Key Points:</span>
+                    <ul className='flex list-inside !list-disc flex-col gap-1 '>
+                      {flashcard?.keyPoints.split(';').map((keyPoint) => (
+                        <li
+                          className='list-item decoration-gray-600'
+                          key={keyPoint.trim()}
+                        >
+                          {keyPoint.trim()}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              )}
+
+              {flashcard?.relatedFacts && (
+                <>
+                  <span className='my-2 h-[4px] w-full bg-gray-200'></span>
+                  <div className='flex flex-col gap-1'>
+                    <span className='text-gray-400'>Related Facts:</span>
+                    <ul className='flex list-inside !list-disc flex-col gap-1 '>
+                      {flashcard?.relatedFacts.split(';').map((fact) => (
+                        <li
+                          className='list-item decoration-gray-600'
+                          key={fact.trim()}
+                        >
+                          {fact.trim()}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              )}
 
               <div className='sticky bottom-0 w-full'>
                 <div className='relative flex w-full'>

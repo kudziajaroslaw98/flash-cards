@@ -181,6 +181,7 @@ export default function FlashcardsList() {
             searchable
             clearAll
             multiple
+            disabled={setsDictionary.length === 0}
           />
 
           <Dropdown

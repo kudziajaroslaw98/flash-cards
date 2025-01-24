@@ -204,7 +204,7 @@ export const NewFlashcardModal = ({
             className='flex flex-col items-center justify-center'
           >
             <FormComponent<Flashcard | Omit<Flashcard, 'weight' | 'order'>>
-              className='w-full max-w-80'
+              className='w-full px-8'
               scheme={getFormScheme}
               emitFormValue={setFormValue}
               initialValues={flashcards[currentIndex]}

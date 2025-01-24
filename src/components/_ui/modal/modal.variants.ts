@@ -8,40 +8,40 @@ export const modalHeaderVariants = cva(
         default: 'px-6 py-4 pt-8',
         alert: 'justify-center px-6 pb-2 pt-4',
         form: 'px-6 py-6',
-        compact: 'px-4 py-3'
+        compact: 'px-4 py-3',
       },
       borderVisible: {
         true: 'border-b',
-        false: ''
-      }
+        false: '',
+      },
     },
     defaultVariants: {
       variant: 'default',
-      borderVisible: true
-    }
-  }
+      borderVisible: true,
+    },
+  },
 );
 
 export const modalBodyVariants = cva(
-  'flex w-full flex-col text-sm text-slate-500',
+  'flex w-full max-h-[500px] flex-col text-sm text-slate-500',
   {
     variants: {
       variant: {
-        default: 'px-6 py-6',
+        default: 'px-4 py-4',
         alert: 'text-center px-6 pt-1 pb-4',
-        form: 'px-6 py-4',
-        compact: 'px-4 py-2'
+        form: 'py-4',
+        compact: 'px-4 py-2',
       },
       borderVisible: {
         true: 'border-y',
-        false: ''
-      }
+        false: '',
+      },
     },
     defaultVariants: {
       variant: 'default',
-      borderVisible: false
-    }
-  }
+      borderVisible: false,
+    },
+  },
 );
 
 export const modalFooterVariants = cva(
@@ -52,16 +52,16 @@ export const modalFooterVariants = cva(
         default: 'px-6 py-4',
         alert: 'px-6 pb-4 pt-2 justify-center flex w-full gap-2',
         form: 'px-6 py-6',
-        compact: 'px-4 py-3'
+        compact: 'px-4 py-3',
       },
       borderVisible: {
         true: 'border-t',
-        false: ''
-      }
+        false: '',
+      },
     },
     defaultVariants: {
       variant: 'default',
-      borderVisible: true
-    }
-  }
+      borderVisible: true,
+    },
+  },
 );
