@@ -103,31 +103,31 @@ export default function Dropdown<T>({
   const valueRef = useRef<T | T[] | null | undefined>(null);
 
   // TODO: How to animate this?
-  const dropdownPopupStyles = useMemo(
-    () =>
-      ({
+  const dropdownPopupStyles = useMemo(() => {
+    if (dropdownLabelRef.current === null) return {};
+    else {
+      return {
         position: 'fixed',
         top:
           contextPosition === 'bottom'
-            ? (((dropdownLabelRef.current?.getBoundingClientRect()
+            ? (((dropdownLabelRef.current.getBoundingClientRect()
                 .top as number) +
-                dropdownLabelRef.current?.getBoundingClientRect()
+                dropdownLabelRef.current.getBoundingClientRect()
                   .height) as number) + 8
             : 'unset',
         bottom:
           contextPosition === 'top'
-            ? (dropdownLabelRef.current?.getBoundingClientRect()
+            ? (dropdownLabelRef.current.getBoundingClientRect()
                 .bottom as number) -
-              (dropdownLabelRef.current?.getBoundingClientRect()
-                .top as number) +
-              dropdownLabelRef.current?.getBoundingClientRect().height +
+              (dropdownLabelRef.current.getBoundingClientRect().top as number) +
+              dropdownLabelRef.current.getBoundingClientRect().height +
               8
             : 'unset',
-        left: dropdownLabelRef.current?.getBoundingClientRect().left,
-        width: dropdownLabelRef.current?.getBoundingClientRect().width,
-      }) as const,
-    [dropdownLabelRef.current],
-  );
+        left: dropdownLabelRef.current.getBoundingClientRect().left,
+        width: dropdownLabelRef.current.getBoundingClientRect().width,
+      } as const;
+    }
+  }, [dropdownLabelRef.current]);
 
   useOutsideAlerter(dropdownWrapperRef, () => {
     if (visible) {
@@ -321,7 +321,7 @@ export default function Dropdown<T>({
               ? 'border-green-500 text-green-500'
               : 'border-gray-300  text-gray-500 dark:border-slate-800 ',
             error ? 'border-red-400 text-red-400 dark:border-red-400' : '',
-            disabled ? 'bg-gray-200 text-gray-400' : '',
+            disabled ? 'bg-gray-200 text-gray-400 dark:bg-slate-900' : '',
           ])}
           onClick={() => {
             handleClickOnDropdown();
@@ -356,7 +356,7 @@ export default function Dropdown<T>({
             data-open={visible}
             className={cn([
               DropdownVariants({ contextPosition }),
-              'border border-gray-300  dark:border-slate-950 ',
+              'border border-gray-300  dark:border-slate-900',
             ])}
             style={{ ...dropdownPopupStyles }}
           >
