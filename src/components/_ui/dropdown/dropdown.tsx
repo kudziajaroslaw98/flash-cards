@@ -321,7 +321,9 @@ export default function Dropdown<T>({
               ? 'border-green-500 text-green-500'
               : 'border-gray-300  text-gray-500 dark:border-slate-800 ',
             error ? 'border-red-400 text-red-400 dark:border-red-400' : '',
-            disabled ? 'bg-gray-200 text-gray-400 dark:bg-slate-900' : '',
+            disabled
+              ? 'bg-gray-100 text-gray-200 dark:bg-slate-900 dark:text-slate-800'
+              : '',
           ])}
           onClick={() => {
             handleClickOnDropdown();
