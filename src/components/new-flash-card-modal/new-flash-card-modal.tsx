@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 import uuid from '#/shared/utils/uuid.util';
-import { newFlashCardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';
+import { newFlashcardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';
 import type { Flashcard } from '#/types/flash-card.type';
 import { useCompletion } from 'ai/react';
 import { Button } from '../_ui/button/button';
@@ -11,27 +11,27 @@ import Modal from '../_ui/modal/modal';
 import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
 import FormComponent from '../form-component/form';
 
-interface NewFlashCardModalProps {
-  handleNewFlashCard: (
-    flashCard: Omit<Flashcard, 'weight' | 'order'>[],
+interface NewFlashcardModalProps {
+  handleNewFlashcard: (
+    flashcard: Omit<Flashcard, 'weight' | 'order'>[],
   ) => void;
-  handleEditFlashCard: (editRecords: Partial<Flashcard>[]) => void;
-  selectedFlashCards: Flashcard[];
+  handleEditFlashcard: (editRecords: Partial<Flashcard>[]) => void;
+  selectedFlashcards: Flashcard[];
   isInEditMode?: boolean;
   trigger: React.ReactNode;
 }
 
-export const NewFlashCardModal = ({
-  handleNewFlashCard,
-  handleEditFlashCard,
-  selectedFlashCards,
+export const NewFlashcardModal = ({
+  handleNewFlashcard,
+  handleEditFlashcard,
+  selectedFlashcards,
   trigger,
   isInEditMode = false,
-}: NewFlashCardModalProps) => {
+}: NewFlashcardModalProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formValue, setFormValue] = useState<Partial<Flashcard>>({});
-  const [flashCards, setFlashCards] =
-    useState<Omit<Flashcard, 'weight' | 'order'>[]>(selectedFlashCards);
+  const [flashcards, setFlashcards] =
+    useState<Omit<Flashcard, 'weight' | 'order'>[]>(selectedFlashcards);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loadingGenerate, setLoadingGenerate] = useState(false);
   const { isLoggedIn, isPlanActive } = useSessionContext();
@@ -40,7 +40,7 @@ export const NewFlashCardModal = ({
     api: API_ROUTES.ANSWER_GENERATE,
   });
 
-  const getNewFlashCard = () => ({
+  const getNewFlashcard = () => ({
     type: 'index' as const,
     frontUuid: uuid(),
     question: '',
@@ -59,24 +59,24 @@ export const NewFlashCardModal = ({
   });
 
   const clearInitialValues = () => {
-    if (selectedFlashCards.length === 0) {
-      setFlashCards([getNewFlashCard()]);
+    if (selectedFlashcards.length === 0) {
+      setFlashcards([getNewFlashcard()]);
     } else {
-      setFlashCards(selectedFlashCards);
+      setFlashcards(selectedFlashcards);
     }
     setFormValue({});
   };
 
   useEffect(() => {
-    if (selectedFlashCards.length === 0) {
-      setFlashCards([getNewFlashCard()]);
+    if (selectedFlashcards.length === 0) {
+      setFlashcards([getNewFlashcard()]);
     } else {
-      setFlashCards(selectedFlashCards);
+      setFlashcards(selectedFlashcards);
     }
-  }, [selectedFlashCards]);
+  }, [selectedFlashcards]);
 
   useEffect(() => {
-    setFlashCards((prev) =>
+    setFlashcards((prev) =>
       prev.map((item) =>
         item.frontUuid === formValue.frontUuid
           ? (formValue as Omit<Flashcard, 'order'>)
@@ -88,7 +88,7 @@ export const NewFlashCardModal = ({
   useEffect(() => {
     setFormValue((prev) => ({
       ...prev,
-      answer: completion,
+      definition: completion,
     }));
   }, [completion]);
 
@@ -103,18 +103,17 @@ export const NewFlashCardModal = ({
     window.umami.track('Flashcard dialog - submitted', { isInEditMode });
     setIsModalOpen(false);
 
-    const mappedFlashCards = flashCards.map((flashCard) => ({
-      ...flashCard,
-      answer: flashCard.type === 'index' ? '' : flashCard.answer,
-      question: flashCard.type === 'index' ? '' : flashCard.question,
-      questionAddition:
-        flashCard.type === 'question' ? '' : flashCard.questionAddition,
+    const mappedFlashcards = flashcards.map((flashcard) => ({
+      ...flashcard,
+      answer: flashcard.type === 'index' ? '' : flashcard.definition,
+      question: flashcard.type === 'index' ? '' : flashcard.query,
+      questionAddition: flashcard.type === 'question' ? '' : flashcard.context,
     }));
 
     if (isInEditMode) {
-      handleEditFlashCard(mappedFlashCards);
+      handleEditFlashcard(mappedFlashcards);
     } else {
-      handleNewFlashCard(mappedFlashCards);
+      handleNewFlashcard(mappedFlashcards);
     }
 
     clearInitialValues();
@@ -123,17 +122,17 @@ export const NewFlashCardModal = ({
 
   const handleRightButtonClick = () => {
     window.umami.track('Flashcard dialog - right button clicked');
-    if (currentIndex < flashCards.length - 1) {
+    if (currentIndex < flashcards.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
       if (!isInEditMode) {
-        setFlashCards((prev) => [
+        setFlashcards((prev) => [
           ...prev.map((item) =>
             item.frontUuid === formValue.frontUuid
               ? (formValue as Omit<Flashcard, 'order'>)
               : (item as Omit<Flashcard, 'order'>),
           ),
-          getNewFlashCard(),
+          getNewFlashcard(),
         ]);
         setCurrentIndex((prev) => prev + 1);
       }
@@ -143,7 +142,7 @@ export const NewFlashCardModal = ({
   const handleLeftButtonClick = () => {
     window.umami.track('Flashcard dialog - left button clicked');
     if (currentIndex > 0) {
-      setFlashCards((prev) =>
+      setFlashcards((prev) =>
         prev.map((item) =>
           item.frontUuid === formValue.frontUuid
             ? (formValue as Omit<Flashcard, 'order'>)
@@ -156,15 +155,14 @@ export const NewFlashCardModal = ({
 
   const handleGenerate = useCallback(async () => {
     if (
-      ((formValue.questionAddition !== undefined &&
-        formValue.questionAddition !== '') ||
+      ((formValue.context !== undefined && formValue.context !== '') ||
         formValue.type === 'question') &&
       isLoggedIn &&
       isPlanActive
     ) {
       setLoadingGenerate(true);
       await complete(
-        `generate ${formValue.type === 'question' ? 'answer' : 'description'} to: '${formValue.type === 'question' ? formValue.question : formValue.questionAddition}'`,
+        `generate ${formValue.type === 'question' ? 'answer' : 'description'} to: '${formValue.type === 'question' ? formValue.query : formValue.context}'`,
       );
       setLoadingGenerate(false);
     }
@@ -172,7 +170,7 @@ export const NewFlashCardModal = ({
 
   const getFormScheme = useMemo(
     () =>
-      newFlashCardScheme(
+      newFlashcardScheme(
         handleGenerate,
         loadingGenerate,
         isLoggedIn,
@@ -192,7 +190,7 @@ export const NewFlashCardModal = ({
         handleLeftButtonClick={handleLeftButtonClick}
         handleRightButtonClick={handleRightButtonClick}
         currentIndex={currentIndex}
-        maxIndex={flashCards.length}
+        maxIndex={flashcards.length}
         isInEditMode={isInEditMode}
         submitRef={submitRef}
       >
@@ -209,7 +207,7 @@ export const NewFlashCardModal = ({
               className='w-full max-w-80'
               scheme={getFormScheme}
               emitFormValue={setFormValue}
-              initialValues={flashCards[currentIndex]}
+              initialValues={flashcards[currentIndex]}
             />
           </Modal.Body>
 
@@ -219,7 +217,7 @@ export const NewFlashCardModal = ({
           >
             <Button
               ref={submitRef}
-              label={selectedFlashCards.length > 0 ? 'Edit' : 'Create'}
+              label={selectedFlashcards.length > 0 ? 'Edit' : 'Create'}
               onClick={handleDialogSubmit}
               size={'sm'}
               variant={'primary-text'}

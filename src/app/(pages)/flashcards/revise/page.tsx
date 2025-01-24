@@ -1,4 +1,4 @@
-import FlashCardReviseComponent from '#/components/flash-card-revise/flash-card-revise';
+import FlashcardReviseComponent from '#/components/flash-card-revise/flash-card-revise';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
 export default function RevisePage() {
   return (
     <div className='flex h-full w-full grow flex-col items-center'>
-      <FlashCardReviseComponent />
+      <FlashcardReviseComponent />
     </div>
   );
 }

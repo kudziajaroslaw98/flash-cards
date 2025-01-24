@@ -4,7 +4,7 @@ interface CounterParams {
   count: number;
 }
 
-export default function FlashCardsCounter(params: CounterParams) {
+export default function FlashcardsCounter(params: CounterParams) {
   return (
     <span className='flex flex-col items-center justify-center md:py-6'>
       <h4 className='text-8xl font-bold text-green-400 dark:text-green-500'>

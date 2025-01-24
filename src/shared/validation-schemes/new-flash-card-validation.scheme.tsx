@@ -2,13 +2,13 @@ import type { Flashcard } from '#/types/flash-card.type';
 import type { FormScheme } from '#/types/form-scheme.type';
 import { z } from 'zod';
 
-export const newFlashCardScheme = (
+export const newFlashcardScheme = (
   handleGenerate: () => void,
   loadingGenerate: boolean,
   isLoggedIn: boolean,
   isPlanActive: boolean,
 ): FormScheme<
-  Pick<Flashcard, 'question' | 'questionAddition' | 'answer' | 'type'>
+  Pick<Flashcard, 'query' | 'context' | 'definition' | 'type'>
 > => ({
   inputs: {
     type: {
@@ -24,7 +24,7 @@ export const newFlashCardScheme = (
       ],
       required: true,
     },
-    questionAddition: {
+    context: {
       _internal_constraints: [
         {
           type: 'show',
@@ -36,7 +36,7 @@ export const newFlashCardScheme = (
         },
         {
           type: 'validation',
-          key: 'questionAddition',
+          key: 'context',
           constraint: z.string().min(1, 'Word or sentence is required'),
           whenKey: 'type',
           whenConstraint: z
@@ -51,7 +51,7 @@ export const newFlashCardScheme = (
       placeholder: 'Prowess',
       required: true,
     },
-    question: {
+    query: {
       _internal_constraints: [
         {
           type: 'show',
@@ -77,7 +77,7 @@ export const newFlashCardScheme = (
         },
         {
           type: 'validation',
-          key: 'question',
+          key: 'query',
           constraint: z.string().min(1, 'Question is required'),
           whenKey: 'type',
           whenConstraint: z.string().includes('question'),
@@ -88,7 +88,7 @@ export const newFlashCardScheme = (
       label: 'Question',
       placeholder: 'What is the definition of word below?',
     },
-    answer: {
+    definition: {
       _internal_constraints: [
         {
           type: 'show',
@@ -110,7 +110,7 @@ export const newFlashCardScheme = (
         },
         {
           type: 'validation',
-          key: 'answer',
+          key: 'definition',
           constraint: z.string().min(1, 'Answer is required'),
           whenKey: 'type',
           whenConstraint: z

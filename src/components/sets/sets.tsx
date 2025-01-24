@@ -12,7 +12,7 @@ import { NewSetModal } from '#/components/new-set-modal/new-set-modal';
 import useLongPress from '#/hooks/use-long-press.hook';
 import { useAppContext } from '#/providers/app-context';
 import { cn } from '#/shared/utils/cn.util';
-import type { FlashCardSet } from '#/types/flash-card-set.type';
+import type { FlashcardSet } from '#/types/flash-card-set.type';
 import { BadgeCheck, Pencil, Plus, Search, Star, Trash } from 'lucide-react';
 import { AnimatePresence, m } from 'motion/react';
 import { useRouter } from 'next/navigation';
@@ -26,18 +26,18 @@ export default function Sets() {
   const { sets, categories, addSets, removeSets, updateSets, updateSet } =
     useAppContext();
 
-  const [filteredSets, setFilteredSets] = useState<FlashCardSet[]>([]);
-  const [selected, setSelected] = useState<FlashCardSet[]>([]);
+  const [filteredSets, setFilteredSets] = useState<FlashcardSet[]>([]);
+  const [selected, setSelected] = useState<FlashcardSet[]>([]);
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
 
   const toggleRef = useRef<HTMLButtonElement>(null);
 
-  const handleNewSets = (sets: Partial<FlashCardSet>[]) => {
+  const handleNewSets = (sets: Partial<FlashcardSet>[]) => {
     window.umami.track('add_sets', { count: sets.length });
     addSets(sets);
   };
 
-  const handleEditSets = (sets: Partial<FlashCardSet>[]) => {
+  const handleEditSets = (sets: Partial<FlashcardSet>[]) => {
     window.umami.track('edit_sets', { count: sets.length });
     updateSets(sets);
   };
@@ -90,12 +90,12 @@ export default function Sets() {
     }
   }, [selected]);
 
-  const handleSetToggleChange = (set: FlashCardSet) => {
+  const handleSetToggleChange = (set: FlashcardSet) => {
     window.umami.track('Toggle set favourite');
     updateSet({ ...set, isFavourite: !set.isFavourite });
   };
 
-  const toggleSelected = (set: FlashCardSet) => {
+  const toggleSelected = (set: FlashcardSet) => {
     window.umami.track('Set toggle selected');
     const isFlashCardSelected =
       selected.findIndex((item) => item.frontUuid === set.frontUuid) !== -1;
@@ -115,7 +115,7 @@ export default function Sets() {
     setSelected([]);
   };
 
-  const [onStart, onEnd, onMove] = useLongPress<FlashCardSet, FlashCardSet>(
+  const [onStart, onEnd, onMove] = useLongPress<FlashcardSet, FlashcardSet>(
     (set) => {
       window.umami.track('Set long pressed');
       toggleSelected(set);
@@ -123,13 +123,13 @@ export default function Sets() {
     (set, e) => {
       if (isInSelectionMode) {
         window.umami.track('Set short pressed - toggle selected');
-        toggleSelected(set.at(0) as FlashCardSet);
+        toggleSelected(set.at(0) as FlashcardSet);
       } else {
         window.umami.track('Set short pressed - open set');
         const target = e.target as HTMLElement;
 
         if (target?.classList?.contains('toggle-button')) {
-          handleSetToggleChange(set.at(0) as FlashCardSet);
+          handleSetToggleChange(set.at(0) as FlashcardSet);
         } else {
           router.push(`/flashcards/sets/${set.at(0)?.hardlink}`);
         }
@@ -229,7 +229,7 @@ export default function Sets() {
                   <div className='flex w-full items-center justify-between'>
                     <div className='flex w-full items-center gap-2'>
                       {set.category && <Badge>{set.category}</Badge>}
-                      <Badge>{`${set.flashCards.length} cards`}</Badge>
+                      <Badge>{`${set.flashcards.length} cards`}</Badge>
                     </div>
 
                     <ToggleButton

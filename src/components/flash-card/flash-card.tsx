@@ -8,24 +8,24 @@ import { m } from 'motion/react';
 import { useEffect, useState } from 'react';
 import Card from '../_ui/card/card';
 
-interface FlashCardProps {
-  flashCard: Flashcard;
+interface FlashcardProps {
+  flashcard: Flashcard;
   size?: 'sm' | 'md' | 'lg';
   isSelected?: boolean;
-  onSelect?: (flashCard: Flashcard) => void;
+  onSelect?: (flashcard: Flashcard) => void;
   isInSelectionMode?: boolean;
   flipBlocked?: boolean;
 }
 
-export default function FlashCardComponent({
+export default function FlashcardComponent({
   isSelected,
-  flashCard,
+  flashcard,
   onSelect,
   isInSelectionMode,
   flipBlocked = false,
   size = 'lg',
   ...props
-}: Readonly<FlashCardProps>) {
+}: Readonly<FlashcardProps>) {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const [onStart, onEnd, onMove] = useLongPress<Flashcard>(
@@ -40,9 +40,9 @@ export default function FlashCardComponent({
       if (isInSelectionMode) {
         window.umami.track('Flashcard selected');
         if (onSelect) {
-          onSelect(flashCard);
+          onSelect(flashcard);
         }
-      } else if (!flipBlocked && flashCard.type !== 'index') {
+      } else if (!flipBlocked && flashcard.type !== 'index') {
         window.umami.track('Flashcard flipped');
         setIsFlipped(!isFlipped);
       }
@@ -57,9 +57,9 @@ export default function FlashCardComponent({
 
   return (
     <m.div
-      onMouseDown={(e) => onStart(e, flashCard)}
+      onMouseDown={(e) => onStart(e, flashcard)}
       onMouseUp={onEnd}
-      onTouchStart={(e) => onStart(e, flashCard)}
+      onTouchStart={(e) => onStart(e, flashcard)}
       onTouchEnd={onEnd}
       onTouchMove={onMove}
     >
@@ -72,7 +72,7 @@ export default function FlashCardComponent({
           zIndex: -20,
         }}
         className='flex justify-center'
-        key={`${flashCard.frontUuid}:${isFlipped ? 'flipped' : 'unflipped'}`}
+        key={`${flashcard.frontUuid}:${isFlipped ? 'flipped' : 'unflipped'}`}
       >
         <Card
           tabIndex={0}
@@ -89,7 +89,7 @@ export default function FlashCardComponent({
             <span
               className={cn([
                 'flex h-full w-full flex-col',
-                (flashCard.type === 'index' || flashCard.type === 'question') &&
+                (flashcard.type === 'index' || flashcard.type === 'question') &&
                   'items-center justify-center',
               ])}
             >
@@ -98,33 +98,33 @@ export default function FlashCardComponent({
                   <BadgeCheck className='absolute -right-4 -top-4 h-6 w-6 fill-green-500 text-gray-50 dark:text-slate-950' />
                 )}
 
-                {flashCard.type !== 'index' && (
+                {flashcard.type !== 'index' && (
                   <h5
                     className={cn([
                       'z-20 flex h-20 w-full flex-col items-center justify-center hyphens-auto text-center',
                       size === 'sm' && 'text-xs',
                       size === 'md' && 'text-xs',
                       size === 'lg' && 'text-sm',
-                      flashCard.type === 'question' &&
+                      flashcard.type === 'question' &&
                         'h-full flex-col justify-center',
                     ])}
                   >
-                    {flashCard.question}
+                    {flashcard.query}
                   </h5>
                 )}
 
-                {flashCard.type !== 'question' && (
+                {flashcard.type !== 'question' && (
                   <h2
                     className={cn([
                       'z-20 flex h-full w-full flex-col items-center hyphens-auto py-2 text-center text-green-400 ',
                       size === 'sm' && 'text-2xl',
                       size === 'md' && 'text-2xl',
                       size === 'lg' && 'text-3xl',
-                      flashCard.type === 'index' && 'justify-center',
-                      flashCard.type === 'single' && 'pt-8',
+                      flashcard.type === 'index' && 'justify-center',
+                      flashcard.type === 'single' && 'pt-8',
                     ])}
                   >
-                    {flashCard.questionAddition}
+                    {flashcard.context}
                   </h2>
                 )}
               </>
@@ -146,7 +146,7 @@ export default function FlashCardComponent({
                 </div>
               </div>
 
-              {flashCard.answer}
+              {flashcard.definition}
 
               <div className='sticky bottom-0 w-full'>
                 <div className='relative flex w-full'>

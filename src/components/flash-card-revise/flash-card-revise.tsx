@@ -16,11 +16,11 @@ import { AllRevised } from './all-revised';
 import { ReviseItem } from './revise-item';
 import { ReviseOptions } from './revise-options';
 
-export default function FlashCardReviseComponent() {
+export default function FlashcardReviseComponent() {
   const {
     setsDictionary,
     flashcards,
-    updateFlashCard,
+    updateFlashcard: updateFlashcard,
     metadata,
     updateMetadata,
   } = useAppContext();
@@ -55,7 +55,7 @@ export default function FlashCardReviseComponent() {
   const [clickedOption, setClickedOption] = useState<string>();
   const [clicked, setClicked] = useState(false);
 
-  const setFlashCards = useMemo(
+  const setFlashcards = useMemo(
     () =>
       flashcards.filter((flashcard) => flashcard?.sets?.includes(revisedSet)),
     [flashcards, revisedSet],
@@ -70,7 +70,7 @@ export default function FlashCardReviseComponent() {
     todayItemsEnd,
   } = useSpacedRepetition({
     array: flashcards as Flashcard[],
-    setArray: revisedSet === defaultSet.value ? undefined : setFlashCards,
+    setArray: revisedSet === defaultSet.value ? undefined : setFlashcards,
     differentiateBy: 'type',
   });
 
@@ -83,7 +83,7 @@ export default function FlashCardReviseComponent() {
 
     const spacedItem = calculateRepetition(revisedCard, value);
 
-    updateFlashCard(spacedItem);
+    updateFlashcard(spacedItem);
   };
 
   const changeClicked = (flashCard: Flashcard | undefined, key?: string) => {
@@ -118,12 +118,12 @@ export default function FlashCardReviseComponent() {
     );
 
     updateMetadata({ ...clonedStats });
-    updateFlashCard(spacedItem);
+    updateFlashcard(spacedItem);
     setClickedCard(flashCard);
     setClicked(true);
   };
 
-  const reshuffleFlashCards = () => {
+  const reshuffleFlashcards = () => {
     window.umami.track('Reshuffle flashcards', { key: null, clicked });
 
     setClickedCard(undefined);
@@ -134,7 +134,7 @@ export default function FlashCardReviseComponent() {
     reroll();
   };
 
-  const reshuffleFlashCardsWithKey = (key: string) => {
+  const reshuffleFlashcardsWithKey = (key: string) => {
     window.umami.track('Reshuffle flashcards', { key, clicked });
     if (!clicked) return;
 
@@ -176,8 +176,8 @@ export default function FlashCardReviseComponent() {
     setRevisedCard(randomItems?.[0]);
   }, [randomItems]);
 
-  useKeyPress([' '], () => reshuffleFlashCardsWithKey('Space'));
-  useKeyPress(['ArrowRight'], () => reshuffleFlashCardsWithKey('ArrowRight'));
+  useKeyPress([' '], () => reshuffleFlashcardsWithKey('Space'));
+  useKeyPress(['ArrowRight'], () => reshuffleFlashcardsWithKey('ArrowRight'));
   useKeyPress(['1'], () => clickRevisedOption('1'));
   useKeyPress(['2'], () => clickRevisedOption('2'));
   useKeyPress(['3'], () => clickRevisedOption('3'));
@@ -241,7 +241,7 @@ export default function FlashCardReviseComponent() {
             label={'Reshuffle'}
             icon={<RefreshCw className='h-4 w-4' />}
             iconPosition={'right'}
-            onClick={reshuffleFlashCards}
+            onClick={reshuffleFlashcards}
             size={'xlg'}
             className='!w-full !max-w-xs'
             disabled={!clicked}

@@ -7,26 +7,26 @@ import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
 import { Button } from '#/components/_ui/button/button';
 import Dropdown from '#/components/_ui/dropdown/dropdown';
 import Input from '#/components/_ui/input/input';
-import FlashCardComponent from '#/components/flash-card/flash-card';
-import FlashCardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter';
+import FlashcardComponent from '#/components/flash-card/flash-card';
+import FlashcardsCounterComponent from '#/components/flash-cards-counter/flash-cards-counter';
 import { FloatingButtons } from '#/components/floating-buttons/floating-buttons';
-import { NewFlashCardModal } from '#/components/new-flash-card-modal/new-flash-card-modal';
+import { NewFlashcardModal } from '#/components/new-flash-card-modal/new-flash-card-modal';
 
 import { useAppContext } from '#/providers/app-context';
 import { cn } from '#/shared/utils/cn.util';
-import type { Flashcard, FlashCardType } from '#/types/flash-card.type';
+import type { Flashcard, FlashcardType } from '#/types/flash-card.type';
 
 import { Pencil, Plus, Search, Trash } from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
 
-export default function FlashCardsList() {
+export default function FlashcardsList() {
   const {
     flashcards,
     setsDictionary,
-    flashCardTypeDictionaries,
-    removeFlashCards,
-    addFlashCards,
-    updateFlashCards,
+    flashcardTypeDictionaries,
+    removeFlashcards,
+    addFlashcards,
+    updateFlashcards,
     metadata,
     updateMetadata,
   } = useAppContext();
@@ -38,12 +38,12 @@ export default function FlashCardsList() {
   const [searchedText, setSearchedText] = useState('');
   const [searchedSets, setSearchedSets] = useState<Array<string>>([]);
   const [searchedType, setSearchedType] = useState<Flashcard['type'][]>([]);
-  const [filteredFlashCards, setFilteredFlashCards] = useState<Flashcard[]>([]);
+  const [filteredFlashcards, setFilteredFlashcards] = useState<Flashcard[]>([]);
 
   const isSelected = useCallback(
-    (flashCard: Flashcard) => {
+    (flashcard: Flashcard) => {
       return (
-        selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
+        selected.findIndex((item) => item.frontUuid === flashcard.frontUuid) !==
         -1
       );
     },
@@ -51,13 +51,13 @@ export default function FlashCardsList() {
   );
 
   const toggleSelected = useCallback(
-    (flashCard: Flashcard) => {
-      if (isSelected(flashCard)) {
+    (flashcard: Flashcard) => {
+      if (isSelected(flashcard)) {
         setSelected((prev) =>
-          prev.filter((item) => flashCard.frontUuid !== item.frontUuid),
+          prev.filter((item) => flashcard.frontUuid !== item.frontUuid),
         );
       } else {
-        setSelected((prev) => [...prev, flashCard]);
+        setSelected((prev) => [...prev, flashcard]);
       }
     },
     [isSelected],
@@ -65,17 +65,17 @@ export default function FlashCardsList() {
 
   const removeSelected = () => {
     window.umami.track('Remove flashcards', { count: selected.length });
-    removeFlashCards(selected);
+    removeFlashcards(selected);
     setSelected([]);
   };
 
-  const addNewRecord = (flashCards: Partial<Flashcard>[]) => {
-    window.umami.track('Add flashcards', { count: flashCards.length });
-    addFlashCards(flashCards);
+  const addNewRecord = (flashcards: Partial<Flashcard>[]) => {
+    window.umami.track('Add flashcards', { count: flashcards.length });
+    addFlashcards(flashcards);
 
     updateMetadata({
       ...metadata,
-      createdFlashCards: metadata.createdFlashCards + flashCards.length,
+      createdFlashCards: metadata.createdFlashCards + flashcards.length,
     });
 
     setTimeout(() => {
@@ -88,7 +88,7 @@ export default function FlashCardsList() {
 
   const editSelectedRecords = (editRecords: Partial<Flashcard>[]) => {
     window.umami.track('Edit flashcards', { count: editRecords.length });
-    updateFlashCards(editRecords);
+    updateFlashcards(editRecords);
   };
 
   const handleEditButtonClick = () => {
@@ -102,16 +102,16 @@ export default function FlashCardsList() {
   };
 
   const handleFilterWithMultipleCryteria = () => {
-    const tmpFlashCards = flashcards
+    const tmpFlashcards = flashcards
       .filter(
         (flashcard) =>
-          flashcard.question
+          flashcard.query
             ?.toLowerCase()
             ?.includes(searchedText.toLowerCase()) ||
-          flashcard?.answer
+          flashcard?.definition
             ?.toLowerCase()
             ?.includes(searchedText.toLowerCase()) ||
-          flashcard.questionAddition
+          flashcard.context
             ?.toLowerCase()
             ?.includes(searchedText.toLowerCase()) ||
           searchedText === '',
@@ -126,7 +126,7 @@ export default function FlashCardsList() {
           searchedType?.includes(flashcard.type) || searchedType.length === 0,
       );
 
-    setFilteredFlashCards(tmpFlashCards);
+    setFilteredFlashcards(tmpFlashcards);
   };
 
   const handleSearchedTextChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -137,7 +137,7 @@ export default function FlashCardsList() {
     setSearchedSets(sets);
   };
 
-  const handleTypesChange = (types: Array<FlashCardType>) => {
+  const handleTypesChange = (types: Array<FlashcardType>) => {
     setSearchedType(types);
   };
 
@@ -155,7 +155,7 @@ export default function FlashCardsList() {
 
   return (
     <div className='flex w-full flex-col gap-6 py-8'>
-      <FlashCardsCounterComponent count={flashcards.length} />
+      <FlashcardsCounterComponent count={flashcards.length} />
 
       <div className='flex w-full flex-col flex-wrap items-center justify-center gap-2 text-sm sm:flex-row sm:justify-end'>
         <span className='flex w-full justify-center sm:w-auto'>
@@ -184,7 +184,7 @@ export default function FlashCardsList() {
           />
 
           <Dropdown
-            config={flashCardTypeDictionaries}
+            config={flashcardTypeDictionaries}
             onChange={handleTypesChange}
             multipleLabel='Types'
             label='All Types'
@@ -198,20 +198,23 @@ export default function FlashCardsList() {
         {flashcards.length > 0 && (
           <div
             className={cn([
-              'grid w-full justify-center gap-4 xl:justify-between',
+              'grid w-full justify-center gap-4',
+              filteredFlashcards.length > 5
+                ? 'xl:justify-between'
+                : 'justify-start',
               tileSize === 'sm' && 'grid-cols-[repeat(auto-fit,11rem)]',
               tileSize === 'md' && 'grid-cols-[repeat(auto-fit,11rem)]',
               tileSize === 'lg' && 'grid-cols-[repeat(auto-fit,16rem)]',
             ])}
           >
             <AnimatePresence mode='popLayout'>
-              {filteredFlashCards.map((flashCard) => (
-                <div key={flashCard.frontUuid}>
-                  <FlashCardComponent
-                    flashCard={flashCard}
+              {filteredFlashcards.map((flashcard) => (
+                <div key={flashcard.frontUuid}>
+                  <FlashcardComponent
+                    flashcard={flashcard}
                     size={tileSize}
-                    isSelected={isSelected(flashCard)}
-                    onSelect={() => toggleSelected(flashCard)}
+                    isSelected={isSelected(flashcard)}
+                    onSelect={() => toggleSelected(flashcard)}
                     isInSelectionMode={isInSelectionMode}
                   />
                 </div>
@@ -221,10 +224,10 @@ export default function FlashCardsList() {
         )}
 
         <FloatingButtons className='mt-4'>
-          <NewFlashCardModal
-            handleNewFlashCard={addNewRecord}
-            handleEditFlashCard={editSelectedRecords}
-            selectedFlashCards={isInEditMode ? selected : []}
+          <NewFlashcardModal
+            handleNewFlashcard={addNewRecord}
+            handleEditFlashcard={editSelectedRecords}
+            selectedFlashcards={isInEditMode ? selected : []}
             isInEditMode={isInEditMode}
             trigger={
               <Button
@@ -238,10 +241,10 @@ export default function FlashCardsList() {
 
           {flashcards.length > 0 && (
             <>
-              <NewFlashCardModal
-                handleNewFlashCard={addNewRecord}
-                handleEditFlashCard={editSelectedRecords}
-                selectedFlashCards={isInEditMode ? selected : []}
+              <NewFlashcardModal
+                handleNewFlashcard={addNewRecord}
+                handleEditFlashcard={editSelectedRecords}
+                selectedFlashcards={isInEditMode ? selected : []}
                 isInEditMode={isInEditMode}
                 trigger={
                   <Button

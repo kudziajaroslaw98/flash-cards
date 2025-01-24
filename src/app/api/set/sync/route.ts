@@ -3,12 +3,12 @@ import checkValidity from '#/shared/utils/check-validity.util';
 import { isDifferent } from '#/shared/utils/is-different.util';
 import omit from '#/shared/utils/omit.util';
 import { createClient } from '#/shared/utils/supabase/server';
-import type { FlashCardSet } from '#/types/flash-card-set.type';
+import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 type requestBody = {
-  sets: FlashCardSet[];
+  sets: FlashcardSet[];
   lastSyncAt: Date | null;
 };
 
@@ -29,16 +29,16 @@ async function newUserSync(
 async function fetchDataFromDb(
   supabase: SupabaseClient,
   userUuid: string,
-): Promise<{ sets: FlashCardSet[] }> {
+): Promise<{ sets: FlashcardSet[] }> {
   const sets = await supabase
     .from('sets')
     .select(
-      'frontUuid, name, description, isFavourite, category, hardlink,createdAt, updatedAt, flashCards',
+      'frontUuid, name, description, isFavourite, category, hardlink,createdAt, updatedAt, flashcards',
     )
     .eq('user_uuid', userUuid);
 
   return {
-    sets: sets.data as FlashCardSet[],
+    sets: sets.data as FlashcardSet[],
   };
 }
 
@@ -64,7 +64,7 @@ async function upsertDataInDb(
 
   const changedFlashcards = body.sets.filter((set) =>
     isDifferent(
-      omit(sets.find((s) => s.frontUuid === set.frontUuid) as FlashCardSet, [
+      omit(sets.find((s) => s.frontUuid === set.frontUuid) as FlashcardSet, [
         'createdAt',
         'updatedAt',
       ]),
@@ -93,7 +93,7 @@ async function validateBody(body: Record<string, unknown>) {
         hardlink: z.string().min(1),
         createdAt: z.union([z.date(), z.string()]),
         updatedAt: z.union([z.date(), z.string()]),
-        flashCards: z.array(z.string().uuid()),
+        flashcards: z.array(z.string().uuid()),
       }),
     ),
     lastSyncAt: z.union([z.date(), z.null(), z.string()]),
@@ -107,7 +107,7 @@ async function validateBody(body: Record<string, unknown>) {
 }
 
 export type ApiSetsSyncResponse = {
-  sets: FlashCardSet[];
+  sets: FlashcardSet[];
 };
 
 const rateLimit = new RateLimit(1, 10, '[set/sync]');

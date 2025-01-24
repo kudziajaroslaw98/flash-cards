@@ -33,7 +33,7 @@ async function fetchDataFromDb(
   const flashcards = await supabase
     .from('flashcards')
     .select(
-      'frontUuid, question, questionAddition, answer, order, createdAt, updatedAt, type, spacedRepetition',
+      'frontUuid, query, context, definition, order, createdAt, updatedAt, type, spacedRepetition, examples, keyPoints, synonyms, relatedFacts',
     )
     .eq('user_uuid', userUuid);
   return {
@@ -48,14 +48,14 @@ async function upsertDataInDb(
   userUuid: string,
 ) {
   // TODO: update only changed flashcards ?
-  const flashCardsUuids = body.flashcards.map(
+  const flashcardsUuids = body.flashcards.map(
     (flashcard) => flashcard.frontUuid,
   );
 
   const flashcardsUuidsToDelete = await supabase.rpc(
     'get_missing_flashcards_uuids',
     {
-      uuids: flashCardsUuids,
+      uuids: flashcardsUuids,
     },
   );
 
@@ -98,9 +98,9 @@ async function validateBody(body: Record<string, unknown>) {
           .includes('index')
           .or(z.string().includes('single'))
           .or(z.string().includes('question')),
-        question: z.string().optional(),
-        answer: z.string().optional(),
-        questionAddition: z.string().optional(),
+        query: z.string().optional(),
+        definition: z.string().optional(),
+        context: z.string().optional(),
         order: z.number().nonnegative(),
         frontUuid: z.string().uuid(),
         createdAt: z.union([z.date(), z.string()]),
@@ -112,6 +112,10 @@ async function validateBody(body: Record<string, unknown>) {
           lastReviewAt: z.union([z.date(), z.string()]),
           dueDate: z.union([z.date(), z.string()]),
         }),
+        examples: z.string().optional(),
+        keyPoints: z.string().optional(),
+        synonyms: z.string().optional(),
+        relatedFacts: z.string().optional(),
       }),
     ),
     lastSyncAt: z.union([z.date(), z.string(), z.null()]),

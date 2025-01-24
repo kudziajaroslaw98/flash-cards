@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     '] is generating flashcards',
   );
 
-  const { flashCards: flashcards, setName } = await req.json();
+  const { flashcards: flashcards, setName } = await req.json();
 
   try {
     validateBody({ flashcards, setName });

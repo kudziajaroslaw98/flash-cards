@@ -1,22 +1,22 @@
 import { DictionaryValue } from '#/types/dictionary-value.type';
 import { FormScheme } from '#/types/form-scheme.type';
 import { z } from 'zod';
-import { FlashCardSet } from '../../types/flash-card-set.type';
+import { FlashcardSet } from '../../types/flash-card-set.type';
 
-export const assignFlashCardsScheme = (
+export const assignFlashcardsScheme = (
   config: DictionaryValue<string>[] = [],
-): FormScheme<Pick<FlashCardSet, 'flashCards'>> => ({
+): FormScheme<Pick<FlashcardSet, 'flashcards'>> => ({
   inputs: {
-    flashCards: {
+    flashcards: {
       _internal_constraints: [
         {
           type: 'validation',
-          key: 'flashCards',
+          key: 'flashcards',
           constraint: z.array(z.string().uuid()),
         },
       ],
       type: 'dropdown',
-      name: 'flashCards',
+      name: 'flashcards',
       label: 'Flashcards',
       config: config,
       multiple: true,
