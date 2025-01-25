@@ -7,11 +7,11 @@ export const metadata: Metadata = {
     { name: 'Jarosław Kudzia', url: 'https://github.com/kudziajaroslaw98' },
   ],
   creator: 'Jarosław Kudzia',
-  title: 'Flash Card Sets - Organize Your Learning',
+  title: 'Flashcard Sets - Organize Your Learning',
   description:
-    'Create, manage, and study your flash card sets. Organize your learning materials efficiently.',
+    'Create, manage, and study your flashcard sets. Organize your learning materials efficiently.',
   keywords: [
-    'flash card sets',
+    'flashcard sets',
     'study sets',
     'flashcard collections',
     'learning materials',
@@ -19,9 +19,9 @@ export const metadata: Metadata = {
     'organize flashcards',
   ],
   openGraph: {
-    title: 'Flash Card Sets - Organize Your Learning',
+    title: 'Flashcard Sets - Organize Your Learning',
     description:
-      'Create, manage, and study your flash card sets. Organize your learning materials efficiently.',
+      'Create, manage, and study your flashcard sets. Organize your learning materials efficiently.',
     images: [
       {
         url: 'https://flashcards.finalphase.app/og/og_image.png',
@@ -30,15 +30,15 @@ export const metadata: Metadata = {
       },
     ],
     url: 'https://flashcards.finalphase.app/',
-    siteName: 'Flash Card Sets - Organize Your Learning',
+    siteName: 'Flashcard Sets - Organize Your Learning',
     locale: 'en-US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Flash Card Sets - Organize Your Learning',
+    title: 'Flashcard Sets - Organize Your Learning',
     description:
-      'Create, manage, and study your flash card sets. Organize your learning materials efficiently.',
+      'Create, manage, and study your flashcard sets. Organize your learning materials efficiently.',
     images: [
       {
         url: 'https://flashcards.finalphase.app/og/og_image.png',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     index: true,
     follow: false,
   },
-  applicationName: 'Flash Cards - Learning Words Made Easy',
+  applicationName: 'Flashcards - Learning Words Made Easy',
   alternates: {
     canonical: 'https://flashcards.finalphase.app/',
   },

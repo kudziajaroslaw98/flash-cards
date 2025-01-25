@@ -6,7 +6,8 @@ import { isDifferent } from '#/shared/utils/is-different.util';
 import { DictionaryValue } from '#/types//dictionary-value.type';
 import { cva, VariantProps } from 'class-variance-authority';
 import { Search } from 'lucide-react';
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import * as m from 'motion/react-m';
+import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '../button/button';
 import Input from '../input/input';
 import DropdownItem from './dropdown-item';
@@ -17,13 +18,10 @@ const DropdownVariants = cva(
   {
     variants: {
       contextPosition: {
-        top: 'left-0 -top-2 data-[open=true]:z-30 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
-        'top-right':
-          'right-0 -top-2 data-[open=true]:z-30 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
-        'top-left':
-          'left-0 -top-2 data-[open=true]:z-30 data-[open=true]:animate-fade-in-to-top data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-bottom',
-        bottom:
-          'left-0 -bottom-2 data-[open=true]:!z-30 data-[open=true]:animate-fade-in-to-bottom data-[open=false]:-z-10 data-[open=false]:animate-fade-out-to-top',
+        top: '',
+        'top-right': '',
+        'top-left': '',
+        bottom: '',
       },
     },
     defaultVariants: {
@@ -49,6 +47,7 @@ interface BaseDropdownProps<T> extends VariantProps<typeof DropdownVariants> {
   onBlur?: () => void;
   onFocus?: () => void;
   onAddNew?: (value: string) => void;
+  disabled?: boolean;
   name?: string;
 }
 
@@ -83,6 +82,7 @@ export default function Dropdown<T>({
   onAddNew,
   error = null,
   touched = false,
+  disabled = false,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   type = 'dropdown',
   ...props
@@ -99,8 +99,37 @@ export default function Dropdown<T>({
   const [newItemValue, setNewItemValue] = useState('');
 
   const dropdownWrapperRef = useRef<HTMLDivElement>(null);
+  const dropdownLabelRef = useRef<HTMLDivElement>(null);
   const configRef = useRef<DictionaryValue<T>[] | null>(null);
   const valueRef = useRef<T | T[] | null | undefined>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  // TODO: How to animate this?
+  // const dropdownPopupStyles = useMemo(() => {
+  //   if (dropdownLabelRef.current === null) return {};
+  //   else {
+  //     return {
+  //       position: 'fixed',
+  //       top:
+  //         contextPosition === 'bottom'
+  //           ? (((dropdownLabelRef.current.getBoundingClientRect()
+  //               .top as number) +
+  //               dropdownLabelRef.current.getBoundingClientRect()
+  //                 .height) as number) + 8
+  //           : 'unset',
+  //       bottom:
+  //         contextPosition === 'top'
+  //           ? (dropdownLabelRef.current.getBoundingClientRect()
+  //               .bottom as number) -
+  //             (dropdownLabelRef.current.getBoundingClientRect().top as number) +
+  //             dropdownLabelRef.current.getBoundingClientRect().height +
+  //             8
+  //           : 'unset',
+  //       left: dropdownLabelRef.current.getBoundingClientRect().left,
+  //       width: dropdownLabelRef.current.getBoundingClientRect().width,
+  //     } as const;
+  //   }
+  // }, [dropdownLabelRef.current]);
 
   useOutsideAlerter(dropdownWrapperRef, () => {
     if (visible) {
@@ -112,6 +141,39 @@ export default function Dropdown<T>({
       }
     }
   });
+
+  const updatePopoverPosition = useCallback(() => {
+    if (
+      !dropdownWrapperRef.current ||
+      !popoverRef.current ||
+      !dropdownLabelRef.current
+    )
+      return;
+
+    const buttonRect = dropdownLabelRef.current.getBoundingClientRect();
+    const top =
+      (((dropdownLabelRef.current.getBoundingClientRect().y as number) +
+        dropdownLabelRef.current.getBoundingClientRect().height) as number) + 8;
+
+    popoverRef.current.style.top = `${top}px`;
+    popoverRef.current.style.left = `${buttonRect.left + window.scrollX}px`;
+    popoverRef.current.style.width = `${dropdownLabelRef.current.getBoundingClientRect().width}px`;
+  }, []);
+
+  useEffect(() => {
+    if (visible) {
+      updatePopoverPosition();
+      window.addEventListener('scroll', updatePopoverPosition, {
+        passive: true,
+      });
+      window.addEventListener('resize', updatePopoverPosition);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', updatePopoverPosition);
+      window.removeEventListener('resize', updatePopoverPosition);
+    };
+  }, [visible, updatePopoverPosition]);
 
   useEffect(() => {
     if (
@@ -170,6 +232,7 @@ export default function Dropdown<T>({
 
   const toggleDropdown = () => {
     window.umami.track('Dropdown - Toggle', { name: props.name ?? label });
+    if (disabled) return;
     setVisible((prev) => !prev);
     setSearchValue('');
   };
@@ -266,9 +329,10 @@ export default function Dropdown<T>({
     <div
       ref={dropdownWrapperRef}
       className={cn([
-        'group relative z-40 flex w-full max-w-md flex-col',
+        'group relative flex w-full max-w-md flex-col',
         controlLabel ? 'pt-2' : '',
         labelClassName ?? '',
+        visible ? 'z-50' : 'z-40',
       ])}
     >
       {controlLabel && (
@@ -284,13 +348,17 @@ export default function Dropdown<T>({
       )}
       <div className='w-full'>
         <div
+          ref={dropdownLabelRef}
           className={cn([
-            'group relative z-10 flex h-10 cursor-pointer items-center justify-center rounded-md border text-sm outline-none focus:ring focus:ring-green-400/50',
+            'group relative flex h-10 cursor-pointer items-center justify-center rounded-md border text-sm outline-none focus:ring focus:ring-green-400/50',
             'transition',
             selected.length > 0
               ? 'border-green-500 text-green-500'
               : 'border-gray-300  text-gray-500 dark:border-slate-800 ',
             error ? 'border-red-400 text-red-400 dark:border-red-400' : '',
+            disabled
+              ? 'bg-gray-100 text-gray-200 dark:bg-slate-900 dark:text-slate-800'
+              : '',
           ])}
           onClick={() => {
             handleClickOnDropdown();
@@ -321,12 +389,16 @@ export default function Dropdown<T>({
           )}
         </div>
         {visible && (
-          <div
+          <m.div
             data-open={visible}
             className={cn([
               DropdownVariants({ contextPosition }),
-              'border border-gray-300  dark:border-slate-950 ',
+              'fixed border  border-gray-300 dark:border-slate-900',
             ])}
+            ref={popoverRef}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
           >
             {props.searchable && (
               <div className='min-w-fit rounded-t-md border-b bg-gray-100 p-1 dark:border-slate-800/40 dark:bg-slate-900 '>
@@ -444,7 +516,7 @@ export default function Dropdown<T>({
                 Clear All
               </div>
             )}
-          </div>
+          </m.div>
         )}
       </div>
 

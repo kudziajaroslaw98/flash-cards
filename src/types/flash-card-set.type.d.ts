@@ -1,8 +1,8 @@
-export type FlashCardSet = {
+export type FlashcardSet = {
   frontUuid: string;
   name: string;
   description: string;
-  flashCards: string[];
+  flashcards: string[];
   isFavourite: boolean;
   category?: string;
   hardlink: string;

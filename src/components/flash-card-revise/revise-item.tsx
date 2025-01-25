@@ -1,12 +1,12 @@
 import { cn } from '#/shared/utils/cn.util';
-import type { FlashCard } from '#/types/flash-card.type';
+import type { Flashcard } from '#/types/flash-card.type';
 import { CornerLeftDown } from 'lucide-react';
 import Card from '../_ui/card/card';
-import FlashCardComponent from '../flash-card/flash-card';
+import FlashcardComponent from '../flash-card/flash-card';
 
 type ReviewItem = {
   clicked: boolean;
-  revisedCard: FlashCard | undefined;
+  revisedCard: Flashcard | undefined;
 };
 
 export function ReviseItem({ clicked, revisedCard }: ReviewItem) {
@@ -27,9 +27,9 @@ export function ReviseItem({ clicked, revisedCard }: ReviewItem) {
 
       <div>
         {revisedCard ? (
-          <FlashCardComponent
+          <FlashcardComponent
             key={revisedCard.frontUuid}
-            flashCard={revisedCard}
+            flashcard={revisedCard}
             flipBlocked={!clicked}
           />
         ) : (

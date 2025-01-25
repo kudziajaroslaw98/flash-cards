@@ -1,7 +1,7 @@
 'use client';
 
-import { useAppContext } from '#/providers/app-context';
 import CardComponent from '#/components/_ui/card/card';
+import { useAppContext } from '#/providers/app-context';
 import type { Metadata } from '#/types/metadata.type';
 
 export default function StatsListComponent() {
@@ -11,7 +11,7 @@ export default function StatsListComponent() {
     answers: 'Answers',
     correctAnswers: 'Correct answers',
     incorrectAnswers: 'Incorrect answers',
-    createdFlashCards: 'Created Flash Cards',
+    createdFlashCards: 'Created Flashcards',
     accuracy: 'Accuracy',
     streak: 'Streak',
     lastSyncAt: 'Last sync at',

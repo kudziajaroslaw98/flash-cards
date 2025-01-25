@@ -38,7 +38,7 @@ export const metadata: Metadata = {
       },
     ],
     url: 'https://flashcards.finalphase.app/',
-    siteName: 'Learn with Flash Cards - Interactive Learning',
+    siteName: 'Learn with Flashcards - Interactive Learning',
     locale: 'en-US',
     type: 'website',
   },
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  applicationName: 'Flash Cards - Learning Words Made Easy',
+  applicationName: 'Flashcards - Learning Words Made Easy',
   alternates: {
     canonical: 'https://flashcards.finalphase.app/guide/',
   },

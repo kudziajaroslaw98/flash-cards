@@ -3,12 +3,12 @@ import checkValidity from '#/shared/utils/check-validity.util';
 import { isDifferent } from '#/shared/utils/is-different.util';
 import omit from '#/shared/utils/omit.util';
 import { createClient } from '#/shared/utils/supabase/server';
-import type { FlashCard } from '#/types/flash-card.type';
+import type { Flashcard } from '#/types/flash-card.type';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 type requestBody = {
-  flashcards: FlashCard[];
+  flashcards: Flashcard[];
   lastSyncAt: Date;
 };
 
@@ -29,16 +29,16 @@ async function newUserSync(
 async function fetchDataFromDb(
   supabase: SupabaseClient,
   userUuid: string,
-): Promise<{ flashcards: FlashCard[] }> {
+): Promise<{ flashcards: Flashcard[] }> {
   const flashcards = await supabase
     .from('flashcards')
     .select(
-      'frontUuid, question, questionAddition, answer, order, createdAt, updatedAt, type, spacedRepetition',
+      'frontUuid, query, context, definition, order, createdAt, updatedAt, type, spacedRepetition, examples, keyPoints, synonyms, relatedFacts',
     )
     .eq('user_uuid', userUuid);
   return {
     flashcards:
-      flashcards.data !== null ? (flashcards.data as FlashCard[]) : [],
+      flashcards.data !== null ? (flashcards.data as Flashcard[]) : [],
   };
 }
 
@@ -48,14 +48,14 @@ async function upsertDataInDb(
   userUuid: string,
 ) {
   // TODO: update only changed flashcards ?
-  const flashCardsUuids = body.flashcards.map(
+  const flashcardsUuids = body.flashcards.map(
     (flashcard) => flashcard.frontUuid,
   );
 
   const flashcardsUuidsToDelete = await supabase.rpc(
     'get_missing_flashcards_uuids',
     {
-      uuids: flashCardsUuids,
+      uuids: flashcardsUuids,
     },
   );
 
@@ -74,7 +74,7 @@ async function upsertDataInDb(
       omit(
         flashcards.find(
           (f) => f.frontUuid === flashcard.frontUuid,
-        ) as FlashCard,
+        ) as Flashcard,
         ['createdAt', 'updatedAt'],
       ),
     ),
@@ -98,10 +98,10 @@ async function validateBody(body: Record<string, unknown>) {
           .includes('index')
           .or(z.string().includes('single'))
           .or(z.string().includes('question')),
-        question: z.string().optional(),
-        answer: z.string().optional(),
-        questionAddition: z.string().optional(),
-        order: z.number().nonnegative(),
+        query: z.string().optional(),
+        definition: z.string().optional(),
+        context: z.string().optional(),
+        order: z.number().nonnegative().or(z.null()),
         frontUuid: z.string().uuid(),
         createdAt: z.union([z.date(), z.string()]),
         updatedAt: z.union([z.date(), z.string()]),
@@ -109,9 +109,14 @@ async function validateBody(body: Record<string, unknown>) {
           interval: z.number().nonnegative(),
           easeFactor: z.number().nonnegative(),
           reviews: z.number().nonnegative(),
-          lastReviewAt: z.union([z.date(), z.string()]),
+          lastReviewAt: z.union([z.date(), z.string(), z.null()]),
           dueDate: z.union([z.date(), z.string()]),
         }),
+        examples: z.string().optional(),
+        keyPoints: z.string().optional(),
+        synonyms: z.string().optional(),
+        relatedFacts: z.string().optional(),
+        sets: z.array(z.string().uuid()).or(z.null()),
       }),
     ),
     lastSyncAt: z.union([z.date(), z.string(), z.null()]),
@@ -125,7 +130,7 @@ async function validateBody(body: Record<string, unknown>) {
 }
 
 export type ApiFlashcardsSyncResponse = {
-  flashcards: FlashCard[];
+  flashcards: Flashcard[];
 };
 const rateLimit = new RateLimit(1, 10, '[flashcard/sync]');
 

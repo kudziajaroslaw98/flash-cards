@@ -6,7 +6,7 @@ import { Button } from '#/components/_ui/button/button';
 import useKeyPress from '#/hooks/use-key-press.hook';
 import useSpacedRepetition from '#/hooks/use-spaced-repetition';
 import { useAppContext } from '#/providers/app-context';
-import type { FlashCard } from '#/types/flash-card.type';
+import type { Flashcard } from '#/types/flash-card.type';
 import { ArrowRight, RefreshCw } from 'lucide-react';
 import Dropdown from '../_ui/dropdown/dropdown';
 import LinkComponent from '../_ui/link/link';
@@ -16,11 +16,11 @@ import { AllRevised } from './all-revised';
 import { ReviseItem } from './revise-item';
 import { ReviseOptions } from './revise-options';
 
-export default function FlashCardReviseComponent() {
+export default function FlashcardReviseComponent() {
   const {
     setsDictionary,
     flashcards,
-    updateFlashCard,
+    updateFlashcard: updateFlashcard,
     metadata,
     updateMetadata,
   } = useAppContext();
@@ -48,14 +48,14 @@ export default function FlashCardReviseComponent() {
     },
   ] as const;
 
-  const defaultSet = { value: 'default', label: 'All flash cards' };
-  const [revisedCard, setRevisedCard] = useState<FlashCard>();
+  const defaultSet = { value: 'default', label: 'All flashcards' };
+  const [revisedCard, setRevisedCard] = useState<Flashcard>();
   const [revisedSet, setRevisedSet] = useState<string>(defaultSet.value);
-  const [clickedCard, setClickedCard] = useState<FlashCard>();
+  const [clickedCard, setClickedCard] = useState<Flashcard>();
   const [clickedOption, setClickedOption] = useState<string>();
   const [clicked, setClicked] = useState(false);
 
-  const setFlashCards = useMemo(
+  const setFlashcards = useMemo(
     () =>
       flashcards.filter((flashcard) => flashcard?.sets?.includes(revisedSet)),
     [flashcards, revisedSet],
@@ -69,8 +69,8 @@ export default function FlashCardReviseComponent() {
     setContinueReroll,
     todayItemsEnd,
   } = useSpacedRepetition({
-    array: flashcards as FlashCard[],
-    setArray: revisedSet === defaultSet.value ? undefined : setFlashCards,
+    array: flashcards as Flashcard[],
+    setArray: revisedSet === defaultSet.value ? undefined : setFlashcards,
     differentiateBy: 'type',
   });
 
@@ -83,10 +83,10 @@ export default function FlashCardReviseComponent() {
 
     const spacedItem = calculateRepetition(revisedCard, value);
 
-    updateFlashCard(spacedItem);
+    updateFlashcard(spacedItem);
   };
 
-  const changeClicked = (flashCard: FlashCard | undefined, key?: string) => {
+  const changeClicked = (flashCard: Flashcard | undefined, key?: string) => {
     if (!flashCard || !revisedCard) return;
 
     if (key) {
@@ -118,13 +118,13 @@ export default function FlashCardReviseComponent() {
     );
 
     updateMetadata({ ...clonedStats });
-    updateFlashCard(spacedItem);
+    updateFlashcard(spacedItem);
     setClickedCard(flashCard);
     setClicked(true);
   };
 
-  const reshuffleFlashCards = () => {
-    window.umami.track('Reshuffle flash cards', { key: null, clicked });
+  const reshuffleFlashcards = () => {
+    window.umami.track('Reshuffle flashcards', { key: null, clicked });
 
     setClickedCard(undefined);
     setRevisedCard(undefined);
@@ -134,8 +134,8 @@ export default function FlashCardReviseComponent() {
     reroll();
   };
 
-  const reshuffleFlashCardsWithKey = (key: string) => {
-    window.umami.track('Reshuffle flash cards', { key, clicked });
+  const reshuffleFlashcardsWithKey = (key: string) => {
+    window.umami.track('Reshuffle flashcards', { key, clicked });
     if (!clicked) return;
 
     setClickedCard(undefined);
@@ -176,8 +176,8 @@ export default function FlashCardReviseComponent() {
     setRevisedCard(randomItems?.[0]);
   }, [randomItems]);
 
-  useKeyPress([' '], () => reshuffleFlashCardsWithKey('Space'));
-  useKeyPress(['ArrowRight'], () => reshuffleFlashCardsWithKey('ArrowRight'));
+  useKeyPress([' '], () => reshuffleFlashcardsWithKey('Space'));
+  useKeyPress(['ArrowRight'], () => reshuffleFlashcardsWithKey('ArrowRight'));
   useKeyPress(['1'], () => clickRevisedOption('1'));
   useKeyPress(['2'], () => clickRevisedOption('2'));
   useKeyPress(['3'], () => clickRevisedOption('3'));
@@ -241,11 +241,11 @@ export default function FlashCardReviseComponent() {
             label={'Reshuffle'}
             icon={<RefreshCw className='h-4 w-4' />}
             iconPosition={'right'}
-            onClick={reshuffleFlashCards}
+            onClick={reshuffleFlashcards}
             size={'xlg'}
             className='!w-full !max-w-xs'
             disabled={!clicked}
-            alt='Reshuffle flash cards'
+            alt='Reshuffle flashcards'
           />
 
           <Dropdown

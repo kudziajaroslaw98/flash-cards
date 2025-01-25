@@ -95,9 +95,10 @@ export default async function Home() {
       body: (
         <ul className='flex flex-col gap-2'>
           {listItem('Generate sets from pdf/txt files')}
+          {listItem('Ai Agent to manage flashcard with simple chat')}
           {listItem('Filters on flashcard list')}
           {listItem(
-            'More detailed flash card - real-world examples, key points, synonyms, related facts.',
+            'More detailed flashcard - real-world examples, key points, synonyms, related facts.',
           )}
           {listItem('More advanced spaced repetition algorithm')}
         </ul>
@@ -200,7 +201,7 @@ export default async function Home() {
           <div className='flex items-center justify-center'>
             <Image
               src='/images/flash-cards-logo.svg'
-              alt='Flash Cards Logo'
+              alt='Flashcards Logo'
               width={32}
               height={32}
             />
@@ -271,7 +272,7 @@ export default async function Home() {
         <div className='relative flex w-full max-w-2xl flex-col items-center justify-center gap-4 py-32 md:py-48'>
           <Image
             src='/images/flash-cards-logo.svg'
-            alt='Flash Cards Logo'
+            alt='Flashcards Logo'
             width={64}
             height={64}
           />
@@ -627,7 +628,7 @@ export default async function Home() {
           <div className='flex items-center justify-center gap-2'>
             <Image
               src={'/images/flash-cards-logo.svg'}
-              alt='Flash Cards Logo'
+              alt='Flashcards Logo'
               width={32}
               height={32}
             />
@@ -641,7 +642,7 @@ export default async function Home() {
 
           <div className='flex flex-col items-center justify-center gap-4'>
             <span className='text-center text-slate-400'>
-              © {new Date().getFullYear()} Flash Cards. All rights reserved.
+              © {new Date().getFullYear()} Flashcards. All rights reserved.
             </span>
           </div>
 

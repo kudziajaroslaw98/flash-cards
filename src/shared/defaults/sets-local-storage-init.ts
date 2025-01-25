@@ -6,7 +6,7 @@ export const SETS_LOCAL_STORAGE_INIT = {
       'A set of simple and common words with their meanings, perfect for daily conversations and improving basic English vocabulary.',
     category: 'Language Learning',
     isFavourite: false,
-    flashCards: [
+    flashcards: [
       'c5f20e37-c4c6-4a76-b987-4ab0adcf1ae5',
       '4d49e5e0-54e9-44de-b4b8-c654c95878fd',
       '757a6f43-2dc2-4d58-ba2d-5694defa0eab',

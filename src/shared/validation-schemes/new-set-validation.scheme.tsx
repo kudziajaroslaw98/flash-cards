@@ -1,7 +1,7 @@
 import type { DictionaryValue } from '#/types/dictionary-value.type';
 import type { FormScheme } from '#/types/form-scheme.type';
 import { z } from 'zod';
-import type { FlashCardSet } from '../../types/flash-card-set.type';
+import type { FlashcardSet } from '../../types/flash-card-set.type';
 
 export const newSetFormScheme = (
   dictionaryItems: DictionaryValue<string>[],
@@ -10,7 +10,7 @@ export const newSetFormScheme = (
   isLoggedIn: boolean,
   onAddNew: (value: string) => void,
   isPlanActive: boolean,
-): FormScheme<Pick<FlashCardSet, 'name' | 'description' | 'category'>> => ({
+): FormScheme<Pick<FlashcardSet, 'name' | 'description' | 'category'>> => ({
   inputs: {
     name: {
       type: 'text',

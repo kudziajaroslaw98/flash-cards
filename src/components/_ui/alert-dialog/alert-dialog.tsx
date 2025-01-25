@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { Button } from '../button/button';
 import { Dialog, type DialogProps } from '../dialog/dialog';

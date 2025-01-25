@@ -8,13 +8,14 @@ import { FLASHCARDS_LOCAL_STORAGE_INIT } from '#/shared/defaults/flashcards-loca
 import { SETS_LOCAL_STORAGE_INIT } from '#/shared/defaults/sets-local-storage-init';
 import { DEFAULT_METADATA } from '#/shared/defaults/stats.default';
 import { generateHash } from '#/shared/utils/generate-hash';
+import isNewerVersion from '#/shared/utils/is-newer-version';
 import omit from '#/shared/utils/omit.util';
 import { createClient } from '#/shared/utils/supabase/client';
 import uuid from '#/shared/utils/uuid.util';
 import type { ApiResponse } from '#/types/api-response.type';
 import type { DictionaryValue } from '#/types/dictionary-value.type';
-import type { FlashCardSet } from '#/types/flash-card-set.type';
-import type { FlashCard, FlashCardType } from '#/types/flash-card.type';
+import type { FlashcardSet } from '#/types/flash-card-set.type';
+import type { Flashcard, FlashcardType } from '#/types/flash-card.type';
 import type { Metadata } from '#/types/metadata.type';
 import {
   createContext,
@@ -27,26 +28,26 @@ import {
 import { useSessionContext } from './session-provider.component';
 
 export type AppContextType = {
-  flashcards: FlashCard[];
-  sets: FlashCardSet[];
+  flashcards: Flashcard[];
+  sets: FlashcardSet[];
   setsDictionary: DictionaryValue<string>[];
   categories: DictionaryValue<string>[];
   metadata: Metadata;
   theme: 'dark' | 'light';
   avatarSeed: string;
-  flashCardTypeDictionaries: DictionaryValue<FlashCardType>[];
+  flashcardTypeDictionaries: DictionaryValue<FlashcardType>[];
   setTheme: (theme: 'dark' | 'light') => void;
-  setFlashCards: (flashcards: FlashCard[]) => void;
-  addFlashCards: (flashcards: Partial<FlashCard>[]) => void;
-  removeFlashCards: (flashcards: FlashCard[]) => void;
-  updateFlashCards: (flashcards: Partial<FlashCard>[]) => void;
-  updateFlashCard: (flashcard: Partial<FlashCard>) => void;
-  assignFlashCardsToSet: (flashcardUuids: string[], setUuid: string) => void;
-  setSets: (sets: FlashCardSet[]) => void;
-  addSets: (set: Partial<FlashCardSet>[]) => void;
-  removeSets: (set: FlashCardSet[]) => void;
-  updateSet: (set: Partial<FlashCardSet>) => void;
-  updateSets: (sets: Partial<FlashCardSet>[]) => void;
+  setFlashcards: (flashcards: Flashcard[]) => void;
+  addFlashcards: (flashcards: Partial<Flashcard>[]) => void;
+  removeFlashcards: (flashcards: Flashcard[]) => void;
+  updateFlashcards: (flashcards: Partial<Flashcard>[]) => void;
+  updateFlashcard: (flashcard: Partial<Flashcard>) => void;
+  assignFlashcardsToSet: (flashcardUuids: string[], setUuid: string) => void;
+  setSets: (sets: FlashcardSet[]) => void;
+  addSets: (set: Partial<FlashcardSet>[]) => void;
+  removeSets: (set: FlashcardSet[]) => void;
+  updateSet: (set: Partial<FlashcardSet>) => void;
+  updateSets: (sets: Partial<FlashcardSet>[]) => void;
   updateMetadata: (metadata: Partial<Metadata>) => void;
 };
 
@@ -58,14 +59,14 @@ export const AppContext = createContext<AppContextType>({
   metadata: DEFAULT_METADATA,
   theme: 'dark',
   avatarSeed: '',
-  flashCardTypeDictionaries: [],
+  flashcardTypeDictionaries: [],
   setTheme: () => null,
-  setFlashCards: () => null,
-  addFlashCards: () => null,
-  removeFlashCards: () => null,
-  updateFlashCards: () => null,
-  updateFlashCard: () => null,
-  assignFlashCardsToSet: () => null,
+  setFlashcards: () => null,
+  addFlashcards: () => null,
+  removeFlashcards: () => null,
+  updateFlashcards: () => null,
+  updateFlashcard: () => null,
+  assignFlashcardsToSet: () => null,
   setSets: () => null,
   addSets: () => null,
   removeSets: () => null,
@@ -79,10 +80,10 @@ export default function AppProvider(props: PropsWithChildren) {
   // #region DEFAULTS
   /////////////////
 
-  const defaultFlashCard = {
-    questionAddition: '',
-    question: '',
-    answer: '',
+  const defaultFlashcard = {
+    context: '',
+    query: '',
+    definition: '',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     spacedRepetition: {
@@ -93,9 +94,13 @@ export default function AppProvider(props: PropsWithChildren) {
       reviews: 0,
     },
     sets: [],
+    examples: '',
+    keyPoints: '',
+    synonyms: '',
+    relatedFacts: '',
   } as const;
 
-  const defaultSet: FlashCardSet = {
+  const defaultSet: FlashcardSet = {
     frontUuid: uuid(),
     name: '',
     description: '',
@@ -103,7 +108,7 @@ export default function AppProvider(props: PropsWithChildren) {
     isFavourite: false,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    flashCards: [],
+    flashcards: [],
     hardlink: '',
   } as const;
 
@@ -133,8 +138,8 @@ export default function AppProvider(props: PropsWithChildren) {
     sets: string | null;
   }>({ flashcards: null, sets: null });
   const [appVersion, setAppVersion] = useState<string>('');
-  const [flashCardsArray, setFlashCardsArray] = useState<FlashCard[]>([]);
-  const [setsArray, setSetsArray] = useState<FlashCardSet[]>([]);
+  const [flashcardsArray, setFlashcardsArray] = useState<Flashcard[]>([]);
+  const [setsArray, setSetsArray] = useState<FlashcardSet[]>([]);
   const [categories, setCategories] = useState<DictionaryValue<string>[]>([]);
   const [setsDictionary, setSetsDictionary] = useState<
     DictionaryValue<string>[]
@@ -143,10 +148,10 @@ export default function AppProvider(props: PropsWithChildren) {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const websocketChannel =
     useRef<ReturnType<typeof supabase.channel>>(undefined);
-  const flashCardTypeDictionaries: DictionaryValue<FlashCardType>[] = [
-    { value: 'index', label: 'Index Flash Card' },
+  const flashcardTypeDictionaries: DictionaryValue<FlashcardType>[] = [
+    { value: 'index', label: 'Index Flashcard' },
     { value: 'question', label: 'Question with answer' },
-    { value: 'single', label: 'Detailed Flash Card' },
+    { value: 'single', label: 'Detailed Flashcard' },
   ];
 
   /////////////////
@@ -160,7 +165,7 @@ export default function AppProvider(props: PropsWithChildren) {
   useLocalStorage({
     key: 'flashcards',
     defaultValue: FLASHCARDS_LOCAL_STORAGE_INIT,
-    setArrayValue: setFlashCardsArray,
+    setArrayValue: setFlashcardsArray,
   });
   useLocalStorage({
     key: 'sets',
@@ -179,7 +184,7 @@ export default function AppProvider(props: PropsWithChildren) {
   });
   useLocalStorage({
     key: 'appVersion',
-    defaultValue: '1.0.0',
+    defaultValue: '1.0.1',
     setValue: setAppVersion,
   });
   useLocalStorage({
@@ -196,65 +201,68 @@ export default function AppProvider(props: PropsWithChildren) {
   // #region FLASHCARDS MANAGEMENT
   /////////////////
 
-  const setFlashCards = (flashcards: FlashCard[]) => {
-    const flashcardsObject: Record<string, FlashCard> = {};
+  const setFlashcards = (flashcards: Flashcard[]) => {
+    const flashcardsObject: Record<string, Flashcard> = {};
 
-    flashcards.forEach((item: FlashCard) => {
+    flashcards.forEach((item: Flashcard) => {
       flashcardsObject[item.frontUuid] = item;
     });
     localStorage.setItem('flashcards', JSON.stringify(flashcardsObject));
-    setFlashCardsArray(flashcards);
+    setFlashcardsArray(flashcards);
   };
 
-  const addFlashCards = async (flashcards: Partial<FlashCard>[]) => {
-    const flashcardsObject: Record<string, FlashCard> = {};
-    const flashcardSize = flashCardsArray.length;
+  const addFlashcards = async (flashcards: Partial<Flashcard>[]) => {
+    const flashcardsObject: Record<string, Flashcard> = {};
+    const flashcardSize = flashcardsArray.length;
 
-    const mappedFlashCards: FlashCard[] = flashcards.map((flashCard, index) => {
-      const flashCardUuid = flashCard.frontUuid ?? uuid();
+    const mappedFlashcards: Flashcard[] = flashcards.map((flashcard, index) => {
+      const flashcardUuid = flashcard.frontUuid ?? uuid();
       return {
-        type: flashCard.type ?? 'index',
-        frontUuid: flashCardUuid,
-        question: flashCard.question ?? defaultFlashCard.question,
-        questionAddition:
-          flashCard.questionAddition ?? defaultFlashCard.questionAddition,
-        answer: flashCard.answer ?? defaultFlashCard.answer,
+        type: flashcard.type ?? 'index',
+        frontUuid: flashcardUuid,
+        query: flashcard.query ?? defaultFlashcard.query,
+        context: flashcard.context ?? defaultFlashcard.context,
+        definition: flashcard.definition ?? defaultFlashcard.definition,
         order: flashcardSize + (index + 1),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        spacedRepetition: flashCard.spacedRepetition ?? {
+        spacedRepetition: flashcard.spacedRepetition ?? {
           interval: 0,
           easeFactor: 1.3,
           lastReviewAt: new Date().toISOString(),
           dueDate: new Date(Date.now()).toISOString(),
           reviews: 0,
         },
-        sets: flashCard?.sets ?? [],
+        sets: flashcard?.sets ?? [],
+        examples: flashcard?.examples ?? defaultFlashcard.examples,
+        keyPoints: flashcard?.keyPoints ?? defaultFlashcard.keyPoints,
+        synonyms: flashcard?.synonyms ?? defaultFlashcard.synonyms,
+        relatedFacts: flashcard?.relatedFacts ?? defaultFlashcard.relatedFacts,
       };
     });
 
-    const flashcardsOutput = [...flashCardsArray, ...mappedFlashCards].map(
+    const flashcardsOutput = [...flashcardsArray, ...mappedFlashcards].map(
       (item, index) => ({
         ...item,
         order: index,
       }),
     );
-    flashcardsOutput.forEach((item: FlashCard) => {
+    flashcardsOutput.forEach((item: Flashcard) => {
       flashcardsObject[item.frontUuid] = item;
     });
 
     localStorage.setItem('flashcards', JSON.stringify(flashcardsObject));
-    setFlashCardsArray(flashcardsOutput);
+    setFlashcardsArray(flashcardsOutput);
 
     await supabase
       .from('flashcards')
       .insert(
-        mappedFlashCards.map((item) => ({ ...item, user_uuid: user?.id })),
+        mappedFlashcards.map((item) => ({ ...item, user_uuid: user?.id })),
       );
   };
 
-  const addFlashCardsFromWebsocket = (flashcard: FlashCard) => {
-    setFlashCardsArray((prev) => {
+  const addFlashcardsFromWebsocket = (flashcard: Flashcard) => {
+    setFlashcardsArray((prev) => {
       const exists = prev.some(
         (item) => item.frontUuid === flashcard.frontUuid,
       );
@@ -266,7 +274,7 @@ export default function AppProvider(props: PropsWithChildren) {
           ...item,
           order: index,
         }));
-        const object: Record<string, FlashCard> = {};
+        const object: Record<string, Flashcard> = {};
         array.forEach((item) => {
           object[item.frontUuid] = item;
         });
@@ -276,13 +284,13 @@ export default function AppProvider(props: PropsWithChildren) {
     });
   };
 
-  const removeFlashCards = async (flashcards: FlashCard[]) => {
-    const flashcardsObject: Record<string, FlashCard> = {};
+  const removeFlashcards = async (flashcards: Flashcard[]) => {
+    const flashcardsObject: Record<string, Flashcard> = {};
     const flashcardsToDelete: string[] = flashcards.map(
       (item) => item.frontUuid,
     );
-    const filteredFlashcards = flashCardsArray
-      .filter((item: FlashCard) => !flashcards.includes(item))
+    const filteredFlashcards = flashcardsArray
+      .filter((item: Flashcard) => !flashcards.includes(item))
       .map((item, index) => ({
         ...item,
         order: index,
@@ -295,14 +303,14 @@ export default function AppProvider(props: PropsWithChildren) {
       .delete()
       .in('frontUuid', flashcardsToDelete);
 
-    removeFlashCardsFromSets(flashcardsToDelete);
+    removeFlashcardsFromSets(flashcardsToDelete);
 
-    filteredFlashcards.forEach((item: FlashCard) => {
+    filteredFlashcards.forEach((item: Flashcard) => {
       flashcardsObject[item.frontUuid] = item;
     });
 
     localStorage.setItem('flashcards', JSON.stringify(flashcardsObject));
-    setFlashCardsArray(filteredFlashcards);
+    setFlashcardsArray(filteredFlashcards);
 
     await websocketChannel.current?.send({
       type: 'broadcast',
@@ -311,15 +319,15 @@ export default function AppProvider(props: PropsWithChildren) {
     });
   };
 
-  const removeFlashCardsByUuid = async (uuids: string[]) => {
-    setFlashCardsArray((prev) => {
-      const filteredFlashcards = prev.filter((item: FlashCard) => {
+  const removeFlashcardsByUuid = async (uuids: string[]) => {
+    setFlashcardsArray((prev) => {
+      const filteredFlashcards = prev.filter((item: Flashcard) => {
         if (!uuids.includes(item.frontUuid)) {
           return true;
         }
         return false;
       });
-      const object: Record<string, FlashCard> = {};
+      const object: Record<string, Flashcard> = {};
       filteredFlashcards.forEach((item) => {
         object[item.frontUuid] = item;
       });
@@ -331,55 +339,58 @@ export default function AppProvider(props: PropsWithChildren) {
     });
   };
 
-  const updateFlashCards = async (flashcards: Partial<FlashCard>[]) => {
-    const flashcardsObject: Record<string, FlashCard> = {};
-    const mappedFlashCards: FlashCard[] = flashcards.map(
-      (flashCard, index) => ({
-        type: flashCard.type ?? 'index',
-        frontUuid: flashCard.frontUuid ?? uuid(),
-        order: flashCard.order ?? index + 1,
-        questionAddition:
-          flashCard.questionAddition ?? defaultFlashCard.questionAddition,
-        question: flashCard.question ?? defaultFlashCard.question,
-        answer: flashCard.answer ?? defaultFlashCard.answer,
-        createdAt: flashCard.createdAt ?? defaultFlashCard.createdAt,
+  const updateFlashcards = async (flashcards: Partial<Flashcard>[]) => {
+    const flashcardsObject: Record<string, Flashcard> = {};
+    const mappedFlashcards: Flashcard[] = flashcards.map(
+      (flashcard, index) => ({
+        type: flashcard.type ?? 'index',
+        frontUuid: flashcard.frontUuid ?? uuid(),
+        order: flashcard.order ?? index + 1,
+        context: flashcard.context ?? defaultFlashcard.context,
+        query: flashcard.query ?? defaultFlashcard.query,
+        definition: flashcard.definition ?? defaultFlashcard.definition,
+        createdAt: flashcard.createdAt ?? defaultFlashcard.createdAt,
         updatedAt: new Date().toISOString(),
         spacedRepetition: {
           interval:
-            flashCard.spacedRepetition?.interval ??
-            defaultFlashCard.spacedRepetition.interval,
+            flashcard.spacedRepetition?.interval ??
+            defaultFlashcard.spacedRepetition.interval,
           easeFactor:
-            flashCard.spacedRepetition?.easeFactor ??
-            defaultFlashCard.spacedRepetition.easeFactor,
+            flashcard.spacedRepetition?.easeFactor ??
+            defaultFlashcard.spacedRepetition.easeFactor,
           reviews:
-            flashCard.spacedRepetition?.reviews ??
-            defaultFlashCard.spacedRepetition.reviews,
+            flashcard.spacedRepetition?.reviews ??
+            defaultFlashcard.spacedRepetition.reviews,
           lastReviewAt:
-            flashCard.spacedRepetition?.lastReviewAt ??
-            defaultFlashCard.spacedRepetition.lastReviewAt,
+            flashcard.spacedRepetition?.lastReviewAt ??
+            defaultFlashcard.spacedRepetition.lastReviewAt,
           dueDate:
-            flashCard.spacedRepetition?.dueDate ??
-            defaultFlashCard.spacedRepetition.dueDate,
+            flashcard.spacedRepetition?.dueDate ??
+            defaultFlashcard.spacedRepetition.dueDate,
         },
-        sets: flashCard?.sets ?? [],
+        sets: flashcard?.sets ?? [],
+        examples: flashcard?.examples ?? defaultFlashcard.examples,
+        keyPoints: flashcard?.keyPoints ?? defaultFlashcard.keyPoints,
+        synonyms: flashcard?.synonyms ?? defaultFlashcard.synonyms,
+        relatedFacts: flashcard?.relatedFacts ?? defaultFlashcard.relatedFacts,
       }),
     );
 
-    const updatedFlashcards = flashCardsArray.map((flashCard) => {
+    const updatedFlashcards = flashcardsArray.map((flashcard) => {
       const updatedFlashcard =
-        mappedFlashCards.find(
-          (item) => item.frontUuid === flashCard.frontUuid,
-        ) ?? flashCard;
+        mappedFlashcards.find(
+          (item) => item.frontUuid === flashcard.frontUuid,
+        ) ?? flashcard;
 
-      flashcardsObject[flashCard.frontUuid] = updatedFlashcard;
+      flashcardsObject[flashcard.frontUuid] = updatedFlashcard;
       return updatedFlashcard;
     });
 
     localStorage.setItem('flashcards', JSON.stringify(flashcardsObject));
-    setFlashCardsArray(updatedFlashcards);
+    setFlashcardsArray(updatedFlashcards);
 
     await Promise.all(
-      mappedFlashCards.map((flashcard) =>
+      mappedFlashcards.map((flashcard) =>
         supabase
           .from('flashcards')
           .update(flashcard)
@@ -388,42 +399,45 @@ export default function AppProvider(props: PropsWithChildren) {
     );
   };
 
-  const updateFlashCard = async (flashCard: Partial<FlashCard>) => {
-    const flashcardsObject: Record<string, FlashCard> = {};
-    const updatedFlashCard: FlashCard = {
-      type: flashCard.type ?? ('index' as FlashCardType),
-      frontUuid: flashCard.frontUuid ?? uuid(),
-      order: flashCard.order ?? flashCardsArray.length + 1,
-      questionAddition:
-        flashCard.questionAddition ?? defaultFlashCard.questionAddition,
-      question: flashCard.question ?? defaultFlashCard.question,
-      answer: flashCard.answer ?? defaultFlashCard.answer,
-      createdAt: flashCard.createdAt ?? new Date().toISOString(),
+  const updateFlashcard = async (flashcard: Partial<Flashcard>) => {
+    const flashcardsObject: Record<string, Flashcard> = {};
+    const updatedFlashcard: Flashcard = {
+      type: flashcard.type ?? ('index' as FlashcardType),
+      frontUuid: flashcard.frontUuid ?? uuid(),
+      order: flashcard.order ?? flashcardsArray.length + 1,
+      context: flashcard.context ?? defaultFlashcard.context,
+      query: flashcard.query ?? defaultFlashcard.query,
+      definition: flashcard.definition ?? defaultFlashcard.definition,
+      createdAt: flashcard.createdAt ?? new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       spacedRepetition: {
         interval:
-          flashCard.spacedRepetition?.interval ??
-          defaultFlashCard.spacedRepetition.interval,
+          flashcard.spacedRepetition?.interval ??
+          defaultFlashcard.spacedRepetition.interval,
         easeFactor:
-          flashCard.spacedRepetition?.easeFactor ??
-          defaultFlashCard.spacedRepetition.easeFactor,
+          flashcard.spacedRepetition?.easeFactor ??
+          defaultFlashcard.spacedRepetition.easeFactor,
         reviews:
-          flashCard.spacedRepetition?.reviews ??
-          defaultFlashCard.spacedRepetition.reviews,
+          flashcard.spacedRepetition?.reviews ??
+          defaultFlashcard.spacedRepetition.reviews,
         lastReviewAt:
-          flashCard.spacedRepetition?.lastReviewAt ??
-          defaultFlashCard.spacedRepetition.lastReviewAt,
+          flashcard.spacedRepetition?.lastReviewAt ??
+          defaultFlashcard.spacedRepetition.lastReviewAt,
         dueDate:
-          flashCard.spacedRepetition?.dueDate ??
-          defaultFlashCard.spacedRepetition.dueDate,
+          flashcard.spacedRepetition?.dueDate ??
+          defaultFlashcard.spacedRepetition.dueDate,
       },
-      sets: flashCard?.sets ?? [],
+      sets: flashcard?.sets ?? [],
+      examples: flashcard?.examples ?? defaultFlashcard.examples,
+      keyPoints: flashcard?.keyPoints ?? defaultFlashcard.keyPoints,
+      synonyms: flashcard?.synonyms ?? defaultFlashcard.synonyms,
+      relatedFacts: flashcard?.relatedFacts ?? defaultFlashcard.relatedFacts,
     };
 
-    const updatedFlashCards = flashCardsArray.map((item) => {
-      if (item.frontUuid === flashCard.frontUuid) {
-        flashcardsObject[item.frontUuid] = updatedFlashCard as FlashCard;
-        return updatedFlashCard;
+    const updatedFlashcards = flashcardsArray.map((item) => {
+      if (item.frontUuid === flashcard.frontUuid) {
+        flashcardsObject[item.frontUuid] = updatedFlashcard as Flashcard;
+        return updatedFlashcard;
       }
 
       flashcardsObject[item.frontUuid] = item;
@@ -431,23 +445,23 @@ export default function AppProvider(props: PropsWithChildren) {
     });
 
     localStorage.setItem('flashcards', JSON.stringify(flashcardsObject));
-    setFlashCardsArray(updatedFlashCards);
+    setFlashcardsArray(updatedFlashcards);
 
     await supabase
       .from('flashcards')
-      .update(updatedFlashCard)
-      .eq('frontUuid', flashCard.frontUuid);
+      .update(updatedFlashcard)
+      .eq('frontUuid', flashcard.frontUuid);
   };
 
-  const updateFlashCardsFromWebsocket = (flashcard: FlashCard) => {
-    setFlashCardsArray((prev) => {
+  const updateFlashcardsFromWebsocket = (flashcard: Flashcard) => {
+    setFlashcardsArray((prev) => {
       const updatedFlashcards = prev.map((item) => {
         if (item.frontUuid === flashcard.frontUuid) {
           return flashcard;
         }
         return item;
       });
-      const object: Record<string, FlashCard> = {};
+      const object: Record<string, Flashcard> = {};
       updatedFlashcards.forEach((item) => {
         object[item.frontUuid] = item;
       });
@@ -456,9 +470,9 @@ export default function AppProvider(props: PropsWithChildren) {
     });
   };
 
-  const assignFlashCardsToSet = (flashcardUuids: string[], setUuid: string) => {
-    setFlashCardsArray((prev: FlashCard[]) => {
-      const updatedFlashcards: FlashCard[] = prev.map((item) => {
+  const assignFlashcardsToSet = (flashcardUuids: string[], setUuid: string) => {
+    setFlashcardsArray((prev: Flashcard[]) => {
+      const updatedFlashcards: Flashcard[] = prev.map((item) => {
         if (flashcardUuids.includes(item.frontUuid)) {
           return { ...item, sets: [...(item?.sets ?? []), setUuid] };
         } else if (item?.sets?.includes(setUuid)) {
@@ -470,7 +484,7 @@ export default function AppProvider(props: PropsWithChildren) {
         return item;
       });
 
-      const object: Record<string, FlashCard> = {};
+      const object: Record<string, Flashcard> = {};
 
       updatedFlashcards.forEach((item) => {
         object[item.frontUuid] = item;
@@ -481,13 +495,13 @@ export default function AppProvider(props: PropsWithChildren) {
     });
   };
 
-  const removeSetsFromFlashCards = (setUuid: string[]) => {
-    const flashCardsCopy = flashCardsArray.map((item) => ({
+  const removeSetsFromFlashcards = (setUuid: string[]) => {
+    const flashcardsCopy = flashcardsArray.map((item) => ({
       ...item,
       sets: item.sets?.filter((uuid) => !setUuid.includes(uuid)),
     }));
 
-    updateFlashCards(flashCardsCopy);
+    updateFlashcards(flashcardsCopy);
   };
 
   /////////////////
@@ -498,14 +512,14 @@ export default function AppProvider(props: PropsWithChildren) {
   // #region SETS MANAGEMENT
   /////////////////
 
-  const addSets = async (sets: Partial<FlashCardSet>[]) => {
-    const setsObject: Record<string, FlashCardSet> = {};
+  const addSets = async (sets: Partial<FlashcardSet>[]) => {
+    const setsObject: Record<string, FlashcardSet> = {};
 
-    const mappedSets: FlashCardSet[] = sets.map((set) => ({
+    const mappedSets: FlashcardSet[] = sets.map((set) => ({
       frontUuid: set.frontUuid ?? uuid(),
       name: set.name ?? '',
       description: set.description ?? '',
-      flashCards: set.flashCards ?? [],
+      flashcards: set.flashcards ?? [],
       isFavourite: set.isFavourite ?? false,
       category: set.category ?? '',
       hardlink: set.name?.replace(/ /g, '-').toLowerCase() ?? '',
@@ -514,7 +528,7 @@ export default function AppProvider(props: PropsWithChildren) {
     }));
 
     const setsOutput = [...setsArray, ...mappedSets];
-    setsOutput.forEach((item: FlashCardSet) => {
+    setsOutput.forEach((item: FlashcardSet) => {
       setsObject[item.frontUuid] = item;
     });
 
@@ -526,7 +540,7 @@ export default function AppProvider(props: PropsWithChildren) {
       .insert(mappedSets.map((item) => ({ ...item, user_uuid: user?.id })));
   };
 
-  const addSetsFromWebsocket = (set: FlashCardSet) => {
+  const addSetsFromWebsocket = (set: FlashcardSet) => {
     setSetsArray((prev) => {
       const exists = prev.some((item) => item.frontUuid === set.frontUuid);
 
@@ -534,7 +548,7 @@ export default function AppProvider(props: PropsWithChildren) {
         return prev;
       } else {
         const array = [...prev, set];
-        const object: Record<string, FlashCardSet> = {};
+        const object: Record<string, FlashcardSet> = {};
 
         array.forEach((item) => {
           object[item.frontUuid] = item;
@@ -546,9 +560,9 @@ export default function AppProvider(props: PropsWithChildren) {
     });
   };
 
-  const setSets = (sets: FlashCardSet[]) => {
-    const setsObject: Record<string, FlashCardSet> = {};
-    sets.forEach((item: FlashCardSet) => {
+  const setSets = (sets: FlashcardSet[]) => {
+    const setsObject: Record<string, FlashcardSet> = {};
+    sets.forEach((item: FlashcardSet) => {
       setsObject[item.frontUuid] = item;
     });
 
@@ -556,19 +570,19 @@ export default function AppProvider(props: PropsWithChildren) {
     setSetsArray(sets);
   };
 
-  const removeSets = async (sets: FlashCardSet[]) => {
-    const setsObject: Record<string, FlashCardSet> = {};
+  const removeSets = async (sets: FlashcardSet[]) => {
+    const setsObject: Record<string, FlashcardSet> = {};
     const setsToDelete: string[] = sets.map((item) => item.frontUuid);
     const filteredSets = setsArray.filter(
-      (item: FlashCardSet) =>
+      (item: FlashcardSet) =>
         !sets.some((set) => set.frontUuid === item.frontUuid),
     );
 
     await supabase.from('sets').delete().in('frontUuid', setsToDelete);
 
-    removeSetsFromFlashCards(setsToDelete);
+    removeSetsFromFlashcards(setsToDelete);
 
-    filteredSets.forEach((item: FlashCardSet) => {
+    filteredSets.forEach((item: FlashcardSet) => {
       setsObject[item.frontUuid] = item;
     });
 
@@ -584,13 +598,13 @@ export default function AppProvider(props: PropsWithChildren) {
 
   const removeSetsByUuid = async (uuids: string[]) => {
     setSetsArray((prev) => {
-      const filteredSets = prev.filter((item: FlashCardSet) => {
+      const filteredSets = prev.filter((item: FlashcardSet) => {
         if (!uuids.includes(item.frontUuid)) {
           return true;
         }
         return false;
       });
-      const object: Record<string, FlashCardSet> = {};
+      const object: Record<string, FlashcardSet> = {};
       filteredSets.forEach((item) => {
         object[item.frontUuid] = item;
       });
@@ -602,24 +616,24 @@ export default function AppProvider(props: PropsWithChildren) {
     });
   };
 
-  const removeFlashCardsFromSets = (flashCardUuids: string[]) => {
+  const removeFlashcardsFromSets = (flashcardUuids: string[]) => {
     const sets = setsArray.map((set) => ({
       ...set,
-      flashCards: set.flashCards.filter(
-        (uuid) => !flashCardUuids.includes(uuid) || uuid === null,
+      flashcards: set.flashcards.filter(
+        (uuid) => !flashcardUuids.includes(uuid) || uuid === null,
       ),
     }));
 
     updateSets(sets);
   };
 
-  const updateSets = async (sets: Partial<FlashCardSet>[]) => {
-    const setsObject: Record<string, FlashCardSet> = {};
-    const mappedSets: FlashCardSet[] = sets.map((set) => ({
+  const updateSets = async (sets: Partial<FlashcardSet>[]) => {
+    const setsObject: Record<string, FlashcardSet> = {};
+    const mappedSets: FlashcardSet[] = sets.map((set) => ({
       frontUuid: set.frontUuid ?? uuid(),
       name: set.name ?? '',
       description: set.description ?? '',
-      flashCards: set.flashCards ?? [],
+      flashcards: set.flashcards ?? [],
       isFavourite: set.isFavourite ?? false,
       category: set.category ?? '',
       hardlink: set.name?.replace(/ /g, '-').toLowerCase() ?? '',
@@ -645,13 +659,13 @@ export default function AppProvider(props: PropsWithChildren) {
     );
   };
 
-  const updateSet = async (set: Partial<FlashCardSet>) => {
-    const setsObject: Record<string, FlashCardSet> = {};
+  const updateSet = async (set: Partial<FlashcardSet>) => {
+    const setsObject: Record<string, FlashcardSet> = {};
     const updatedSet = {
       frontUuid: set.frontUuid ?? uuid(),
       name: set.name ?? '',
       description: set.description ?? '',
-      flashCards: set.flashCards ?? [],
+      flashcards: set.flashcards ?? [],
       isFavourite: set.isFavourite ?? false,
       category: set.category ?? '',
       hardlink: set.name?.replace(/ /g, '-').toLowerCase() ?? '',
@@ -673,7 +687,7 @@ export default function AppProvider(props: PropsWithChildren) {
     setSetsArray(updatedSets);
   };
 
-  const updateSetsFromWebsocket = (set: FlashCardSet) => {
+  const updateSetsFromWebsocket = (set: FlashcardSet) => {
     setSetsArray((prev) => {
       const updatedSets = prev.map((item) => {
         if (item.frontUuid === set.frontUuid) {
@@ -681,7 +695,7 @@ export default function AppProvider(props: PropsWithChildren) {
         }
         return item;
       });
-      const object: Record<string, FlashCardSet> = {};
+      const object: Record<string, FlashcardSet> = {};
 
       updatedSets.forEach((item) => {
         object[item.frontUuid] = item;
@@ -726,12 +740,12 @@ export default function AppProvider(props: PropsWithChildren) {
         { event: 'UPDATE', schema: 'public', table: 'flashcards' },
         (payload) => {
           if (payload.new) {
-            const updatedFlashcard = payload.new as FlashCard & {
+            const updatedFlashcard = payload.new as Flashcard & {
               user_uuid: string;
               id: string;
             };
-            updateFlashCardsFromWebsocket(
-              omit(updatedFlashcard, ['user_uuid', 'id']) as FlashCard,
+            updateFlashcardsFromWebsocket(
+              omit(updatedFlashcard, ['user_uuid', 'id']) as Flashcard,
             );
           }
         },
@@ -743,12 +757,12 @@ export default function AppProvider(props: PropsWithChildren) {
         { event: 'INSERT', schema: 'public', table: 'flashcards' },
         (payload) => {
           if (payload.new) {
-            const newFlashcard = payload.new as FlashCard & {
+            const newFlashcard = payload.new as Flashcard & {
               user_uuid: string;
               id: string;
             };
-            addFlashCardsFromWebsocket(
-              omit(newFlashcard, ['user_uuid', 'id']) as FlashCard,
+            addFlashcardsFromWebsocket(
+              omit(newFlashcard, ['user_uuid', 'id']) as Flashcard,
             );
           }
         },
@@ -760,7 +774,7 @@ export default function AppProvider(props: PropsWithChildren) {
           payload.flashcards.length >= 0 &&
           Array.isArray(payload.flashcards)
         ) {
-          removeFlashCardsByUuid(payload.flashcards);
+          removeFlashcardsByUuid(payload.flashcards);
         }
       })
 
@@ -770,12 +784,12 @@ export default function AppProvider(props: PropsWithChildren) {
         { event: 'UPDATE', schema: 'public', table: 'sets' },
         (payload) => {
           if (payload.new) {
-            const updatedSet = payload.new as FlashCardSet & {
+            const updatedSet = payload.new as FlashcardSet & {
               user_uuid: string;
               id: string;
             };
             updateSetsFromWebsocket(
-              omit(updatedSet, ['user_uuid', 'id']) as FlashCardSet,
+              omit(updatedSet, ['user_uuid', 'id']) as FlashcardSet,
             );
           }
         },
@@ -787,7 +801,7 @@ export default function AppProvider(props: PropsWithChildren) {
         { event: 'INSERT', schema: 'public', table: 'sets' },
         (payload) => {
           if (payload.new) {
-            const newSet = payload.new as FlashCardSet & {
+            const newSet = payload.new as FlashcardSet & {
               user_uuid: string;
               id: string;
             };
@@ -815,11 +829,11 @@ export default function AppProvider(props: PropsWithChildren) {
     const newLastSyncAt = new Date();
     const oldLastSyncAt = metadata.lastSyncAt;
 
-    const fetchFlashCards: Promise<ApiResponse<ApiFlashcardsSyncResponse>> =
+    const fetchFlashcards: Promise<ApiResponse<ApiFlashcardsSyncResponse>> =
       fetch(API_ROUTES.SYNC_FLASH_CARDS, {
         method: 'POST',
         body: JSON.stringify({
-          flashcards: flashCardsArray,
+          flashcards: flashcardsArray,
           lastSyncAt: oldLastSyncAt,
         }),
       });
@@ -849,7 +863,7 @@ export default function AppProvider(props: PropsWithChildren) {
 
     const responses = await Promise.allSettled([
       fetchMetadata,
-      fetchFlashCards,
+      fetchFlashcards,
       fetchSets,
     ]);
 
@@ -859,22 +873,22 @@ export default function AppProvider(props: PropsWithChildren) {
           const value = response.value?.data;
 
           if ('flashcards' in value) {
-            setFlashCardsArray(value.flashcards);
-            const flashCardsObject: Record<string, FlashCard> = {};
+            setFlashcardsArray(value.flashcards);
+            const flashcardsObject: Record<string, Flashcard> = {};
 
-            value.flashcards.forEach((item: FlashCard) => {
-              flashCardsObject[item.frontUuid] = item;
+            value.flashcards.forEach((item: Flashcard) => {
+              flashcardsObject[item.frontUuid] = item;
             });
 
             localStorage.setItem(
               'flashcards',
-              JSON.stringify(flashCardsObject),
+              JSON.stringify(flashcardsObject),
             );
           } else if ('sets' in value) {
             setSetsArray(value?.sets);
-            const setsObject: Record<string, FlashCardSet> = {};
+            const setsObject: Record<string, FlashcardSet> = {};
 
-            value?.sets?.forEach((item: FlashCardSet) => {
+            value?.sets?.forEach((item: FlashcardSet) => {
               setsObject[item.frontUuid] = item;
             });
 
@@ -904,53 +918,54 @@ export default function AppProvider(props: PropsWithChildren) {
   // #region MIGRATION
   /////////////////
 
-  const migrateFlashCards = () => {
+  const migrateFlashcards = () => {
     if (!appVersion) return;
     if (
-      appVersion === '1.0.0' &&
-      migration.flashcards !== null &&
-      migration.flashcards !== '1.0.0'
+      migration.flashcards === null ||
+      isNewerVersion(migration.flashcards, '1.0.0')
     ) {
-      setFlashCardsArray((prev) => {
-        const flashCardsObject: Record<string, FlashCard> = {};
+      setFlashcardsArray((prev) => {
+        const flashcardsObject: Record<string, Flashcard> = {};
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const unknownFlashCards = prev as any[];
+        const unknownFlashcards = prev as any[];
 
-        const updatedFlashCards = unknownFlashCards.map((flashCard) => {
-          const migratedFlashCard: FlashCard = {
-            type: flashCard?.type ?? ('index' as FlashCardType),
-            frontUuid: flashCard?.frontUuid ?? uuid(),
-            question: flashCard?.question ?? defaultFlashCard.question,
+        const updatedFlashcards = unknownFlashcards.map((flashcard) => {
+          const migratedFlashcard = {
+            type: flashcard?.type ?? ('index' as FlashcardType),
+            frontUuid: flashcard?.frontUuid ?? uuid(),
+            question: flashcard?.question ?? defaultFlashcard.query,
             questionAddition:
-              flashCard?.questionAddition ?? defaultFlashCard.questionAddition,
-            answer: flashCard?.answer ?? defaultFlashCard.answer,
-            order: flashCard?.order ?? flashCardsArray.length + 1,
-            createdAt: flashCard?.createdAt ?? new Date().toISOString(),
+              flashcard?.questionAddition ?? defaultFlashcard.context,
+            answer: flashcard?.answer ?? defaultFlashcard.definition,
+            order: flashcard?.order ?? flashcardsArray.length + 1,
+            createdAt: flashcard?.createdAt ?? new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             spacedRepetition: {
               interval:
-                flashCard?.spacedRepetition?.interval ??
-                defaultFlashCard.spacedRepetition.interval,
+                flashcard?.spacedRepetition?.interval ??
+                defaultFlashcard.spacedRepetition.interval,
               easeFactor:
-                flashCard?.spacedRepetition?.easeFactor ??
-                defaultFlashCard.spacedRepetition.easeFactor,
+                flashcard?.spacedRepetition?.easeFactor ??
+                defaultFlashcard.spacedRepetition.easeFactor,
               reviews:
-                flashCard?.spacedRepetition?.reviews ??
-                defaultFlashCard.spacedRepetition.reviews,
+                flashcard?.spacedRepetition?.reviews ??
+                defaultFlashcard.spacedRepetition.reviews,
               lastReviewAt:
-                flashCard?.spacedRepetition?.lastReviewAt ??
-                defaultFlashCard.spacedRepetition.lastReviewAt,
+                flashcard?.spacedRepetition?.lastReviewAt ??
+                defaultFlashcard.spacedRepetition.lastReviewAt,
               dueDate:
-                flashCard?.spacedRepetition?.dueDate ??
-                defaultFlashCard.spacedRepetition.dueDate,
+                flashcard?.spacedRepetition?.dueDate ??
+                defaultFlashcard.spacedRepetition.dueDate,
             },
-            sets: flashCard?.sets ?? [],
+            sets: flashcard?.sets ?? [],
           };
 
-          flashCardsObject[migratedFlashCard.frontUuid] = migratedFlashCard;
-          return migratedFlashCard;
+          flashcardsObject[migratedFlashcard.frontUuid] =
+            migratedFlashcard as unknown as Flashcard;
+          return migratedFlashcard as unknown as Flashcard;
         });
 
+        localStorage.setItem('flashcards', JSON.stringify(flashcardsObject));
         setMigration((prev) => {
           localStorage.setItem(
             'migrations',
@@ -959,35 +974,90 @@ export default function AppProvider(props: PropsWithChildren) {
 
           return { ...prev, flashcards: '1.0.0' };
         });
-        localStorage.setItem('flashcards', JSON.stringify(flashCardsObject));
+        return updatedFlashcards;
+      });
+    } else if (
+      migration.flashcards !== null &&
+      isNewerVersion(migration.flashcards, '1.0.1')
+    ) {
+      setFlashcardsArray((prev) => {
+        console.log('prev', prev);
+        const flashcardsObject: Record<string, Flashcard> = {};
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const unknownFlashcards = prev as any[];
 
-        return updatedFlashCards;
+        const updatedFlashcards = unknownFlashcards.map((flashcard) => {
+          const migratedFlashcard: Flashcard = {
+            type: flashcard?.type ?? ('index' as FlashcardType),
+            frontUuid: flashcard?.frontUuid ?? uuid(),
+            query: flashcard?.question ?? defaultFlashcard.query,
+            context: flashcard?.questionAddition ?? defaultFlashcard.context,
+            definition: flashcard?.answer ?? defaultFlashcard.definition,
+            order: flashcard?.order ?? flashcardsArray.length + 1,
+            createdAt: flashcard?.createdAt ?? new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            spacedRepetition: {
+              interval:
+                flashcard?.spacedRepetition?.interval ??
+                defaultFlashcard.spacedRepetition.interval,
+              easeFactor:
+                flashcard?.spacedRepetition?.easeFactor ??
+                defaultFlashcard.spacedRepetition.easeFactor,
+              reviews:
+                flashcard?.spacedRepetition?.reviews ??
+                defaultFlashcard.spacedRepetition.reviews,
+              lastReviewAt:
+                flashcard?.spacedRepetition?.lastReviewAt ??
+                defaultFlashcard.spacedRepetition.lastReviewAt,
+              dueDate:
+                flashcard?.spacedRepetition?.dueDate ??
+                defaultFlashcard.spacedRepetition.dueDate,
+            },
+            sets: flashcard?.sets ?? [],
+            examples: flashcard?.examples ?? defaultFlashcard.examples,
+            keyPoints: flashcard?.keyPoints ?? defaultFlashcard.keyPoints,
+            synonyms: flashcard?.synonyms ?? defaultFlashcard.synonyms,
+            relatedFacts:
+              flashcard?.relatedFacts ?? defaultFlashcard.relatedFacts,
+          };
+
+          flashcardsObject[migratedFlashcard.frontUuid] = migratedFlashcard;
+          return migratedFlashcard;
+        });
+
+        localStorage.setItem('flashcards', JSON.stringify(flashcardsObject));
+        setMigration((prev) => {
+          localStorage.setItem(
+            'migrations',
+            JSON.stringify({ ...prev, flashcards: '1.0.1' }),
+          );
+
+          return { ...prev, flashcards: '1.0.1' };
+        });
+
+        return updatedFlashcards;
       });
     }
   };
 
   const migrateSets = () => {
     if (!appVersion) return;
-    if (
-      appVersion === '1.0.0' &&
-      migration?.sets !== null &&
-      migration?.sets !== '1.0.0'
-    ) {
+    if (migration.sets === null || isNewerVersion(migration.sets, '1.0.0')) {
       setSetsArray((prev) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const unknownSets = prev as any[];
-        const setsObject: Record<string, FlashCardSet> = {};
+        const setsObject: Record<string, FlashcardSet> = {};
         const updatedSets = unknownSets.map((set) => {
-          const setFlashCards = set?.flashcards ?? [];
+          const setFlashcards = set?.flashcards ?? [];
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const updatedFlashCards = setFlashCards?.map((flashCard: any) => {
-            if (typeof flashCard === 'string') {
-              return flashCard;
+          const updatedFlashcards = setFlashcards?.map((flashcard: any) => {
+            if (typeof flashcard === 'string') {
+              return flashcard;
             } else {
-              return flashCard.frontUuid;
+              return flashcard.frontUuid;
             }
           });
-          const migratedSet: FlashCardSet = {
+          const migratedSet: FlashcardSet = {
             frontUuid: set?.frontUuid ?? uuid(),
             name: set?.name ?? defaultSet.name,
             description: set?.description ?? defaultSet.description,
@@ -999,13 +1069,14 @@ export default function AppProvider(props: PropsWithChildren) {
               set?.hardlink ??
               (set?.name as string)?.replace(/ /g, '-')?.toLowerCase() ??
               '',
-            flashCards: updatedFlashCards,
+            flashcards: updatedFlashcards,
           };
 
           setsObject[migratedSet.frontUuid] = migratedSet;
           return migratedSet;
         });
 
+        localStorage.setItem('sets', JSON.stringify(setsObject));
         setMigration((prev) => {
           localStorage.setItem(
             'migrations',
@@ -1014,8 +1085,45 @@ export default function AppProvider(props: PropsWithChildren) {
 
           return { ...prev, sets: '1.0.0' };
         });
-        localStorage.setItem('sets', JSON.stringify(setsObject));
+        return updatedSets;
+      });
+    } else if (
+      migration.sets !== null &&
+      isNewerVersion(migration.sets, '1.0.1')
+    ) {
+      setSetsArray((prev) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const unknownSets = prev as any[];
+        const setsObject: Record<string, FlashcardSet> = {};
+        const updatedSets = unknownSets.map((set) => {
+          const migratedSet: FlashcardSet = {
+            frontUuid: set?.frontUuid ?? uuid(),
+            name: set?.name ?? defaultSet.name,
+            description: set?.description ?? defaultSet.description,
+            category: set?.category ?? defaultSet.category,
+            isFavourite: set?.isFavourite ?? defaultSet.isFavourite,
+            createdAt: set?.createdAt ?? new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            hardlink:
+              set?.hardlink ??
+              (set?.name as string)?.replace(/ /g, '-')?.toLowerCase() ??
+              '',
+            flashcards: set?.flashCards ?? [],
+          };
 
+          setsObject[migratedSet.frontUuid] = migratedSet;
+          return migratedSet;
+        });
+
+        localStorage.setItem('sets', JSON.stringify(setsObject));
+        setMigration((prev) => {
+          localStorage.setItem(
+            'migrations',
+            JSON.stringify({ ...prev, sets: '1.0.1' }),
+          );
+
+          return { ...prev, sets: '1.0.1' };
+        });
         return updatedSets;
       });
     }
@@ -1054,21 +1162,27 @@ export default function AppProvider(props: PropsWithChildren) {
   }, [setsArray]);
 
   useEffect(() => {
-    if (appVersion === '1.0.0' && migration.flashcards !== '1.0.0') {
-      migrateFlashCards();
+    if (!appVersion) return;
+
+    if (flashcardsArray.length > 0) {
+      migrateFlashcards();
     }
 
-    if (appVersion === '1.0.0' && migration?.sets !== '1.0.0') {
+    if (setsArray.length > 0) {
       migrateSets();
+    }
+
+    if (migration.flashcards === '1.0.1' && migration.sets === '1.0.1') {
+      localStorage.setItem('appVersion', JSON.stringify('1.0.1'));
+      setAppVersion('1.0.1');
     }
   }, [
     appVersion,
-    migration,
-    flashCardsArray,
+    flashcardsArray,
     setsArray,
-    migrateFlashCards,
+    migrateFlashcards,
     migrateSets,
-    setFlashCardsArray,
+    setFlashcardsArray,
     setSetsArray,
   ]);
 
@@ -1095,21 +1209,21 @@ export default function AppProvider(props: PropsWithChildren) {
   return (
     <AppContext.Provider
       value={{
-        flashcards: flashCardsArray.sort((a, b) => a.order - b.order),
+        flashcards: flashcardsArray.sort((a, b) => a.order - b.order),
         sets: setsArray,
         setsDictionary,
         categories,
         metadata: metadata,
         theme: theme,
         avatarSeed: avatarSeed,
-        flashCardTypeDictionaries,
+        flashcardTypeDictionaries: flashcardTypeDictionaries,
         setTheme,
-        setFlashCards,
-        addFlashCards,
-        removeFlashCards,
-        updateFlashCards,
-        updateFlashCard,
-        assignFlashCardsToSet,
+        setFlashcards: setFlashcards,
+        addFlashcards: addFlashcards,
+        removeFlashcards: removeFlashcards,
+        updateFlashcards: updateFlashcards,
+        updateFlashcard: updateFlashcard,
+        assignFlashcardsToSet: assignFlashcardsToSet,
         setSets,
         addSets,
         removeSets,

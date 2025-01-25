@@ -5,7 +5,7 @@ import { useSessionContext } from '#/providers/session-provider.component';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 import uuid from '#/shared/utils/uuid.util';
 import type { DictionaryValue } from '#/types//dictionary-value.type';
-import type { FlashCardSet } from '#/types/flash-card-set.type';
+import type { FlashcardSet } from '#/types/flash-card-set.type';
 import { useCompletion } from 'ai/react';
 import { Button } from '../_ui/button/button';
 import Modal from '../_ui/modal/modal';
@@ -13,10 +13,10 @@ import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
 import FormComponent from '../form-component/form';
 
 interface NewSetModalProps {
-  handleNew?: (sets: Partial<FlashCardSet>[]) => void;
-  handleEdit?: (sets: Partial<FlashCardSet>[]) => void;
+  handleNew?: (sets: Partial<FlashcardSet>[]) => void;
+  handleEdit?: (sets: Partial<FlashcardSet>[]) => void;
   categories: DictionaryValue<string>[];
-  selectedSets: FlashCardSet[];
+  selectedSets: FlashcardSet[];
   isInEditMode?: boolean;
   trigger?: React.ReactNode;
   open?: boolean;
@@ -32,8 +32,8 @@ export const NewSetModal = ({
   open = false,
 }: NewSetModalProps) => {
   const [isModalOpen, setIsModalOpen] = useState(open);
-  const [formValue, setFormValue] = useState<Partial<FlashCardSet>>({});
-  const [sets, setSets] = useState<Partial<FlashCardSet>[]>(selectedSets);
+  const [formValue, setFormValue] = useState<Partial<FlashcardSet>>({});
+  const [sets, setSets] = useState<Partial<FlashcardSet>[]>(selectedSets);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loadingGenerate, setLoadingGenerate] = useState(false);
   const [categories, setCategories] = useState<DictionaryValue<string>[]>([]);
@@ -121,7 +121,7 @@ export const NewSetModal = ({
       setCurrentIndex(currentIndex + 1);
     } else {
       if (!isInEditMode) {
-        const newSet: Partial<FlashCardSet> = {
+        const newSet: Partial<FlashcardSet> = {
           frontUuid: uuid(),
           name: '',
           description: '',
@@ -207,8 +207,8 @@ export const NewSetModal = ({
             className='flex flex-col items-center justify-center pb-8 pt-4'
           >
             <FormComponent<
-              | Pick<FlashCardSet, 'name' | 'description' | 'category'>
-              | Partial<FlashCardSet>
+              | Pick<FlashcardSet, 'name' | 'description' | 'category'>
+              | Partial<FlashcardSet>
             >
               className='w-full max-w-80'
               scheme={getFormScheme}

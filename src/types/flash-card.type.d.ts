@@ -1,10 +1,14 @@
-type BaseFlashCard = {
+type BaseFlashcard = {
   frontUuid: string;
   order: number;
   createdAt: string;
   updatedAt: string;
   spacedRepetition: SpacedRepetition;
   sets: string[];
+  examples?: string;
+  keyPoints?: string;
+  synonyms?: string;
+  relatedFacts?: string;
 };
 
 export type SpacedRepetition = {
@@ -15,26 +19,26 @@ export type SpacedRepetition = {
   reviews: number;
 };
 
-export type FlashCardType = 'index' | 'single' | 'question';
+export type FlashcardType = 'index' | 'single' | 'question';
 
-export type FlashCard = BaseFlashCard &
+export type Flashcard = BaseFlashcard &
   (
     | {
         type: 'index';
-        questionAddition: string;
-        question?: string;
-        answer?: string;
+        context: string;
+        query?: string;
+        definition?: string;
       }
     | {
         type: 'single';
-        questionAddition: string;
-        question: string;
-        answer: string;
+        context: string;
+        query: string;
+        definition: string;
       }
     | {
         type: 'question';
-        questionAddition?: string;
-        question: string;
-        answer: string;
+        context?: string;
+        query: string;
+        definition: string;
       }
   );

@@ -100,6 +100,7 @@ function Input({
           ])}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          aria-invalid={touched && !valid ? 'true' : 'false'}
         />
       </span>
 

@@ -10,10 +10,12 @@ import {
 } from '#/types//form-scheme.type';
 import {
   useEffect,
+  useImperativeHandle,
   useRef,
   useState,
   type Dispatch,
   type FormEvent,
+  type Ref,
   type SetStateAction,
 } from 'react';
 import {
@@ -23,13 +25,15 @@ import {
 } from 'zod';
 import FormInputsComponent from './form-inputs';
 
-export default function FormComponent<T>(props: {
+export type FormProps<T> = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ref?: Ref<FormMethods<T>>;
   scheme: FormScheme<T>;
   initialValues?: T;
   emitFormValid?:
     | Dispatch<SetStateAction<boolean>>
     | ((value: boolean) => void);
-  emitFormValue:
+  emitFormValue?:
     | Dispatch<SetStateAction<Partial<T>>>
     | ((value: Partial<T>) => void);
   className?: string;
@@ -43,7 +47,19 @@ export default function FormComponent<T>(props: {
     touch?: boolean;
     visibility?: boolean;
   };
-}) {
+};
+
+export interface FormMethods<T> {
+  checkValidity: () => Promise<void>;
+  isValid: () => boolean;
+  value: T;
+}
+
+export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
+  //////////////
+  // #region STATE
+  //////////////
+
   const [inputsValidity, setInputsValidity] = useState<Record<string, boolean>>(
     {},
   );
@@ -64,10 +80,26 @@ export default function FormComponent<T>(props: {
     Record<string, unknown | unknown[]>
   >({});
   const [formInputs, setFormInputs] = useState<string[]>([]);
+  const [formValidity, setFormValidity] = useState<boolean>(true);
   const [touchedInputs, setTouchedInputs] = useState<Record<string, boolean>>(
     {},
   );
   const initialValuesRef = useRef<T | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    checkValidity: () => checkFormValidityOnSubmit(),
+    isValid: () => getFormValidity(),
+    value: formValues as T,
+  }));
+
+  //////////////
+  // #endregion
+  //////////////
+
+  //////////////
+  // #region FORM CONSTRUCT
+  //////////////
 
   useEffect(() => {
     if (
@@ -147,25 +179,53 @@ export default function FormComponent<T>(props: {
   }, [props.initialValues, props.scheme.inputs]);
 
   useEffect(() => {
-    if (props?.formValid !== undefined && props?.formValid === false) {
-      let initialValids = { ...inputsValidity };
-      let initialErrors = { ...inputsErrors };
+    let initialVisibility: Record<string, boolean> = {};
+    let initialValidations: Record<string, InputValidation<T>[]> = {};
+    const inputs = Object.entries(props.scheme.inputs) as [
+      string,
+      ExtendedInputType<InputType, T>,
+    ][];
 
-      Object.entries(props.scheme.inputs).forEach(([inputName]) => {
-        initialValids = {
-          ...initialValids,
-          [inputName]: props.formValid as boolean,
+    inputs.forEach(([inputName, input]) => {
+      initialVisibility = { ...initialVisibility, [inputName]: true };
+      initialValidations = { ...initialValidations, [inputName]: [] };
+
+      if (input?._internal_constraints) {
+        const showConstraints = input._internal_constraints.filter(
+          ({ type }) => type === 'show',
+        );
+        const validationConstraints = input._internal_constraints.filter(
+          ({ type }) => type === 'validation',
+        );
+
+        initialValidations = {
+          ...initialValidations,
+          [inputName]: validationConstraints,
         };
-        initialErrors = { ...initialErrors, [inputName]: '' };
-      });
 
-      setInputsValidity(initialValids);
-      setInputsErrors(initialErrors);
-    }
-  }, [props.formValid]);
+        if (showConstraints.length > 0) {
+          const isInvalid = showConstraints.some(
+            ({ key, constraint }) =>
+              !constraint.safeParse(formValues?.[key as string]).success,
+          );
+
+          if (isInvalid) {
+            initialVisibility = { ...initialVisibility, [inputName]: false };
+          }
+        }
+      }
+    });
+
+    setInputsVisibility(initialVisibility);
+    setInputValidations(initialValidations);
+  }, [formValues]);
 
   //////////////
-  // debug log
+  // #endregion
+  //////////////
+
+  //////////////
+  // #region DEBUG LOG
   //////////////
 
   useEffect(() => {
@@ -176,13 +236,13 @@ export default function FormComponent<T>(props: {
 
   useEffect(() => {
     if (props?.debug?.validity) {
-      console.log('form - valids - ', inputsValidity);
+      console.warn('form - valids - ', inputsValidity);
     }
   }, [props.debug, inputsValidity]);
 
   useEffect(() => {
     if (props?.debug?.errors) {
-      console.log('form - errors - ', inputsErrors);
+      console.warn('form - errors - ', inputsErrors);
     }
   }, [props.debug, inputsErrors]);
 
@@ -205,67 +265,118 @@ export default function FormComponent<T>(props: {
   }, [props.debug, inputsVisibility]);
 
   //////////////
+  // #endregion
   //////////////
+
+  //////////////
+  // #region VALIDATION
   //////////////
 
-  const checkFormValidity = () => {
-    const inputs = Object.keys(props.scheme.inputs);
-    let valids = defaultValids;
-    let errors = {};
+  const checkFormValidity = async (
+    newTouched?: Record<string, boolean>,
+  ): Promise<void> => {
+    const checking: Promise<void> = new Promise((resolve) => {
+      const inputs = Object.keys(props.scheme.inputs);
+      let valids = defaultValids;
+      let errors = {};
+      let formValid = true;
 
-    inputs.forEach((inputName) => {
-      const validations = inputValidations[inputName].filter((validation) => {
-        return (
-          validation.whenConstraint &&
-          validation.whenKey &&
-          validation.whenConstraint.safeParse(
-            formValues[validation.whenKey as string],
-          ).success
-        );
-      });
-
-      const outputs: (SafeParseSuccess<unknown> | SafeParseError<unknown>)[] =
-        validations.map((validation) => {
-          return validation.constraint.safeParse(
-            formValues[validation.key as string],
+      inputs.forEach((inputName) => {
+        const validations = inputValidations[inputName].filter((validation) => {
+          return (
+            validation.whenConstraint &&
+            validation.whenKey &&
+            validation.whenConstraint.safeParse(
+              formValues[validation.whenKey as string],
+            ).success
           );
         });
 
-      if (touchedInputs[inputName]) {
-        outputs.forEach((output) => {
-          if (!output.success) {
-            console.log(output);
-            const issues = output?.error?.issues;
-            const haveErrors = issues?.length > 0;
+        const outputs: (SafeParseSuccess<unknown> | SafeParseError<unknown>)[] =
+          validations.map((validation) => {
+            return validation.constraint.safeParse(
+              formValues[validation.key as string],
+            );
+          });
 
-            if (haveErrors) {
-              issues.forEach((issue: ZodIssueBase) => {
-                valids = { ...valids, [inputName]: false };
-                errors = { ...errors, [inputName]: issue.message };
-              });
+        if (newTouched ?? touchedInputs[inputName]) {
+          outputs.forEach((output) => {
+            if (!output.success) {
+              formValid = false;
+              const issues = output?.error?.issues;
+              const haveErrors = issues?.length > 0;
+
+              if (haveErrors) {
+                issues.forEach((issue: ZodIssueBase) => {
+                  valids = { ...valids, [inputName]: false };
+                  errors = { ...errors, [inputName]: issue.message };
+                });
+              }
             }
-          }
-        });
+          });
+        }
+
+        setInputsErrors(errors);
+        setInputsValidity(valids);
+        setTouchedInputs(newTouched ?? touchedInputs);
+
+        if (props.emitFormValid) {
+          props.emitFormValid(Object.values(valids).every((item) => item));
+        }
+      });
+
+      setFormValidity(formValid);
+
+      for (const [key, value] of Object.entries(valids)) {
+        if (!value) {
+          const firstInvalidElement = formRef.current?.querySelector(
+            `[name="${key}"]`,
+          ) as HTMLElement;
+          firstInvalidElement?.focus();
+          break;
+        }
       }
 
-      setInputsErrors(errors);
-      setInputsValidity(valids);
-
-      if (props.emitFormValid) {
-        props.emitFormValid(Object.values(valids).every((item) => item));
-      }
+      resolve();
     });
+
+    return await checking;
   };
+
+  const checkFormValidityOnSubmit = async () => {
+    const inputs = Object.keys(props.scheme.inputs);
+    let touchedTmp = {};
+
+    inputs.forEach((inputName) => {
+      touchedTmp = { ...touchedTmp, [inputName]: true };
+    });
+
+    await checkFormValidity(touchedTmp);
+  };
+
+  const getFormValidity = () => {
+    return formValidity;
+  };
+
+  //////////////
+  // #endregion
+  //////////////
+
+  //////////////
+  // #region HANDLERS
+  //////////////
 
   const handleOnInput = (
     event: FormEvent<HTMLInputElement> | FormEvent<HTMLTextAreaElement>,
     inputName: string,
   ) => {
-    props.emitFormValue({
-      ...formValues,
-      [inputName]: (event.target as HTMLInputElement | HTMLTextAreaElement)
-        ?.value,
-    } as T);
+    if (props.emitFormValue) {
+      props.emitFormValue({
+        ...formValues,
+        [inputName]: (event.target as HTMLInputElement | HTMLTextAreaElement)
+          ?.value,
+      } as T);
+    }
 
     setFormValues((prev) => ({
       ...prev,
@@ -275,10 +386,12 @@ export default function FormComponent<T>(props: {
   };
 
   const handleOnChange = (value: unknown | unknown[], inputName: string) => {
-    props.emitFormValue({
-      ...formValues,
-      [inputName]: value,
-    } as T);
+    if (props.emitFormValue) {
+      props.emitFormValue({
+        ...formValues,
+        [inputName]: value,
+      } as T);
+    }
 
     setFormValues((prev) => ({
       ...prev,
@@ -294,8 +407,18 @@ export default function FormComponent<T>(props: {
     setTouchedInputs((prev) => ({ ...prev, [inputName]: true }));
   };
 
+  //////////////
+  // #endregion
+  //////////////
+
   return (
-    <form className={cn([props.className])}>
+    <form
+      className={cn([
+        'h-full overflow-x-visible overflow-y-scroll p-4',
+        props.className,
+      ])}
+      ref={formRef}
+    >
       <FormInputsComponent<T>
         inputs={props.scheme.inputs}
         formValues={formValues}

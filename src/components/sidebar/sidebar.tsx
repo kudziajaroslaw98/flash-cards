@@ -59,7 +59,7 @@ export default function SidebarComponent() {
     },
     {
       type: 'group',
-      label: 'Flash Cards',
+      label: 'Flashcards',
       icon: <Zap className={`${groupIconSize} fill-current`} />,
       visible: true,
       items: [
@@ -131,7 +131,7 @@ export default function SidebarComponent() {
             width={24}
             height={24}
             src={'/images/flash-cards-logo.svg'}
-            alt={'Flash Cards Logo'}
+            alt={'Flashcards Logo'}
             loading='eager'
           />
 

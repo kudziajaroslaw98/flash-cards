@@ -1,3 +1,5 @@
+'use client';
+
 import { Trigger } from '#/components/_shared/trigger';
 import { ShortcutList } from '#/components/shortcut-list/shortcut-list';
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';

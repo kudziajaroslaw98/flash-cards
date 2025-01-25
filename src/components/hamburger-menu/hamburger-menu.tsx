@@ -54,7 +54,7 @@ export default function HamburgerMenuComponent() {
     },
     {
       type: 'group',
-      label: 'Flash Cards',
+      label: 'Flashcards',
       icon: <Zap className={`${groupIconSize} fill-current`} />,
       visible: true,
       items: [
@@ -174,7 +174,7 @@ export default function HamburgerMenuComponent() {
               toggle(!toggled);
             }}
             toggled={toggled}
-            alt='Hamburger menu'
+            alt='Hamburger menu toggle'
           />
         }
         afterMenuItems={

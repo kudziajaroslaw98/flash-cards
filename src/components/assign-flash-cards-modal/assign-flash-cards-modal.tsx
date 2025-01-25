@@ -1,72 +1,72 @@
-import { assignFlashCardsScheme } from '#/shared/validation-schemes/assign-flash-cards-validation.scheme';
-import type { FlashCardSet } from '#/types/flash-card-set.type';
-import type { FlashCard } from '#/types/flash-card.type';
+import { assignFlashcardsScheme } from '#/shared/validation-schemes/assign-flash-cards-validation.scheme';
+import type { FlashcardSet } from '#/types/flash-card-set.type';
+import type { Flashcard } from '#/types/flash-card.type';
 import React, { useMemo, useRef, useState } from 'react';
 import { Button } from '../_ui/button/button';
 import { Dialog } from '../_ui/dialog/dialog';
 import Modal from '../_ui/modal/modal';
 import FormComponent from '../form-component/form';
 
-interface AssignFlashCardsModalProps {
+interface AssignFlashcardsModalProps {
   handleSubmit: (value: string[]) => void;
-  flashCards: FlashCard[];
+  flashcards: Flashcard[];
   setCards: string[];
   trigger: React.ReactNode;
 }
 
-export const AssignFlashCardsModal = ({
+export const AssignFlashcardsModal = ({
   handleSubmit,
-  flashCards = [],
+  flashcards = [],
   setCards = [],
   trigger,
-}: AssignFlashCardsModalProps) => {
+}: AssignFlashcardsModalProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formValue, setFormValue] = useState<Partial<FlashCardSet>>({
-    flashCards: [],
+  const [formValue, setFormValue] = useState<Partial<FlashcardSet>>({
+    flashcards: [],
   });
 
   const submitRef = useRef<HTMLButtonElement>(null);
-  const initialValue = { flashCards: setCards };
+  const initialValue = { flashcards: setCards };
 
   const getFormScheme = useMemo(
     () =>
-      assignFlashCardsScheme(
-        flashCards?.map((flashCard) => {
-          if (flashCard.type === 'index' || flashCard.type === 'single') {
+      assignFlashcardsScheme(
+        flashcards?.map((flashcard) => {
+          if (flashcard.type === 'index' || flashcard.type === 'single') {
             return {
-              label: flashCard.questionAddition,
-              value: flashCard.frontUuid,
+              label: flashcard.context,
+              value: flashcard.frontUuid,
             };
           }
           return {
-            label: flashCard.question,
-            value: flashCard.frontUuid,
+            label: flashcard.query,
+            value: flashcard.frontUuid,
           };
         }),
       ),
-    [flashCards],
+    [flashcards],
   );
 
   const handleDialogClose = () => {
     setIsModalOpen(false);
-    setFormValue({ flashCards: [] });
+    setFormValue({ flashcards: [] });
   };
 
   const handleDialogSubmit = () => {
     setIsModalOpen(false);
 
-    if (!formValue?.flashCards?.length) {
+    if (!formValue?.flashcards?.length) {
       handleSubmit([]);
     } else {
-      const mappedFlashCards = flashCards
-        .filter((flashCard) =>
-          formValue?.flashCards?.includes(flashCard.frontUuid),
+      const mappedFlashcards = flashcards
+        .filter((flashcard) =>
+          formValue?.flashcards?.includes(flashcard.frontUuid),
         )
-        .map((flashCard) => flashCard.frontUuid);
-      handleSubmit(mappedFlashCards);
+        .map((flashcard) => flashcard.frontUuid);
+      handleSubmit(mappedFlashcards);
     }
 
-    setFormValue({ flashCards: [] });
+    setFormValue({ flashcards: [] });
   };
 
   return (
@@ -80,13 +80,13 @@ export const AssignFlashCardsModal = ({
         submitRef={submitRef}
       >
         <Modal className='w-full max-w-96'>
-          <Modal.Header variant='form'>Assign flash cards</Modal.Header>
+          <Modal.Header variant='form'>Assign flashcards</Modal.Header>
 
           <Modal.Body
             variant='form'
             className='flex flex-col items-center justify-center pb-8 pt-4'
           >
-            <FormComponent<Pick<FlashCardSet, 'flashCards'>>
+            <FormComponent<Pick<FlashcardSet, 'flashcards'>>
               className='w-full max-w-80'
               scheme={getFormScheme}
               emitFormValue={setFormValue}
@@ -104,7 +104,7 @@ export const AssignFlashCardsModal = ({
               onClick={handleDialogSubmit}
               size={'sm'}
               variant={'primary-text'}
-              alt='Assign flash cards'
+              alt='Assign flashcards'
             ></Button>
           </Modal.Footer>
         </Modal>

@@ -1,19 +1,19 @@
 'use client';
 
-import type { FlashCard } from '#/types/flash-card.type';
+import type { Flashcard } from '#/types/flash-card.type';
 import { Pencil, Plus, Trash } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from '../_ui/button/button';
-import FlashCardComponent from '../flash-card/flash-card';
+import FlashcardComponent from '../flash-card/flash-card';
 
-export default function FlashCardSelectExample() {
+export default function FlashcardSelectExample() {
   const flashcards = [
     {
       type: 'index',
       frontUuid: 'c5f20e37-c4c6-4a76-b987-4ab0adcf1ae5',
-      question: "What's the meaning of word below?",
-      questionAddition: 'Lazy',
-      answer: 'Unwilling to work or use energy.',
+      query: "What's the meaning of word below?",
+      context: 'Lazy',
+      definition: 'Unwilling to work or use energy.',
       order: 1,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -29,9 +29,9 @@ export default function FlashCardSelectExample() {
     {
       type: 'question',
       frontUuid: '757a6f43-2dc2-4d58-ba2d-5694defa0eab',
-      question: "What's the meaning of word below?",
-      questionAddition: 'Quick',
-      answer: 'Happening or done with great speed.',
+      query: "What's the meaning of word below?",
+      context: 'Quick',
+      definition: 'Happening or done with great speed.',
       order: 3,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -48,9 +48,9 @@ export default function FlashCardSelectExample() {
     {
       type: 'single',
       frontUuid: 'b03e05d5-c42d-4808-a621-1ac2fc4abed6',
-      question: "What's the meaning of word below?",
-      questionAddition: 'Happy',
-      answer: 'Feeling or showing pleasure or contentment.',
+      query: "What's the meaning of word below?",
+      context: 'Happy',
+      definition: 'Feeling or showing pleasure or contentment.',
       order: 4,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -63,15 +63,15 @@ export default function FlashCardSelectExample() {
       },
       sets: [],
     },
-  ] as FlashCard[];
+  ] as Flashcard[];
 
-  const [selected, setSelected] = useState<FlashCard[]>([]);
+  const [selected, setSelected] = useState<Flashcard[]>([]);
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
 
   const isSelected = useCallback(
-    (flashCard: FlashCard) => {
+    (flashcard: Flashcard) => {
       return (
-        selected.findIndex((item) => item.frontUuid === flashCard.frontUuid) !==
+        selected.findIndex((item) => item.frontUuid === flashcard.frontUuid) !==
         -1
       );
     },
@@ -79,13 +79,13 @@ export default function FlashCardSelectExample() {
   );
 
   const toggleSelected = useCallback(
-    (flashCard: FlashCard) => {
-      if (isSelected(flashCard)) {
+    (flashcard: Flashcard) => {
+      if (isSelected(flashcard)) {
         setSelected((prev) =>
-          prev.filter((item) => flashCard.frontUuid !== item.frontUuid),
+          prev.filter((item) => flashcard.frontUuid !== item.frontUuid),
         );
       } else {
-        setSelected((prev) => [...prev, flashCard]);
+        setSelected((prev) => [...prev, flashcard]);
       }
     },
     [isSelected],
@@ -102,13 +102,13 @@ export default function FlashCardSelectExample() {
   return (
     <div className='flex flex-col gap-4'>
       <div className='flex flex-wrap justify-center gap-4'>
-        {flashcards.map((flashCard) => (
-          <div key={flashCard.frontUuid}>
-            <FlashCardComponent
-              flashCard={flashCard}
+        {flashcards.map((flashcard) => (
+          <div key={flashcard.frontUuid}>
+            <FlashcardComponent
+              flashcard={flashcard}
               size={'md'}
-              isSelected={isSelected(flashCard)}
-              onSelect={() => toggleSelected(flashCard)}
+              isSelected={isSelected(flashcard)}
+              onSelect={() => toggleSelected(flashcard)}
               isInSelectionMode={isInSelectionMode}
             />
           </div>
@@ -119,7 +119,7 @@ export default function FlashCardSelectExample() {
         <Button
           icon={<Plus className='h-4 w-4' />}
           size={'icon-square'}
-          alt='Add Flash Card'
+          alt='Add Flashcard'
         />
 
         <Button
@@ -127,7 +127,7 @@ export default function FlashCardSelectExample() {
           size={'icon-square'}
           disabled={selected.length === 0}
           variant={'secondary'}
-          alt='Edit Flash Card'
+          alt='Edit Flashcard'
         />
 
         <Button
@@ -135,7 +135,7 @@ export default function FlashCardSelectExample() {
           variant={'destructive'}
           icon={<Trash className='h-4 w-4' />}
           size={'icon-square'}
-          alt='Delete Flash Card'
+          alt='Delete Flashcard'
         />
       </div>
 
