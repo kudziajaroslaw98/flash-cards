@@ -33,7 +33,6 @@ const cspHeader = `
     object-src 'none';
     base-uri 'self';
     form-action 'self' https://checkout.stripe.com https://js.stripe.com;
-    connect-src 'self' https://api.stripe.com;
     frame-src 'self' https://checkout.stripe.com;
     frame-ancestors 'none';
     serviceworker-src 'self';
