@@ -64,12 +64,20 @@ export default function FlashcardComponent({
       onTouchMove={onMove}
     >
       <m.div
-        animate={{ translateY: '0%', opacity: 100, zIndex: 21 }}
+        animate={{
+          translateY: '0%',
+          opacity: 100,
+          zIndex: 21,
+          maxHeight: '100%',
+          height: '100%',
+        }}
         initial={{ translateY: '10%', opacity: 0, zIndex: -20 }}
         exit={{
           translateY: '-5%',
           opacity: 0,
           zIndex: -20,
+          maxHeight: 0,
+          height: 0,
         }}
         className='flex justify-center'
         key={`${flashcard.frontUuid}:${isFlipped ? 'flipped' : 'unflipped'}`}

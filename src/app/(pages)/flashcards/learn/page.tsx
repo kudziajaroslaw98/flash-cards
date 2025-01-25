@@ -1,4 +1,4 @@
-import FlashCardsList from '#/components/flash-cards-list/flash-cards-list';
+import FlashcardsPage from '#/components/flashcard-page/flashcards-page';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
 export default async function LearnPage() {
   return (
     <div className='flex h-full w-full flex-col items-center gap-16'>
-      <FlashCardsList />
+      <FlashcardsPage />
     </div>
   );
 }

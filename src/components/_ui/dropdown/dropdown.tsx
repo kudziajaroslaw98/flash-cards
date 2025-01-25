@@ -6,7 +6,8 @@ import { isDifferent } from '#/shared/utils/is-different.util';
 import { DictionaryValue } from '#/types//dictionary-value.type';
 import { cva, VariantProps } from 'class-variance-authority';
 import { Search } from 'lucide-react';
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import * as m from 'motion/react-m';
+import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '../button/button';
 import Input from '../input/input';
 import DropdownItem from './dropdown-item';
@@ -101,33 +102,34 @@ export default function Dropdown<T>({
   const dropdownLabelRef = useRef<HTMLDivElement>(null);
   const configRef = useRef<DictionaryValue<T>[] | null>(null);
   const valueRef = useRef<T | T[] | null | undefined>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
 
   // TODO: How to animate this?
-  const dropdownPopupStyles = useMemo(() => {
-    if (dropdownLabelRef.current === null) return {};
-    else {
-      return {
-        position: 'fixed',
-        top:
-          contextPosition === 'bottom'
-            ? (((dropdownLabelRef.current.getBoundingClientRect()
-                .top as number) +
-                dropdownLabelRef.current.getBoundingClientRect()
-                  .height) as number) + 8
-            : 'unset',
-        bottom:
-          contextPosition === 'top'
-            ? (dropdownLabelRef.current.getBoundingClientRect()
-                .bottom as number) -
-              (dropdownLabelRef.current.getBoundingClientRect().top as number) +
-              dropdownLabelRef.current.getBoundingClientRect().height +
-              8
-            : 'unset',
-        left: dropdownLabelRef.current.getBoundingClientRect().left,
-        width: dropdownLabelRef.current.getBoundingClientRect().width,
-      } as const;
-    }
-  }, [dropdownLabelRef.current]);
+  // const dropdownPopupStyles = useMemo(() => {
+  //   if (dropdownLabelRef.current === null) return {};
+  //   else {
+  //     return {
+  //       position: 'fixed',
+  //       top:
+  //         contextPosition === 'bottom'
+  //           ? (((dropdownLabelRef.current.getBoundingClientRect()
+  //               .top as number) +
+  //               dropdownLabelRef.current.getBoundingClientRect()
+  //                 .height) as number) + 8
+  //           : 'unset',
+  //       bottom:
+  //         contextPosition === 'top'
+  //           ? (dropdownLabelRef.current.getBoundingClientRect()
+  //               .bottom as number) -
+  //             (dropdownLabelRef.current.getBoundingClientRect().top as number) +
+  //             dropdownLabelRef.current.getBoundingClientRect().height +
+  //             8
+  //           : 'unset',
+  //       left: dropdownLabelRef.current.getBoundingClientRect().left,
+  //       width: dropdownLabelRef.current.getBoundingClientRect().width,
+  //     } as const;
+  //   }
+  // }, [dropdownLabelRef.current]);
 
   useOutsideAlerter(dropdownWrapperRef, () => {
     if (visible) {
@@ -139,6 +141,39 @@ export default function Dropdown<T>({
       }
     }
   });
+
+  const updatePopoverPosition = useCallback(() => {
+    if (
+      !dropdownWrapperRef.current ||
+      !popoverRef.current ||
+      !dropdownLabelRef.current
+    )
+      return;
+
+    const buttonRect = dropdownLabelRef.current.getBoundingClientRect();
+    const top =
+      (((dropdownLabelRef.current.getBoundingClientRect().y as number) +
+        dropdownLabelRef.current.getBoundingClientRect().height) as number) + 8;
+
+    popoverRef.current.style.top = `${top}px`;
+    popoverRef.current.style.left = `${buttonRect.left + window.scrollX}px`;
+    popoverRef.current.style.width = `${dropdownLabelRef.current.getBoundingClientRect().width}px`;
+  }, []);
+
+  useEffect(() => {
+    if (visible) {
+      updatePopoverPosition();
+      window.addEventListener('scroll', updatePopoverPosition, {
+        passive: true,
+      });
+      window.addEventListener('resize', updatePopoverPosition);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', updatePopoverPosition);
+      window.removeEventListener('resize', updatePopoverPosition);
+    };
+  }, [visible, updatePopoverPosition]);
 
   useEffect(() => {
     if (
@@ -354,13 +389,16 @@ export default function Dropdown<T>({
           )}
         </div>
         {visible && (
-          <div
+          <m.div
             data-open={visible}
             className={cn([
               DropdownVariants({ contextPosition }),
-              'border border-gray-300  dark:border-slate-900',
+              'fixed border  border-gray-300 dark:border-slate-900',
             ])}
-            style={{ ...dropdownPopupStyles }}
+            ref={popoverRef}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
           >
             {props.searchable && (
               <div className='min-w-fit rounded-t-md border-b bg-gray-100 p-1 dark:border-slate-800/40 dark:bg-slate-900 '>
@@ -478,7 +516,7 @@ export default function Dropdown<T>({
                 Clear All
               </div>
             )}
-          </div>
+          </m.div>
         )}
       </div>
 

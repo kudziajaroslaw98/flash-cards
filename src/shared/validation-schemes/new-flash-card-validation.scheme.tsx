@@ -56,7 +56,7 @@ export const newFlashcardScheme = (
         },
       ],
       type: 'text',
-      name: 'questionAddition',
+      name: 'context',
       label: 'Word / Sentence',
       placeholder: 'Prowess',
       required: true,
@@ -89,11 +89,11 @@ export const newFlashcardScheme = (
           whenConstraint: z
             .string()
             .includes('question')
-            .or(z.string().includes('multiple')),
+            .or(z.string().includes('single')),
         },
       ],
       type: 'textarea',
-      name: 'answer',
+      name: 'definition',
       label: 'Answer',
       placeholder: 'Military valor and skill.',
       handleGenerate: handleGenerate,
@@ -133,7 +133,7 @@ export const newFlashcardScheme = (
         },
       ],
       type: 'textarea',
-      name: 'question',
+      name: 'query',
       label: 'Question',
       placeholder: 'What is the definition of word below?',
     },

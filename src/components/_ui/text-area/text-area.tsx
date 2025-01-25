@@ -121,6 +121,7 @@ export default function TextArea({
           onInput={handleOnInput}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          aria-invalid={touched && !valid ? 'true' : 'false'}
         ></textarea>
 
         {handleGenerate && (

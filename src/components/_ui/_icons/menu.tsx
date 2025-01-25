@@ -1,38 +1,60 @@
 'use client';
 
 import type { Variants } from 'motion/react';
-import { useAnimation } from 'motion/react';
 import * as m from 'motion/react-m';
-import { useEffect } from 'react';
-
-const lineVariants: Variants = {
-  normal: {
-    rotate: 0,
-    y: 0,
-    opacity: 1,
-  },
-  animate: (custom: number) => ({
-    rotate: custom === 1 ? 45 : custom === 3 ? -45 : 0,
-    y: custom === 1 ? 6 : custom === 3 ? -6 : 0,
-    opacity: custom === 2 ? 0 : 1,
-    transition: {
-      type: 'spring',
-      stiffness: 260,
-      damping: 20,
-    },
-  }),
-};
 
 const MenuIcon = ({ animate }: { animate?: boolean }) => {
-  const controls = useAnimation();
-
-  useEffect(() => {
-    if (animate) {
-      controls.start('animate');
-    } else {
-      controls.start('normal');
-    }
-  }, [animate]);
+  const line1Variants: Variants = {
+    normal: {
+      rotate: 0,
+      y: 0,
+      opacity: 1,
+    },
+    animate: {
+      rotate: '45deg',
+      y: 6,
+      opacity: 1,
+      transition: {
+        type: 'spring',
+        stiffness: 260,
+        damping: 20,
+      },
+    },
+  };
+  const line2Variants: Variants = {
+    normal: {
+      rotate: 0,
+      y: 0,
+      opacity: 1,
+    },
+    animate: {
+      rotate: 0,
+      y: 0,
+      opacity: 0,
+      transition: {
+        type: 'spring',
+        stiffness: 260,
+        damping: 20,
+      },
+    },
+  };
+  const line3Variants: Variants = {
+    normal: {
+      rotate: 0,
+      y: 0,
+      opacity: 1,
+    },
+    animate: {
+      rotate: -45,
+      y: -6,
+      opacity: 1,
+      transition: {
+        type: 'spring',
+        stiffness: 260,
+        damping: 20,
+      },
+    },
+  };
 
   return (
     <div className='hover:bg-accent flex cursor-pointer select-none items-center justify-center rounded-md p-2 transition-colors duration-200'>
@@ -52,27 +74,27 @@ const MenuIcon = ({ animate }: { animate?: boolean }) => {
           y1='6'
           x2='20'
           y2='6'
-          variants={lineVariants}
-          animate={controls}
-          custom={1}
+          initial='normal'
+          variants={line1Variants}
+          animate={animate ? 'animate' : 'normal'}
         />
         <m.line
           x1='4'
           y1='12'
           x2='20'
           y2='12'
-          variants={lineVariants}
-          animate={controls}
-          custom={2}
+          initial='normal'
+          variants={line2Variants}
+          animate={animate ? 'animate' : 'normal'}
         />
         <m.line
           x1='4'
           y1='18'
           x2='20'
           y2='18'
-          variants={lineVariants}
-          animate={controls}
-          custom={3}
+          initial='normal'
+          variants={line3Variants}
+          animate={animate ? 'animate' : 'normal'}
         />
       </svg>
     </div>

@@ -174,7 +174,7 @@ export default function HamburgerMenuComponent() {
               toggle(!toggled);
             }}
             toggled={toggled}
-            alt='Hamburger menu'
+            alt='Hamburger menu toggle'
           />
         }
         afterMenuItems={
