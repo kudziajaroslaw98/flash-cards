@@ -65,7 +65,7 @@ export default function FlashcardsList({
             'grid h-auto w-full justify-center gap-4 transition-all',
             filteredFlashcards.length > 5
               ? 'xl:justify-between'
-              : 'justify-start',
+              : 'xl:justify-start',
             tileSize === 'sm' && 'grid-cols-[repeat(auto-fit,11rem)]',
             tileSize === 'md' && 'grid-cols-[repeat(auto-fit,11rem)]',
             tileSize === 'lg' && 'grid-cols-[repeat(auto-fit,16rem)]',

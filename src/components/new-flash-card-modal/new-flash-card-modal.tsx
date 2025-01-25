@@ -131,6 +131,10 @@ export const NewFlashcardModal = ({
           definition: item.type === 'index' ? '' : item.definition,
           query: item.type === 'index' ? '' : item.query,
           context: item.type === 'question' ? '' : item.context,
+          examples: item.type === 'single' ? item.examples : '',
+          keyPoints: item.type === 'single' ? item.keyPoints : '',
+          relatedFacts: item.type === 'single' ? item.relatedFacts : '',
+          synonyms: item.type === 'single' ? item.synonyms : '',
         };
       },
     );
