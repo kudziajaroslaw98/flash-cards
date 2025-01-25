@@ -35,7 +35,6 @@ const cspHeader = `
     form-action 'self' https://checkout.stripe.com https://js.stripe.com;
     frame-src 'self' https://checkout.stripe.com;
     frame-ancestors 'none';
-    serviceworker-src 'self';
     upgrade-insecure-requests;
 `;
 
