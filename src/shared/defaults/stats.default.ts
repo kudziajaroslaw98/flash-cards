@@ -1,6 +1,7 @@
 import type { Metadata } from '#/types/metadata.type';
 
 export const DEFAULT_METADATA: Metadata = {
+  index: 'current',
   answers: 0,
   accuracy: 0.0,
   correctAnswers: 0,

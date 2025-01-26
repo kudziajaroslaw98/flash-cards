@@ -14,7 +14,7 @@ class AppDB extends Dexie {
     this.version(1).stores({
       flashcards: '&frontUuid, tags, createdAt, updatedAt, *sets',
       sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards',
-      metadata: 'key',
+      metadata: 'index',
     });
     // Setup hooks
     this.setupFlashcardHooks();
@@ -24,12 +24,22 @@ class AppDB extends Dexie {
   private setupFlashcardHooks() {
     this.flashcards.hook('updating', (modifications: Partial<Flashcard>) => {
       modifications.updatedAt = new Date().toISOString();
+      modifications.synced = false;
+    });
+
+    this.flashcards.hook('creating', (primKey, card) => {
+      card.synced = false;
     });
   }
 
   private setupSetHooks() {
     this.sets.hook('updating', (modifications: Partial<FlashcardSet>) => {
       modifications.updatedAt = new Date().toISOString();
+      modifications.synced = false;
+    });
+
+    this.sets.hook('creating', (primKey, set) => {
+      set.synced = false;
     });
   }
 }
