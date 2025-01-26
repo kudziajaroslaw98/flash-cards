@@ -638,6 +638,8 @@ export default function AppProvider(props: PropsWithChildren) {
       .from('flashcards')
       .upsert(unsyncedFlashcards);
 
+    console.log(error);
+
     if (error) {
       await db.flashcards
         .where('frontUuid')
@@ -650,7 +652,9 @@ export default function AppProvider(props: PropsWithChildren) {
     if (!isLoggedIn || user === null) return;
 
     const metadata = await db.metadata.get('current');
+    const newLastSyncAt = new Date().toISOString();
     let lastSyncAt: string;
+
     if (
       !metadata ||
       !metadata.lastSyncAt ||
@@ -662,28 +666,23 @@ export default function AppProvider(props: PropsWithChildren) {
       // Valid date: use ISO string
       lastSyncAt = new Date(metadata.lastSyncAt).toISOString();
     }
-    console.log(lastSyncAt); // Should output ISO format, not "Sun Jan 26..."
 
     // Fetch changes from Supabase
     const { data: remoteFlashcards, error } = await supabase
       .from('flashcards')
       .select(
-        'frontUuid, tags, createdAt, updatedAt, sets, examples, keyPoints, synonyms, relatedFacts, spacedRepetition, synced, context, query,definition',
+        'frontUuid, type, tags, createdAt, updatedAt, sets, examples, keyPoints, synonyms, relatedFacts, spacedRepetition, synced, context, query, definition, order',
       )
       .gt('updatedAt', lastSyncAt);
 
     if (!error && remoteFlashcards) {
       // Upsert into IndexedDB
       await db.flashcards.bulkPut(remoteFlashcards as Flashcard[]);
-
-      // Update lastSyncAt to the latest remote updatedAt
-      const latestRemoteUpdate = Math.max(
-        ...remoteFlashcards.map((c) => new Date(c.updatedAt).getTime()),
-      );
-      await db.metadata.update('current', {
-        lastSyncAt: new Date(latestRemoteUpdate),
-      });
     }
+
+    await db.metadata.update('current', {
+      lastSyncAt: new Date(newLastSyncAt),
+    });
   };
 
   const syncWithDB = async () => {
