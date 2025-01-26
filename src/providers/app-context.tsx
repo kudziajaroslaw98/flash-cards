@@ -638,9 +638,9 @@ export default function AppProvider(props: PropsWithChildren) {
       .from('flashcards')
       .upsert(unsyncedFlashcards);
 
-    console.log(error);
+    console.log('local -> remote', unsyncedFlashcards, error);
 
-    if (error) {
+    if (!error) {
       await db.flashcards
         .where('frontUuid')
         .anyOf(unsyncedFlashcards.map((c) => c.frontUuid))
@@ -674,6 +674,8 @@ export default function AppProvider(props: PropsWithChildren) {
         'frontUuid, type, tags, createdAt, updatedAt, sets, examples, keyPoints, synonyms, relatedFacts, spacedRepetition, synced, context, query, definition, order',
       )
       .gt('updatedAt', lastSyncAt);
+
+    console.log('remote -> local', remoteFlashcards, error);
 
     if (!error && remoteFlashcards) {
       // Upsert into IndexedDB
