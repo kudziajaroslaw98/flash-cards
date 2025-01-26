@@ -535,13 +535,13 @@ export default function AppProvider(props: PropsWithChildren) {
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'flashcards' },
-        (payload) => {
+        async (payload) => {
           if (payload.new) {
             const updatedFlashcard = payload.new as Flashcard & {
               user_uuid: string;
               id: string;
             };
-            db.flashcards.put(
+            await db.flashcards.put(
               omit(updatedFlashcard, ['user_uuid', 'id']) as Flashcard,
             );
           }
@@ -552,26 +552,26 @@ export default function AppProvider(props: PropsWithChildren) {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'flashcards' },
-        (payload) => {
+        async (payload) => {
           if (payload.new) {
             const newFlashcard = payload.new as Flashcard & {
               user_uuid: string;
               id: string;
             };
-            db.flashcards.put(
+            await db.flashcards.put(
               omit(newFlashcard, ['user_uuid', 'id']) as Flashcard,
             );
           }
         },
       )
       // FLASHCARDS - DELETE
-      .on('broadcast', { event: 'flashcards_delete' }, ({ payload }) => {
+      .on('broadcast', { event: 'flashcards_delete' }, async ({ payload }) => {
         if (
           payload.flashcards &&
           payload.flashcards.length >= 0 &&
           Array.isArray(payload.flashcards)
         ) {
-          db.flashcards.bulkDelete(payload.flashcards);
+          await db.flashcards.bulkDelete(payload.flashcards);
         }
       })
 
@@ -579,13 +579,15 @@ export default function AppProvider(props: PropsWithChildren) {
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'sets' },
-        (payload) => {
+        async (payload) => {
           if (payload.new) {
             const updatedSet = payload.new as FlashcardSet & {
               user_uuid: string;
               id: string;
             };
-            db.sets.put(omit(updatedSet, ['user_uuid', 'id']) as FlashcardSet);
+            await db.sets.put(
+              omit(updatedSet, ['user_uuid', 'id']) as FlashcardSet,
+            );
           }
         },
       )
@@ -594,25 +596,27 @@ export default function AppProvider(props: PropsWithChildren) {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'sets' },
-        (payload) => {
+        async (payload) => {
           if (payload.new) {
             const newSet = payload.new as FlashcardSet & {
               user_uuid: string;
               id: string;
             };
-            db.sets.put(omit(newSet, ['user_uuid', 'id']) as FlashcardSet);
+            await db.sets.put(
+              omit(newSet, ['user_uuid', 'id']) as FlashcardSet,
+            );
           }
         },
       )
 
       // SETS - DELETE
-      .on('broadcast', { event: 'sets_delete' }, ({ payload }) => {
+      .on('broadcast', { event: 'sets_delete' }, async ({ payload }) => {
         if (
           payload?.sets &&
           payload?.sets.length >= 0 &&
           Array.isArray(payload?.sets)
         ) {
-          db.sets.bulkDelete(payload?.sets);
+          await db.sets.bulkDelete(payload?.sets);
         }
       })
       .subscribe();
