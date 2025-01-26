@@ -650,7 +650,9 @@ export default function AppProvider(props: PropsWithChildren) {
     if (!isLoggedIn || user === null) return;
 
     const metadata = await db.metadata.get('current');
-    const lastSyncAt = metadata?.lastSyncAt ?? new Date().toISOString();
+    const lastSyncAt = metadata?.lastSyncAt
+      ? new Date(metadata.lastSyncAt)
+      : new Date(0).toISOString();
 
     // Fetch changes from Supabase
     const { data: remoteFlashcards, error } = await supabase
