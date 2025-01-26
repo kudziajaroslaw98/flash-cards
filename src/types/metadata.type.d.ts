@@ -1,5 +1,4 @@
 export type Metadata = {
-  index: 'current';
   answers: number;
   correctAnswers: number;
   incorrectAnswers: number;

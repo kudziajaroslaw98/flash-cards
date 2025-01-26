@@ -14,7 +14,7 @@ class AppDB extends Dexie {
     this.version(1).stores({
       flashcards: '&frontUuid, tags, createdAt, updatedAt, *sets',
       sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards',
-      metadata: 'index',
+      metadata: 'key',
     });
     // Setup hooks
     this.setupFlashcardHooks();

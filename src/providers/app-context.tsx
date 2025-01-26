@@ -650,7 +650,19 @@ export default function AppProvider(props: PropsWithChildren) {
     if (!isLoggedIn || user === null) return;
 
     const metadata = await db.metadata.get('current');
-    const lastSyncAt = metadata?.lastSyncAt ?? new Date().toISOString();
+    let lastSyncAt: string;
+    if (
+      !metadata ||
+      !metadata.lastSyncAt ||
+      isNaN(new Date(metadata.lastSyncAt).getTime())
+    ) {
+      // First sync or invalid date: use epoch
+      lastSyncAt = new Date(0).toISOString();
+    } else {
+      // Valid date: use ISO string
+      lastSyncAt = new Date(metadata.lastSyncAt).toISOString();
+    }
+    console.log(lastSyncAt); // Should output ISO format, not "Sun Jan 26..."
 
     // Fetch changes from Supabase
     const { data: remoteFlashcards, error } = await supabase
@@ -669,7 +681,7 @@ export default function AppProvider(props: PropsWithChildren) {
         ...remoteFlashcards.map((c) => new Date(c.updatedAt).getTime()),
       );
       await db.metadata.update('current', {
-        lastSyncAt: new Date(latestRemoteUpdate).toISOString(),
+        lastSyncAt: new Date(latestRemoteUpdate),
       });
     }
   };
