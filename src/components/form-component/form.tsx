@@ -282,25 +282,41 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
       let formValid = true;
 
       inputs.forEach((inputName) => {
-        const validations = inputValidations[inputName].filter((validation) => {
-          return (
-            validation.whenConstraint &&
-            validation.whenKey &&
-            validation.whenConstraint.safeParse(
-              formValues[validation.whenKey as string],
-            ).success
+        const dependentValidations = inputValidations[inputName].filter(
+          (validation) => {
+            return (
+              validation.whenConstraint &&
+              validation.whenKey &&
+              validation.whenConstraint.safeParse(
+                formValues[validation.whenKey as string],
+              ).success
+            );
+          },
+        );
+        const independentValidations = inputValidations[inputName].filter(
+          (validation) => !validation.whenConstraint || !validation.whenKey,
+        );
+
+        const dependentOutputs: (
+          | SafeParseSuccess<unknown>
+          | SafeParseError<unknown>
+        )[] = dependentValidations.map((validation) => {
+          return validation.constraint.safeParse(
+            formValues[validation.key as string],
           );
         });
 
-        const outputs: (SafeParseSuccess<unknown> | SafeParseError<unknown>)[] =
-          validations.map((validation) => {
-            return validation.constraint.safeParse(
-              formValues[validation.key as string],
-            );
-          });
+        const independentOutputs: (
+          | SafeParseSuccess<unknown>
+          | SafeParseError<unknown>
+        )[] = independentValidations.map((validation) => {
+          return validation.constraint.safeParse(
+            formValues[validation.key as string],
+          );
+        });
 
         if (newTouched ?? touchedInputs[inputName]) {
-          outputs.forEach((output) => {
+          [...dependentOutputs, ...independentOutputs].forEach((output) => {
             if (!output.success) {
               formValid = false;
               const issues = output?.error?.issues;
@@ -399,8 +415,8 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
     }));
   };
 
-  const handleOnBlur = () => {
-    checkFormValidity();
+  const handleOnBlur = async () => {
+    await checkFormValidity();
   };
 
   const handleOnFocus = (inputName: string) => {

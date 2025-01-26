@@ -103,6 +103,7 @@ export default function Dropdown<T>({
   const configRef = useRef<DictionaryValue<T>[] | null>(null);
   const valueRef = useRef<T | T[] | null | undefined>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
+  const hasFocus = useRef(false);
 
   // TODO: How to animate this?
   // const dropdownPopupStyles = useMemo(() => {
@@ -136,6 +137,7 @@ export default function Dropdown<T>({
       window.umami.track('Dropdown - Click outside');
       setVisible(false);
       setSearchValue('');
+      hasFocus.current = false;
       if (onBlur) {
         onBlur();
       }
@@ -282,6 +284,7 @@ export default function Dropdown<T>({
   };
 
   const handleClickOnDropdown = () => {
+    hasFocus.current = true;
     if (onFocus) {
       onFocus();
     }
@@ -350,17 +353,23 @@ export default function Dropdown<T>({
         <div
           ref={dropdownLabelRef}
           className={cn([
-            'group relative flex h-10 cursor-pointer items-center justify-center rounded-md border text-sm outline-none focus:ring focus:ring-green-400/50',
+            'border-gray-300 text-gray-500 dark:border-slate-800',
+            'group relative flex h-10 w-full cursor-pointer items-center justify-center rounded-md border text-sm outline-none group-has-[:focus]:ring',
+            hasFocus.current ? 'ring' : '',
             'transition',
-            selected.length > 0
-              ? 'border-green-500 text-green-500'
-              : 'border-gray-300  text-gray-500 dark:border-slate-800 ',
+            touched && !valid
+              ? 'border-red-400 text-red-400 ring-red-400/50 dark:border-red-400'
+              : '',
+            touched && valid
+              ? 'border-green-500 text-green-500 ring-green-400/50'
+              : '',
             error ? 'border-red-400 text-red-400 dark:border-red-400' : '',
             disabled
               ? 'bg-gray-100 text-gray-200 dark:bg-slate-900 dark:text-slate-800'
               : '',
           ])}
-          onClick={() => {
+          onClick={(e) => {
+            e.preventDefault();
             handleClickOnDropdown();
             toggleDropdown();
           }}
@@ -374,7 +383,6 @@ export default function Dropdown<T>({
         >
           {multiple ? (
             <DropdownLabel
-              onClick={() => {}}
               visible={visible}
               selectedCount={selected.length}
               label={selected[0]?.label ?? label}

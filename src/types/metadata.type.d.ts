@@ -7,4 +7,5 @@ export type Metadata = {
   streak: number;
   lastSyncAt: Date | null;
   theme?: 'dark' | 'light';
+  synced: boolean;
 };

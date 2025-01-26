@@ -10,7 +10,7 @@ import { useCompletion } from 'ai/react';
 import { Button } from '../_ui/button/button';
 import Modal from '../_ui/modal/modal';
 import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
-import FormComponent from '../form-component/form';
+import FormComponent, { type FormMethods } from '../form-component/form';
 
 interface NewSetModalProps {
   handleNew?: (sets: Partial<FlashcardSet>[]) => void;
@@ -38,6 +38,10 @@ export const NewSetModal = ({
   const [loadingGenerate, setLoadingGenerate] = useState(false);
   const [categories, setCategories] = useState<DictionaryValue<string>[]>([]);
   const { isLoggedIn, isPlanActive } = useSessionContext();
+  const formRef =
+    useRef<
+      FormMethods<Pick<FlashcardSet, 'description' | 'name' | 'category'>>
+    >(null);
 
   const { completion, complete } = useCompletion({
     api: API_ROUTES.SET_DESCRIPTION,
@@ -79,14 +83,6 @@ export const NewSetModal = ({
   }, [selectedSets]);
 
   useEffect(() => {
-    setSets((prev) =>
-      prev.map((item) =>
-        item.frontUuid === formValue.frontUuid ? formValue : item,
-      ),
-    );
-  }, [formValue]);
-
-  useEffect(() => {
     setIsModalOpen(open);
   }, [open]);
 
@@ -97,19 +93,51 @@ export const NewSetModal = ({
     }));
   }, [completion]);
 
+  const updateFormValue = () => {
+    const currentFormValue = formRef.current?.value as Pick<
+      FlashcardSet,
+      'frontUuid' | 'description' | 'name' | 'category'
+    >;
+
+    setFormValue(currentFormValue);
+    setSets((prev) =>
+      prev.map((item) =>
+        item.frontUuid === currentFormValue.frontUuid ? currentFormValue : item,
+      ),
+    );
+  };
+
   const handleDialogClose = () => {
     setIsModalOpen(false);
     setCurrentIndex(0);
     clearInitialValues();
   };
 
-  const handleDialogSubmit = () => {
+  const handleDialogSubmit = async () => {
+    window.umami.track('Flashcard set dialog - submitted', { isInEditMode });
+
+    await formRef.current?.checkValidity();
+
+    console.log(formRef.current?.isValid());
+    if (!formRef.current?.isValid()) {
+      return;
+    }
+
     setIsModalOpen(false);
 
+    const currentFormValue = formRef.current?.value as Pick<
+      FlashcardSet,
+      'frontUuid' | 'description' | 'name' | 'category'
+    >;
+
+    const mappedSets = sets.map((set) =>
+      set.frontUuid === currentFormValue.frontUuid ? currentFormValue : set,
+    );
+
     if (isInEditMode && handleEdit) {
-      handleEdit(sets);
+      handleEdit(mappedSets);
     } else if (handleNew) {
-      handleNew(sets);
+      handleNew(mappedSets);
     }
 
     clearInitialValues();
@@ -117,6 +145,8 @@ export const NewSetModal = ({
   };
 
   const handleRightButtonClick = () => {
+    window.umami.track('Flashcard set dialog - right button clicked');
+    updateFormValue();
     if (currentIndex < sets.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
@@ -127,24 +157,17 @@ export const NewSetModal = ({
           description: '',
         };
 
-        setSets((prev) => [
-          ...prev.map((item) =>
-            item.frontUuid === formValue.frontUuid ? formValue : item,
-          ),
-          newSet,
-        ]);
+        setSets((prev) => [...prev, newSet]);
         setCurrentIndex((prev) => prev + 1);
       }
     }
   };
 
   const handleLeftButtonClick = () => {
+    window.umami.track('Flashcard set dialog - left button clicked');
+
     if (currentIndex > 0) {
-      setSets((prev) =>
-        prev.map((item) =>
-          item.frontUuid === formValue.frontUuid ? formValue : item,
-        ),
-      );
+      updateFormValue();
       setCurrentIndex((prev) => prev - 1);
     }
   };
@@ -210,10 +233,16 @@ export const NewSetModal = ({
               | Pick<FlashcardSet, 'name' | 'description' | 'category'>
               | Partial<FlashcardSet>
             >
+              ref={formRef}
               className='w-full max-w-80'
               scheme={getFormScheme}
-              emitFormValue={setFormValue}
               initialValues={sets[currentIndex]}
+              debug={{
+                inputs: true,
+                validity: true,
+                touch: true,
+                values: true,
+              }}
             />
           </Modal.Body>
           <Modal.Footer

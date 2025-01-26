@@ -192,7 +192,9 @@ export default function SetHardlinkPage() {
 
     if (newFlashcards.length > 0) {
       window.umami.track('Add flashcards', { count: newFlashcards.length });
-      addFlashcards(newFlashcards);
+      addFlashcards(
+        newFlashcards.map((f) => ({ ...f, sets: [set.frontUuid] })),
+      );
 
       updateMetadata({
         ...metadata,
