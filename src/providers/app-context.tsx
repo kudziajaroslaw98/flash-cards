@@ -636,7 +636,7 @@ export default function AppProvider(props: PropsWithChildren) {
 
     const { error } = await supabase
       .from('flashcards')
-      .upsert(unsyncedFlashcards);
+      .upsert(unsyncedFlashcards, { onConflict: 'frontUuid' });
 
     console.log('local -> remote', unsyncedFlashcards, error);
 
