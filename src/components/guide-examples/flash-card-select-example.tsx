@@ -25,6 +25,8 @@ export default function FlashcardSelectExample() {
         lastReviewAt: new Date().toISOString(),
       },
       sets: [],
+      tags: [],
+      synced: false,
     },
     {
       type: 'question',
@@ -44,6 +46,8 @@ export default function FlashcardSelectExample() {
       },
 
       sets: [],
+      tags: [],
+      synced: false,
     },
     {
       type: 'single',
@@ -62,6 +66,8 @@ export default function FlashcardSelectExample() {
         lastReviewAt: new Date().toISOString(),
       },
       sets: [],
+      tags: [],
+      synced: false,
     },
   ] as Flashcard[];
 
