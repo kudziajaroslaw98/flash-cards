@@ -28,7 +28,7 @@ class AppDB extends Dexie {
     });
 
     this.flashcards.hook('creating', (primKey, card) => {
-      card.synced = false;
+      card.synced = card.synced === true;
     });
   }
 
@@ -39,7 +39,7 @@ class AppDB extends Dexie {
     });
 
     this.sets.hook('creating', (primKey, set) => {
-      set.synced = false;
+      set.synced = set.synced === true;
     });
   }
 }
