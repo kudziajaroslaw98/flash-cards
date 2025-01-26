@@ -1,3 +1,11 @@
+import {
+  defaultFlashcard,
+  defaultMetadata,
+  defaultSet,
+} from '#/providers/app-context';
+import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
+import { metadataMerge } from '#/shared/helpers/metadata-merge';
+import { setsMerge } from '#/shared/helpers/sets-merge';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { Flashcard } from '#/types/flash-card.type';
 import type { Metadata } from '#/types/metadata.type';
@@ -11,11 +19,35 @@ class AppDB extends Dexie {
   constructor() {
     super('FlashcardDB');
 
-    this.version(1).stores({
-      flashcards: '&frontUuid, tags, createdAt, updatedAt, *sets',
-      sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards',
-      metadata: 'key',
-    });
+    this.version(1)
+      .stores({
+        flashcards: '&frontUuid, tags, createdAt, updatedAt, *sets',
+        sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards',
+        metadata: 'key',
+      })
+      .upgrade((transaction) => {
+        transaction
+          .table('flashcards')
+          .toCollection()
+          .modify((card) => {
+            flashcardsMerge(defaultFlashcard, card);
+          });
+
+        transaction
+          .table('sets')
+          .toCollection()
+          .modify((set) => {
+            setsMerge(defaultSet, set);
+          });
+
+        transaction
+          .table('metadata')
+          .toCollection()
+          .modify((meta) => {
+            metadataMerge(defaultMetadata, meta);
+          });
+      });
+
     // Setup hooks
     this.setupFlashcardHooks();
     this.setupSetHooks();

@@ -1,5 +1,7 @@
 import { db } from '#/db/dexie.db';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
+import { FLASHCARDS_DB_DEFAULT } from '#/shared/defaults/flashcards-local-storage-init';
+import { SETS_DB_DEFAULT } from '#/shared/defaults/sets-local-storage-init';
 import { DEFAULT_METADATA } from '#/shared/defaults/stats.default';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { metadataMerge } from '#/shared/helpers/metadata-merge';
@@ -23,6 +25,44 @@ import {
   type PropsWithChildren,
 } from 'react';
 import { useSessionContext } from './session-provider.component';
+
+export const defaultFlashcard = {
+  type: 'index',
+  context: '',
+  query: '',
+  definition: '',
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  spacedRepetition: {
+    interval: 0,
+    easeFactor: 1.3,
+    lastReviewAt: new Date().toISOString(),
+    dueDate: new Date(Date.now() + 1000 * 60 * 10).toISOString(),
+    reviews: 0,
+  },
+  sets: [],
+  examples: '',
+  keyPoints: '',
+  synonyms: '',
+  relatedFacts: '',
+  tags: [],
+  synced: false,
+} as Omit<Flashcard, 'frontUuid' | 'order'>;
+
+export const defaultSet: FlashcardSet = {
+  frontUuid: uuid(),
+  name: '',
+  description: '',
+  category: '',
+  isFavourite: false,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  flashcards: [],
+  hardlink: '',
+  synced: false,
+} as FlashcardSet;
+
+export const defaultMetadata = DEFAULT_METADATA;
 
 export type AppContextType = {
   flashcards: Flashcard[];
@@ -69,52 +109,6 @@ export const AppContext = createContext<AppContextType>({
 });
 
 export default function AppProvider(props: PropsWithChildren) {
-  /////////////////
-  // #region DEFAULTS
-  /////////////////
-
-  const defaultFlashcard = {
-    type: 'index',
-    context: '',
-    query: '',
-    definition: '',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      lastReviewAt: new Date().toISOString(),
-      dueDate: new Date(Date.now() + 1000 * 60 * 10).toISOString(),
-      reviews: 0,
-    },
-    sets: [],
-    examples: '',
-    keyPoints: '',
-    synonyms: '',
-    relatedFacts: '',
-    tags: [],
-    synced: false,
-  } as Omit<Flashcard, 'frontUuid' | 'order'>;
-
-  const defaultSet: FlashcardSet = {
-    frontUuid: uuid(),
-    name: '',
-    description: '',
-    category: '',
-    isFavourite: false,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    flashcards: [],
-    hardlink: '',
-    synced: false,
-  } as FlashcardSet;
-
-  const defaultMetadata = DEFAULT_METADATA;
-
-  /////////////////
-  // #endregion DEFAULTS
-  /////////////////
-
   /////////////////
   // #region EXTERNAL HOOKS
   /////////////////
@@ -496,8 +490,6 @@ export default function AppProvider(props: PropsWithChildren) {
       .from('flashcards')
       .upsert(unsyncedFlashcards, { onConflict: 'frontUuid' });
 
-    console.log('local -> remote', unsyncedFlashcards, error);
-
     if (!error) {
       await db.flashcards
         .where('frontUuid')
@@ -533,8 +525,6 @@ export default function AppProvider(props: PropsWithChildren) {
       )
       .gt('updatedAt', lastSyncAt);
 
-    console.log('remote -> local', remoteFlashcards, error);
-
     if (!error && remoteFlashcards) {
       // Upsert into IndexedDB
       await db.flashcards.bulkPut(remoteFlashcards as Flashcard[]);
@@ -568,35 +558,23 @@ export default function AppProvider(props: PropsWithChildren) {
   // #region MIGRATION
   /////////////////
 
-  const backupBeforeDixieMigration = () => {
-    const backupAvailable = localStorage.getItem('backup_dexie') !== null;
-
-    if (!backupAvailable) {
-      const backup = {
-        flashcards: JSON.parse(localStorage.getItem('flashcards') || '[]'),
-        sets: JSON.parse(localStorage.getItem('sets') || '[]'),
-        metadata: JSON.parse(localStorage.getItem('metadata') || '{}'),
-      };
-      localStorage.setItem('backup_pre_dexie', JSON.stringify(backup));
-    }
-  };
-
   const migrateLocalStorageToDexie = async () => {
     try {
       // 1. Check if migration already ran
       if (localStorage.getItem('dexie_migrated')) return;
+      localStorage.removeItem('flashcards');
+      localStorage.removeItem('sets');
+      localStorage.removeItem('metadata');
+      localStorage.removeItem('appVersion');
+      localStorage.removeItem('migrations');
+      localStorage.removeItem('backup_pre_dexie');
 
       // 2. Validate localStorage data
-      const parseWithDefault = (key: string) => {
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : [];
-      };
+      const flashcards = FLASHCARDS_DB_DEFAULT;
+      const sets = SETS_DB_DEFAULT;
 
-      const flashcards = Object.values(
-        parseWithDefault('flashcards'),
-      ) as Flashcard[];
-      const sets = Object.values(parseWithDefault('sets')) as FlashcardSet[];
-      const metadata = parseWithDefault('metadata');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const metadata = DEFAULT_METADATA as any;
 
       // 3. Use explicit Dexie transaction
       await db.transaction(
@@ -649,7 +627,6 @@ export default function AppProvider(props: PropsWithChildren) {
 
   useEffect(() => {
     setAvatarSeed(generateHash());
-    backupBeforeDixieMigration();
     migrateLocalStorageToDexie();
   }, []);
 

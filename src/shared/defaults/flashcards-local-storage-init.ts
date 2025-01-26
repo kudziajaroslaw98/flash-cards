@@ -1,7 +1,10 @@
-export const FLASHCARDS_LOCAL_STORAGE_INIT = {
-  'c5f20e37-c4c6-4a76-b987-4ab0adcf1ae5': {
+import type { Flashcard } from '#/types/flash-card.type';
+import uuid from '../utils/uuid.util';
+
+export const FLASHCARDS_DB_DEFAULT: Flashcard[] = [
+  {
     type: 'index' as const,
-    frontUuid: 'c5f20e37-c4c6-4a76-b987-4ab0adcf1ae5',
+    frontUuid: uuid(),
     query: '',
     context: 'Lazy',
     definition: '',
@@ -15,11 +18,13 @@ export const FLASHCARDS_LOCAL_STORAGE_INIT = {
       dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
       lastReviewAt: new Date().toISOString(),
     },
-    sets: ['8059ca9e-15ec-42d2-9291-c76f0bece6d7'],
+    sets: [],
+    synced: false,
+    tags: [],
   },
-  '4d49e5e0-54e9-44de-b4b8-c654c95878fd': {
+  {
     type: 'index' as const,
-    frontUuid: '4d49e5e0-54e9-44de-b4b8-c654c95878fd',
+    frontUuid: uuid(),
     query: '',
     context: 'Bright',
     definition: '',
@@ -33,11 +38,14 @@ export const FLASHCARDS_LOCAL_STORAGE_INIT = {
       dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
       lastReviewAt: new Date().toISOString(),
     },
-    sets: ['8059ca9e-15ec-42d2-9291-c76f0bece6d7'],
+    sets: [],
+
+    synced: false,
+    tags: [],
   },
-  '757a6f43-2dc2-4d58-ba2d-5694defa0eab': {
+  {
     type: 'single' as const,
-    frontUuid: '757a6f43-2dc2-4d58-ba2d-5694defa0eab',
+    frontUuid: uuid(),
     query: "What's the meaning of word below?",
     context: 'Quick',
     definition: 'Happening or done with great speed.',
@@ -51,7 +59,7 @@ export const FLASHCARDS_LOCAL_STORAGE_INIT = {
       dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
       lastReviewAt: new Date().toISOString(),
     },
-    sets: ['8059ca9e-15ec-42d2-9291-c76f0bece6d7'],
+    sets: [],
     examples:
       'He made a quick decision to avoid further problems; The quick fox jumped over the lazy dog.',
 
@@ -61,10 +69,13 @@ export const FLASHCARDS_LOCAL_STORAGE_INIT = {
     synonyms: 'fast, swift, speedy, rapid',
     relatedFacts:
       'The word "quick" originates from Old English "cwic," meaning alive or moving; Often used in idioms like "quick as a flash."',
+
+    synced: false,
+    tags: [],
   },
-  'b03e05d5-c42d-4808-a621-1ac2fc4abed6': {
+  {
     type: 'single' as const,
-    frontUuid: 'b03e05d5-c42d-4808-a621-1ac2fc4abed6',
+    frontUuid: uuid(),
     query: "What's the meaning of word below?",
     context: 'Happy',
     definition: 'Feeling or showing pleasure or contentment.',
@@ -78,7 +89,7 @@ export const FLASHCARDS_LOCAL_STORAGE_INIT = {
       dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
       lastReviewAt: new Date().toISOString(),
     },
-    sets: ['8059ca9e-15ec-42d2-9291-c76f0bece6d7'],
+    sets: [],
     examples:
       'She felt happy after hearing the good news; The children were happy to play outside.',
 
@@ -88,10 +99,13 @@ export const FLASHCARDS_LOCAL_STORAGE_INIT = {
     synonyms: 'joyful, content, cheerful, pleased',
     relatedFacts:
       'The word "happy" has roots in Middle English, derived from "hap," meaning luck or fortune; Commonly used in phrases like "happy-go-lucky" or "happy ending."',
+
+    synced: false,
+    tags: [],
   },
-  'aa7054e8-277b-432c-be39-5696351d1767': {
+  {
     type: 'question' as const,
-    frontUuid: 'aa7054e8-277b-432c-be39-5696351d1767',
+    frontUuid: uuid(),
     query: "What's the meaning of word below?",
     context: '',
     definition: 'Not hard or firm to the touch.',
@@ -105,11 +119,14 @@ export const FLASHCARDS_LOCAL_STORAGE_INIT = {
       dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
       lastReviewAt: new Date().toISOString(),
     },
-    sets: ['8059ca9e-15ec-42d2-9291-c76f0bece6d7'],
+    sets: [],
+
+    synced: false,
+    tags: [],
   },
-  'b5cc2f5e-c7fb-4f88-b9ec-b6259ac97da2': {
+  {
     type: 'question' as const,
-    frontUuid: 'b5cc2f5e-c7fb-4f88-b9ec-b6259ac97da2',
+    frontUuid: uuid(),
     query: "What's the meaning of word below?",
     context: '',
     definition: 'Tidy and organized.',
@@ -123,11 +140,14 @@ export const FLASHCARDS_LOCAL_STORAGE_INIT = {
       dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
       lastReviewAt: new Date().toISOString(),
     },
-    sets: ['8059ca9e-15ec-42d2-9291-c76f0bece6d7'],
+    sets: [],
+
+    synced: false,
+    tags: [],
   },
-  '288a8828-25aa-4ee0-9ac3-b038a5ee4314': {
+  {
     type: 'index' as const,
-    frontUuid: '288a8828-25aa-4ee0-9ac3-b038a5ee4314',
+    frontUuid: uuid(),
     query: '',
     context: 'Kind',
     definition: '',
@@ -142,10 +162,13 @@ export const FLASHCARDS_LOCAL_STORAGE_INIT = {
       lastReviewAt: new Date().toISOString(),
     },
     sets: [],
+
+    synced: false,
+    tags: [],
   },
-  'c9ac5033-4bff-4cbf-9cf1-18e1581e658d': {
+  {
     type: 'index' as const,
-    frontUuid: 'c9ac5033-4bff-4cbf-9cf1-18e1581e658d',
+    frontUuid: uuid(),
     query: '',
     context: 'Quickly',
     definition: '',
@@ -160,10 +183,13 @@ export const FLASHCARDS_LOCAL_STORAGE_INIT = {
       lastReviewAt: new Date().toISOString(),
     },
     sets: [],
+
+    synced: false,
+    tags: [],
   },
-  '05b49a47-00f1-4fe0-87c9-d1b435fa7043': {
+  {
     type: 'index' as const,
-    frontUuid: '05b49a47-00f1-4fe0-87c9-d1b435fa7043',
+    frontUuid: uuid(),
     query: '',
     context: 'Cold',
     definition: '',
@@ -178,10 +204,13 @@ export const FLASHCARDS_LOCAL_STORAGE_INIT = {
       lastReviewAt: new Date().toISOString(),
     },
     sets: [],
+
+    synced: false,
+    tags: [],
   },
-  'c3b37bbc-266e-4326-934d-886a385d1996': {
+  {
     type: 'index' as const,
-    frontUuid: 'c3b37bbc-266e-4326-934d-886a385d1996',
+    frontUuid: uuid(),
     query: '',
     context: 'Funny',
     definition: '',
@@ -196,5 +225,8 @@ export const FLASHCARDS_LOCAL_STORAGE_INIT = {
       lastReviewAt: new Date().toISOString(),
     },
     sets: [],
+
+    synced: false,
+    tags: [],
   },
-};
+];
