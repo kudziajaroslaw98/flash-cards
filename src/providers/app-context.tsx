@@ -558,7 +558,7 @@ export default function AppProvider(props: PropsWithChildren) {
               user_uuid: string;
               id: string;
             };
-            await db.flashcards.add(
+            await db.flashcards.put(
               omit(newFlashcard, ['user_uuid', 'id']) as Flashcard,
             );
           }
@@ -602,7 +602,7 @@ export default function AppProvider(props: PropsWithChildren) {
               user_uuid: string;
               id: string;
             };
-            await db.sets.add(
+            await db.sets.put(
               omit(newSet, ['user_uuid', 'id']) as FlashcardSet,
             );
           }
