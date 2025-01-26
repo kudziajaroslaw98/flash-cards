@@ -8,4 +8,5 @@ export const DEFAULT_METADATA: Metadata = {
   createdFlashCards: 10,
   streak: 1,
   lastSyncAt: null,
+  synced: false,
 };

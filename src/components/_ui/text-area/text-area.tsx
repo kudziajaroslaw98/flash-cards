@@ -105,10 +105,10 @@ export default function TextArea({
           {...props}
           ref={textAreaRef}
           className={cn([
-            touched && !valid ? '!border-red-400' : '',
-            touched && valid ? '!border-green-400' : '',
+            touched && !valid ? '!border-red-400 ring-red-400/50' : '',
+            touched && valid ? '!border-green-400 ring-green-400/50' : '',
             'relative flex w-full items-center gap-4 rounded-md border border-gray-300 bg-gray-100 p-2 px-4 dark:border-slate-800 dark:bg-slate-900',
-            'h-auto resize-y text-sm outline-none ring-green-400/50 transition-all focus:ring',
+            'h-auto resize-y text-sm outline-none transition-all focus:ring',
             label
               ? 'placeholder:text-gray-400  dark:placeholder:text-slate-700'
               : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',

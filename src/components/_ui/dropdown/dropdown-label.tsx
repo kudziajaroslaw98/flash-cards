@@ -11,12 +11,12 @@ export default function DropdownLabel({
   label: string;
   multipleLabel?: string;
   visible: boolean;
-  onClick: () => void;
+  onClick?: () => void;
 }) {
   return (
     <span
       onClick={onClick}
-      className='flex w-full cursor-pointer items-center justify-between gap-4 px-4'
+      className='pointer-events-none flex w-full cursor-pointer items-center justify-between gap-4 px-4'
     >
       {selectedCount && selectedCount > 1 ? (
         <span className='flex gap-2 text-inherit'>

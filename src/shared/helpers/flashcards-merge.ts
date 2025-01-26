@@ -1,0 +1,40 @@
+import type { Flashcard } from '#/types/flash-card.type';
+import uuid from '../utils/uuid.util';
+
+export const flashcardsMerge = (
+  defaultFlashcard: Omit<Flashcard, 'frontUuid' | 'order'>,
+  flashcard: Partial<Flashcard>,
+) => {
+  return {
+    type: flashcard.type ?? 'index',
+    frontUuid: flashcard.frontUuid ?? uuid(),
+    query: flashcard.query ?? defaultFlashcard.query,
+    context: flashcard.context ?? defaultFlashcard.context,
+    definition: flashcard.definition ?? defaultFlashcard.definition,
+    order: flashcard.order,
+    createdAt: flashcard.createdAt ?? new Date().toISOString(),
+    updatedAt: flashcard.updatedAt ?? new Date().toISOString(),
+    spacedRepetition: {
+      interval:
+        flashcard?.spacedRepetition?.interval ??
+        defaultFlashcard.spacedRepetition.interval,
+      easeFactor:
+        flashcard?.spacedRepetition?.easeFactor ??
+        defaultFlashcard.spacedRepetition.easeFactor,
+      lastReviewAt:
+        flashcard?.spacedRepetition?.lastReviewAt ?? new Date().toISOString(),
+      dueDate:
+        flashcard?.spacedRepetition?.dueDate ??
+        new Date(Date.now()).toISOString(),
+      reviews:
+        flashcard?.spacedRepetition?.reviews ??
+        defaultFlashcard.spacedRepetition.reviews,
+    },
+    sets: flashcard?.sets ?? [],
+    examples: flashcard?.examples ?? defaultFlashcard.examples,
+    keyPoints: flashcard?.keyPoints ?? defaultFlashcard.keyPoints,
+    synonyms: flashcard?.synonyms ?? defaultFlashcard.synonyms,
+    relatedFacts: flashcard?.relatedFacts ?? defaultFlashcard.relatedFacts,
+    tags: flashcard?.tags ?? defaultFlashcard.tags,
+  } as Flashcard;
+};

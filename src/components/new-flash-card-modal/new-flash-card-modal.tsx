@@ -31,7 +31,7 @@ export const NewFlashcardModal = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formValue, setFormValue] = useState<Partial<Flashcard>>({});
   const [flashcards, setFlashcards] =
-    useState<Omit<Flashcard, 'weight' | 'order'>[]>(selectedFlashcards);
+    useState<Omit<Flashcard, 'order'>[]>(selectedFlashcards);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loadingGenerate, setLoadingGenerate] = useState(false);
   const { isLoggedIn, isPlanActive } = useSessionContext();
@@ -61,6 +61,8 @@ export const NewFlashcardModal = ({
       dueDate: new Date(Date.now()).toISOString(),
     },
     sets: [],
+    tags: [],
+    synced: false,
   });
 
   const clearInitialValues = () => {

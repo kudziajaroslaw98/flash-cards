@@ -9,6 +9,8 @@ type BaseFlashcard = {
   keyPoints?: string;
   synonyms?: string;
   relatedFacts?: string;
+  tags: string[];
+  synced: boolean;
 };
 
 export type SpacedRepetition = {
