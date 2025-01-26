@@ -5,6 +5,7 @@ import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { metadataMerge } from '#/shared/helpers/metadata-merge';
 import { setsMerge } from '#/shared/helpers/sets-merge';
 import { generateHash } from '#/shared/utils/generate-hash';
+import omit from '#/shared/utils/omit.util';
 import { createClient } from '#/shared/utils/supabase/client';
 import uuid from '#/shared/utils/uuid.util';
 import type { DictionaryValue } from '#/types/dictionary-value.type';
@@ -525,186 +526,184 @@ export default function AppProvider(props: PropsWithChildren) {
   // #region SYNCHRONIZATION
   /////////////////
 
-  // const applyWebsockets = async () => {
-  //   if (!isLoggedIn || !user) return;
-  //   const user_channel = supabase.channel(`user-${user.id}`);
-  //   websocketChannel.current = user_channel;
-  //   // FLASHCARDS - UPDATE
-  //   websocketChannel.current
-  //     .on(
-  //       'postgres_changes',
-  //       { event: 'UPDATE', schema: 'public', table: 'flashcards' },
-  //       (payload) => {
-  //         if (payload.new) {
-  //           const updatedFlashcard = payload.new as Flashcard & {
-  //             user_uuid: string;
-  //             id: string;
-  //           };
-  //           updateFlashcardsFromWebsocket(
-  //             omit(updatedFlashcard, ['user_uuid', 'id']) as Flashcard,
-  //           );
-  //         }
-  //       },
-  //     )
+  const applyWebsockets = async () => {
+    if (!isLoggedIn || !user) return;
+    const user_channel = supabase.channel(`user-${user.id}`);
+    websocketChannel.current = user_channel;
+    // FLASHCARDS - UPDATE
+    websocketChannel.current
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'flashcards' },
+        (payload) => {
+          if (payload.new) {
+            const updatedFlashcard = payload.new as Flashcard & {
+              user_uuid: string;
+              id: string;
+            };
+            db.flashcards.put(
+              omit(updatedFlashcard, ['user_uuid', 'id']) as Flashcard,
+            );
+          }
+        },
+      )
 
-  //     // // FLASHCARDS - INSERT
-  //     .on(
-  //       'postgres_changes',
-  //       { event: 'INSERT', schema: 'public', table: 'flashcards' },
-  //       (payload) => {
-  //         if (payload.new) {
-  //           const newFlashcard = payload.new as Flashcard & {
-  //             user_uuid: string;
-  //             id: string;
-  //           };
-  //           addFlashcardsFromWebsocket(
-  //             omit(newFlashcard, ['user_uuid', 'id']) as Flashcard,
-  //           );
-  //         }
-  //       },
-  //     )
-  //     // FLASHCARDS - DELETE
-  //     .on('broadcast', { event: 'flashcards_delete' }, ({ payload }) => {
-  //       if (
-  //         payload.flashcards &&
-  //         payload.flashcards.length >= 0 &&
-  //         Array.isArray(payload.flashcards)
-  //       ) {
-  //         removeFlashcardsByUuid(payload.flashcards);
-  //       }
-  //     })
+      // // FLASHCARDS - INSERT
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'flashcards' },
+        (payload) => {
+          if (payload.new) {
+            const newFlashcard = payload.new as Flashcard & {
+              user_uuid: string;
+              id: string;
+            };
+            db.flashcards.put(
+              omit(newFlashcard, ['user_uuid', 'id']) as Flashcard,
+            );
+          }
+        },
+      )
+      // FLASHCARDS - DELETE
+      .on('broadcast', { event: 'flashcards_delete' }, ({ payload }) => {
+        if (
+          payload.flashcards &&
+          payload.flashcards.length >= 0 &&
+          Array.isArray(payload.flashcards)
+        ) {
+          db.flashcards.bulkDelete(payload.flashcards);
+        }
+      })
 
-  //     // SETS - UPDATE
-  //     .on(
-  //       'postgres_changes',
-  //       { event: 'UPDATE', schema: 'public', table: 'sets' },
-  //       (payload) => {
-  //         if (payload.new) {
-  //           const updatedSet = payload.new as FlashcardSet & {
-  //             user_uuid: string;
-  //             id: string;
-  //           };
-  //           updateSetsFromWebsocket(
-  //             omit(updatedSet, ['user_uuid', 'id']) as FlashcardSet,
-  //           );
-  //         }
-  //       },
-  //     )
+      // SETS - UPDATE
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'sets' },
+        (payload) => {
+          if (payload.new) {
+            const updatedSet = payload.new as FlashcardSet & {
+              user_uuid: string;
+              id: string;
+            };
+            db.sets.put(omit(updatedSet, ['user_uuid', 'id']) as FlashcardSet);
+          }
+        },
+      )
 
-  //     // SETS - INSERT
-  //     .on(
-  //       'postgres_changes',
-  //       { event: 'INSERT', schema: 'public', table: 'sets' },
-  //       (payload) => {
-  //         if (payload.new) {
-  //           const newSet = payload.new as FlashcardSet & {
-  //             user_uuid: string;
-  //             id: string;
-  //           };
-  //           addSetsFromWebsocket(omit(newSet, ['user_uuid', 'id']));
-  //         }
-  //       },
-  //     )
+      // SETS - INSERT
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'sets' },
+        (payload) => {
+          if (payload.new) {
+            const newSet = payload.new as FlashcardSet & {
+              user_uuid: string;
+              id: string;
+            };
+            db.sets.put(omit(newSet, ['user_uuid', 'id']) as FlashcardSet);
+          }
+        },
+      )
 
-  //     // SETS - DELETE
-  //     .on('broadcast', { event: 'sets_delete' }, ({ payload }) => {
-  //       if (
-  //         payload?.sets &&
-  //         payload?.sets.length >= 0 &&
-  //         Array.isArray(payload?.sets)
-  //       ) {
-  //         removeSetsByUuid(payload?.sets);
-  //       }
-  //     })
-  //     .subscribe();
-  // };
+      // SETS - DELETE
+      .on('broadcast', { event: 'sets_delete' }, ({ payload }) => {
+        if (
+          payload?.sets &&
+          payload?.sets.length >= 0 &&
+          Array.isArray(payload?.sets)
+        ) {
+          db.sets.bulkDelete(payload?.sets);
+        }
+      })
+      .subscribe();
+  };
 
-  // const syncWithDB = async () => {
-  //   if (!isLoggedIn) return;
+  const syncWithDB = async () => {
+    if (!isLoggedIn) return;
 
-  //   const newLastSyncAt = new Date();
-  //   const oldLastSyncAt = metadata.lastSyncAt;
+    //   const newLastSyncAt = new Date();
+    //   const oldLastSyncAt = metadata.lastSyncAt;
 
-  //   const fetchFlashcards: Promise<ApiResponse<ApiFlashcardsSyncResponse>> =
-  //     fetch(API_ROUTES.SYNC_FLASH_CARDS, {
-  //       method: 'POST',
-  //       body: JSON.stringify({
-  //         flashcards: flashcardsArray,
-  //         lastSyncAt: oldLastSyncAt,
-  //       }),
-  //     });
+    //   const fetchFlashcards: Promise<ApiResponse<ApiFlashcardsSyncResponse>> =
+    //     fetch(API_ROUTES.SYNC_FLASH_CARDS, {
+    //       method: 'POST',
+    //       body: JSON.stringify({
+    //         flashcards: flashcardsArray,
+    //         lastSyncAt: oldLastSyncAt,
+    //       }),
+    //     });
 
-  //   const fetchSets: Promise<ApiResponse<ApiSetsSyncResponse>> = fetch(
-  //     API_ROUTES.SYNC_SETS,
-  //     {
-  //       method: 'POST',
-  //       body: JSON.stringify({
-  //         sets: setsArray,
-  //         lastSyncAt: oldLastSyncAt,
-  //       }),
-  //     },
-  //   );
+    //   const fetchSets: Promise<ApiResponse<ApiSetsSyncResponse>> = fetch(
+    //     API_ROUTES.SYNC_SETS,
+    //     {
+    //       method: 'POST',
+    //       body: JSON.stringify({
+    //         sets: setsArray,
+    //         lastSyncAt: oldLastSyncAt,
+    //       }),
+    //     },
+    //   );
 
-  //   const fetchMetadata: Promise<ApiResponse<ApiMetadataSyncResponse>> = fetch(
-  //     API_ROUTES.SYNC_METADATA,
-  //     {
-  //       method: 'POST',
-  //       body: JSON.stringify({
-  //         metadata: metadata,
-  //         theme: theme,
-  //         newLastSyncAt: newLastSyncAt,
-  //       }),
-  //     },
-  //   );
+    //   const fetchMetadata: Promise<ApiResponse<ApiMetadataSyncResponse>> = fetch(
+    //     API_ROUTES.SYNC_METADATA,
+    //     {
+    //       method: 'POST',
+    //       body: JSON.stringify({
+    //         metadata: metadata,
+    //         theme: theme,
+    //         newLastSyncAt: newLastSyncAt,
+    //       }),
+    //     },
+    //   );
 
-  //   const responses = await Promise.allSettled([
-  //     fetchMetadata,
-  //     fetchFlashcards,
-  //     fetchSets,
-  //   ]);
+    //   const responses = await Promise.allSettled([
+    //     fetchMetadata,
+    //     fetchFlashcards,
+    //     fetchSets,
+    //   ]);
 
-  //   responses.forEach((response) => {
-  //     if (response.status === 'fulfilled') {
-  //       if (response.value.success) {
-  //         const value = response.value?.data;
+    //   responses.forEach((response) => {
+    //     if (response.status === 'fulfilled') {
+    //       if (response.value.success) {
+    //         const value = response.value?.data;
 
-  //         if ('flashcards' in value) {
-  //           setFlashcardsArray(value.flashcards);
-  //           const flashcardsObject: Record<string, Flashcard> = {};
+    //         if ('flashcards' in value) {
+    //           setFlashcardsArray(value.flashcards);
+    //           const flashcardsObject: Record<string, Flashcard> = {};
 
-  //           value.flashcards.forEach((item: Flashcard) => {
-  //             flashcardsObject[item.frontUuid] = item;
-  //           });
+    //           value.flashcards.forEach((item: Flashcard) => {
+    //             flashcardsObject[item.frontUuid] = item;
+    //           });
 
-  //           localStorage.setItem(
-  //             'flashcards',
-  //             JSON.stringify(flashcardsObject),
-  //           );
-  //         } else if ('sets' in value) {
-  //           setSetsArray(value?.sets);
-  //           const setsObject: Record<string, FlashcardSet> = {};
+    //           localStorage.setItem(
+    //             'flashcards',
+    //             JSON.stringify(flashcardsObject),
+    //           );
+    //         } else if ('sets' in value) {
+    //           setSetsArray(value?.sets);
+    //           const setsObject: Record<string, FlashcardSet> = {};
 
-  //           value?.sets?.forEach((item: FlashcardSet) => {
-  //             setsObject[item.frontUuid] = item;
-  //           });
+    //           value?.sets?.forEach((item: FlashcardSet) => {
+    //             setsObject[item.frontUuid] = item;
+    //           });
 
-  //           localStorage.setItem('sets', JSON.stringify(setsObject));
-  //         } else if ('metadata' in value) {
-  //           setMetadata(value.metadata);
-  //           setTheme(value.theme);
+    //           localStorage.setItem('sets', JSON.stringify(setsObject));
+    //         } else if ('metadata' in value) {
+    //           setMetadata(value.metadata);
+    //           setTheme(value.theme);
 
-  //           localStorage.setItem('metadata', JSON.stringify(value.metadata));
-  //           localStorage.setItem('theme', JSON.stringify(value.theme));
-  //         }
-  //       }
+    //           localStorage.setItem('metadata', JSON.stringify(value.metadata));
+    //           localStorage.setItem('theme', JSON.stringify(value.theme));
+    //         }
+    //       }
 
-  //       return;
-  //     }
-  //     console.error(response.reason);
-  //   });
+    //       return;
+    //     }
+    //     console.error(response.reason);
+    //   });
 
-  //   await applyWebsockets();
-  // };
+    await applyWebsockets();
+  };
 
   /////////////////
   // #endregion SYNCHRONIZATION
@@ -1061,7 +1060,7 @@ export default function AppProvider(props: PropsWithChildren) {
 
   useEffect(() => {
     if (!isLoggedIn) return;
-    // syncWithDB();
+    syncWithDB();
 
     return () => {
       if (websocketChannel.current) {
