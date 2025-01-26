@@ -142,8 +142,11 @@ export default function AppProvider(props: PropsWithChildren) {
   // const [appVersion, setAppVersion] = useState<string>('');
   const flashcardsArray = useLiveQuery(() => db.flashcards.toArray()) ?? [];
   const setsArray = useLiveQuery(() => db.sets.toArray()) ?? [];
-  const metadata = useLiveQuery(() => db.metadata.get('current')) ?? {
-    ...DEFAULT_METADATA};
+  const metadata =
+    useLiveQuery(() => db.metadata.get('current')) ??
+    ({
+      ...DEFAULT_METADATA,
+    } as Metadata);
   const [categories, setCategories] = useState<DictionaryValue<string>[]>([]);
   const [setsDictionary, setSetsDictionary] = useState<
     DictionaryValue<string>[]
@@ -627,7 +630,7 @@ export default function AppProvider(props: PropsWithChildren) {
   const syncLocalToRemote = async () => {
     if (!isLoggedIn || user === null) return;
 
-      const unsyncedFlashcards = (await db.flashcards.toArray())
+    const unsyncedFlashcards = (await db.flashcards.toArray())
       .filter((card) => !card.synced)
       .map((card) => ({ ...card, synced: true, user_uuid: user.id }));
 
@@ -646,27 +649,30 @@ export default function AppProvider(props: PropsWithChildren) {
   const syncRemoteToLocal = async () => {
     if (!isLoggedIn || user === null) return;
 
-     const metadata = await db.metadata.get('current');
-      const lastSyncAt = metadata?.lastSyncAt ?? new Date().toISOString();
+    const metadata = await db.metadata.get('current');
+    const lastSyncAt = metadata?.lastSyncAt ?? new Date().toISOString();
 
-      // Fetch changes from Supabase
-      const { data: remoteFlashcards, error } = await supabase
-        .from('flashcards')
-        .select('frontUuid, tags, createdAt, updatedAt, sets, examples, keyPoints, synonyms, relatedFacts, spacedRepetition, synced, context, query,definition')
-        .gt('updatedAt', lastSyncAt);
+    // Fetch changes from Supabase
+    const { data: remoteFlashcards, error } = await supabase
+      .from('flashcards')
+      .select(
+        'frontUuid, tags, createdAt, updatedAt, sets, examples, keyPoints, synonyms, relatedFacts, spacedRepetition, synced, context, query,definition',
+      )
+      .gt('updatedAt', lastSyncAt);
 
-      if (!error && remoteFlashcards) {
-        // Upsert into IndexedDB
-        await db.flashcards.bulkPut(remoteFlashcards as Flashcard[]);
+    if (!error && remoteFlashcards) {
+      // Upsert into IndexedDB
+      await db.flashcards.bulkPut(remoteFlashcards as Flashcard[]);
 
-        // Update lastSyncAt to the latest remote updatedAt
-        const latestRemoteUpdate = Math.max(
-          ...remoteFlashcards.map((c) => new Date(c.updatedAt).getTime())
-        );
-        await db.metadata.update('current',{
-          lastSyncAt: new Date(latestRemoteUpdate).toISOString(),
-        });
-  }
+      // Update lastSyncAt to the latest remote updatedAt
+      const latestRemoteUpdate = Math.max(
+        ...remoteFlashcards.map((c) => new Date(c.updatedAt).getTime()),
+      );
+      await db.metadata.update('current', {
+        lastSyncAt: new Date(latestRemoteUpdate).toISOString(),
+      });
+    }
+  };
 
   const syncWithDB = async () => {
     // LOCAL TO REMOTE
@@ -675,7 +681,7 @@ export default function AppProvider(props: PropsWithChildren) {
     await syncLocalToRemote();
 
     // REMOTE TO LOCAL
-   
+
     await syncRemoteToLocal();
     //   const newLastSyncAt = new Date();
     //   const oldLastSyncAt = metadata.lastSyncAt;
