@@ -3,7 +3,7 @@
 import { useAppContext } from '#/providers/app-context';
 import type { Flashcard, FlashcardType } from '#/types/flash-card.type';
 import { Search } from 'lucide-react';
-import { useEffect, useState, type ChangeEvent } from 'react';
+import { useCallback, useEffect, useState, type ChangeEvent } from 'react';
 import Dropdown from '../_ui/dropdown/dropdown';
 import Input from '../_ui/input/input';
 
@@ -19,7 +19,7 @@ export default function FlashcardsFilters({
   const { flashcards, setsDictionary, flashcardTypeDictionaries } =
     useAppContext();
 
-  const handleFilterWithMultipleCryteria = () => {
+  const handleFilterWithMultipleCryteria = useCallback(() => {
     const tmpFlashcards = flashcards
       .filter(
         (flashcard) =>
@@ -45,7 +45,7 @@ export default function FlashcardsFilters({
       );
 
     setFilteredFlashcards(tmpFlashcards);
-  };
+  }, [searchedText, searchedSets, searchedType, flashcards]);
 
   const handleSearchedTextChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchedText(event.target.value);
