@@ -7,6 +7,7 @@ import useKeyPress from '#/hooks/use-key-press.hook';
 import useSpacedRepetition from '#/hooks/use-spaced-repetition';
 import { useAppContext } from '#/providers/app-context';
 import type { Flashcard } from '#/types/flash-card.type';
+import type { ReviseOptionsType } from '#/types/revise-options.type';
 import { ArrowRight, RefreshCw } from 'lucide-react';
 import Dropdown from '../_ui/dropdown/dropdown';
 import LinkComponent from '../_ui/link/link';
@@ -17,13 +18,8 @@ import { ReviseItem } from './revise-item';
 import { ReviseOptions } from './revise-options';
 
 export default function FlashcardReviseComponent() {
-  const {
-    setsDictionary,
-    flashcards,
-    updateFlashcard: updateFlashcard,
-    metadata,
-    updateMetadata,
-  } = useAppContext();
+  const { setsDictionary, flashcards, metadata, updateMetadata } =
+    useAppContext();
 
   const spaceRepetitionOptions = [
     {
@@ -69,21 +65,15 @@ export default function FlashcardReviseComponent() {
     setContinueReroll,
     todayItemsEnd,
   } = useSpacedRepetition({
-    array: flashcards as Flashcard[],
-    setArray: revisedSet === defaultSet.value ? undefined : setFlashcards,
-    differentiateBy: 'type',
+    array: revisedSet === defaultSet.value ? flashcards : setFlashcards,
   });
 
-  const spaceRepetitionClick = (value: 'again' | 'hard' | 'good' | 'easy') => {
+  const spaceRepetitionClick = (value: ReviseOptionsType) => {
     if (!revisedCard) return;
     window.umami.track('Space repetition clicked', { value });
 
     setClickedOption(value);
     setClicked(true);
-
-    const spacedItem = calculateRepetition(revisedCard, value);
-
-    updateFlashcard(spacedItem);
   };
 
   const changeClicked = (flashCard: Flashcard | undefined, key?: string) => {
@@ -103,14 +93,13 @@ export default function FlashcardReviseComponent() {
     const clonedStats = { ...metadata };
 
     clonedStats.answers += 1;
-    let spacedItem;
 
     if (revisedCard.type === 'single' && correct) {
       clonedStats.correctAnswers += 1;
-      spacedItem = calculateRepetition(revisedCard, 'good');
+      calculateRepetition(revisedCard, 'good');
     } else {
       clonedStats.incorrectAnswers += 1;
-      spacedItem = calculateRepetition(revisedCard, 'again');
+      calculateRepetition(revisedCard, 'again');
     }
 
     clonedStats.accuracy = parseFloat(
@@ -118,14 +107,15 @@ export default function FlashcardReviseComponent() {
     );
 
     updateMetadata({ ...clonedStats });
-    updateFlashcard(spacedItem);
     setClickedCard(flashCard);
     setClicked(true);
   };
 
   const reshuffleFlashcards = () => {
     window.umami.track('Reshuffle flashcards', { key: null, clicked });
+    if (!clicked || !revisedCard) return;
 
+    calculateRepetition(revisedCard, clickedOption as ReviseOptionsType);
     setClickedCard(undefined);
     setRevisedCard(undefined);
     setClickedOption(undefined);
@@ -136,8 +126,9 @@ export default function FlashcardReviseComponent() {
 
   const reshuffleFlashcardsWithKey = (key: string) => {
     window.umami.track('Reshuffle flashcards', { key, clicked });
-    if (!clicked) return;
+    if (!clicked || !revisedCard) return;
 
+    calculateRepetition(revisedCard, clickedOption as ReviseOptionsType);
     setClickedCard(undefined);
     setRevisedCard(undefined);
     setClickedOption(undefined);

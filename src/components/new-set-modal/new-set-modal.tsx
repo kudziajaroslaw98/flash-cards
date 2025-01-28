@@ -87,6 +87,10 @@ export const NewSetModal = ({
   }, [open]);
 
   useEffect(() => {
+    setFormValue(sets[currentIndex]);
+  }, [currentIndex, sets]);
+
+  useEffect(() => {
     setFormValue((prev) => ({
       ...prev,
       description: completion,
@@ -94,15 +98,9 @@ export const NewSetModal = ({
   }, [completion]);
 
   const updateFormValue = () => {
-    const currentFormValue = formRef.current?.value as Pick<
-      FlashcardSet,
-      'frontUuid' | 'description' | 'name' | 'category'
-    >;
-
-    setFormValue(currentFormValue);
     setSets((prev) =>
       prev.map((item) =>
-        item.frontUuid === currentFormValue.frontUuid ? currentFormValue : item,
+        item.frontUuid === formValue.frontUuid ? formValue : item,
       ),
     );
   };
@@ -125,10 +123,7 @@ export const NewSetModal = ({
 
     setIsModalOpen(false);
 
-    const currentFormValue = formRef.current?.value as Pick<
-      FlashcardSet,
-      'frontUuid' | 'description' | 'name' | 'category'
-    >;
+    const currentFormValue = formValue;
 
     const mappedSets = sets.map((set) =>
       set.frontUuid === currentFormValue.frontUuid ? currentFormValue : set,
@@ -173,6 +168,7 @@ export const NewSetModal = ({
   };
 
   const handleGenerate = useCallback(async () => {
+    console.log('formValue', formValue);
     if (
       formValue.name !== undefined &&
       formValue.name !== '' &&
@@ -236,13 +232,8 @@ export const NewSetModal = ({
               ref={formRef}
               className='w-full max-w-80'
               scheme={getFormScheme}
-              initialValues={sets[currentIndex]}
-              debug={{
-                inputs: true,
-                validity: true,
-                touch: true,
-                values: true,
-              }}
+              emitFormValue={setFormValue}
+              initialValues={formValue}
             />
           </Modal.Body>
           <Modal.Footer

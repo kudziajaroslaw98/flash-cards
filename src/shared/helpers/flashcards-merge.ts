@@ -29,6 +29,15 @@ export const flashcardsMerge = (
       reviews:
         flashcard?.spacedRepetition?.reviews ??
         defaultFlashcard.spacedRepetition.reviews,
+      weight:
+        flashcard?.spacedRepetition?.weight ??
+        defaultFlashcard.spacedRepetition.weight,
+      reversedWeight:
+        flashcard?.spacedRepetition?.reversedWeight ??
+        defaultFlashcard.spacedRepetition.reversedWeight,
+      culmulativeWeight:
+        flashcard?.spacedRepetition?.culmulativeWeight ??
+        defaultFlashcard.spacedRepetition.culmulativeWeight,
     },
     sets: flashcard?.sets ?? [],
     examples: flashcard?.examples ?? defaultFlashcard.examples,

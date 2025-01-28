@@ -9,4 +9,6 @@ export const DEFAULT_METADATA: Metadata = {
   streak: 1,
   lastSyncAt: null,
   synced: false,
+  dailyStats: [],
+  focusSessions: [],
 };

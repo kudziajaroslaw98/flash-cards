@@ -19,6 +19,9 @@ export type SpacedRepetition = {
   lastReviewAt: string | Date;
   dueDate: string | Date;
   reviews: number;
+  weight: number;
+  reversedWeight: number;
+  culmulativeWeight: number;
 };
 
 export type FlashcardType = 'index' | 'single' | 'question';

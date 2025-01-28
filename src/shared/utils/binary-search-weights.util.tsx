@@ -1,8 +1,12 @@
-export default function binarySearch(
-  arrayOfNumbers: number[],
+import type { DotNestedKeys } from '#/types/dot-nested-keys.type';
+import { deepFind } from './deep-find';
+
+export default function binarySearch<T>(
+  array: T[],
+  differentiateBy: DotNestedKeys<T>,
   randomNumber: number,
   start = 0,
-  end = arrayOfNumbers.length,
+  end = array.length,
 ): number {
   if (end < start) {
     return -1;
@@ -12,11 +16,15 @@ export default function binarySearch(
 
   const mid = Math.floor((start + end) / 2);
 
-  if (arrayOfNumbers[mid] === randomNumber) {
+  if (
+    (deepFind<T>(array[mid] as T, differentiateBy) as number) === randomNumber
+  ) {
     return mid + 1;
-  } else if (arrayOfNumbers[mid] < randomNumber) {
-    return binarySearch(arrayOfNumbers, randomNumber, mid + 1, end);
+  } else if (
+    (deepFind<T>(array[mid] as T, differentiateBy) as number) < randomNumber
+  ) {
+    return binarySearch(array, differentiateBy, randomNumber, mid + 1, end);
   } else {
-    return binarySearch(arrayOfNumbers, randomNumber, start, mid);
+    return binarySearch(array, differentiateBy, randomNumber, start, mid);
   }
 }

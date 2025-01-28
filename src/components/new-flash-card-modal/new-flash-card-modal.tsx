@@ -83,6 +83,10 @@ export const NewFlashcardModal = ({
   }, [selectedFlashcards]);
 
   useEffect(() => {
+    setFormValue(flashcards[currentIndex]);
+  }, [flashcards, currentIndex]);
+
+  useEffect(() => {
     setFormValue((prev) => ({
       ...prev,
       definition: completion,
@@ -90,12 +94,11 @@ export const NewFlashcardModal = ({
   }, [completion]);
 
   const updateFormValue = () => {
-    const currentFormValue = formRef.current?.value as Omit<Flashcard, 'order'>;
-
-    setFormValue(currentFormValue);
     setFlashcards((prev) =>
       prev.map((item) =>
-        item.frontUuid === currentFormValue.frontUuid ? currentFormValue : item,
+        item.frontUuid === formValue.frontUuid
+          ? (formValue as Flashcard)
+          : item,
       ),
     );
   };
@@ -120,7 +123,8 @@ export const NewFlashcardModal = ({
 
     setIsModalOpen(false);
 
-    const currentFormValue = formRef.current?.value as Omit<Flashcard, 'order'>;
+    console.log(formValue);
+    const currentFormValue = formValue as Omit<Flashcard, 'order'>;
     const mappedFlashcards: Omit<Flashcard, 'order'>[] = flashcards.map(
       (flashcard) => {
         const item =
@@ -226,8 +230,9 @@ export const NewFlashcardModal = ({
             <FormComponent<Flashcard | Omit<Flashcard, 'order'>>
               ref={formRef}
               className='w-full px-8'
+              emitFormValue={setFormValue}
               scheme={getFormScheme}
-              initialValues={flashcards[currentIndex]}
+              initialValues={formValue as Flashcard}
             />
           </Modal.Body>
 
