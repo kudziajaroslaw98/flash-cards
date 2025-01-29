@@ -1,7 +1,7 @@
-import { defaultFlashcard } from '#/providers/app-context';
 import type { Flashcard } from '#/types/flash-card.type';
 import { flashcardsMerge } from '../helpers/flashcards-merge';
 import uuid from '../utils/uuid.util';
+import { defaultFlashcard } from './default-flashcard';
 
 export const FLASHCARDS_DB_DEFAULT: Flashcard[] = [
   flashcardsMerge(defaultFlashcard, {

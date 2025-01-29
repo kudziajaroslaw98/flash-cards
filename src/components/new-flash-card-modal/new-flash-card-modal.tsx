@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { defaultFlashcard } from '#/providers/app-context';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
+import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import uuid from '#/shared/utils/uuid.util';
 import { newFlashcardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';

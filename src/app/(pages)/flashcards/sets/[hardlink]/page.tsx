@@ -12,9 +12,10 @@ import { NewFlashcardModal } from '#/components/new-flash-card-modal/new-flash-c
 import { NewSetModal } from '#/components/new-set-modal/new-set-modal';
 import { db } from '#/db/dexie.db';
 import useFetch from '#/hooks/use-fetch.hook';
-import { defaultFlashcard, useAppContext } from '#/providers/app-context';
+import { useAppContext } from '#/providers/app-context';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
+import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { cn } from '#/shared/utils/cn.util';
 import uuid from '#/shared/utils/uuid.util';

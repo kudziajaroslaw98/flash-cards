@@ -1,8 +1,10 @@
 import { db } from '#/db/dexie.db';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
+import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
+import { defaultMetadata } from '#/shared/defaults/default-metadata';
+import { defaultSet } from '#/shared/defaults/default-set';
 import { FLASHCARDS_DB_DEFAULT } from '#/shared/defaults/flashcards-local-storage-init';
 import { SETS_DB_DEFAULT } from '#/shared/defaults/sets-local-storage-init';
-import { DEFAULT_METADATA } from '#/shared/defaults/stats.default';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { metadataMerge } from '#/shared/helpers/metadata-merge';
 import { setsMerge } from '#/shared/helpers/sets-merge';
@@ -25,50 +27,6 @@ import {
   type PropsWithChildren,
 } from 'react';
 import { useSessionContext } from './session-provider.component';
-
-export const defaultFlashcard = {
-  type: 'index',
-  context: '',
-  query: '',
-  definition: '',
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-  spacedRepetition: {
-    interval: 0,
-    easeFactor: 1.3,
-    lastReviewAt: new Date().toISOString(),
-    dueDate: new Date(Date.now() + 1000 * 60 * 10).toISOString(),
-    reviews: 0,
-    weight: 0,
-    reversedWeight: 0,
-    culmulativeWeight: 0,
-    incorrectCount: 0,
-    totalTimeSpent: 0,
-  },
-  sets: [],
-  examples: '',
-  keyPoints: '',
-  synonyms: '',
-  relatedFacts: '',
-  tags: [],
-  synced: false,
-} as Omit<Flashcard, 'frontUuid' | 'order'>;
-
-export const defaultSet: FlashcardSet = {
-  frontUuid: uuid(),
-  name: '',
-  description: '',
-  category: '',
-  isFavourite: false,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-  flashcards: [],
-  hardlink: '',
-  synced: false,
-  reminders: [],
-} as FlashcardSet;
-
-export const defaultMetadata = DEFAULT_METADATA;
 
 export type AppContextType = {
   flashcards: Flashcard[];
@@ -97,7 +55,7 @@ export const AppContext = createContext<AppContextType>({
   sets: [],
   setsDictionary: [],
   categories: [],
-  metadata: DEFAULT_METADATA,
+  metadata: defaultMetadata,
   theme: 'dark',
   avatarSeed: '',
   flashcardTypeDictionaries: [],
@@ -136,7 +94,7 @@ export default function AppProvider(props: PropsWithChildren) {
   const metadata =
     useLiveQuery(() => db.metadata.get('current')) ??
     ({
-      ...DEFAULT_METADATA,
+      ...defaultMetadata,
     } as Metadata);
   const setsDictionary = useMemo(() => {
     return setsArray.map((set) => ({
@@ -580,7 +538,7 @@ export default function AppProvider(props: PropsWithChildren) {
       const sets = SETS_DB_DEFAULT;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const metadata = DEFAULT_METADATA as any;
+      const metadata = defaultMetadata as any;
 
       // 3. Use explicit Dexie transaction
       await db.transaction(

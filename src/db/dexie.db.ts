@@ -1,8 +1,6 @@
-import {
-  defaultFlashcard,
-  defaultMetadata,
-  defaultSet,
-} from '#/providers/app-context';
+import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
+import { defaultMetadata } from '#/shared/defaults/default-metadata';
+import { defaultSet } from '#/shared/defaults/default-set';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { metadataMerge } from '#/shared/helpers/metadata-merge';
 import { setsMerge } from '#/shared/helpers/sets-merge';
