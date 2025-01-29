@@ -3,7 +3,7 @@
 import { Button } from '#/components/_ui/button/button';
 import { createClient } from '#/shared/utils/supabase/client';
 import { ArrowLeftIcon, Fingerprint, Github } from 'lucide-react';
-import { m } from 'motion/react';
+import * as m from 'motion/react-m';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';

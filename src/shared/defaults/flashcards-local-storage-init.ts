@@ -1,65 +1,28 @@
+import { defaultFlashcard } from '#/providers/app-context';
 import type { Flashcard } from '#/types/flash-card.type';
+import { flashcardsMerge } from '../helpers/flashcards-merge';
 import uuid from '../utils/uuid.util';
 
 export const FLASHCARDS_DB_DEFAULT: Flashcard[] = [
-  {
+  flashcardsMerge(defaultFlashcard, {
     type: 'index' as const,
     frontUuid: uuid(),
-    query: '',
     context: 'Lazy',
-    definition: '',
     order: 1,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
-    synced: false,
-    tags: [],
-  },
-  {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'index' as const,
     frontUuid: uuid(),
-    query: '',
     context: 'Bright',
-    definition: '',
     order: 2,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
-
-    synced: false,
-    tags: [],
-  },
-  {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'single' as const,
     frontUuid: uuid(),
     query: "What's the meaning of word below?",
     context: 'Quick',
     definition: 'Happening or done with great speed.',
     order: 3,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
     examples:
       'He made a quick decision to avoid further problems; The quick fox jumped over the lazy dog.',
 
@@ -69,27 +32,14 @@ export const FLASHCARDS_DB_DEFAULT: Flashcard[] = [
     synonyms: 'fast, swift, speedy, rapid',
     relatedFacts:
       'The word "quick" originates from Old English "cwic," meaning alive or moving; Often used in idioms like "quick as a flash."',
-
-    synced: false,
-    tags: [],
-  },
-  {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'single' as const,
     frontUuid: uuid(),
     query: "What's the meaning of word below?",
     context: 'Happy',
     definition: 'Feeling or showing pleasure or contentment.',
     order: 4,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
     examples:
       'She felt happy after hearing the good news; The children were happy to play outside.',
 
@@ -99,134 +49,43 @@ export const FLASHCARDS_DB_DEFAULT: Flashcard[] = [
     synonyms: 'joyful, content, cheerful, pleased',
     relatedFacts:
       'The word "happy" has roots in Middle English, derived from "hap," meaning luck or fortune; Commonly used in phrases like "happy-go-lucky" or "happy ending."',
-
-    synced: false,
-    tags: [],
-  },
-  {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'question' as const,
     frontUuid: uuid(),
     query: "What's the meaning of word below?",
-    context: '',
     definition: 'Not hard or firm to the touch.',
     order: 5,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
-
-    synced: false,
-    tags: [],
-  },
-  {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'question' as const,
     frontUuid: uuid(),
     query: "What's the meaning of word below?",
-    context: '',
     definition: 'Tidy and organized.',
     order: 6,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
-
-    synced: false,
-    tags: [],
-  },
-  {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'index' as const,
     frontUuid: uuid(),
-    query: '',
     context: 'Kind',
-    definition: '',
     order: 7,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
-
-    synced: false,
-    tags: [],
-  },
-  {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'index' as const,
     frontUuid: uuid(),
-    query: '',
     context: 'Quickly',
-    definition: '',
     order: 8,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
-
-    synced: false,
-    tags: [],
-  },
-  {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'index' as const,
     frontUuid: uuid(),
-    query: '',
     context: 'Cold',
-    definition: '',
     order: 9,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
-
-    synced: false,
-    tags: [],
-  },
-  {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'index' as const,
     frontUuid: uuid(),
-    query: '',
     context: 'Funny',
-    definition: '',
     order: 10,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
-
-    synced: false,
-    tags: [],
-  },
+  }),
 ];

@@ -14,7 +14,8 @@ import { useAppContext } from '#/providers/app-context';
 import { cn } from '#/shared/utils/cn.util';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
 import { BadgeCheck, Pencil, Plus, Search, Star, Trash } from 'lucide-react';
-import { AnimatePresence, m } from 'motion/react';
+import { AnimatePresence } from 'motion/react';
+import * as m from 'motion/react-m';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 

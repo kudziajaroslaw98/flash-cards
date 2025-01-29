@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { defaultFlashcard } from '#/providers/app-context';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
+import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import uuid from '#/shared/utils/uuid.util';
 import { newFlashcardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';
 import type { Flashcard } from '#/types/flash-card.type';
@@ -41,29 +43,11 @@ export const NewFlashcardModal = ({
     api: API_ROUTES.ANSWER_GENERATE,
   });
 
-  const getNewFlashcard: () => Omit<Flashcard, 'order'> = () => ({
-    type: 'index' as const,
-    frontUuid: uuid(),
-    query: '',
-    context: '',
-    definition: '',
-    examples: '',
-    keyPoints: '',
-    synonyms: '',
-    relatedFacts: '',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      lastReviewAt: new Date().toISOString(),
-      dueDate: new Date(Date.now()).toISOString(),
-    },
-    sets: [],
-    tags: [],
-    synced: false,
-  });
+  const getNewFlashcard: () => Omit<Flashcard, 'order'> = () =>
+    flashcardsMerge(defaultFlashcard, {
+      type: 'index' as const,
+      frontUuid: uuid(),
+    });
 
   const clearInitialValues = () => {
     if (selectedFlashcards.length === 0) {

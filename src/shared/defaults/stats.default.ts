@@ -11,4 +11,8 @@ export const DEFAULT_METADATA: Metadata = {
   synced: false,
   dailyStats: [],
   focusSessions: [],
+  completedPlans: [],
+  notificationPermission: 'default',
+  activeStudyPlan: undefined,
+  theme: 'dark',
 };

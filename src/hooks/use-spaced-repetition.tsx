@@ -156,7 +156,7 @@ export default function useSpacedRepetition({
       db.flashcards.bulkUpdate(event.data.mappedItems);
     };
 
-    worker.terminate;
+    worker.terminate();
   };
 
   const calculateRepetition = async (

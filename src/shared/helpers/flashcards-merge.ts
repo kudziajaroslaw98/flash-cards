@@ -38,6 +38,12 @@ export const flashcardsMerge = (
       culmulativeWeight:
         flashcard?.spacedRepetition?.culmulativeWeight ??
         defaultFlashcard.spacedRepetition.culmulativeWeight,
+      incorrectCount:
+        flashcard?.spacedRepetition?.incorrectCount ??
+        defaultFlashcard.spacedRepetition.incorrectCount,
+      totalTimeSpent:
+        flashcard?.spacedRepetition?.totalTimeSpent ??
+        defaultFlashcard.spacedRepetition.totalTimeSpent,
     },
     sets: flashcard?.sets ?? [],
     examples: flashcard?.examples ?? defaultFlashcard.examples,

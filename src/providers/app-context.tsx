@@ -42,6 +42,8 @@ export const defaultFlashcard = {
     weight: 0,
     reversedWeight: 0,
     culmulativeWeight: 0,
+    incorrectCount: 0,
+    totalTimeSpent: 0,
   },
   sets: [],
   examples: '',
@@ -63,6 +65,7 @@ export const defaultSet: FlashcardSet = {
   flashcards: [],
   hardlink: '',
   synced: false,
+  reminders: [],
 } as FlashcardSet;
 
 export const defaultMetadata = DEFAULT_METADATA;

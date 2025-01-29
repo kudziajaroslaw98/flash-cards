@@ -14,5 +14,6 @@ export const SETS_DB_DEFAULT: FlashcardSet[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     synced: false,
+    reminders: [],
   },
 ];
