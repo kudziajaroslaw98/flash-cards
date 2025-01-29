@@ -22,6 +22,8 @@ export type SpacedRepetition = {
   weight: number;
   reversedWeight: number;
   culmulativeWeight: number;
+  totalTimeSpent: number; // in seconds
+  incorrectCount: number;
 };
 
 export type FlashcardType = 'index' | 'single' | 'question';

@@ -9,4 +9,5 @@ export type FlashcardSet = {
   createdAt: string;
   updatedAt: string;
   synced: boolean;
+  reminders: string[];
 };

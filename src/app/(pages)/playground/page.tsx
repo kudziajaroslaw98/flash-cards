@@ -1,5 +1,6 @@
 'use client';
 
+import TagInput from '#/components/_ui/tag-input/tag-input';
 import { useState, type ChangeEvent } from 'react';
 
 export default function PlaygroundPage() {
@@ -35,14 +36,23 @@ export default function PlaygroundPage() {
   };
 
   return (
-    <div>
-      <textarea
-        value={message}
-        rows={10}
-        cols={50}
-        onChange={handleOnChange}
-      />
-      <button onClick={handleOnClick}>Click me</button>
-    </div>
+    <>
+      <div>
+        <textarea
+          value={message}
+          rows={10}
+          cols={50}
+          onChange={handleOnChange}
+        />
+        <button onClick={handleOnClick}>Click me</button>
+      </div>
+
+      <div className='mt-20'>
+        <TagInput
+          type='tag'
+          valid={true}
+        />
+      </div>
+    </>
   );
 }
