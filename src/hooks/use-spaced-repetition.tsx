@@ -281,6 +281,6 @@ export default function useSpacedRepetition({
     calculateRepetition,
     continueReroll,
     setContinueReroll,
-    todayItemsEnd: todayItems.length === 0,
+    todayItems: todayItems.length,
   };
 }

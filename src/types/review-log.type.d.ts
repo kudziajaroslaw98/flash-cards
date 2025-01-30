@@ -5,4 +5,5 @@ export type ReviewLog = {
   recalled: boolean;
   timeSpent: number; // 4.5 seconds
   tags: string[];
+  synced: boolean;
 };

@@ -23,14 +23,9 @@ export function ReviseOptions({
 }: ReviseOptionsProps) {
   const spaceRepetitionOptions = [
     {
-      value: 'again',
-      label: 'Again',
-      description: 'Show again in ~ 10 minutes',
-    },
-    {
-      value: 'hard',
-      label: 'Hard',
-      description: 'Show again in ~ 1 hour',
+      value: 'easy',
+      label: 'Easy',
+      description: 'Show again in ~ 1 week',
     },
     {
       value: 'good',
@@ -38,9 +33,14 @@ export function ReviseOptions({
       description: 'Show again in ~ 1 day',
     },
     {
-      value: 'easy',
-      label: 'Easy',
-      description: 'Show again in ~ 1 week',
+      value: 'hard',
+      label: 'Hard',
+      description: 'Show again in ~ 1 hour',
+    },
+    {
+      value: 'again',
+      label: 'Again',
+      description: 'Show again in ~ 10 minutes',
     },
   ] as const;
 
@@ -53,13 +53,13 @@ export function ReviseOptions({
   }, [randomItems]);
 
   return (
-    <div className='mt-8 grid gap-2 xl:grid-cols-[repeat(2,minmax(20rem,1fr))]'>
+    <div className='mt-8 grid w-full grid-cols-[repeat(1,1fr)] items-center justify-items-center gap-2 lg:w-auto lg:grid-cols-[repeat(2,minmax(20rem,1fr))]'>
       {(revisedCard?.type === 'index' || revisedCard?.type === 'question') && (
         <>
           {spaceRepetitionOptions.map((option, index) => (
             <div
               className={cn([
-                'flex w-[320px] cursor-pointer gap-4 rounded-md border border-gray-200 p-4 transition hover:bg-gray-100 dark:border-slate-800/40 dark:hover:bg-slate-800',
+                'flex w-full max-w-80 cursor-pointer items-center justify-center gap-4 rounded-md border border-gray-200 p-4 transition hover:bg-gray-100 dark:border-slate-800/40 dark:hover:bg-slate-800',
                 clickedOption === option.value &&
                   'border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
               ])}
@@ -70,12 +70,31 @@ export function ReviseOptions({
                 )
               }
             >
-              <span className='flex size-8 min-h-8 min-w-8 items-center justify-center rounded-md bg-green-400 text-gray-100 dark:text-slate-900'>
+              <span
+                className={cn([
+                  'flex size-8 min-h-8 min-w-8 items-center justify-center rounded-md text-gray-100 dark:text-slate-900',
+                  option.value === 'easy' && 'bg-green-400',
+                  option.value === 'good' && 'bg-blue-400',
+                  option.value === 'hard' && 'bg-orange-400',
+                  option.value === 'again' && 'bg-red-400',
+                ])}
+              >
                 {index + 1}
               </span>
 
-              <span className='flex w-[280px] text-sm text-gray-600 dark:text-slate-400'>
-                {option.label} - {option.description}
+              <span className='flex w-full  flex-col text-sm text-gray-600 dark:text-slate-400'>
+                <span
+                  className={cn([
+                    'font-semibold',
+                    option.value === 'easy' && 'text-green-400',
+                    option.value === 'good' && 'text-blue-400',
+                    option.value === 'hard' && 'text-orange-400',
+                    option.value === 'again' && 'text-red-400',
+                  ])}
+                >
+                  {option.label}
+                </span>
+                <span className='text-xs'>{option.description}</span>
               </span>
             </div>
           ))}

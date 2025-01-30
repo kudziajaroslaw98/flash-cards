@@ -1,5 +1,6 @@
 'use client';
 
+import ProgressBar from '#/components/_ui/progress-bar/progress-bar';
 import TagInput from '#/components/_ui/tag-input/tag-input';
 import { useState, type ChangeEvent } from 'react';
 
@@ -51,6 +52,13 @@ export default function PlaygroundPage() {
         <TagInput
           type='tags'
           valid={true}
+        />
+      </div>
+
+      <div className='mt-20'>
+        <ProgressBar
+          value={40}
+          max={100}
         />
       </div>
     </>

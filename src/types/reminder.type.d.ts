@@ -4,6 +4,7 @@ export type Reminder = {
   days: WeekDay[]; // ['mon', 'tue', etc.]
   time: string; // "19:30"
   enabled: boolean;
+  synced: boolean;
 };
 
 export type WeekDay = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';

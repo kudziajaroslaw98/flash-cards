@@ -4,4 +4,5 @@ export type DailyStat = {
   cardsReviewed: number;
   cardsRecalled: number;
   timeSpent: number; // in seconds
+  synced: boolean;
 };

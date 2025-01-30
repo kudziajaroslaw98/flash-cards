@@ -88,11 +88,10 @@ export class AppDB extends Dexie {
       });
 
     // Setup hooks
-    this.setupFlashcardHooks();
-    this.setupSetHooks();
+    this.setupHooks();
   }
 
-  private setupFlashcardHooks() {
+  private setupHooks() {
     this.flashcards.hook('updating', (modifications: Partial<Flashcard>) => {
       modifications.updatedAt = new Date().toISOString();
       modifications.synced = false;
@@ -101,9 +100,11 @@ export class AppDB extends Dexie {
     this.flashcards.hook('creating', (primKey, card) => {
       card.synced = card.synced === true;
     });
-  }
 
-  private setupSetHooks() {
+    this.dailyStats.hook('updating', (modifications: Partial<DailyStat>) => {
+      modifications.synced = false;
+    });
+
     this.sets.hook('updating', (modifications: Partial<FlashcardSet>) => {
       modifications.updatedAt = new Date().toISOString();
       modifications.synced = false;

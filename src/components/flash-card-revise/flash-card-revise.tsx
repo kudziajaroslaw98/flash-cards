@@ -15,6 +15,7 @@ import type { ReviewLog } from '#/types/review-log.type';
 import type { ReviseOptionsType } from '#/types/revise-options.type';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { ArrowRight, RefreshCw } from 'lucide-react';
+import { Accordion } from '../_ui/accordion/accordion';
 import Dropdown from '../_ui/dropdown/dropdown';
 import LinkComponent from '../_ui/link/link';
 import { FloatingButtons } from '../floating-buttons/floating-buttons';
@@ -22,6 +23,7 @@ import { ShortcutList } from '../shortcut-list/shortcut-list';
 import { AllRevised } from './all-revised';
 import { ReviseItem } from './revise-item';
 import { ReviseOptions } from './revise-options';
+import { ReviseSession } from './revise-session';
 
 export default function FlashcardReviseComponent() {
   const { setsDictionary, flashcards, metadata, updateMetadata } =
@@ -71,9 +73,10 @@ export default function FlashcardReviseComponent() {
     end: new Date().toISOString(),
     activeTime: 0,
     distractions: 0,
+    synced: false,
   });
 
-  const { activeTime, distractions } = useFocusTracker();
+  const { activeTime, activeTimeRef, distractionsRef } = useFocusTracker();
   // eslint-disable-next-line no-undef
   const cardTime = useRef<Date>(new Date()); //in seconds
 
@@ -89,7 +92,7 @@ export default function FlashcardReviseComponent() {
     randomItems,
     continueReroll,
     setContinueReroll,
-    todayItemsEnd,
+    todayItems,
   } = useSpacedRepetition({
     array: revisedSet === defaultSet.value ? flashcards : setFlashcards,
   });
@@ -105,6 +108,7 @@ export default function FlashcardReviseComponent() {
       recalled: false,
       timeSpent: Math.floor((Date.now() - cardTime.current.getTime()) / 1000),
       tags: revisedCard.tags,
+      synced: false,
     };
 
     if (value === 'easy' || value === 'good') {
@@ -218,8 +222,8 @@ export default function FlashcardReviseComponent() {
       db.focusSessions.put({
         ...focusSession.current,
         end: new Date().toISOString(),
-        activeTime: activeTime.current,
-        distractions: distractions.current,
+        activeTime: activeTimeRef.current,
+        distractions: distractionsRef.current,
       });
 
       if (dailyStat) {
@@ -230,7 +234,8 @@ export default function FlashcardReviseComponent() {
             (dailyStat.cardsRecalled + cardsRecalled.current),
           cardsReviewed: dailyStat.cardsReviewed + cardsReviewed.current,
           cardsRecalled: dailyStat.cardsRecalled + cardsRecalled.current,
-          timeSpent: dailyStat.timeSpent + activeTime.current,
+          timeSpent: dailyStat.timeSpent + activeTimeRef.current,
+          synced: false,
         });
       } else {
         db.dailyStats.put({
@@ -238,7 +243,8 @@ export default function FlashcardReviseComponent() {
           retention: cardsReviewed.current / cardsRecalled.current,
           cardsReviewed: cardsReviewed.current,
           cardsRecalled: cardsRecalled.current,
-          timeSpent: activeTime.current,
+          timeSpent: activeTimeRef.current,
+          synced: false,
         });
       }
     };
@@ -254,31 +260,44 @@ export default function FlashcardReviseComponent() {
   return flashcards.length > 0 ? (
     <div className='flex h-full w-full flex-col justify-stretch'>
       <div className='flex h-full w-full flex-col items-center gap-8 pb-44'>
-        {(todayItemsEnd && continueReroll) || !todayItemsEnd ? (
+        {(todayItems === 0 && continueReroll) || todayItems > 0 ? (
           <>
+            <div className='flex flex-col gap-4'>
+              <ReviseSession
+                totalCards={todayItems}
+                recalled={cardsRecalled.current}
+                reviewed={cardsReviewed.current}
+                timeSpent={activeTime}
+              />
+
+              <Accordion className='hidden md:grid'>
+                <Accordion.Item title='Shortcuts'>
+                  <ShortcutList
+                    className='hidden md:flex md:flex-col md:items-center'
+                    shortcuts={[
+                      {
+                        name: 'Reshuffle',
+                        keys: [
+                          'Space',
+                          <ArrowRight
+                            key='ArrowBigRight'
+                            className='size-4'
+                          />,
+                        ],
+                      },
+                      {
+                        name: 'Answer 1 - 4',
+                        keys: ['1', '2', '3', '4'],
+                      },
+                    ]}
+                  />
+                </Accordion.Item>
+              </Accordion>
+            </div>
+
             <ReviseItem
               clicked={clicked}
               revisedCard={revisedCard}
-            />
-
-            <ShortcutList
-              className='hidden md:flex'
-              shortcuts={[
-                {
-                  name: 'Reshuffle',
-                  keys: [
-                    'Space',
-                    <ArrowRight
-                      key='ArrowBigRight'
-                      className='size-4'
-                    />,
-                  ],
-                },
-                {
-                  name: 'Answer 1 - 4',
-                  keys: ['1', '2', '3', '4'],
-                },
-              ]}
             />
 
             <ReviseOptions

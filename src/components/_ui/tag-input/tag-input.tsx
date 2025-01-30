@@ -86,10 +86,6 @@ function TagInput({
       const lastTag = tags[tags.length - 1];
       if (lastTag) {
         removeTag(tags.length - 1);
-        if (props.onChange) {
-          props.onChange(tags.slice(0, -1));
-        }
-
         setInputValue(lastTag);
       }
     }
@@ -101,6 +97,9 @@ function TagInput({
   };
 
   const removeTag = (index: number) => {
+    if (props.onChange) {
+      props.onChange(tags.slice(0, -1));
+    }
     setTags((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -159,26 +158,38 @@ function TagInput({
           />
         </span>
 
-        <div className='inline-flex flex-wrap gap-2'>
-          {tags.map((tag, index) => (
-            <div
-              key={index}
-              className='flex items-center gap-1 rounded-md border border-green-300 bg-green-100/25 py-1 pl-3 pr-1 text-xs font-semibold text-green-600 transition-colors hover:bg-green-200 dark:border-green-950 dark:bg-green-950/25 dark:text-green-400'
-            >
-              <span className='flex h-full items-center justify-center'>
-                {tag}
-              </span>
-              <Button
-                onClick={() => removeTag(index)}
-                size={'icon-xs'}
-                icon={<X className='h-3 w-3' />}
-                iconPosition='right'
-                alt='Remove tag'
-                variant={'primary-text'}
-              />
-            </div>
-          ))}
-        </div>
+        {tags.length > 0 && (
+          <div className='inline-flex flex-wrap gap-2'>
+            {tags.map((tag, index) => (
+              <div
+                key={index}
+                className={cn(
+                  touched && !valid
+                    ? '!border-red-400 bg-red-100/25 !ring-red-400/50 dark:bg-red-950/25'
+                    : '',
+                  touched && valid
+                    ? '!border-green-400 bg-green-100/25 !ring-green-400/50 dark:bg-green-950/25'
+                    : '',
+                  'transition-colorsdark:border-slate-800 flex items-center gap-1 rounded-md border border-gray-300 py-1 pl-3 pr-1 text-xs font-semibold',
+                )}
+              >
+                <span className='flex h-full items-center justify-center'>
+                  {tag}
+                </span>
+                <Button
+                  onClick={() => removeTag(index)}
+                  size={'icon-xs'}
+                  icon={<X className='h-3 w-3' />}
+                  iconPosition='right'
+                  alt='Remove tag'
+                  variant={
+                    touched && !valid ? 'destructive-text' : 'primary-text'
+                  }
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <span
