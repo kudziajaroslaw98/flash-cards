@@ -152,7 +152,6 @@ function TagInput({
             ])}
             onChange={handleOnInput}
             onKeyDown={handleInputKeyDown}
-            onKe
             onFocus={handleFocus}
             onBlur={handleBlur}
             aria-invalid={touched && !valid ? 'true' : 'false'}
