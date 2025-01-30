@@ -35,9 +35,11 @@ export function ReviseSession({
           <span className='font-semibold'>{recalled}</span>
         </span>
 
-        <span>
-          <span>Time spent:</span>{' '}
-          <span className='font-semibold'>{timeSpent} seconds</span>
+        <span className='flex gap-1'>
+          <span>Time spent:</span>
+          <span className='flex w-14 font-semibold'>
+            {Math.floor(timeSpent / 60)}m {timeSpent % 60}s
+          </span>
         </span>
       </div>
 
