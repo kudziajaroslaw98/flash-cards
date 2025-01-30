@@ -61,7 +61,10 @@ export function ReviseOptions({
               className={cn([
                 'flex w-full max-w-80 cursor-pointer items-center justify-center gap-4 rounded-md border border-gray-200 p-4 transition hover:bg-gray-100 dark:border-slate-800/40 dark:hover:bg-slate-800',
                 clickedOption === option.value &&
-                  'border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
+                  'scale-110 border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
+                clicked &&
+                  clickedOption !== option.value &&
+                  'scale-95 opacity-25 blur-[2px]',
               ])}
               key={`answer-${index}`}
               onClick={() =>

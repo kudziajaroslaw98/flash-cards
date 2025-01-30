@@ -6,7 +6,7 @@ import {
 } from '#/shared/utils/calculate-weight';
 import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
 import type { Flashcard } from '#/types/flash-card.type';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type SpaceRepetitionAlgorithmProps = {
   items: Flashcard[];
@@ -22,6 +22,7 @@ export default function useSpacedRepetition({
   array,
   numberOfItems = 4,
 }: UseSpacedRepetitionProps) {
+  const todayItemsRef = useRef<number | null>(null);
   const [randomItems, setRandomItems] = useState<Flashcard[] | null>(null);
   const [continueReroll, setContinueReroll] = useState(false);
   const todayItems = useMemo(
@@ -232,6 +233,12 @@ export default function useSpacedRepetition({
   };
 
   useEffect(() => {
+    if (todayItems.length > 0 && todayItemsRef.current === null) {
+      todayItemsRef.current = todayItems.length;
+    }
+  }, [todayItems]);
+
+  useEffect(() => {
     if (array.length === 0 || (todayItems.length === 0 && !continueReroll)) {
       return;
     }
@@ -281,6 +288,7 @@ export default function useSpacedRepetition({
     calculateRepetition,
     continueReroll,
     setContinueReroll,
-    todayItems: todayItems.length,
+    todayItems: todayItemsRef.current,
+    availableTodayItems: todayItems.length,
   };
 }

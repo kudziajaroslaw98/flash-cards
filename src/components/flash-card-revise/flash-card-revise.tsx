@@ -93,13 +93,20 @@ export default function FlashcardReviseComponent() {
     continueReroll,
     setContinueReroll,
     todayItems,
+    availableTodayItems,
   } = useSpacedRepetition({
     array: revisedSet === defaultSet.value ? flashcards : setFlashcards,
   });
 
   const spaceRepetitionClick = (value: ReviseOptionsType) => {
-    if (!revisedCard) return;
+    if (!revisedCard) {
+      return;
+    }
     window.umami.track('Space repetition clicked', { value });
+
+    if (clicked) {
+      return;
+    }
 
     const reviewLog: ReviewLog = {
       timestamp: new Date().toISOString(),
@@ -144,10 +151,10 @@ export default function FlashcardReviseComponent() {
     if (revisedCard.type === 'single' && correct) {
       clonedStats.correctAnswers += 1;
       cardsRecalled.current += 1;
-      calculateRepetition(revisedCard, 'good');
+      setClickedOption('easy');
     } else {
+      setClickedOption('again');
       clonedStats.incorrectAnswers += 1;
-      calculateRepetition(revisedCard, 'again');
     }
 
     clonedStats.accuracy = parseFloat(
@@ -260,11 +267,12 @@ export default function FlashcardReviseComponent() {
   return flashcards.length > 0 ? (
     <div className='flex h-full w-full flex-col justify-stretch'>
       <div className='flex h-full w-full flex-col items-center gap-8 pb-44'>
-        {(todayItems === 0 && continueReroll) || todayItems > 0 ? (
+        {(availableTodayItems === 0 && continueReroll) ||
+        availableTodayItems > 0 ? (
           <>
             <div className='flex flex-col gap-4'>
               <ReviseSession
-                totalCards={todayItems}
+                totalCards={todayItems ?? 0}
                 recalled={cardsRecalled.current}
                 reviewed={cardsReviewed.current}
                 timeSpent={activeTime}
