@@ -51,11 +51,13 @@ export const NewFlashcardModal = ({
 
   const clearInitialValues = () => {
     if (selectedFlashcards.length === 0) {
-      setFlashcards([getNewFlashcard()]);
+      const newFlashcard = getNewFlashcard();
+      setFlashcards([newFlashcard]);
+      setFormValue(newFlashcard);
     } else {
       setFlashcards(selectedFlashcards);
+      setFormValue(selectedFlashcards[0]);
     }
-    setFormValue({});
   };
 
   useEffect(() => {
@@ -107,7 +109,6 @@ export const NewFlashcardModal = ({
 
     setIsModalOpen(false);
 
-    console.log(formValue);
     const currentFormValue = formValue as Omit<Flashcard, 'order'>;
     const mappedFlashcards: Omit<Flashcard, 'order'>[] = flashcards.map(
       (flashcard) => {

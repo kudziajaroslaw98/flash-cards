@@ -25,11 +25,13 @@ export default function FlashcardsActions({
   } = useAppContext();
 
   const updatedSelected =
-    useLiveQuery(() =>
-      db.flashcards
-        .where('frontUuid')
-        .anyOf(selected.map((f) => f.frontUuid))
-        .toArray(),
+    useLiveQuery(
+      () =>
+        db.flashcards
+          .where('frontUuid')
+          .anyOf(selected.map((f) => f.frontUuid))
+          .toArray(),
+      [selected],
     ) ?? [];
 
   const addNewRecord = (flashcards: Partial<Flashcard>[]) => {

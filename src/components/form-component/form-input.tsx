@@ -2,6 +2,7 @@
 
 import isDropdown from '#/shared/guards/is-dropdown';
 import isInput from '#/shared/guards/is-input';
+import isTagInput from '#/shared/guards/is-tag-input';
 import isTextArea from '#/shared/guards/is-text-area';
 import type {
   ExtendedInputType,
@@ -12,6 +13,7 @@ import * as m from 'motion/react-m';
 import type { FormEvent } from 'react';
 import Dropdown from '../_ui/dropdown/dropdown';
 import Input from '../_ui/input/input';
+import TagInput from '../_ui/tag-input/tag-input';
 import TextArea from '../_ui/text-area/text-area';
 
 type FormInputProps<T> = {
@@ -101,6 +103,21 @@ export default function FormInput<T>({
           touched={touched}
           value={(value as string) ?? ''}
           onInput={(e) => handleOnInput(e, inputName)}
+          onFocus={() => handleOnFocus(inputName)}
+          onBlur={handleOnBlur}
+          {...constaintProps}
+        />
+      )}
+
+      {isTagInput(inputProps) && (
+        <TagInput
+          {...inputProps}
+          key={`${inputName}-${index}`}
+          valid={touched ? valid : true}
+          error={touched ? error : null}
+          touched={touched}
+          value={(value as string[]) ?? []}
+          onChange={(value) => handleOnChange(value, inputName)}
           onFocus={() => handleOnFocus(inputName)}
           onBlur={handleOnBlur}
           {...constaintProps}

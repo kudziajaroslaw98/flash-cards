@@ -2,7 +2,7 @@
 
 import { cn } from '#/shared/utils/cn.util';
 import { X } from 'lucide-react';
-import { useRef, useState, type InputHTMLAttributes } from 'react';
+import { useEffect, useRef, useState, type InputHTMLAttributes } from 'react';
 import { Button } from '../button/button';
 
 export type TagInputValidation =
@@ -22,21 +22,22 @@ export interface TagInputComponentProps
     | 'placeholder'
     | 'value'
     | 'name'
-    | 'onChange'
     | 'onBlur'
     | 'onFocus'
     | 'onInput'
     | 'onKeyDown'
     | 'tabIndex'
   > {
-  type: 'tag';
+  type: 'tags';
   label?: string;
   for?: string;
   valid: boolean;
   error?: string | null;
   touched?: boolean;
   icon?: React.ReactNode;
-  value?: string;
+  value?: string[];
+  maxTags?: number;
+  onChange?: (tags: string[]) => void;
 }
 
 function TagInput({
@@ -44,16 +45,17 @@ function TagInput({
   valid,
   label,
   required,
+  icon,
+  maxTags,
   touched = false,
   error = null,
   className = '',
-  type = 'tag',
-  icon,
+  type = 'tags',
   ...props
 }: TagInputComponentProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>(props.value || []);
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     window.umami.track('Focus input', { name: props.name });
@@ -65,13 +67,7 @@ function TagInput({
     if (props.onBlur) props.onBlur(e);
   };
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    if (props.onChange) props.onChange(e);
-  };
-
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    console.log(inputValue);
     if (e.key === ',' || e.key === 'Enter') {
       e.preventDefault();
       const newTag = inputValue.trim().replace(/,/g, '');
@@ -89,9 +85,20 @@ function TagInput({
     }
   };
 
+  const handleOnInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (tags.length === maxTags) return;
+    setInputValue(e.target.value);
+  };
+
   const removeTag = (index: number) => {
     setTags((prev) => prev.filter((_, i) => i !== index));
   };
+
+  useEffect(() => {
+    if (props.onChange) {
+      props.onChange(tags);
+    }
+  }, [tags]);
 
   return (
     <label
@@ -131,10 +138,10 @@ function TagInput({
               label
                 ? 'placeholder:text-gray-400 dark:placeholder:text-slate-700'
                 : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
-              'peer w-auto text-sm text-gray-800',
+              'peer w-full text-sm text-gray-800',
               'bg-transparent text-inherit outline-none transition-all dark:text-slate-200',
             ])}
-            onChange={handleOnChange}
+            onChange={handleOnInput}
             onKeyDown={handleInputKeyDown}
             onFocus={handleFocus}
             onBlur={handleBlur}
