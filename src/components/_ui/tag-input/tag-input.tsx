@@ -68,7 +68,7 @@ function TagInput({
   };
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === ',' || e.key === 'Enter') {
+    if (e.code === 'Comma' || e.code === 'Enter') {
       e.preventDefault();
       const newTag = inputValue.trim().replace(/,/g, '');
       if (newTag && !tags.includes(newTag)) {
@@ -82,7 +82,7 @@ function TagInput({
       }
       setInputValue('');
     }
-    if (e.key === 'Backspace' && !inputValue) {
+    if (e.code === 'Backspace' && !inputValue) {
       const lastTag = tags[tags.length - 1];
       if (lastTag) {
         removeTag(tags.length - 1);
@@ -152,6 +152,7 @@ function TagInput({
             ])}
             onChange={handleOnInput}
             onKeyDown={handleInputKeyDown}
+            onKe
             onFocus={handleFocus}
             onBlur={handleBlur}
             aria-invalid={touched && !valid ? 'true' : 'false'}
