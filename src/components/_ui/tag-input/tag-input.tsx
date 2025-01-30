@@ -72,7 +72,13 @@ function TagInput({
       e.preventDefault();
       const newTag = inputValue.trim().replace(/,/g, '');
       if (newTag && !tags.includes(newTag)) {
-        setTags([...tags, newTag]);
+        const newTags = [...tags, newTag];
+
+        setTags(newTags);
+
+        if (props.onChange) {
+          props.onChange(newTags);
+        }
       }
       setInputValue('');
     }
@@ -80,6 +86,10 @@ function TagInput({
       const lastTag = tags[tags.length - 1];
       if (lastTag) {
         removeTag(tags.length - 1);
+        if (props.onChange) {
+          props.onChange(tags.slice(0, -1));
+        }
+
         setInputValue(lastTag);
       }
     }
@@ -95,10 +105,10 @@ function TagInput({
   };
 
   useEffect(() => {
-    if (props.onChange) {
-      props.onChange(tags);
+    if (props.value) {
+      setTags(props.value);
     }
-  }, [tags]);
+  }, [props.value]);
 
   return (
     <label

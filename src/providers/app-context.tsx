@@ -89,7 +89,8 @@ export default function AppProvider(props: PropsWithChildren) {
   /////////////////
 
   const [avatarSeed, setAvatarSeed] = useState<string>('');
-  const flashcardsArray = useLiveQuery(() => db.flashcards.toArray()) ?? [];
+  const flashcardsArray =
+    useLiveQuery(() => db.flashcards.toCollection().sortBy('order')) ?? [];
   const setsArray = useLiveQuery(() => db.sets.toArray()) ?? [];
   const metadata =
     useLiveQuery(() => db.metadata.get('current')) ??

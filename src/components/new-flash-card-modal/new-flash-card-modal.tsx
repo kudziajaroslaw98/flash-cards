@@ -218,6 +218,9 @@ export const NewFlashcardModal = ({
               emitFormValue={setFormValue}
               scheme={getFormScheme}
               initialValues={formValue as Flashcard}
+              debug={{
+                values: true,
+              }}
             />
           </Modal.Body>
 

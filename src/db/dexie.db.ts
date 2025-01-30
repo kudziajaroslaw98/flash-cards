@@ -5,15 +5,21 @@ import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { metadataMerge } from '#/shared/helpers/metadata-merge';
 import { setsMerge } from '#/shared/helpers/sets-merge';
 import { calculateWeight } from '#/shared/utils/calculate-weight';
+import type { DailyStat } from '#/types/daily-stat.type';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { Flashcard } from '#/types/flash-card.type';
+import type { FocusSession } from '#/types/focus-session.type';
 import type { Metadata } from '#/types/metadata.type';
+import type { ReviewLog } from '#/types/review-log.type';
 import Dexie from 'dexie';
 
 export class AppDB extends Dexie {
   flashcards!: Dexie.Table<Flashcard, string>;
   sets!: Dexie.Table<FlashcardSet, string>;
   metadata!: Dexie.Table<Metadata, string>;
+  focusSessions!: Dexie.Table<FocusSession, string>;
+  dailyStats!: Dexie.Table<DailyStat, string>;
+  reviewLogs!: Dexie.Table<ReviewLog, string>;
 
   constructor() {
     super('FlashcardDB');
@@ -24,6 +30,9 @@ export class AppDB extends Dexie {
           '&frontUuid, tags, createdAt, updatedAt, *sets, spacedRepetition.dueDate, spacedRepetition.easeFactor, [setUuids+spacedRepetition.dueDate]',
         sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards',
         metadata: 'key',
+        dailyStats: 'date',
+        focusSessions: 'uuid, start, end',
+        reviewLogs: 'timestamp, sessionUuid, cardFrontUuid, *tags',
       })
       .upgrade((transaction) => {
         transaction

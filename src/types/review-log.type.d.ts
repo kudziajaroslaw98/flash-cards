@@ -1,8 +1,8 @@
-export type reviewLog = {
-  card_id: 'string';
-  correct: boolean;
-  time_spent: number; // 4.5 seconds
+export type ReviewLog = {
   timestamp: Date | string;
+  sessionUuid: string;
+  cardFrontUuid: string;
+  recalled: boolean;
+  timeSpent: number; // 4.5 seconds
   tags: string[];
-  session_id: 'string';
 };

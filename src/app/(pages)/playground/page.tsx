@@ -49,7 +49,7 @@ export default function PlaygroundPage() {
 
       <div className='mt-20'>
         <TagInput
-          type='tag'
+          type='tags'
           valid={true}
         />
       </div>

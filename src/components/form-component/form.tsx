@@ -102,6 +102,7 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
   //////////////
 
   useEffect(() => {
+    console.log('initial', props.initialValues);
     if (
       initialValuesRef.current === null ||
       isDifferent(initialValuesRef.current, props.initialValues)
@@ -109,7 +110,7 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
       let initialInputs: string[] = [];
       let initialValids: Record<string, boolean> = {};
       let initialErrors: Record<string, string | null> = {};
-      let tmpValues: Record<string, string> = {};
+      let tmpValues: Record<string, string | unknown[]> = {};
       let initialVisibility: Record<string, boolean> = {};
       let initialValidations: Record<string, InputValidation<T>[]> = {};
 
@@ -152,20 +153,28 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
         initialInputs = [...initialInputs, inputName];
         initialValids = { ...initialValids, [inputName]: true };
         initialErrors = { ...initialErrors, [inputName]: null };
+
+        const inputDefaultInitialValue = Array.isArray(
+          // @ts-expect-error Generic type generate error here
+          props.initialValues?.[inputName],
+        )
+          ? []
+          : '';
+
         tmpValues = {
           ...tmpValues,
           // @ts-expect-error Generic type generate error here
           [inputName]: props.initialValues?.[inputName]
             ? // @ts-expect-error  Generic type generate error here
               props.initialValues?.[inputName]
-            : '',
+            : inputDefaultInitialValue,
         };
       });
 
-      const initialValues: Record<keyof T, string> = {
+      const initialValues: Record<keyof T, string | unknown[]> = {
         ...props.initialValues,
         ...tmpValues,
-      } as Record<keyof T, string>;
+      } as Record<keyof T, unknown[]>;
 
       setFormInputs(initialInputs);
       setInputsValidity(initialValids);

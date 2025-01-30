@@ -1,6 +1,7 @@
 export type FocusSession = {
-  start: Date;
-  end: Date;
+  uuid: string;
+  start: Date | string;
+  end: Date | string;
   activeTime: number; // in seconds
   distractions: number;
 };

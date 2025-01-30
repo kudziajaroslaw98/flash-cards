@@ -1,13 +1,19 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from '#/components/_ui/button/button';
+import { db } from '#/db/dexie.db';
+import { useFocusTracker } from '#/hooks/use-focus-tracker.hook';
 import useKeyPress from '#/hooks/use-key-press.hook';
 import useSpacedRepetition from '#/hooks/use-spaced-repetition';
 import { useAppContext } from '#/providers/app-context';
+import uuid from '#/shared/utils/uuid.util';
 import type { Flashcard } from '#/types/flash-card.type';
+import type { FocusSession } from '#/types/focus-session.type';
+import type { ReviewLog } from '#/types/review-log.type';
 import type { ReviseOptionsType } from '#/types/revise-options.type';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { ArrowRight, RefreshCw } from 'lucide-react';
 import Dropdown from '../_ui/dropdown/dropdown';
 import LinkComponent from '../_ui/link/link';
@@ -44,12 +50,32 @@ export default function FlashcardReviseComponent() {
     },
   ] as const;
 
+  const dailyStat = useLiveQuery(() =>
+    db.dailyStats
+      .where('date')
+      .equals(new Date().toISOString().split('T')[0])
+      .toArray(),
+  )?.[0];
+
   const defaultSet = { value: 'default', label: 'All flashcards' };
   const [revisedCard, setRevisedCard] = useState<Flashcard>();
   const [revisedSet, setRevisedSet] = useState<string>(defaultSet.value);
   const [clickedCard, setClickedCard] = useState<Flashcard>();
   const [clickedOption, setClickedOption] = useState<string>();
   const [clicked, setClicked] = useState(false);
+  const cardsReviewed = useRef(0);
+  const cardsRecalled = useRef(0);
+  const focusSession = useRef<FocusSession>({
+    uuid: uuid(),
+    start: new Date().toISOString(),
+    end: new Date().toISOString(),
+    activeTime: 0,
+    distractions: 0,
+  });
+
+  const { activeTime, distractions } = useFocusTracker();
+  // eslint-disable-next-line no-undef
+  const cardTime = useRef<Date>(new Date()); //in seconds
 
   const setFlashcards = useMemo(
     () =>
@@ -72,6 +98,22 @@ export default function FlashcardReviseComponent() {
     if (!revisedCard) return;
     window.umami.track('Space repetition clicked', { value });
 
+    const reviewLog: ReviewLog = {
+      timestamp: new Date().toISOString(),
+      sessionUuid: focusSession.current.uuid,
+      cardFrontUuid: revisedCard.frontUuid,
+      recalled: false,
+      timeSpent: Math.floor((Date.now() - cardTime.current.getTime()) / 1000),
+      tags: revisedCard.tags,
+    };
+
+    if (value === 'easy' || value === 'good') {
+      cardsRecalled.current += 1;
+      reviewLog.recalled = true;
+    }
+
+    db.reviewLogs.add(reviewLog);
+    cardsReviewed.current += 1;
     setClickedOption(value);
     setClicked(true);
   };
@@ -92,10 +134,12 @@ export default function FlashcardReviseComponent() {
     const correct = revisedCard?.frontUuid === flashCard.frontUuid;
     const clonedStats = { ...metadata };
 
+    cardsReviewed.current += 1;
     clonedStats.answers += 1;
 
     if (revisedCard.type === 'single' && correct) {
       clonedStats.correctAnswers += 1;
+      cardsRecalled.current += 1;
       calculateRepetition(revisedCard, 'good');
     } else {
       clonedStats.incorrectAnswers += 1;
@@ -165,7 +209,40 @@ export default function FlashcardReviseComponent() {
     if (!randomItems?.length) return;
 
     setRevisedCard(randomItems?.[0]);
+    cardTime.current = new Date();
   }, [randomItems]);
+
+  useEffect(() => {
+    return () => {
+      console.log('exit');
+      db.focusSessions.put({
+        ...focusSession.current,
+        end: new Date().toISOString(),
+        activeTime: activeTime.current,
+        distractions: distractions.current,
+      });
+
+      if (dailyStat) {
+        db.dailyStats.put({
+          date: new Date().toISOString().split('T')[0],
+          retention:
+            (dailyStat.cardsReviewed + cardsReviewed.current) /
+            (dailyStat.cardsRecalled + cardsRecalled.current),
+          cardsReviewed: dailyStat.cardsReviewed + cardsReviewed.current,
+          cardsRecalled: dailyStat.cardsRecalled + cardsRecalled.current,
+          timeSpent: dailyStat.timeSpent + activeTime.current,
+        });
+      } else {
+        db.dailyStats.put({
+          date: new Date().toISOString().split('T')[0],
+          retention: cardsReviewed.current / cardsRecalled.current,
+          cardsReviewed: cardsReviewed.current,
+          cardsRecalled: cardsRecalled.current,
+          timeSpent: activeTime.current,
+        });
+      }
+    };
+  }, []);
 
   useKeyPress([' '], () => reshuffleFlashcardsWithKey('Space'));
   useKeyPress(['ArrowRight'], () => reshuffleFlashcardsWithKey('ArrowRight'));

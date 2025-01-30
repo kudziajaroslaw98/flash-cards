@@ -1,15 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 export const useFocusTracker = () => {
-  const [activeTime, setActiveTime] = useState(0);
-  const [distractions, setDistractions] = useState(0);
   // eslint-disable-next-line no-undef
   const timerRef = useRef<NodeJS.Timeout>(null);
+  const activeTime = useRef<number>(0);
+  const distractions = useRef<number>(0);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden && timerRef.current) {
-        setDistractions((prev) => prev + 1);
+        distractions.current += 1;
         clearInterval(timerRef.current);
       } else {
         startTimer();
@@ -18,7 +18,7 @@ export const useFocusTracker = () => {
 
     const startTimer = () => {
       timerRef.current = setInterval(() => {
-        setActiveTime((prev) => prev + 1);
+        activeTime.current += 1;
       }, 1000);
     };
 
