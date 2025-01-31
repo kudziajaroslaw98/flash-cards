@@ -13,7 +13,6 @@ import type { Flashcard } from '#/types/flash-card.type';
 import type { FocusSession } from '#/types/focus-session.type';
 import type { ReviewLog } from '#/types/review-log.type';
 import type { ReviseOptionsType } from '#/types/revise-options.type';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { ArrowRight, RefreshCw } from 'lucide-react';
 import { Accordion } from '../_ui/accordion/accordion';
 import Dropdown from '../_ui/dropdown/dropdown';
@@ -51,13 +50,6 @@ export default function FlashcardReviseComponent() {
       description: 'Show again in ~ 1 week',
     },
   ] as const;
-
-  const dailyStat = useLiveQuery(() =>
-    db.dailyStats
-      .where('date')
-      .equals(new Date().toISOString().split('T')[0])
-      .toArray(),
-  )?.[0];
 
   const defaultSet = { value: 'default', label: 'All flashcards' };
   const [revisedCard, setRevisedCard] = useState<Flashcard>();
@@ -233,27 +225,37 @@ export default function FlashcardReviseComponent() {
         distractions: distractionsRef.current,
       });
 
-      if (dailyStat) {
-        db.dailyStats.put({
-          date: new Date().toISOString().split('T')[0],
-          retention:
-            (dailyStat.cardsReviewed + cardsReviewed.current) /
-            (dailyStat.cardsRecalled + cardsRecalled.current),
-          cardsReviewed: dailyStat.cardsReviewed + cardsReviewed.current,
-          cardsRecalled: dailyStat.cardsRecalled + cardsRecalled.current,
-          timeSpent: dailyStat.timeSpent + activeTimeRef.current,
-          synced: false,
-        });
-      } else {
-        db.dailyStats.put({
-          date: new Date().toISOString().split('T')[0],
-          retention: cardsReviewed.current / cardsRecalled.current,
-          cardsReviewed: cardsReviewed.current,
-          cardsRecalled: cardsRecalled.current,
-          timeSpent: activeTimeRef.current,
-          synced: false,
-        });
-      }
+      const updateDailyStats = async () => {
+        const dailyStat = await db.dailyStats.get(
+          new Date().toISOString().split('T')[0],
+        );
+        if (dailyStat) {
+          db.dailyStats.put({
+            date: new Date().toISOString().split('T')[0],
+            retention: parseFloat(
+              (
+                (dailyStat.cardsRecalled + cardsRecalled.current) /
+                (dailyStat.cardsReviewed + cardsReviewed.current)
+              ).toFixed(2),
+            ),
+            cardsReviewed: dailyStat.cardsReviewed + cardsReviewed.current,
+            cardsRecalled: dailyStat.cardsRecalled + cardsRecalled.current,
+            timeSpent: dailyStat.timeSpent + activeTimeRef.current,
+            synced: false,
+          });
+        } else {
+          db.dailyStats.put({
+            date: new Date().toISOString().split('T')[0],
+            retention: cardsReviewed.current / cardsRecalled.current,
+            cardsReviewed: cardsReviewed.current,
+            cardsRecalled: cardsRecalled.current,
+            timeSpent: activeTimeRef.current,
+            synced: false,
+          });
+        }
+      };
+
+      updateDailyStats();
     };
   }, []);
 

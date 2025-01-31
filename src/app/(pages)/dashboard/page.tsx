@@ -1,3 +1,4 @@
+import RetentionHeatmap from '#/components/retention-heatmap/retention-heatmap';
 import StatsListComponent from '#/components/stats-list/stats-list';
 import type { Metadata } from 'next';
 
@@ -61,6 +62,10 @@ export default function DashboardPage() {
   return (
     <div className='flex h-full w-full flex-col items-center justify-center gap-16'>
       <StatsListComponent />
+
+      <h5>Your daily performance</h5>
+
+      <RetentionHeatmap />
     </div>
   );
 }

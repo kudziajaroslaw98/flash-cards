@@ -66,7 +66,7 @@ export default function PlaygroundPage() {
         />
       </div>
 
-      <RetentionHeatmap dailyStats={dailyStats ?? []} />
+      <RetentionHeatmap />
     </>
   );
 }

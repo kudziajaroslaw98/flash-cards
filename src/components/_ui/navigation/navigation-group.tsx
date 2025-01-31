@@ -14,7 +14,7 @@ export default function NavigationGroupComponent(props: NavigationGroupProps) {
     visible && (
       <div
         key={`${group.label}_${group.items.length}`}
-        className={`flex flex-col ${expanded ? 'gap-4' : 'gap-6'}`}
+        className={`flex flex-col pt-4 ${expanded ? 'gap-4' : 'gap-6'}`}
       >
         {(group?.label || group?.icon) && (
           <h6

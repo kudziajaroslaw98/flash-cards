@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   LogIn,
   LogOut,
+  PlayCircle,
   Settings,
   UserRound,
   Zap,
@@ -56,6 +57,13 @@ export default function SidebarComponent() {
       href: APP_ROUTES.guide,
       visible: true,
       icon: <BookOpenText className={`${iconSize} `} />,
+    },
+    {
+      type: 'item',
+      label: 'Playground',
+      href: '/playground',
+      visible: process.env.NODE_ENV === 'development' && true,
+      icon: <PlayCircle className={`${iconSize} `} />,
     },
     {
       type: 'group',
@@ -161,7 +169,7 @@ export default function SidebarComponent() {
         className={`flex h-full w-full flex-col justify-center gap-8 overflow-y-auto p-4`}
       >
         <div
-          className={`hidden h-full flex-col gap-8 md:flex  ${!expanded && 'items-center'}`}
+          className={`hidden h-full flex-col gap-4 md:flex  ${!expanded && 'items-center'}`}
         >
           {navigation?.map(
             (section) =>
