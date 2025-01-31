@@ -3,14 +3,9 @@
 import ProgressBar from '#/components/_ui/progress-bar/progress-bar';
 import TagInput from '#/components/_ui/tag-input/tag-input';
 import RetentionHeatmap from '#/components/retention-heatmap/retention-heatmap';
-import { db } from '#/db/dexie.db';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { useState, type ChangeEvent } from 'react';
 
 export default function PlaygroundPage() {
-  // return <WelcomePage />;
-  const dailyStats = useLiveQuery(() => db.dailyStats.toArray());
-
   const [message, setMessage] = useState(
     'Can you add a new flashcard of word "Undisturbed" for me?',
   );
