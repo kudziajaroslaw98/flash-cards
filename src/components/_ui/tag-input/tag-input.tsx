@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '#/shared/utils/cn.util';
-import { X } from 'lucide-react';
+import { PlusIcon, X } from 'lucide-react';
 import { useEffect, useRef, useState, type InputHTMLAttributes } from 'react';
 import { Button } from '../button/button';
 
@@ -91,9 +91,36 @@ function TagInput({
     }
   };
 
+  const handleAddButton = () => {
+    const newTag = inputValue.trim().replace(/,/g, '');
+    if (newTag && !tags.includes(newTag)) {
+      const newTags = [...tags, newTag];
+      setTags(newTags);
+
+      if (props.onChange) {
+        props.onChange(newTags);
+      }
+    }
+    setInputValue('');
+  };
+
   const handleOnInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (tags.length === maxTags) return;
-    setInputValue(e.target.value);
+    const value = e.target.value;
+
+    // Detect comma in input value (works for mobile keyboards)
+    if (value.includes(',')) {
+      const newTag = value.replace(/,/g, '').trim();
+      if (newTag && !tags.includes(newTag)) {
+        const newTags = [...tags, newTag];
+        setTags(newTags);
+        props.onChange?.(newTags);
+      }
+      setInputValue('');
+      return;
+    }
+
+    setInputValue(value);
   };
 
   const removeTag = (index: number) => {
@@ -147,7 +174,7 @@ function TagInput({
               label
                 ? 'placeholder:text-gray-400 dark:placeholder:text-slate-700'
                 : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
-              'peer w-full text-sm text-gray-800',
+              'peer w-[90%] text-sm text-gray-800',
               'bg-transparent text-inherit outline-none transition-all dark:text-slate-200',
             ])}
             onChange={handleOnInput}
@@ -155,6 +182,18 @@ function TagInput({
             onFocus={handleFocus}
             onBlur={handleBlur}
             aria-invalid={touched && !valid ? 'true' : 'false'}
+            enterKeyHint='done'
+          />
+
+          <Button
+            className='flex'
+            onClick={handleAddButton}
+            icon={<PlusIcon className='size-4' />}
+            iconPosition='right'
+            alt='Add Tag'
+            variant={'primary'}
+            size={'icon-sm'}
+            disabled={tags.length === maxTags || !inputValue}
           />
         </span>
 
@@ -179,7 +218,7 @@ function TagInput({
                 <Button
                   onClick={() => removeTag(index)}
                   size={'icon-xs'}
-                  icon={<X className='h-3 w-3' />}
+                  icon={<X className='size-3' />}
                   iconPosition='right'
                   alt='Remove tag'
                   variant={
