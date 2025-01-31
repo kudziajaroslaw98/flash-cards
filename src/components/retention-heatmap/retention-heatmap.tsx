@@ -2,18 +2,95 @@
 
 import { db } from '#/db/dexie.db';
 import { useThemeContext } from '#/providers/theme-provider.component';
+import type { ReviewLog } from '#/types/review-log.type';
 import * as d3 from 'd3';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+async function getWeeklyReviewLogs() {
+  // Get date range for current week
+  const today = new Date();
+  const startOfWeek = getStartOfWeek(today).toISOString();
+  const endOfToday = getEndOfDay(today).toISOString();
+
+  console.log(today, startOfWeek, endOfToday);
+
+  // Dexie query
+  return await db.reviewLogs
+    .where('timestamp')
+    .between(startOfWeek, endOfToday, true, true)
+    .toArray();
+}
+
+// Helper functions
+function getStartOfWeek(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay(); // 0 (Sunday) - 6 (Saturday)
+  const diff = d.getDate() - day;
+  d.setDate(diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function getEndOfDay(date: Date): Date {
+  const d = new Date(date);
+  d.setHours(23, 59, 59, 999);
+  return d;
+}
 
 const RetentionHeatmap = () => {
-  const dailyStats = useLiveQuery(() => db.dailyStats.toArray()) ?? [];
+  const [reviewLogs, setReviewLogs] = useState<ReviewLog[]>([]);
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { isLightMode } = useThemeContext();
 
+  const processedData = useMemo(() => {
+    // Aggregates reviews into hourly buckets
+    const hourlyCounts = new Map<string, { total: number; recalled: number }>();
+
+    reviewLogs.forEach((log) => {
+      const date = new Date(log.timestamp);
+      const day = date.getDay();
+      const hour = date.getHours();
+      const key = `${day}-${hour}`;
+
+      // Count total reviews and successful recalls
+      if (!hourlyCounts.has(key)) {
+        hourlyCounts.set(key, { total: 0, recalled: 0 });
+      }
+
+      const counts = hourlyCounts.get(key)!;
+      counts.total++;
+      if (log.recalled) counts.recalled++;
+    });
+
+    // Convert to heatmap format with retention rate
+    const x = Array.from(hourlyCounts.entries()).map(([key, counts]) => {
+      const [day, hour] = key.split('-').map(Number);
+      return {
+        x: hour,
+        y: day,
+        value: counts.total > 0 ? counts.recalled / counts.total : 0,
+        total: counts.total,
+        recalled: counts.recalled,
+      };
+    });
+    console.log(x);
+
+    return x;
+  }, [reviewLogs]);
+
   useEffect(() => {
+    const loadData = async () => {
+      const logs = await getWeeklyReviewLogs();
+      console.log(logs);
+      setReviewLogs(logs);
+    };
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    console.log(processedData);
     if (!svgRef.current || !tooltipRef.current || !containerRef.current) return;
 
     const svg = d3.select(svgRef.current);
@@ -62,47 +139,35 @@ const RetentionHeatmap = () => {
       .domain([0, 0.5, 1])
       .range(['#4ade8000', '#4ade808a', '#4ade80ff']);
 
-    // Process data with flipped axes
-    const gridData = dailyStats.map((stat) => ({
-      x: new Date(stat.date).getHours(), // Hour (0-23)
-      y: new Date(stat.date).getDay(), // Day of week (0-6)
-      value: stat.retention,
-      date: stat.date,
-    }));
-
     // Create dots
     svg
       .selectAll('circle')
-      .data(gridData)
+      .data(processedData)
       .enter()
       .append('circle')
       .attr('cx', (d) => (xScale(String(d.x)) || 0) + xScale.bandwidth() / 2)
       .attr('cy', (d) => (yScale(String(d.y)) || 0) + yScale.bandwidth() / 2)
       .attr('r', dotRadius)
       .attr('fill', (d) => colorScale(d.value))
-      .attr('stroke', '#4ade80')
-      .attr('stroke-width', 0.0)
-
-      .on('mouseover', (event: MouseEvent, d) => {
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 0.8)
+      .on('mouseover', function (event, d) {
         const containerRect = containerRef.current!.getBoundingClientRect();
         const mouseX = event.clientX - containerRect.left;
         const mouseY = event.clientY - containerRect.top;
+
         tooltip
           .style('opacity', 1)
-          .style('background-color', isLightMode ? '#f9fafb' : '#020617')
-          .style(
-            'border',
-            isLightMode ? '1px solid #e2e8f0' : '1px solid #4b5563',
-          )
           .html(
-            `${d3.timeFormat('%A %H:00')(new Date(d.date))}<br/>
-                 Retention: ${(d.value * 100).toFixed(1)}%`,
+            `Hour: ${d.x}:00<br/>
+                 Day: ${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.y]}<br/>
+                 Retention: ${(d.value * 100).toFixed(1)}%<br/>
+                 Reviews: ${d.total} (${d.recalled} recalled)`,
           )
-          .style('left', `${mouseX + 5}px`)
-          .style('top', `${mouseY - 20}px`);
+          .style('left', `${mouseX + 10}px`)
+          .style('top', `${mouseY - 28}px`);
       })
       .on('mouseout', () => tooltip.style('opacity', 0));
-
     // Add grid lines
     const gridLines = svg.append('g');
 
@@ -171,7 +236,7 @@ const RetentionHeatmap = () => {
       .selectAll('.tick line')
       .attr('stroke', axisColor)
       .attr('stroke-width', 0.2);
-  }, [dailyStats, isLightMode]);
+  }, [processedData, isLightMode]);
 
   return (
     <div
