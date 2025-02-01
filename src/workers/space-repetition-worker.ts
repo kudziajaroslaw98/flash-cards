@@ -5,8 +5,6 @@ self.onmessage = async (event: MessageEvent) => {
     const items = event.data.items as Flashcard[];
     let culmulation = 0;
 
-    console.log(items);
-
     const mappedItems = items.map((item, index) => {
       if (index === 0) {
         culmulation = item.spacedRepetition.reversedWeight;
@@ -22,8 +20,6 @@ self.onmessage = async (event: MessageEvent) => {
         },
       };
     });
-
-    console.log(mappedItems);
 
     self.postMessage({ mappedItems });
   }

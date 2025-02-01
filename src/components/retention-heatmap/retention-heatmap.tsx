@@ -1,96 +1,61 @@
 'use client';
 
 import { db } from '#/db/dexie.db';
+import { useChartResize } from '#/hooks/use-chart-resize';
 import { useThemeContext } from '#/providers/theme-provider.component';
 import type { ReviewLog } from '#/types/review-log.type';
 import * as d3 from 'd3';
-import { useEffect, useMemo, useRef, useState } from 'react';
-
-async function getWeeklyReviewLogs() {
-  // Get date range for current week
-  const today = new Date();
-  const startOfWeek = getStartOfWeek(today).toISOString();
-  const endOfToday = getEndOfDay(today).toISOString();
-
-  console.log(today, startOfWeek, endOfToday);
-
-  // Dexie query
-  return await db.reviewLogs
-    .where('timestamp')
-    .between(startOfWeek, endOfToday, true, true)
-    .toArray();
-}
-
-// Helper functions
-function getStartOfWeek(date: Date): Date {
-  const d = new Date(date);
-  const day = d.getDay(); // 0 (Sunday) - 6 (Saturday)
-  const diff = d.getDate() - day;
-  d.setDate(diff);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-function getEndOfDay(date: Date): Date {
-  const d = new Date(date);
-  d.setHours(23, 59, 59, 999);
-  return d;
-}
+import { useEffect, useRef, useState } from 'react';
 
 const RetentionHeatmap = () => {
   const [reviewLogs, setReviewLogs] = useState<ReviewLog[]>([]);
+  const [processedData, setProcessedData] = useState<
+    { x: number; y: number; value: number; total: number; recalled: number }[]
+  >([]);
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const worker = useRef<Worker | null>(null);
+  const [width, setWidth] = useState(625);
+  const [height, setHeight] = useState(200);
   const { isLightMode } = useThemeContext();
 
-  const processedData = useMemo(() => {
-    // Aggregates reviews into hourly buckets
-    const hourlyCounts = new Map<string, { total: number; recalled: number }>();
+  useChartResize(svgRef, () => {
+    if (svgRef.current) {
+      setWidth(
+        svgRef.current.clientWidth > 625 ? 625 : svgRef.current.clientWidth,
+      );
+      setHeight(
+        svgRef.current.clientHeight > 200 ? 200 : svgRef.current.clientHeight,
+      );
+    }
+  });
 
-    reviewLogs.forEach((log) => {
-      const date = new Date(log.timestamp);
-      const day = date.getDay();
-      const hour = date.getHours();
-      const key = `${day}-${hour}`;
+  useEffect(() => {
+    if (!worker.current) return;
+    worker.current.postMessage({ action: 'heatmap', items: reviewLogs });
 
-      // Count total reviews and successful recalls
-      if (!hourlyCounts.has(key)) {
-        hourlyCounts.set(key, { total: 0, recalled: 0 });
-      }
-
-      const counts = hourlyCounts.get(key)!;
-      counts.total++;
-      if (log.recalled) counts.recalled++;
-    });
-
-    // Convert to heatmap format with retention rate
-    const x = Array.from(hourlyCounts.entries()).map(([key, counts]) => {
-      const [day, hour] = key.split('-').map(Number);
-      return {
-        x: hour,
-        y: day,
-        value: counts.total > 0 ? counts.recalled / counts.total : 0,
-        total: counts.total,
-        recalled: counts.recalled,
-      };
-    });
-    console.log(x);
-
-    return x;
+    worker.current.onmessage = function (event) {
+      setProcessedData(event.data.processedData);
+    };
   }, [reviewLogs]);
 
   useEffect(() => {
+    worker.current = new Worker(
+      new URL('../../workers/heatmap-worker.ts', import.meta.url),
+    );
     const loadData = async () => {
       const logs = await getWeeklyReviewLogs();
-      console.log(logs);
       setReviewLogs(logs);
     };
     loadData();
+
+    return () => {
+      worker.current!.terminate();
+    };
   }, []);
 
   useEffect(() => {
-    console.log(processedData);
     if (!svgRef.current || !tooltipRef.current || !containerRef.current) return;
 
     const svg = d3.select(svgRef.current);
@@ -98,15 +63,12 @@ const RetentionHeatmap = () => {
     svg.selectAll('*').remove();
 
     // Styling configuration
-    const axisColor = isLightMode ? '#4b5563' : '#e2e8f0'; // Change this for axis line color
-    const gridColor = isLightMode ? '#e2e8f011' : '#e2e8f011'; // Change this for grid line color
+    const axisColor = isLightMode ? '#4b5563aa' : '#e2e8f0bb'; // Change this for axis line color
+    const gridColor = isLightMode ? '#e2e8f004' : '#e2e8f001'; // Change this for grid line color
     const textColor = isLightMode ? '#444' : '#ccc'; // Change this for axis text color
 
     // Dimensions
-    const width =
-      svgRef.current.clientWidth > 625 ? 625 : svgRef.current.clientWidth;
-    const height = 200;
-    const margin = { top: 16, right: 16, bottom: 48, left: 64 };
+    const margin = { top: 8, right: 8, bottom: 40, left: 48 };
 
     // Grid configuration (24 hours x 7 days)
     const columns = 24; // Hours
@@ -150,7 +112,7 @@ const RetentionHeatmap = () => {
       .attr('r', dotRadius)
       .attr('fill', (d) => colorScale(d.value))
       .attr('stroke', '#fff')
-      .attr('stroke-width', 0.8)
+      .attr('stroke-width', 0.0)
       .on('mouseover', function (event, d) {
         const containerRect = containerRef.current!.getBoundingClientRect();
         const mouseX = event.clientX - containerRect.left;
@@ -160,12 +122,15 @@ const RetentionHeatmap = () => {
           .style('opacity', 1)
           .html(
             `Hour: ${d.x}:00<br/>
-                 Day: ${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.y]}<br/>
+                 Day: ${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][d.y]}<br/>
                  Retention: ${(d.value * 100).toFixed(1)}%<br/>
                  Reviews: ${d.total} (${d.recalled} recalled)`,
           )
           .style('left', `${mouseX + 10}px`)
-          .style('top', `${mouseY - 28}px`);
+          .style('top', `${mouseY - 28}px`)
+          .style('background-color', isLightMode ? '#fff' : '#1f2937')
+          .style('min-width', '200px')
+          .style('z-index', '10000');
       })
       .on('mouseout', () => tooltip.style('opacity', 0));
     // Add grid lines
@@ -184,7 +149,7 @@ const RetentionHeatmap = () => {
       )
       .selectAll('line')
       .attr('stroke', gridColor)
-      .attr('stroke-opacity', 0.5);
+      .attr('stroke-opacity', 0.3);
 
     // Vertical grid lines
     gridLines
@@ -199,36 +164,51 @@ const RetentionHeatmap = () => {
       )
       .selectAll('line')
       .attr('stroke', gridColor)
-      .attr('stroke-opacity', 0.5);
+      .attr('stroke-opacity', 0.3);
+
+    // labels
+    svg
+      .append('text')
+      .attr(
+        'transform',
+        `translate(${width / 2}, ${height - margin.bottom + 35})`,
+      )
+      .style('text-anchor', 'middle')
+      .style('font-size', '10px')
+      .style('fill', textColor)
+      .text('Hour of Day');
+
+    svg
+      .append('text')
+      .attr('transform', `rotate(-90)`)
+      .attr('y', margin.left - 35)
+      .attr('x', -height / 2)
+      .style('text-anchor', 'middle')
+      .style('font-size', '10px')
+      .style('fill', textColor)
+      .text('Day of Week');
 
     // X Axis with styling
     const xAxis = d3
       .axisBottom(xScale)
-      .tickValues(d3.range(0, 24, 3).map(String))
+      .tickValues(d3.range(0, 24, width > 290 ? 3 : 4).map(String))
       .tickFormat((d) => `${d.padStart(2, '0')}:00`);
 
     svg
       .append('g')
       .attr('transform', `translate(0, ${height - margin.bottom})`)
-      .call(xAxis)
-      .selectAll('text')
-      .style('font-size', '10px')
-      .style('fill', textColor);
+      .call(xAxis);
 
     // Y Axis with styling
     const yAxis = d3
       .axisLeft(yScale)
-      .tickFormat((d) => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][+d]);
+      .tickFormat((d) => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][+d]);
 
     svg
       .append('g')
       .attr('transform', `translate(${margin.left}, 0)`)
-      .call(yAxis)
-      .selectAll('text')
-      .style('font-size', '12px')
-      .style('fill', textColor);
+      .call(yAxis);
 
-    // Axis line styling
     svg.selectAll('.domain').attr('stroke', axisColor).attr('stroke-width', 0);
 
     // Tick line styling
@@ -236,20 +216,36 @@ const RetentionHeatmap = () => {
       .selectAll('.tick line')
       .attr('stroke', axisColor)
       .attr('stroke-width', 0.2);
-  }, [processedData, isLightMode]);
+  }, [width, height, processedData, isLightMode]);
+
+  async function getWeeklyReviewLogs() {
+    // Get date range for current week
+    const monthInMilliseconds = 30 * 24 * 60 * 60 * 1000;
+    const today = new Date();
+    const monthlyPeriod = new Date(Date.now() - monthInMilliseconds);
+    const endOfToday = getEndOfDay(today).toISOString();
+
+    // Dexie query
+    return await db.reviewLogs
+      .where('timestamp')
+      .between(monthlyPeriod, endOfToday, true, true)
+      .toArray();
+  }
+
+  function getEndOfDay(date: Date): Date {
+    const d = new Date(date);
+    d.setHours(23, 59, 59, 999);
+    return d;
+  }
 
   return (
     <div
       ref={containerRef}
-      className='relative flex w-full justify-center'
-      style={{
-        position: 'relative',
-        width: '100%',
-      }}
+      className='relative flex h-full w-full max-w-[625px] justify-center'
     >
       <svg
         ref={svgRef}
-        style={{ width: '100%', maxWidth: '625px', height: '200px' }}
+        className='h-full w-full max-w-[625px]'
       />
       <div
         ref={tooltipRef}

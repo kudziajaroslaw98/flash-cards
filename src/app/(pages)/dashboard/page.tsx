@@ -1,4 +1,4 @@
-import RetentionHeatmap from '#/components/retention-heatmap/retention-heatmap';
+import { Dashboard } from '#/components/dashboard/dashboard';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -58,11 +58,5 @@ export const metadata: Metadata = {
 };
 
 export default function DashboardPage() {
-  return (
-    <div className='flex h-full w-full flex-col items-center justify-center gap-4'>
-      <h5>Your daily performance</h5>
-
-      <RetentionHeatmap />
-    </div>
-  );
+  return <Dashboard />;
 }
