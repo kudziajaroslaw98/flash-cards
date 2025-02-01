@@ -39,6 +39,7 @@ export const DistractionPatterns = ({
     const axisColor = isLightMode ? '#4b5563aa' : '#e2e8f0bb'; // Change this for axis line color
     const gridColor = isLightMode ? '#e2e8f004' : '#e2e8f001'; // Change this for grid line color
     const textColor = isLightMode ? '#444' : '#ccc'; // Change this for axis text color
+    const maxDistractions = d3.max(patterns, (d) => d.distractions) || 0;
 
     svg.selectAll('*').remove();
 
@@ -51,7 +52,7 @@ export const DistractionPatterns = ({
 
     const yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(patterns, (d) => d.distractions) || 0])
+      .domain([0, maxDistractions])
       .range([height - margin.bottom, margin.top]);
 
     // Draw bars
@@ -154,8 +155,7 @@ export const DistractionPatterns = ({
 
     const yAxis = d3
       .axisLeft(yScale)
-      .tickValues(d3.range(0, 1.01, 0.2))
-      .tickFormat(d3.format('.0%'));
+      .tickValues(d3.range(0, maxDistractions + 0.01));
     svg
       .append('g')
       .attr('transform', `translate(${margin.left}, 0)`)
