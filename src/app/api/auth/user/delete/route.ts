@@ -1,6 +1,6 @@
-import { createClient as createClientSupabase } from '@supabase/supabase-js';
-import { createClient } from '#/shared/utils/supabase/server';
 import { RateLimit } from '#/shared/utils/api-limiter';
+import supabaseAdmin from '#/shared/utils/supabase/admin';
+import { createClient } from '#/shared/utils/supabase/server';
 
 const rateLimit = new RateLimit(1, 3, '[auth/user/delete]');
 
@@ -33,24 +33,15 @@ export async function GET() {
     '] is deleting their account',
   );
 
-  const supabaseAdmin = createClientSupabase(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    },
-  );
-
   const adminAuthClient = supabaseAdmin.auth.admin;
   const { error } = await adminAuthClient.deleteUser(user.id);
 
   if (error) {
-    console.error(
+    console.log(
       `[auth/user/delete] Error deleting user [${user.id}]:`,
-      error,
+      error.code,
+      error.message,
+      error.name,
     );
     return Response.json({
       success: false,

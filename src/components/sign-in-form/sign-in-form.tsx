@@ -196,41 +196,47 @@ export default function SignInComponent() {
           ></Button>
         </Link>
 
-        {/* {process.env.NODE_ENV === 'development' && ( */}
-        <>
-          <Button
-            variant={'primary-outline'}
-            onClick={() =>
-              supabase.auth.signInWithPassword({
-                email: 'test@test.com',
-                password: 'test',
-              })
-            }
-            disabled={isLoading ?? false}
-            loading={isLoading ?? false}
-            iconPosition='left'
-            label='password'
-            size={'full'}
-            alt='password'
-          ></Button>
+        {process.env.NODE_ENV === 'development' && (
+          <>
+            <Button
+              variant={'primary-outline'}
+              onClick={async () => {
+                const response = await supabase.auth.signInWithPassword({
+                  email: 'test@test.com',
+                  password: 'test1234',
+                });
+                if (response) {
+                  window.location.reload();
+                }
+              }}
+              disabled={isLoading ?? false}
+              loading={isLoading ?? false}
+              iconPosition='left'
+              label='password'
+              size={'full'}
+              alt='password'
+            ></Button>
 
-          <Button
-            variant={'primary-outline'}
-            onClick={() =>
-              supabase.auth.signInWithPassword({
-                email: 'test2@test.com',
-                password: 'test',
-              })
-            }
-            disabled={isLoading ?? false}
-            loading={isLoading ?? false}
-            iconPosition='left'
-            label='password 2'
-            size={'full'}
-            alt='password 2'
-          ></Button>
-        </>
-        {/* )} */}
+            <Button
+              variant={'primary-outline'}
+              onClick={async () => {
+                const response = await supabase.auth.signInWithPassword({
+                  email: 'test2@test.com',
+                  password: 'test',
+                });
+                if (response) {
+                  window.location.reload();
+                }
+              }}
+              disabled={isLoading ?? false}
+              loading={isLoading ?? false}
+              iconPosition='left'
+              label='password 2'
+              size={'full'}
+              alt='password 2'
+            ></Button>
+          </>
+        )}
       </div>
     </m.div>
   );
