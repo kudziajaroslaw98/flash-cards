@@ -153,7 +153,6 @@ export default function useSpacedRepetition({
     worker.postMessage({ action: 'calculate-culmilative', items });
 
     worker.onmessage = function (event) {
-      console.log(event.data);
       db.flashcards.bulkUpdate(event.data.mappedItems);
     };
 

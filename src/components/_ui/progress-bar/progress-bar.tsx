@@ -11,7 +11,7 @@ const ProgressBar = ({ value, max }: ProgressBarProps) => {
   const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
 
   return (
-    <div className='flex h-2 w-full gap-2 rounded-full bg-gray-200 dark:bg-gray-700'>
+    <div className='flex h-2 w-full gap-2 rounded-full bg-gray-200 dark:bg-gray-800'>
       <m.div
         className='relative h-full w-full rounded-full bg-green-400'
         style={{ width: `${percentage}%` }}

@@ -11,5 +11,6 @@ export const defaultMetadata: Metadata = {
   synced: false,
   notificationPermission: 'default',
   activeStudyPlan: undefined,
+  updatedAt: new Date(),
   theme: 'dark',
 };

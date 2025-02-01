@@ -12,4 +12,5 @@ export type Metadata = {
   synced: boolean;
   activeStudyPlan?: StudySession;
   notificationPermission: 'granted' | 'denied' | 'default';
+  updatedAt: Date;
 };

@@ -116,7 +116,6 @@ export const NewSetModal = ({
 
     await formRef.current?.checkValidity();
 
-    console.log(formRef.current?.isValid());
     if (!formRef.current?.isValid()) {
       return;
     }
@@ -168,7 +167,6 @@ export const NewSetModal = ({
   };
 
   const handleGenerate = useCallback(async () => {
-    console.log('formValue', formValue);
     if (
       formValue.name !== undefined &&
       formValue.name !== '' &&

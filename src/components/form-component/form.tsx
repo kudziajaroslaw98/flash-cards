@@ -102,7 +102,6 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
   //////////////
 
   useEffect(() => {
-    console.log('initial', props.initialValues);
     if (
       initialValuesRef.current === null ||
       isDifferent(initialValuesRef.current, props.initialValues)

@@ -1,4 +1,5 @@
 export type ReviewLog = {
+  frontUuid: string;
   timestamp: Date | string;
   sessionUuid: string;
   cardFrontUuid: string;

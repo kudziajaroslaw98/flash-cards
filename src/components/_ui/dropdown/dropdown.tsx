@@ -5,7 +5,7 @@ import { cn } from '#/shared/utils/cn.util';
 import { isDifferent } from '#/shared/utils/is-different.util';
 import { DictionaryValue } from '#/types//dictionary-value.type';
 import { cva, VariantProps } from 'class-variance-authority';
-import { Search } from 'lucide-react';
+import { Eraser, Plus, Search } from 'lucide-react';
 import * as m from 'motion/react-m';
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '../button/button';
@@ -353,7 +353,7 @@ export default function Dropdown<T>({
         <div
           ref={dropdownLabelRef}
           className={cn([
-            'border-gray-300 text-gray-500 dark:border-slate-800',
+            'border-gray-300 text-gray-500 dark:border-slate-800 dark:text-slate-400',
             'group relative flex h-10 w-full cursor-pointer items-center justify-center rounded-md border text-sm outline-none group-has-[:focus]:ring',
             hasFocus.current ? 'ring' : '',
             'transition',
@@ -409,7 +409,7 @@ export default function Dropdown<T>({
             exit={{ opacity: 0, y: -10 }}
           >
             {props.searchable && (
-              <div className='min-w-fit rounded-t-md border-b bg-gray-100 p-1 dark:border-slate-800/40 dark:bg-slate-900 '>
+              <div className='min-w-fit rounded-t-md border-b bg-gray-50 p-2 dark:border-slate-800/40 dark:bg-slate-950 '>
                 <Input
                   type='text'
                   value={searchValue}
@@ -455,19 +455,19 @@ export default function Dropdown<T>({
             </div>
             {props.addNew && !isInAddNewMode && (
               <div
-                className='flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-100  px-4 py-2 text-gray-500 outline-none transition hover:text-green-400 focus:ring focus:ring-green-400/50  dark:border-slate-800/40 dark:bg-slate-900'
+                className='flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-50  px-4 py-2 text-gray-500 outline-none transition hover:text-green-400 focus:ring focus:ring-green-400/50  dark:border-slate-800/40 dark:bg-slate-950'
                 onClick={() => handleToggleAddNew()}
                 onKeyDown={(event) =>
                   event.key === 'Enter' && handleToggleAddNew('Enter')
                 }
                 tabIndex={0}
               >
-                Add new
+                <Plus className='mr-2 h-4 w-4' /> Add new
               </div>
             )}
             {props.addNew && isInAddNewMode && (
               <div>
-                <div className='min-w-fit  bg-gray-100 p-1 py-2 outline-none focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-900'>
+                <div className='min-w-fit  bg-gray-50 p-1 py-2 outline-none focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-950'>
                   <Input
                     type='text'
                     value={newItemValue}
@@ -483,7 +483,7 @@ export default function Dropdown<T>({
                   />
                 </div>
 
-                <div className='flex h-11 w-full cursor-pointer items-center justify-center gap-2 border-t bg-gray-100 px-4 py-6 text-gray-500 transition hover:text-green-400 dark:border-slate-800/40  dark:bg-slate-900'>
+                <div className='flex h-11 w-full cursor-pointer items-center justify-center gap-2 border-t bg-gray-50 px-4 py-6 text-gray-500 transition hover:text-green-400 dark:border-slate-800/40  dark:bg-slate-950'>
                   <Button
                     label='Cancel'
                     onClick={() => handleToggleAddNew()}
@@ -491,7 +491,7 @@ export default function Dropdown<T>({
                       event.key === 'Enter' &&
                       handleToggleAddNew('Enter', 'Cancel')
                     }
-                    variant={'destructive-outline'}
+                    variant={'destructive-text'}
                     size={'sm'}
                     className='!w-full'
                     alt='Cancel'
@@ -503,7 +503,7 @@ export default function Dropdown<T>({
                     onKeyDown={(event) =>
                       event.key === 'Enter' && handleAddNewElement('Enter')
                     }
-                    variant={'primary'}
+                    variant={'primary-text'}
                     size={'sm'}
                     className='!w-full'
                     alt='Add new element'
@@ -514,14 +514,14 @@ export default function Dropdown<T>({
 
             {props.clearAll && (
               <div
-                className='flex h-11 w-full cursor-pointer items-center justify-center rounded-b-md border-t bg-gray-100 px-4 py-2 text-gray-500 outline-none transition  hover:text-green-400 focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-900'
+                className='flex h-11 w-full cursor-pointer items-center justify-center rounded-b-md border-t bg-gray-50 px-4 py-2 text-gray-500 outline-none transition  hover:text-green-400 focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-950'
                 onClick={() => clearPicked()}
                 onKeyDown={(event) =>
                   event.key === 'Enter' && clearPicked('Enter')
                 }
                 tabIndex={0}
               >
-                Clear All
+                <Eraser className='mr-2 h-4 w-4' /> Clear All
               </div>
             )}
           </m.div>

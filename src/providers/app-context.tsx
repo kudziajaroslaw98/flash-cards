@@ -8,6 +8,18 @@ import { SETS_DB_DEFAULT } from '#/shared/defaults/sets-local-storage-init';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { metadataMerge } from '#/shared/helpers/metadata-merge';
 import { setsMerge } from '#/shared/helpers/sets-merge';
+import { localToRemoteDailyStatsSync } from '#/shared/helpers/sync/local-to-remote/daily-stats-sync';
+import { localToRemoteFlashcardsSync } from '#/shared/helpers/sync/local-to-remote/flashcards-sync';
+import { localToRemoteFocusSessionsSync } from '#/shared/helpers/sync/local-to-remote/focus-sessions-sync';
+import { localToRemoteMetadataSync } from '#/shared/helpers/sync/local-to-remote/metadata-sync';
+import { localToRemoteReviewLogsSync } from '#/shared/helpers/sync/local-to-remote/review-logs-sync';
+import { localToRemoteSetsSync } from '#/shared/helpers/sync/local-to-remote/sets-sync';
+import { remoteToLocalDailyStatsSync } from '#/shared/helpers/sync/remote-to-local/daily-stats-sync';
+import { remoteToLocalFlashcardsSync } from '#/shared/helpers/sync/remote-to-local/flashcards-sync';
+import { remoteToLocalFocusSessionsSync } from '#/shared/helpers/sync/remote-to-local/focus-sessions-sync';
+import { remoteToLocalMetadataSync } from '#/shared/helpers/sync/remote-to-local/metadata-sync';
+import { remoteToLocalReviewLogsSync } from '#/shared/helpers/sync/remote-to-local/review-logs-sync';
+import { remoteToLocalSetsSync } from '#/shared/helpers/sync/remote-to-local/sets-sync';
 import { generateHash } from '#/shared/utils/generate-hash';
 import omit from '#/shared/utils/omit.util';
 import { createClient } from '#/shared/utils/supabase/client';
@@ -447,20 +459,25 @@ export default function AppProvider(props: PropsWithChildren) {
   const syncLocalToRemote = async () => {
     if (!isLoggedIn || user === null) return;
 
-    const unsyncedFlashcards = (await db.flashcards.toArray())
-      .filter((card) => !card.synced)
-      .map((card) => ({ ...card, synced: true, user_uuid: user.id }));
+    await Promise.allSettled([
+      // FLASHCARDS
+      localToRemoteFlashcardsSync(supabase, user),
 
-    const { error } = await supabase
-      .from('flashcards')
-      .upsert(unsyncedFlashcards, { onConflict: 'frontUuid' });
+      // SETS
+      localToRemoteSetsSync(supabase, user),
 
-    if (!error) {
-      await db.flashcards
-        .where('frontUuid')
-        .anyOf(unsyncedFlashcards.map((c) => c.frontUuid))
-        .modify({ synced: true });
-    }
+      // METADATA
+      localToRemoteMetadataSync(supabase, user),
+
+      // FOCUS SESSIONS
+      localToRemoteFocusSessionsSync(supabase, user),
+
+      // DAILY STATS
+      localToRemoteDailyStatsSync(supabase, user),
+
+      // REVIEW LOGS
+    ]);
+    await localToRemoteReviewLogsSync(supabase, user);
   };
 
   const syncRemoteToLocal = async () => {
@@ -482,18 +499,25 @@ export default function AppProvider(props: PropsWithChildren) {
       lastSyncAt = new Date(metadata.lastSyncAt).toISOString();
     }
 
-    // Fetch changes from Supabase
-    const { data: remoteFlashcards, error } = await supabase
-      .from('flashcards')
-      .select(
-        'frontUuid, type, tags, createdAt, updatedAt, sets, examples, keyPoints, synonyms, relatedFacts, spacedRepetition, synced, context, query, definition, order',
-      )
-      .gt('updatedAt', lastSyncAt);
+    await Promise.allSettled([
+      // FLASHCARDS
+      remoteToLocalFlashcardsSync(supabase, lastSyncAt),
 
-    if (!error && remoteFlashcards) {
-      // Upsert into IndexedDB
-      await db.flashcards.bulkPut(remoteFlashcards as Flashcard[]);
-    }
+      // SETS
+      remoteToLocalSetsSync(supabase, lastSyncAt),
+
+      // METADATA
+      remoteToLocalMetadataSync(supabase, lastSyncAt),
+
+      // FOCUS SESSIONS
+      remoteToLocalFocusSessionsSync(supabase, lastSyncAt),
+
+      // DAILY STATS
+      remoteToLocalDailyStatsSync(supabase, lastSyncAt),
+
+      // REVIEW LOGS
+    ]);
+    await remoteToLocalReviewLogsSync(supabase, lastSyncAt);
 
     await db.metadata.update('current', {
       lastSyncAt: new Date(newLastSyncAt),
@@ -556,24 +580,14 @@ export default function AppProvider(props: PropsWithChildren) {
           ]);
 
           // 4. Batch insert with validation
-          if (flashcards.length > 0) {
-            await db.flashcards.bulkPut(flashcards);
-          }
-
-          if (sets.length > 0) {
-            await db.sets.bulkPut(sets);
-          }
-
-          if (metadata) {
-            await db.metadata.put({ ...metadata, key: 'current' }, 'current');
-          }
+          await db.flashcards.bulkPut(flashcards);
+          await db.sets.bulkPut(sets);
+          await db.metadata.put({ ...metadata, key: 'current' }, 'current');
 
           // 5. Mark migration complete
           localStorage.setItem('dexie_migrated', 'true');
         },
       );
-
-      console.log('Migration completed successfully');
     } catch (error) {
       console.error('Migration failed:', error);
       // Rollback mechanism

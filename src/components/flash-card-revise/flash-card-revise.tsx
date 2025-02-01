@@ -60,12 +60,13 @@ export default function FlashcardReviseComponent() {
   const cardsReviewed = useRef(0);
   const cardsRecalled = useRef(0);
   const focusSession = useRef<FocusSession>({
-    uuid: uuid(),
+    frontUuid: uuid(),
     start: new Date().toISOString(),
     end: new Date().toISOString(),
     activeTime: 0,
     distractions: 0,
     synced: false,
+    timestamp: new Date().toISOString(),
   });
 
   const { activeTime, activeTimeRef, distractionsRef } = useFocusTracker();
@@ -101,8 +102,9 @@ export default function FlashcardReviseComponent() {
     }
 
     const reviewLog: ReviewLog = {
+      frontUuid: uuid(),
       timestamp: new Date().toISOString(),
-      sessionUuid: focusSession.current.uuid,
+      sessionUuid: focusSession.current.frontUuid,
       cardFrontUuid: revisedCard.frontUuid,
       recalled: false,
       timeSpent: Math.floor((Date.now() - cardTime.current.getTime()) / 1000),
@@ -217,9 +219,9 @@ export default function FlashcardReviseComponent() {
 
   useEffect(() => {
     return () => {
-      console.log('exit');
       db.focusSessions.put({
         ...focusSession.current,
+        timestamp: new Date().toISOString(),
         end: new Date().toISOString(),
         activeTime: activeTimeRef.current,
         distractions: distractionsRef.current,
@@ -231,6 +233,7 @@ export default function FlashcardReviseComponent() {
         );
         if (dailyStat) {
           db.dailyStats.put({
+            ...dailyStat,
             date: new Date().toISOString().split('T')[0],
             retention: parseFloat(
               (
@@ -245,6 +248,8 @@ export default function FlashcardReviseComponent() {
           });
         } else {
           db.dailyStats.put({
+            updatedAt: new Date().toISOString(),
+            frontUuid: uuid(),
             date: new Date().toISOString().split('T')[0],
             retention: cardsReviewed.current / cardsRecalled.current,
             cardsReviewed: cardsReviewed.current,

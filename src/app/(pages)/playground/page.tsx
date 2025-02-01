@@ -1,5 +1,6 @@
 'use client';
 
+import { Accordion } from '#/components/_ui/accordion/accordion';
 import ProgressBar from '#/components/_ui/progress-bar/progress-bar';
 import TagInput from '#/components/_ui/tag-input/tag-input';
 import RetentionHeatmap from '#/components/retention-heatmap/retention-heatmap';
@@ -61,7 +62,11 @@ export default function PlaygroundPage() {
         />
       </div>
 
-      <RetentionHeatmap />
+      <Accordion>
+        <Accordion.Item title='Accordion Item 1'>
+          <RetentionHeatmap />
+        </Accordion.Item>
+      </Accordion>
     </>
   );
 }

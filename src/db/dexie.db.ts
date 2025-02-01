@@ -5,6 +5,7 @@ import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { metadataMerge } from '#/shared/helpers/metadata-merge';
 import { setsMerge } from '#/shared/helpers/sets-merge';
 import { calculateWeight } from '#/shared/utils/calculate-weight';
+import uuid from '#/shared/utils/uuid.util';
 import type { DailyStat } from '#/types/daily-stat.type';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { Flashcard } from '#/types/flash-card.type';
@@ -27,12 +28,13 @@ export class AppDB extends Dexie {
     this.version(1)
       .stores({
         flashcards:
-          '&frontUuid, tags, createdAt, updatedAt, *sets, spacedRepetition.dueDate, spacedRepetition.easeFactor, [setUuids+spacedRepetition.dueDate]',
-        sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards',
-        metadata: 'key',
-        dailyStats: 'date',
-        focusSessions: 'uuid, start, end',
-        reviewLogs: 'timestamp, sessionUuid, cardFrontUuid, *tags',
+          '&frontUuid, tags, createdAt, updatedAt, *sets, spacedRepetition.dueDate, spacedRepetition.easeFactor, [setUuids+spacedRepetition.dueDate], synced',
+        sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards, synced',
+        metadata: 'key, synced',
+        dailyStats: 'frontUuid, updatedAt, date, synced',
+        focusSessions: 'frontUuid, timestamp, start, end, synced',
+        reviewLogs:
+          'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
       })
       .upgrade((transaction) => {
         transaction
@@ -59,9 +61,13 @@ export class AppDB extends Dexie {
     this.version(2)
       .stores({
         flashcards:
-          '&frontUuid, tags, createdAt, updatedAt, *sets, spacedRepetition.dueDate, spacedRepetition.easeFactor, spacedRepetition.weight, [setUuids+spacedRepetition.dueDate], [setUuids+spacedRepetition.weight], spacedRepetition.reversedWeight, spacedRepetition.culmulativeWeight',
-        sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards',
-        metadata: 'key',
+          '&frontUuid, tags, createdAt, updatedAt, *sets, spacedRepetition.dueDate, spacedRepetition.easeFactor, [setUuids+spacedRepetition.dueDate], synced',
+        sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards, synced',
+        metadata: 'key, synced',
+        dailyStats: 'frontUuid, updatedAt, date, synced',
+        focusSessions: 'frontUuid, timestamp, start, end, synced',
+        reviewLogs:
+          'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
       })
       .upgrade((transaction) => {
         transaction
@@ -75,7 +81,6 @@ export class AppDB extends Dexie {
                 weight: calculateWeight(card.spacedRepetition.dueDate),
               },
             });
-            console.log(x);
             return x;
           });
 
@@ -84,6 +89,80 @@ export class AppDB extends Dexie {
           .toCollection()
           .modify((meta) => {
             metadataMerge(defaultMetadata, meta);
+          });
+      });
+
+    this.version(3).stores({
+      flashcards:
+        '&frontUuid, tags, createdAt, updatedAt, *sets, spacedRepetition.dueDate, spacedRepetition.easeFactor, [setUuids+spacedRepetition.dueDate], synced',
+      sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards, synced',
+      metadata: 'key, synced',
+      dailyStats: 'frontUuid, updatedAt, date, synced',
+      focusSessions: 'frontUuid, timestamp, start, end, synced',
+      reviewLogs:
+        'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
+    });
+
+    this.version(4).stores({
+      flashcards:
+        '&frontUuid, tags, createdAt, updatedAt, *sets, spacedRepetition.dueDate, spacedRepetition.easeFactor, [setUuids+spacedRepetition.dueDate], synced',
+      sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards, synced',
+      metadata: 'key, synced',
+      dailyStats: 'frontUuid, updatedAt, date, synced',
+      focusSessions: 'frontUuid, timestamp, start, end, synced',
+      reviewLogs:
+        'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
+    });
+
+    this.version(5)
+      .stores({
+        flashcards:
+          '&frontUuid, tags, createdAt, updatedAt, *sets, spacedRepetition.dueDate, spacedRepetition.easeFactor, [setUuids+spacedRepetition.dueDate], synced',
+        sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards, synced',
+        metadata: 'key, synced',
+        dailyStats: 'frontUuid, updatedAt, date, synced',
+        focusSessions: 'frontUuid, timestamp, start, end, synced',
+        reviewLogs:
+          'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
+      })
+      .upgrade((transaction) => {
+        transaction
+          .table('dailyStats')
+          .toCollection()
+          .modify((stat: DailyStat) => {
+            return {
+              ...stat,
+              updatedAt: stat.updatedAt ? stat.updatedAt : new Date(),
+              frontUuid: stat.frontUuid ? stat.frontUuid : uuid(),
+            };
+          });
+        transaction
+          .table('metadata')
+          .toCollection()
+          .modify((metadata: Metadata) => {
+            return {
+              ...metadata,
+              updatedAt: metadata.updatedAt ? metadata.updatedAt : new Date(),
+            };
+          });
+        transaction
+          .table('focusSessions')
+          .toCollection()
+          .modify((session: FocusSession) => {
+            return {
+              ...session,
+              timestamp: session.timestamp ? session.timestamp : new Date(),
+              frontUuid: session.frontUuid ? session.frontUuid : uuid(),
+            };
+          });
+        transaction
+          .table('reviewLogs')
+          .toCollection()
+          .modify((log: ReviewLog) => {
+            return {
+              ...log,
+              frontUuid: log.frontUuid ? log.frontUuid : uuid(),
+            };
           });
       });
 
@@ -102,6 +181,10 @@ export class AppDB extends Dexie {
     });
 
     this.dailyStats.hook('updating', (modifications: Partial<DailyStat>) => {
+      modifications.synced = false;
+    });
+
+    this.metadata.hook('updating', (modifications: Partial<Metadata>) => {
       modifications.synced = false;
     });
 

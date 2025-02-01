@@ -1,4 +1,6 @@
 export type DailyStat = {
+  updatedAt: string;
+  frontUuid: string;
   date: string;
   retention: number;
   cardsReviewed: number;

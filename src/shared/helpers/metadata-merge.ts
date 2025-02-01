@@ -5,6 +5,13 @@ export const metadataMerge = (
   metadata: Partial<Metadata>,
 ) => {
   return {
+    notificationPermission:
+      metadata.notificationPermission ?? defaultMetadata.notificationPermission,
+    synced: metadata.synced ?? defaultMetadata.synced,
+    theme: metadata.theme ?? defaultMetadata.theme,
+    activeStudyPlan:
+      metadata.activeStudyPlan ?? defaultMetadata.activeStudyPlan,
+    updatedAt: metadata.updatedAt ?? defaultMetadata.updatedAt,
     accuracy: metadata.accuracy ?? defaultMetadata.accuracy,
     answers: metadata.answers ?? defaultMetadata.answers,
     correctAnswers: metadata.correctAnswers ?? defaultMetadata.correctAnswers,

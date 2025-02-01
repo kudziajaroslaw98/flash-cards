@@ -14,5 +14,8 @@ export const setsMerge = (
     createdAt: set.createdAt ?? new Date().toISOString(),
     updatedAt: set.updatedAt ?? new Date().toISOString(),
     hardlink: set.name?.replace(/ /g, '-').toLowerCase() ?? defaultSet.hardlink,
+    isFavourite: set.isFavourite ?? defaultSet.isFavourite,
+    reminders: set.reminders ?? defaultSet.reminders,
+    synced: set.synced ?? defaultSet.synced,
   } as FlashcardSet;
 };

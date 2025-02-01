@@ -41,8 +41,6 @@ export const WeeklyFocusChart = ({
   useEffect(() => {
     if (!svgRef.current) return;
 
-    console.log(weeklyTrends);
-
     const svg = d3.select(svgRef.current);
     const margin = { top: 8, right: 8, bottom: 40, left: 48 };
     const tooltip = d3.select(tooltipRef.current);
