@@ -485,6 +485,7 @@ export default function AppProvider(props: PropsWithChildren) {
 
     const metadata = await db.metadata.get('current');
     const newLastSyncAt = new Date().toISOString();
+    const emptyMetadata = !metadata;
     let lastSyncAt: string;
 
     if (
@@ -507,7 +508,7 @@ export default function AppProvider(props: PropsWithChildren) {
       remoteToLocalSetsSync(supabase, lastSyncAt),
 
       // METADATA
-      remoteToLocalMetadataSync(supabase, lastSyncAt),
+      remoteToLocalMetadataSync(supabase, lastSyncAt, emptyMetadata),
 
       // FOCUS SESSIONS
       remoteToLocalFocusSessionsSync(supabase, lastSyncAt),

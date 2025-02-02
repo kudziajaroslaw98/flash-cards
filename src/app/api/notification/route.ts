@@ -29,7 +29,9 @@ export async function POST(request: Request) {
 
     if (subscription) {
       const parsedSubscription = JSON.parse(subscription.subscription);
-      await webpush.sendNotification(parsedSubscription, payload);
+      const x = await webpush.sendNotification(parsedSubscription, payload);
+
+      console.log(x);
     } else {
       console.error(
         '[notifications/send] User [',

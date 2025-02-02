@@ -9,15 +9,18 @@ import ThemeSwitchComponent from '#/components/theme-switch/theme-switch';
 import { db } from '#/db/dexie.db';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { capitalize } from '#/shared/utils/helpers';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { Banknote, Bell, Palette } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function SettingsPage() {
   const { user, deleteUser, pickedPlan, isPlanActive } = useSessionContext();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
-  const [notificationEnabled, setNotificationEnabled] = useState(false);
+  const permission = useLiveQuery(() =>
+    db.metadata.get('current'),
+  )?.notificationPermission;
 
   const handleDeleteUser = () => {
     setIsDeleting(true);
@@ -27,9 +30,9 @@ export default function SettingsPage() {
   const handleNotificationChange = async () => {
     await Notification.requestPermission().then((result) => {
       if (result === 'granted') {
-        setNotificationEnabled(true);
+        db.metadata.update('current', { notificationPermission: 'granted' });
       } else if (result === 'denied') {
-        setNotificationEnabled(false);
+        db.metadata.update('current', { notificationPermission: 'denied' });
       }
     });
   };
@@ -44,10 +47,6 @@ export default function SettingsPage() {
     db.metadata.clear();
     setIsClearing(false);
   };
-
-  useEffect(() => {
-    handleNotificationChange();
-  }, []);
 
   return (
     <div className='flex w-full flex-col items-center gap-4'>
@@ -138,7 +137,7 @@ export default function SettingsPage() {
             <Switch
               showLabel={false}
               onClick={handleNotificationChange}
-              value={notificationEnabled}
+              value={permission === 'granted'}
             />
           </div>
 

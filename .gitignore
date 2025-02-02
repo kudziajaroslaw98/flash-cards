@@ -17,6 +17,7 @@
 sw.*
 workbox-*
 swe-worker-*
+/public/worker-*
 
 # production
 /build

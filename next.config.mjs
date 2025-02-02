@@ -9,10 +9,12 @@ const withPWA = withPWAInit({
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,
   swcMinify: true,
-  disable: process.env.NODE_ENV === 'development',
+  extendDefaultRuntimeCaching: true,
   workboxOptions: {
     disableDevLogs: true,
   },
+  customWorkerSrc: './service-worker',
+  // disable: process.env.NODE_ENV === 'development',
 });
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
