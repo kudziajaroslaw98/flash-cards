@@ -3,34 +3,36 @@
 import { AlertDialog } from '#/components/_ui/alert-dialog/alert-dialog';
 import AvatarComponent from '#/components/_ui/avatar/avatar';
 import { Button } from '#/components/_ui/button/button';
+import Switch from '#/components/_ui/switch/switch';
+import NotificationButton from '#/components/notifications/notification-button';
 import ThemeSwitchComponent from '#/components/theme-switch/theme-switch';
 import { db } from '#/db/dexie.db';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { capitalize } from '#/shared/utils/helpers';
-import { Banknote, Palette } from 'lucide-react';
+import { Banknote, Bell, Palette } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function SettingsPage() {
   const { user, deleteUser, pickedPlan, isPlanActive } = useSessionContext();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
-  // const [notificationEnabled, setNotificationEnabled] = useState(false);
+  const [notificationEnabled, setNotificationEnabled] = useState(false);
 
   const handleDeleteUser = () => {
     setIsDeleting(true);
     deleteUser();
   };
 
-  // const handleNotificationChange = async () => {
-  //   await Notification.requestPermission().then((result) => {
-  //     if (result === 'granted') {
-  //       setNotificationEnabled(true);
-  //     } else if (result === 'denied') {
-  //       setNotificationEnabled(false);
-  //     }
-  //   });
-  // };
+  const handleNotificationChange = async () => {
+    await Notification.requestPermission().then((result) => {
+      if (result === 'granted') {
+        setNotificationEnabled(true);
+      } else if (result === 'denied') {
+        setNotificationEnabled(false);
+      }
+    });
+  };
 
   const handleClearData = () => {
     setIsClearing(true);
@@ -43,9 +45,9 @@ export default function SettingsPage() {
     setIsClearing(false);
   };
 
-  // useEffect(() => {
-  //   handleNotificationChange();
-  // }, []);
+  useEffect(() => {
+    handleNotificationChange();
+  }, []);
 
   return (
     <div className='flex w-full flex-col items-center gap-4'>
@@ -123,7 +125,7 @@ export default function SettingsPage() {
             />
           </div>
 
-          {/* <div className='flex justify-between gap-2 rounded-md'>
+          <div className='flex justify-between gap-2 rounded-md'>
             <div className='flex items-center gap-2'>
               <div className='flex size-8 items-center justify-center rounded-md bg-gray-200 text-gray-700 dark:bg-slate-900 dark:text-slate-200'>
                 <Bell className='size-4' />
@@ -138,7 +140,9 @@ export default function SettingsPage() {
               onClick={handleNotificationChange}
               value={notificationEnabled}
             />
-          </div> */}
+          </div>
+
+          <NotificationButton />
         </section>
       </div>
 
