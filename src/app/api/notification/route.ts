@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     }
 
     const notifications = subscriptions.map((subscription) => {
-      const parsedSubscription = JSON.parse(subscription.subscription);
+      const parsedSubscription = subscription.subscription;
       return webpush.sendNotification(parsedSubscription, payload);
     });
 
