@@ -19,20 +19,12 @@ export async function POST(request: Request) {
     const { userUuid, title, body } = await request.json();
     const payload = JSON.stringify({ title, body });
 
-    const { data: subscription } = await supabaseAdmin
+    const { data: subscriptions } = await supabaseAdmin
       .from('subscriptions')
       .select('subscription')
-      .eq('user_uuid', userUuid)
-      .single();
+      .eq('user_uuid', userUuid);
 
-    console.log(JSON.stringify(subscription));
-
-    if (subscription) {
-      const parsedSubscription = JSON.parse(subscription.subscription);
-      const x = await webpush.sendNotification(parsedSubscription, payload);
-
-      console.log(x);
-    } else {
+    if (!subscriptions || subscriptions.length === 0) {
       console.error(
         '[notifications/send] User [',
         userUuid,
@@ -40,6 +32,13 @@ export async function POST(request: Request) {
       );
       throw new Error('User has no subscription');
     }
+
+    const notifications = subscriptions.map((subscription) => {
+      const parsedSubscription = JSON.parse(subscription.subscription);
+      return webpush.sendNotification(parsedSubscription, payload);
+    });
+
+    await Promise.all(notifications);
 
     return NextResponse.json({ message: 'Notification sent' }, { status: 200 });
   } catch (error) {

@@ -61,13 +61,10 @@ export async function POST(request: Request) {
     validateBody(body);
 
     const { subscription } = body;
-    const { error } = await supabase.from('subscriptions').upsert(
-      {
-        user_uuid: user.id,
-        subscription: JSON.stringify(subscription),
-      },
-      { onConflict: 'user_uuid' },
-    );
+    const { error } = await supabase.from('subscriptions').insert({
+      user_uuid: user.id,
+      subscription: subscription,
+    });
 
     if (error) {
       console.error(

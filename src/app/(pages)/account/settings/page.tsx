@@ -9,18 +9,41 @@ import ThemeSwitchComponent from '#/components/theme-switch/theme-switch';
 import { db } from '#/db/dexie.db';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { capitalize } from '#/shared/utils/helpers';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { Banknote, Bell, Palette } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 
 export default function SettingsPage() {
   const { user, deleteUser, pickedPlan, isPlanActive } = useSessionContext();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
-  const permission = useLiveQuery(() =>
-    db.metadata.get('current'),
-  )?.notificationPermission;
+  // eslint-disable-next-line no-undef
+  const [permission, setPermission] = useState<
+    'granted' | 'denied' | 'default'
+  >();
+
+  useEffect(() => {
+    const handleNotificationPermission = async () => {
+      const registration = await navigator.serviceWorker.ready;
+      const pushManager = registration.pushManager;
+      const subscription = await pushManager.getSubscription();
+
+      if (subscription) {
+        setPermission('granted');
+        db.metadata.update('current', {
+          notificationPermission: 'granted',
+        });
+      } else {
+        setPermission('denied');
+        db.metadata.update('current', {
+          notificationPermission: 'denied',
+        });
+      }
+    };
+    handleNotificationPermission();
+  }, []);
 
   const handleDeleteUser = () => {
     setIsDeleting(true);
@@ -28,9 +51,64 @@ export default function SettingsPage() {
   };
 
   const handleNotificationChange = async () => {
-    await Notification.requestPermission().then((result) => {
+    if (permission === 'granted') {
+      const registration = await navigator.serviceWorker.ready;
+      const pushManager = registration.pushManager;
+      pushManager.getSubscription().then(async (subscription) => {
+        if (subscription) {
+          const response = await fetch('/api/notification/unsubscribe', {
+            method: 'POST',
+            body: JSON.stringify({ subscription }), // Send user ID
+            headers: { 'Content-Type': 'application/json' },
+          }).then((res) => res.json());
+
+          if (response.success) {
+            subscription.unsubscribe();
+            // TODO: add toast
+          }
+        }
+      });
+      setPermission('denied');
+      db.metadata.update('current', { notificationPermission: 'denied' });
+      return;
+    } else if (permission === 'denied') {
+      setPermission('default');
+      db.metadata.update('current', { notificationPermission: 'default' });
+      return;
+    }
+
+    await Notification.requestPermission().then(async (result) => {
       if (result === 'granted') {
+        setPermission('granted');
         db.metadata.update('current', { notificationPermission: 'granted' });
+        const subscribeToNotifications = async () => {
+          if (
+            !('serviceWorker' in navigator) ||
+            !('PushManager' in window) ||
+            !VAPID_PUBLIC_KEY ||
+            !user
+          ) {
+            return;
+          }
+
+          const registration = await navigator.serviceWorker.ready;
+          const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: VAPID_PUBLIC_KEY,
+          });
+
+          const response = await fetch('/api/notification/subscribe', {
+            method: 'POST',
+            body: JSON.stringify({ subscription }), // Send user ID
+            headers: { 'Content-Type': 'application/json' },
+          }).then((res) => res.json());
+
+          if (response.success) {
+            // TODO: todo: add toast
+          }
+        };
+
+        subscribeToNotifications();
       } else if (result === 'denied') {
         db.metadata.update('current', { notificationPermission: 'denied' });
       }

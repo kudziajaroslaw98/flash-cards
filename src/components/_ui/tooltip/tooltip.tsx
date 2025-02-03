@@ -83,13 +83,6 @@ const Tooltip = ({
     },
   };
 
-  //   const arrowClasses = {
-  //     top: 'top-full -translate-x-1/2 left-1/2 border-t border-gray-800',
-  //     bottom: 'bottom-full -translate-x-1/2 left-1/2 border-b border-gray-800',
-  //     left: 'left-full -translate-y-1/2 top-1/2 border-l border-gray-800',
-  //     right: 'right-full -translate-y-1/2 top-1/2 border-r border-gray-800',
-  //   };
-
   return (
     <div className={`relative ${className}`}>
       <div
