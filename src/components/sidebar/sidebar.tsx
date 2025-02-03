@@ -10,9 +10,9 @@ import {
   ArrowUp,
   BookOpenText,
   GraduationCap,
+  House,
   Languages,
   Layers,
-  LayoutDashboard,
   LogIn,
   LogOut,
   PlayCircle,
@@ -41,7 +41,7 @@ export default function SidebarComponent() {
   const name = user?.user_metadata?.name;
 
   const iconSize = expanded ? 'size-4' : 'size-5';
-  const groupIconSize = 'size-5';
+  const groupIconSize = 'size-3';
 
   const navigation: (NavigationItem | NavigationGroup)[] = [
     {
@@ -49,7 +49,7 @@ export default function SidebarComponent() {
       label: 'Dashboard',
       href: APP_ROUTES.dashboard,
       visible: true,
-      icon: <LayoutDashboard className={`${iconSize} fill-current`} />,
+      icon: <House className={`${iconSize}`} />,
     },
     {
       type: 'item',
@@ -68,7 +68,7 @@ export default function SidebarComponent() {
     {
       type: 'group',
       label: 'Flashcards',
-      icon: <Zap className={`${groupIconSize} fill-current`} />,
+      icon: <Zap className={`${groupIconSize}`} />,
       visible: true,
       items: [
         {
@@ -105,21 +105,24 @@ export default function SidebarComponent() {
         },
       ],
     },
+    {
+      type: 'group',
+      label: 'Premium',
+      icon: <UserRound className={`${groupIconSize}`} />,
+      visible: true && !isPlanActive,
+      items: [
+        {
+          type: 'item',
+          label: 'Upgrade plan',
+          href: APP_ROUTES.pricing,
+          icon: <ArrowUp className={iconSize} />,
+        },
+      ],
+    },
   ];
 
   const handleToggle = () => {
     toggleExpand(!expanded);
-  };
-
-  const handlePlanUpgrade = () => {
-    window.umami.track('Upgrade plan clicked');
-
-    if (!isLoggedIn) {
-      router.push(APP_ROUTES.signIn + '?redirect=pricing');
-      return;
-    } else {
-      router.push(APP_ROUTES.pricing);
-    }
   };
 
   return (
@@ -165,11 +168,9 @@ export default function SidebarComponent() {
         />
       </div>
 
-      <div
-        className={`flex h-full w-full flex-col justify-center gap-8 overflow-y-auto p-4`}
-      >
+      <div className={`flex h-full w-full flex-col justify-center gap-8 p-4`}>
         <div
-          className={`hidden h-full flex-col gap-4 md:flex  ${!expanded && 'items-center'}`}
+          className={`hidden h-full flex-col gap-2 md:flex  ${!expanded && 'items-center'}`}
         >
           {navigation?.map(
             (section) =>
@@ -197,19 +198,6 @@ export default function SidebarComponent() {
 
         <div className='flex h-full w-full items-end justify-center'>
           <div className='flex flex-col items-center justify-center gap-8'>
-            <div className='flex w-full items-center justify-center gap-4'>
-              {!isPlanActive && (
-                <Button
-                  icon={<ArrowUp className='size-6' />}
-                  onClick={handlePlanUpgrade}
-                  label={expanded ? 'Upgrade Plan' : ''}
-                  size={expanded ? 'default' : 'icon'}
-                  variant={'secondary-text'}
-                  alt='Upgrade Plan'
-                />
-              )}
-            </div>
-
             <ThemeSwitchComponent showLabel={expanded} />
 
             <div
@@ -267,7 +255,7 @@ export default function SidebarComponent() {
                 <div
                   className={`w-full max-w-32 flex-col ${expanded ? 'flex' : 'hidden'}`}
                 >
-                  <span className='line-clamp-1  overflow-hidden text-ellipsis font-extrabold text-slate-800 dark:text-gray-100'>
+                  <span className='line-clamp-1  overflow-hidden text-ellipsis font-extrabold text-gray-600 dark:text-slate-300'>
                     {isLoggedIn ? `${name}` : 'Guest'}
                   </span>
 
