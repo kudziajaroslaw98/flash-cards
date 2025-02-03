@@ -3,13 +3,23 @@ self.addEventListener('push', (event) => {
   const title = data?.title || 'Notification';
   const options = {
     body: data?.body || 'You have a new notification.',
-    icon: data?.icon || '/icon.png',
+    icon: data?.icon || '/icon-192x192.png',
+    badge: data?.badge || '/icon-192x192.png',
+    vibrate: [100, 50, 100],
+    silent: false,
+    requireInteraction: false,
+    actions: data?.actions || [],
   };
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
 self.addEventListener('notificationclick', (event) => {
   event?.notification.close();
+
+  if (event.action === 'open') {
+    event.waitUntil(self.clients.openWindow('/flashcards/learn'));
+    return;
+  }
   event?.waitUntil(
     self.clients
       .matchAll({ type: 'window', includeUncontrolled: true })
