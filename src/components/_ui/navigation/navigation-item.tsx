@@ -31,7 +31,7 @@ export default function NavigationItemComponent({
         <Link
           href={item.href}
           className={cn([
-            'relative flex items-center gap-2 rounded-md px-2 py-1 text-gray-500 dark:text-slate-300',
+            'relative flex items-center justify-center gap-2 rounded-md px-2 py-1 text-gray-500 dark:text-slate-300',
             'transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-slate-900 dark:hover:text-slate-200',
             isPathActive &&
               'bg-gray-100 !text-green-400 hover:bg-gray-200 dark:bg-slate-900 dark:hover:bg-slate-800',
@@ -39,12 +39,30 @@ export default function NavigationItemComponent({
             className,
           ])}
         >
-          <span>{item.icon}</span>
-          <span
-            className={`overflow-clip font-medium transition-all ${expanded ? 'max-w-full' : 'max-w-0'}`}
+          <div
+            className={cn([
+              'flex flex-grow items-center',
+              expanded ? 'gap-2' : 'gap-0',
+            ])}
           >
-            {expanded && item.label}
-          </span>
+            <span>{item.icon}</span>
+            <span
+              className={`overflow-clip font-medium transition-all ${expanded ? 'max-w-full' : 'max-w-0'}`}
+            >
+              <span className='flex-grow'>{expanded && item.label}</span>
+            </span>
+          </div>
+          {item?.indicator !== undefined && (
+            <span
+              className={cn([
+                'flex h-3 w-fit items-center justify-center rounded-full px-1 text-[10px] font-semibold',
+                'bg-gray-200 text-gray-600 dark:bg-slate-800 dark:text-slate-200',
+                !expanded && 'absolute -right-1 -top-1',
+              ])}
+            >
+              {item.indicator}
+            </span>
+          )}
 
           {isPathActive && (
             <m.span

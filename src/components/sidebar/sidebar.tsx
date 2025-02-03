@@ -1,9 +1,11 @@
 'use client';
 
+import { db } from '#/db/dexie.db';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { APP_ROUTES } from '#/shared/defaults/app.routes';
 import { NavigationGroup } from '#/types//navigation-group.type';
 import { NavigationItem } from '#/types//navigation-item.type';
+import { useLiveQuery } from 'dexie-react-hooks';
 import {
   ArrowLeft,
   ArrowRight,
@@ -38,6 +40,15 @@ export default function SidebarComponent() {
   const router = useRouter();
 
   const { isLoggedIn, user, logOut, isPlanActive } = useSessionContext();
+  const flashcardsLength = useLiveQuery(() => db.flashcards.count());
+  const setsLength = useLiveQuery(() => db.sets.count());
+  const dueFlashcards = useLiveQuery(() =>
+    db.flashcards
+      .filter(
+        (f) => new Date(f.spacedRepetition.dueDate).getTime() < Date.now(),
+      )
+      .count(),
+  );
   const name = user?.user_metadata?.name;
 
   const iconSize = expanded ? 'size-4' : 'size-5';
@@ -76,18 +87,21 @@ export default function SidebarComponent() {
           label: 'Sets',
           href: APP_ROUTES.flashcards.sets,
           icon: <Layers className={iconSize} />,
+          indicator: setsLength,
         },
         {
           type: 'item',
           label: 'Learn',
           href: APP_ROUTES.flashcards.learn,
           icon: <GraduationCap className={iconSize} />,
+          indicator: flashcardsLength,
         },
         {
           type: 'item',
           label: 'Revise',
           href: APP_ROUTES.flashcards.revise,
           icon: <Languages className={iconSize} />,
+          indicator: dueFlashcards,
         },
       ],
     },

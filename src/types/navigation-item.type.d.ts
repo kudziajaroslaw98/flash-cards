@@ -5,6 +5,7 @@ export type NavigationItem = {
   icon: ReactNode;
   label: string;
   href: string;
+  indicator?: ReactNode;
   active?: boolean;
   visible?: boolean;
 };
