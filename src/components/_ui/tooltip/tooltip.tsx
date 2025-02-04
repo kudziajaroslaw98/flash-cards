@@ -1,7 +1,8 @@
+import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import { cn } from '#/shared/utils/cn.util';
 import { useAnimate } from 'motion/react';
 import * as m from 'motion/react-m';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type Position = 'top' | 'bottom' | 'left' | 'right';
 
@@ -21,6 +22,8 @@ const Tooltip = ({
   show = true,
 }: TooltipProps) => {
   const [scope, animate] = useAnimate();
+  const [isVisible, setIsVisible] = useState(false);
+  const wrapperRef = useRef(null);
 
   const hiddenBase = {
     opacity: 0,
@@ -108,21 +111,49 @@ const Tooltip = ({
     }
   }, [scope.current]);
 
+  const handleOnHoverStart = () => {
+    if (show) {
+      setIsVisible(true);
+      animate(scope.current, variants[position].visible, {
+        duration: 0.2,
+      });
+    }
+  };
+
+  const handleOnHoverEnd = () => {
+    if (show) {
+      setIsVisible(false);
+      animate(scope.current, variants[position].hidden, {
+        duration: 0.2,
+      });
+    }
+  };
+
+  const handleOnTap = () => {
+    if (show) {
+      setIsVisible(true);
+      animate(scope.current, variants[position].visible, {
+        duration: 0.2,
+      });
+    }
+  };
+
+  useOutsideAlerter(wrapperRef, () => {
+    if (show && isVisible) {
+      setIsVisible(false);
+      animate(scope.current, variants[position].hidden, {
+        duration: 0.2,
+      });
+    }
+  });
+
   return (
     <m.div
-      onHoverStart={() =>
-        show &&
-        animate(scope.current, variants[position].visible, {
-          duration: 0.2,
-        })
-      }
-      onHoverEnd={() =>
-        show &&
-        animate(scope.current, variants[position].hidden, {
-          duration: 0.2,
-        })
-      }
+      onHoverStart={handleOnHoverStart}
+      onHoverEnd={handleOnHoverEnd}
+      onTap={handleOnTap}
       className='relative'
+      ref={wrapperRef}
     >
       <m.div className='contents'>{children}</m.div>
 

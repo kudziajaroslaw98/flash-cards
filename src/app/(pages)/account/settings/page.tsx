@@ -252,7 +252,7 @@ export default function SettingsPage() {
                   content={InfoTooltip}
                   className='w-80 text-wrap'
                 >
-                  <Info className='size-3 text-green-600 dark:text-green-400' />
+                  <Info className='size-3 cursor-pointer text-green-600 dark:text-green-400' />
                 </Tooltip>
               </span>
             </div>
