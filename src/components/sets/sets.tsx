@@ -13,7 +13,15 @@ import useLongPress from '#/hooks/use-long-press.hook';
 import { useAppContext } from '#/providers/app-context';
 import { cn } from '#/shared/utils/cn.util';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
-import { BadgeCheck, Pencil, Plus, Search, Star, Trash } from 'lucide-react';
+import {
+  BadgeCheck,
+  Pencil,
+  Plus,
+  Search,
+  Star,
+  Trash,
+  VenetianMask,
+} from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import { useRouter } from 'next/navigation';
@@ -250,7 +258,13 @@ export default function Sets() {
             ))}
           </AnimatePresence>
         </div>
-
+        {filteredSets.length === 0 && (
+          <div className='flex w-full flex-col items-center justify-center py-10'>
+            <VenetianMask className='mb-8 size-12 text-green-500' />
+            <span>Your sets are currently in stealth mode.</span>
+            <span>Let&apos;s coax them into the spotlight!</span>
+          </div>
+        )}
         <FloatingButtons>
           <NewSetModal
             trigger={

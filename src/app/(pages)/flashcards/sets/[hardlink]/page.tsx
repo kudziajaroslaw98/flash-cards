@@ -25,6 +25,7 @@ import type { Flashcard } from '#/types/flash-card.type';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   ArrowLeft,
+  Cookie,
   CopyCheck,
   CopyMinus,
   Download,
@@ -307,9 +308,13 @@ export default function SetHardlinkPage() {
         </span>
       </div>
 
-      {set?.flashcards?.length === 0 && (
-        <div className='text-gray-600 dark:text-slate-300'>
-          <span>No assigned cards</span>
+      {setFlashcards.length === 0 && (
+        <div className='flex w-full flex-col items-center justify-center py-10'>
+          <Cookie className='mb-8 size-12 text-green-500' />
+          <span>
+            This set is as empty as a cookie jar after a midnight snack.
+          </span>
+          <span>Let&apos;s fill it up!</span>
         </div>
       )}
 

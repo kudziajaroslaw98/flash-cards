@@ -13,7 +13,7 @@ import type { Flashcard } from '#/types/flash-card.type';
 import type { FocusSession } from '#/types/focus-session.type';
 import type { ReviewLog } from '#/types/review-log.type';
 import type { ReviseOptionsType } from '#/types/revise-options.type';
-import { ArrowRight, RefreshCw } from 'lucide-react';
+import { ArrowRight, Coffee, RefreshCw } from 'lucide-react';
 import { Accordion } from '../_ui/accordion/accordion';
 import Dropdown from '../_ui/dropdown/dropdown';
 import LinkComponent from '../_ui/link/link';
@@ -365,16 +365,24 @@ export default function FlashcardReviseComponent() {
       </FloatingButtons>
     </div>
   ) : (
-    <div className='flex h-full w-full flex-col items-center justify-center gap-4 text-xl'>
-      <h3 className='text-gray-500 dark:text-slate-200'>
-        You dont have any flashcards yet.
-      </h3>
+    <div className='flex h-full w-full flex-col items-center justify-center gap-4'>
+      <div className='flex w-full flex-col items-center justify-center py-10'>
+        <Coffee className='mb-8 size-12 text-green-500' />
+        <span>This review session is a no-show</span>
+        <span>your flashcards must be off on a coffee break.</span>
 
-      <LinkComponent
-        href='/flashcards/learn'
-        label='You can add them here'
-        className='text-green-400 underline'
-      />
+        <LinkComponent
+          href='/flashcards/learn'
+          className='mt-8'
+        >
+          <Button
+            label={'Time to bring them back!'}
+            icon={<ArrowRight className='size-4' />}
+            iconPosition='right'
+            alt='Redirect to learn page'
+          />
+        </LinkComponent>
+      </div>
     </div>
   );
 }
