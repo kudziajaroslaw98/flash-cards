@@ -216,6 +216,7 @@ function TagInput({
                   {tag}
                 </span>
                 <Button
+                  type='button'
                   onClick={() => removeTag(index)}
                   size={'icon-xs'}
                   icon={<X className='size-3' />}

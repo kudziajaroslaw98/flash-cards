@@ -39,7 +39,7 @@
     "dexie": "^4.0.11",
     "dexie-react-hooks": "^1.1.7",
     "lucide-react": "^0.465.0",
-    "motion": "^11.18.2",
+    "motion": "^12.0.11",
     "next": "15.1.4",
     "next-mdx-remote": "^5.0.0",
     "postcss": "^8.5.1",
