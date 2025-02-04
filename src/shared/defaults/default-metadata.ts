@@ -13,4 +13,5 @@ export const defaultMetadata: Metadata = {
   activeStudyPlan: undefined,
   updatedAt: new Date(),
   theme: 'dark',
+  marketingConsent: false,
 };

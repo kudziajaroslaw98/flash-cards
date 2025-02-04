@@ -41,3 +41,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .vscode/settings.json
+
+# TODO: delete it when figured out how to pull from db.
+# Supabase tmp .
+/supabase

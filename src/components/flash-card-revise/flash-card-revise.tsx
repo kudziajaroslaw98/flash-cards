@@ -69,7 +69,7 @@ export default function FlashcardReviseComponent() {
     timestamp: new Date().toISOString(),
   });
 
-  const { activeTime, activeTimeRef, distractionsRef } = useFocusTracker();
+  const { activeTime, timerStart, distractionsRef } = useFocusTracker();
   // eslint-disable-next-line no-undef
   const cardTime = useRef<Date>(new Date()); //in seconds
 
@@ -219,11 +219,15 @@ export default function FlashcardReviseComponent() {
 
   useEffect(() => {
     return () => {
+      if (!focusSession.current || timerStart.current === null) return;
+      const now = new Date();
+      const activeTime =
+        (now.setMilliseconds(0) - timerStart.current.setMilliseconds(0)) / 1000;
       db.focusSessions.put({
         ...focusSession.current,
         timestamp: new Date().toISOString(),
         end: new Date().toISOString(),
-        activeTime: activeTimeRef.current,
+        activeTime: activeTime,
         distractions: distractionsRef.current,
       });
 
@@ -243,7 +247,7 @@ export default function FlashcardReviseComponent() {
             ),
             cardsReviewed: dailyStat.cardsReviewed + cardsReviewed.current,
             cardsRecalled: dailyStat.cardsRecalled + cardsRecalled.current,
-            timeSpent: dailyStat.timeSpent + activeTimeRef.current,
+            timeSpent: dailyStat.timeSpent + activeTime,
             synced: false,
           });
         } else {
@@ -254,7 +258,7 @@ export default function FlashcardReviseComponent() {
             retention: cardsReviewed.current / cardsRecalled.current,
             cardsReviewed: cardsReviewed.current,
             cardsRecalled: cardsRecalled.current,
-            timeSpent: activeTimeRef.current,
+            timeSpent: activeTime,
             synced: false,
           });
         }

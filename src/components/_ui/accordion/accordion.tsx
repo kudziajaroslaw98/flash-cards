@@ -1,19 +1,12 @@
 import { cn } from '#/shared/utils/cn.util';
-import uuid from '#/shared/utils/uuid.util';
-import { ChevronDownIcon } from 'lucide-react';
-import * as m from 'motion/react-m';
-import React, { useRef } from 'react';
-import AccordionProvider, { useAccordionContext } from './accordion-context';
+import React from 'react';
+import AccordionProvider from './accordion-context';
+import { AccordionItem } from './accordion-item';
 
 interface AccordionProps {
   children: React.ReactNode;
   className?: string;
   multiple?: boolean;
-}
-
-interface AccordionItemProps {
-  title: string;
-  children: React.ReactNode;
 }
 
 export const Accordion = ({ children, className }: AccordionProps) => {
@@ -24,49 +17,5 @@ export const Accordion = ({ children, className }: AccordionProps) => {
   );
 };
 
-export const AccordionItem = ({ title, children }: AccordionItemProps) => {
-  const key = useRef(uuid());
-  const { openKeys, toggleIndex } = useAccordionContext();
-  const isOpen = openKeys.includes(key.current);
-
-  const handleClick = () => {
-    toggleIndex(key.current, true);
-  };
-  //  text-gray-200 dark:bg-slate-900 dark:text-slate-800
-  return (
-    <div className='overflow-hidden rounded-md border border-gray-300 dark:border-slate-800'>
-      <m.button
-        className='flex w-full items-center justify-between p-2 transition-colors hover:bg-gray-100 dark:hover:bg-slate-900'
-        onClick={handleClick}
-      >
-        <span className='text-left text-sm font-medium text-gray-500 dark:text-slate-400'>
-          {title}
-        </span>
-        <m.div
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <ChevronDownIcon className='h-5 w-5 text-gray-500 dark:text-slate-400' />
-        </m.div>
-      </m.button>
-
-      <m.div
-        initial={false}
-        animate={{
-          height: isOpen ? 'auto' : 0,
-          opacity: isOpen ? 1 : 0,
-        }}
-        transition={{ duration: 0.2, ease: 'easeInOut' }}
-        className='overflow-hidden px-4'
-      >
-        <div className='pb-4 pt-2 text-gray-500 dark:text-slate-400'>
-          {children}
-        </div>
-      </m.div>
-    </div>
-  );
-};
-
 Accordion.displayName = 'Accordion';
-AccordionItem.displayName = 'AccordionItem';
 Accordion.Item = AccordionItem;

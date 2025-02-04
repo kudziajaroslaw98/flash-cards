@@ -203,7 +203,7 @@ export default function SignInComponent() {
               onClick={async () => {
                 const response = await supabase.auth.signInWithPassword({
                   email: 'test@test.com',
-                  password: 'test1234',
+                  password: 'test',
                 });
                 if (response) {
                   window.location.reload();

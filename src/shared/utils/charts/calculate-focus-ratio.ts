@@ -7,8 +7,8 @@ export const calculateFocusRatio = (
   let totalTime = 0;
 
   sessions.forEach((session) => {
-    const start = new Date(session.start);
-    const end = new Date(session.end);
+    const start = new Date(new Date(session.start).setMilliseconds(0));
+    const end = new Date(new Date(session.end).setMilliseconds(0));
     const sessionDuration = (end.getTime() - start.getTime()) / 1000; // in seconds
     totalActive += session.activeTime;
     totalTime += sessionDuration;

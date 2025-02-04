@@ -20,10 +20,7 @@ export function Dashboard() {
   const sessions = useLiveQuery(() => db.focusSessions.toArray()) ?? [];
   const metadata = useLiveQuery(() => db.metadata.toCollection().first());
   const focusRatio = calculateFocusRatio(sessions);
-
   const peakTimes = getPeakFocusTimes(sessions);
-
-  if (peakTimes.length === 0) return null;
 
   const formatHour = (hour: number) => {
     const options = { hour: 'numeric', hour12: true } as const;
@@ -56,21 +53,25 @@ export function Dashboard() {
               </p>
             </div>
           </div>
-          <div className='flex flex-wrap gap-4'>
-            <div className='text-4xl font-bold text-green-400'>
-              {Math.round(focusRatio.ratio * 100)}%
+          {sessions.length === 0 ? (
+            <span className='text-sm'>No data available yet</span>
+          ) : (
+            <div className='flex flex-wrap gap-4'>
+              <div className='text-4xl font-bold text-green-400'>
+                {Math.round(focusRatio.ratio * 100)}%
+              </div>
+              <span className='flex flex-col text-sm text-gray-600'>
+                <span className='flex gap-2'>
+                  <span className='font-semibold'>Active:</span>
+                  <span>{`${formatDurationFull(focusRatio.totalActive)}`}</span>
+                </span>
+                <span className='flex gap-2'>
+                  <span className='font-semibold'>Total:</span>
+                  <span>{`${formatDurationFull(focusRatio.totalTime)}`}</span>
+                </span>
+              </span>
             </div>
-            <span className='flex flex-col text-sm text-gray-600'>
-              <span className='flex gap-2'>
-                <span className='font-semibold'>Active:</span>
-                <span>{`${formatDurationFull(focusRatio.totalActive)}`}</span>
-              </span>
-              <span className='flex gap-2'>
-                <span className='font-semibold'>Total:</span>
-                <span>{`${formatDurationFull(focusRatio.totalTime)}`}</span>
-              </span>
-            </span>
-          </div>
+          )}
         </Card>
 
         <Card
@@ -84,6 +85,9 @@ export function Dashboard() {
 
             <span className='font-semibold leading-5'>Peak Focus Times</span>
           </div>
+          {peakTimes.length === 0 && (
+            <span className='text-sm'>No data available yet</span>
+          )}
           <ul className='list-disc pl-4 text-sm'>
             {peakTimes.map((time) => (
               <li key={time.hour}>

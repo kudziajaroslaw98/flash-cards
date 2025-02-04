@@ -166,6 +166,27 @@ export class AppDB extends Dexie {
           });
       });
 
+    this.version(6)
+      .stores({
+        flashcards:
+          '&frontUuid, tags, createdAt, updatedAt, *sets, spacedRepetition.dueDate, spacedRepetition.easeFactor, [setUuids+spacedRepetition.dueDate], synced',
+        sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards, synced',
+        metadata: 'key, synced',
+        dailyStats: 'frontUuid, updatedAt, date, synced',
+        focusSessions: 'frontUuid, timestamp, start, end, synced',
+        reviewLogs:
+          'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
+      })
+      .upgrade((transaction) => {
+        transaction
+          .table('metadata')
+          .toCollection()
+          .modify((metadata: Metadata) => ({
+            ...metadata,
+            marketingConsent: true,
+          }));
+      });
+
     // Setup hooks
     this.setupHooks();
   }

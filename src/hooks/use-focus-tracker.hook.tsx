@@ -3,12 +3,13 @@ import { useEffect, useRef, useState } from 'react';
 export const useFocusTracker = () => {
   // eslint-disable-next-line no-undef
   const timerRef = useRef<NodeJS.Timeout>(null);
-  const activeTimeRef = useRef<number>(0);
+  const timerStart = useRef<Date | null>(null);
   const distractionsRef = useRef<number>(0);
   const [activeTime, setActiveTime] = useState(0);
   const [distractions, setDistractions] = useState(0);
 
   useEffect(() => {
+    timerStart.current = new Date();
     const handleVisibilityChange = () => {
       if (document.hidden && timerRef.current) {
         distractionsRef.current += 1;
@@ -21,7 +22,6 @@ export const useFocusTracker = () => {
 
     const startTimer = () => {
       timerRef.current = setInterval(() => {
-        activeTimeRef.current += 1;
         setActiveTime((prev) => prev + 1);
       }, 1000);
     };
@@ -35,5 +35,5 @@ export const useFocusTracker = () => {
     };
   }, []);
 
-  return { activeTimeRef, distractionsRef, activeTime, distractions };
+  return { timerStart, distractionsRef, activeTime, distractions };
 };
