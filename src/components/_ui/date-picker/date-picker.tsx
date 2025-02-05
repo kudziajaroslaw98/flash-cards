@@ -27,7 +27,7 @@ export interface DateTimePickerProps {
   error?: string | null;
   touched?: boolean;
   icon?: React.ReactNode;
-  value?: string;
+  value?: string | Date;
   required?: boolean;
   className?: string;
   onChange?: (date: Date) => void;
@@ -64,6 +64,12 @@ export default function DateTimePicker({
   // Calculate the calendar grid for the current month
 
   useEffect(() => {
+    if (!value) return;
+    setCalendar(new Date(value));
+    setDate(new Date(value));
+  }, [value]);
+
+  useEffect(() => {
     const monthStart = startOfMonth(calendar);
     const monthEnd = endOfMonth(monthStart);
     const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
@@ -89,22 +95,22 @@ export default function DateTimePicker({
     handleDateClick(date);
   }, []);
 
+  const scrollToSelected = (ref: RefObject<HTMLDivElement | null>) => {
+    if (ref.current) {
+      const selected = ref.current.querySelector(
+        `[aria-labelledby="active-item"]`,
+      );
+      if (selected) {
+        selected.scrollIntoView({ block: 'center', inline: 'center' });
+      }
+    }
+  };
+
   useEffect(() => {
     if (open) {
       // Scroll to selected time
-      const scrollToSelected = (
-        ref: RefObject<HTMLDivElement | null>,
-        value: number,
-      ) => {
-        if (ref.current) {
-          const selected = ref.current.querySelector(`[data-value="${value}"]`);
-          if (selected) {
-            selected.scrollIntoView({ block: 'center' });
-          }
-        }
-      };
-      scrollToSelected(hourColumnRef, date.getHours());
-      scrollToSelected(minuteColumnRef, date.getMinutes());
+      scrollToSelected(hourColumnRef);
+      scrollToSelected(minuteColumnRef);
     }
   }, [open, date]);
 
@@ -126,7 +132,7 @@ export default function DateTimePicker({
       hours ?? date.getHours(),
       minutes ?? date.getMinutes(),
     );
-    console.log(newDate);
+
     setDate(newDate);
     setDateMinutes(newDate.getMinutes());
     setDateHours(newDate.getHours());
@@ -152,16 +158,29 @@ export default function DateTimePicker({
     handleOnChange();
   };
 
+  const handleOnWrapperClick = () => {
+    setOpen(!open);
+    if (!open && onFocus) {
+      onFocus();
+    } else if (open && onBlur) {
+      onBlur();
+    }
+  };
+
   useEffect(() => {
     handleOnChange();
   }, [date]);
 
-  useOutsideAlerter(datePickerWrapper, () => setOpen(false));
+  useOutsideAlerter(datePickerWrapper, () => {
+    setOpen(false);
+    if (onBlur) onBlur();
+  });
 
   return (
     <label
       className={`group relative flex w-full max-w-md flex-col ${label ? 'pt-2' : ''} ${className ?? ''}`}
       htmlFor={forProp}
+      aria-labelledby={type}
     >
       {label && (
         <span
@@ -201,7 +220,7 @@ export default function DateTimePicker({
             loading={false}
             disabled={false}
             variant={'muted-transparent'}
-            onClick={() => setOpen(!open)}
+            onClick={handleOnWrapperClick}
             label={format(date, 'yyyy-MM-dd HH:mm')}
             className='!w-full max-w-full justify-start outline-none !ring-0 focus:scale-100 active:scale-100'
           />
@@ -304,7 +323,7 @@ export default function DateTimePicker({
 
                   {/* Time Picker */}
                   <div className='flex flex-col gap-2 md:flex-row'>
-                    <div className='flex flex-col items-center'>
+                    <div className='flex flex-col md:items-center'>
                       <span className='text-xs'>Hour</span>
 
                       <div
@@ -324,6 +343,9 @@ export default function DateTimePicker({
                               >
                                 <button
                                   key={'hour-' + i}
+                                  aria-labelledby={
+                                    i === dateHours ? 'active-item' : 'item'
+                                  }
                                   data-value={i}
                                   onClick={() => updateHour(i)}
                                   className={`!size-10 w-full rounded-md p-2 text-sm md:mx-1 ${
@@ -340,7 +362,7 @@ export default function DateTimePicker({
                       </div>
                     </div>
 
-                    <div className='flex flex-col items-center'>
+                    <div className='flex flex-col md:items-center'>
                       <span className='text-xs'>Minute</span>
 
                       <div
@@ -361,6 +383,9 @@ export default function DateTimePicker({
                                 <button
                                   key={'minute-' + i}
                                   data-value={i}
+                                  aria-labelledby={
+                                    i === dateMinutes ? 'active-item' : 'item'
+                                  }
                                   onClick={() => updateMinute(i)}
                                   className={`!size-10 w-full rounded-md text-sm md:mx-1 ${
                                     i === dateMinutes

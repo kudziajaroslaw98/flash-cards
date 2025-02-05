@@ -6,7 +6,7 @@ import { ReminderActions } from './reminder-actions';
 import { RemindersHeadline } from './reminders-headline';
 
 export function Reminders() {
-  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [reminders] = useState<Reminder[]>([]);
   return (
     <div className='flex w-full flex-col gap-6'>
       <RemindersHeadline reminders={reminders} />

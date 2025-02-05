@@ -45,7 +45,10 @@ export default function PlaygroundPage() {
         <button onClick={handleOnClick}>Click me</button>
       </div>
 
-      <DatePicker />
+      <DatePicker
+        type={'datetime-picker'}
+        valid={true}
+      />
     </>
   );
 }

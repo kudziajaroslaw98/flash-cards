@@ -35,7 +35,6 @@ export default function HamburgerMenuComponent() {
   const router = useRouter();
   const pathName = usePathname();
   const iconSize = 'size-4';
-  const groupIconSize = 'size-5';
 
   const navigationItems: (NavigationItem | NavigationGroup)[] = [
     {
@@ -133,17 +132,6 @@ export default function HamburgerMenuComponent() {
       document.removeEventListener('click', handler);
     };
   }, []);
-
-  const handlePlanUpgrade = () => {
-    window.umami.track('Upgrade plan clicked');
-
-    if (!isLoggedIn) {
-      router.push(APP_ROUTES.signIn + '?redirect=pricing');
-      return;
-    } else {
-      router.push(APP_ROUTES.pricing);
-    }
-  };
 
   const mapToContextMenuItem = (
     items: (NavigationItem | NavigationGroup)[],
