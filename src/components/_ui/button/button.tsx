@@ -33,6 +33,14 @@ const buttonVariants = cva(
           'text-blue-500 hover:text-gray-50 bg-transparent border border-blue-500 hover:bg-blue-500 active:focus:bg-blue-600',
         'secondary-text':
           'text-blue-500 hover:text-gray-50 bg-transparent border-transparent  hover:bg-blue-500 active:focus:bg-blue-600',
+        muted:
+          'border-transparent text-gray-50 bg-gray-400 border-gray-500 hover:bg-gray-500 active:focus:bg-gray-600',
+        'muted-outline':
+          'text-gray-500 hover:text-gray-50 bg-transparent border border-gray-500 hover:bg-gray-500 active:focus:bg-gray-600',
+        'muted-text':
+          'text-gray-500 hover:text-gray-50 bg-transparent border-transparent  hover:bg-gray-500 active:focus:bg-gray-600',
+        'muted-transparent':
+          'border-transparent text-gray-500 bg-transparent border-transparent hover:bg-gray-500/5 active:focus:bg-gray-600/5',
       },
       size: {
         default: 'h-10 px-4 py-2 md:w-auto',

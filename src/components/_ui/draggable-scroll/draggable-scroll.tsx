@@ -1,4 +1,9 @@
-import React, { MouseEvent as ReactMouseEvent, ReactNode, useRef } from 'react';
+import React, {
+  MouseEvent as ReactMouseEvent,
+  ReactNode,
+  useEffect,
+  useRef,
+} from 'react';
 
 interface DraggableScrollProps {
   children: ReactNode;
@@ -13,10 +18,26 @@ export const DraggableScroll: React.FC<DraggableScrollProps> = ({
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const pos = useRef({ left: 0, top: 0, x: 0, y: 0 });
+  const isDragging = useRef(false);
+
+  // Add passive wheel listener for native scrolling
+  useEffect(() => {
+    const element = scrollRef.current;
+    if (!element) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY > 0) element!.scrollLeft += 40;
+      else element!.scrollLeft -= 40;
+    };
+
+    element.addEventListener('wheel', handleWheel, { passive: false });
+    return () => element.removeEventListener('wheel', handleWheel);
+  }, []);
 
   const mouseDownHandler = (e: ReactMouseEvent<HTMLDivElement>) => {
     if (!scrollRef.current) return;
-    // Save the current scroll position and mouse coordinates
+
+    isDragging.current = true;
     pos.current = {
       left: scrollRef.current.scrollLeft,
       top: scrollRef.current.scrollTop,
@@ -24,42 +45,43 @@ export const DraggableScroll: React.FC<DraggableScrollProps> = ({
       y: e.clientY,
     };
 
-    // Add global mouse move and up event listeners
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
-    scrollRef.current.style.cursor = 'grabbing';
+    document.body.style.cursor = 'grabbing';
+    document.body.style.userSelect = 'none';
   };
 
   const mouseMoveHandler = (e: MouseEvent) => {
-    if (!scrollRef.current) return;
-    // Calculate the distance moved by the mouse
+    if (!isDragging.current || !scrollRef.current) return;
+
     const dx = e.clientX - pos.current.x;
     const dy = e.clientY - pos.current.y;
 
-    // Update scroll position based on the allowed direction
-    if (direction === 'x') {
+    if (direction === 'x' || direction === 'both') {
       scrollRef.current.scrollLeft = pos.current.left - dx;
-    } else if (direction === 'y') {
-      scrollRef.current.scrollTop = pos.current.top - dy;
-    } else if (direction === 'both') {
-      scrollRef.current.scrollLeft = pos.current.left - dx;
+    }
+    if (direction === 'y' || direction === 'both') {
       scrollRef.current.scrollTop = pos.current.top - dy;
     }
   };
 
   const mouseUpHandler = () => {
-    if (!scrollRef.current) return;
+    isDragging.current = false;
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
-    scrollRef.current.style.cursor = 'grab';
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
   };
 
   return (
     <div
       ref={scrollRef}
       onMouseDown={mouseDownHandler}
-      className={`${className} cursor-grab select-none`}
-      style={{ overflow: 'auto' }}
+      className={`${className} no-scroll cursor-grab select-none`}
+      style={{
+        overflow: 'auto',
+        cursor: 'grab',
+      }}
     >
       {children}
     </div>
