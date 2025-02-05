@@ -60,6 +60,13 @@ export default function FlashcardsList({
 
   return (
     <div className='relative flex h-full w-full flex-col'>
+      {flashcards.length === 0 && (
+        <div className='flex flex-col items-center justify-center py-10'>
+          <TreePalm className='mb-8 size-12 text-green-500' />
+          <span>Looks like your flashcards are on vacation.</span>
+          <span>Time to bring them back!</span>
+        </div>
+      )}
       {flashcards.length > 0 && (
         <div
           className={cn([
@@ -92,14 +99,6 @@ export default function FlashcardsList({
               </m.div>
             ))}
           </AnimatePresence>
-        </div>
-      )}
-
-      {flashcards.length === 0 && (
-        <div className='flex flex-col items-center justify-center py-10'>
-          <TreePalm className='mb-8 size-12 text-green-500' />
-          <span>Looks like your flashcards are on vacation.</span>
-          <span>Time to bring them back!</span>
         </div>
       )}
     </div>

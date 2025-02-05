@@ -1,5 +1,5 @@
 export type Reminder = {
-  id: string;
+  frontUuid: string;
   setFrontUuid: string; // References FlashcardSet.frontUuid
   days: WeekDay[]; // ['mon', 'tue', etc.]
   time: string; // "19:30"

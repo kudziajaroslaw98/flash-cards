@@ -60,7 +60,7 @@ export const metadata: Metadata = {
 
 export default function SetsPage() {
   return (
-    <div className='flex h-full w-full grow flex-col items-center md:pb-24'>
+    <div className='flex h-full w-full grow flex-col items-center md:pb-12'>
       <Sets />
     </div>
   );

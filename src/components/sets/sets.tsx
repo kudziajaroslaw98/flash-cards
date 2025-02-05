@@ -147,9 +147,12 @@ export default function Sets() {
   );
 
   return (
-    <>
-      <div className='flex w-full flex-col justify-between gap-4 '>
-        <h4 className='w-52 text-green-400'>Your Decks</h4>
+    <div className='flex w-full flex-col gap-6'>
+      <div className='flex w-full flex-col justify-between gap-2'>
+        <h4 className='w-52 text-green-400'>Your Sets</h4>
+        <span className='flex w-full flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-slate-400'>
+          <span>{sets.length} sets created</span>
+        </span>
 
         <div className='flex w-full flex-col flex-wrap items-center justify-center gap-2 text-sm sm:flex-row sm:justify-end'>
           <span className='flex w-full justify-center sm:w-auto'>
@@ -191,6 +194,13 @@ export default function Sets() {
       </div>
 
       <div className='flex w-full flex-col items-center justify-center gap-4'>
+        {filteredSets.length === 0 && (
+          <div className='flex w-full flex-col items-center justify-center py-10'>
+            <VenetianMask className='mb-8 size-12 text-green-500' />
+            <span>Your sets are currently in stealth mode.</span>
+            <span>Let&apos;s coax them into the spotlight!</span>
+          </div>
+        )}
         <div className='mt-8 grid w-full grid-cols-[repeat(auto-fit,minmax(20rem,1fr))] gap-4 lg:grid-cols-[repeat(2,minmax(20rem,1fr))] 2xl:grid-cols-[repeat(3,minmax(20rem,1fr))]'>
           <AnimatePresence mode='popLayout'>
             {filteredSets.map((set) => (
@@ -258,13 +268,7 @@ export default function Sets() {
             ))}
           </AnimatePresence>
         </div>
-        {filteredSets.length === 0 && (
-          <div className='flex w-full flex-col items-center justify-center py-10'>
-            <VenetianMask className='mb-8 size-12 text-green-500' />
-            <span>Your sets are currently in stealth mode.</span>
-            <span>Let&apos;s coax them into the spotlight!</span>
-          </div>
-        )}
+
         <FloatingButtons>
           <NewSetModal
             trigger={
@@ -323,6 +327,6 @@ export default function Sets() {
           />
         </FloatingButtons>
       </div>
-    </>
+    </div>
   );
 }

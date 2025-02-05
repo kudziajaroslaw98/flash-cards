@@ -1,9 +1,6 @@
 'use client';
 
-import { Accordion } from '#/components/_ui/accordion/accordion';
-import ProgressBar from '#/components/_ui/progress-bar/progress-bar';
-import TagInput from '#/components/_ui/tag-input/tag-input';
-import RetentionHeatmap from '#/components/retention-heatmap/retention-heatmap';
+import DatePicker from '#/components/_ui/date-picker/date-picker';
 import { useState, type ChangeEvent } from 'react';
 
 export default function PlaygroundPage() {
@@ -48,25 +45,7 @@ export default function PlaygroundPage() {
         <button onClick={handleOnClick}>Click me</button>
       </div>
 
-      <div className='mt-20'>
-        <TagInput
-          type='tags'
-          valid={true}
-        />
-      </div>
-
-      <div className='mt-20'>
-        <ProgressBar
-          value={40}
-          max={100}
-        />
-      </div>
-
-      <Accordion>
-        <Accordion.Item title='Accordion Item 1'>
-          <RetentionHeatmap />
-        </Accordion.Item>
-      </Accordion>
+      <DatePicker />
     </>
   );
 }

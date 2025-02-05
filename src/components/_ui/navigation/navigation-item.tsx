@@ -37,8 +37,8 @@ export default function NavigationItemComponent({
           <Link
             href={item.href}
             className={cn([
-              'relative flex items-center justify-center gap-2 rounded-md px-2 py-1 text-gray-500 dark:text-slate-300',
-              'transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-slate-900 dark:hover:text-slate-200',
+              'relative flex items-center justify-center gap-2 rounded-md px-2 py-1 text-gray-500 transition-all duration-300 dark:text-slate-300',
+              'hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-slate-900 dark:hover:text-slate-200',
               isPathActive &&
                 'bg-gray-100 !text-green-400 hover:bg-gray-200 dark:bg-slate-900 dark:hover:bg-slate-800',
               expanded ? 'max-w-full' : 'max-w-9 px-2',
@@ -53,7 +53,7 @@ export default function NavigationItemComponent({
             >
               <span>{item.icon}</span>
               <span
-                className={`overflow-clip font-medium transition-all ${expanded ? 'max-w-full' : 'max-w-0'}`}
+                className={`overflow-clip font-medium ${expanded ? 'max-w-full' : 'max-w-0'}`}
               >
                 <span className='flex-grow'>{expanded && item.label}</span>
               </span>
