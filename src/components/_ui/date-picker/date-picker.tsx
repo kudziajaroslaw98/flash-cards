@@ -98,7 +98,11 @@ export default function DateTimePicker({
         `[aria-labelledby="active-item"]`,
       );
       if (selected) {
-        selected.scrollIntoView({ block: 'center', inline: 'center' });
+        selected.scrollIntoView({
+          block: 'center',
+          inline: 'center',
+          behavior: 'smooth',
+        });
       }
     }
   };

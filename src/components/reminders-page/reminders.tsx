@@ -11,7 +11,7 @@ export function Reminders() {
     <div className='flex w-full flex-col gap-6'>
       <RemindersHeadline reminders={reminders} />
       {reminders.length === 0 && (
-        <div className='flex flex-col items-center justify-center py-10'>
+        <div className='flex flex-col items-center justify-center py-10 text-center'>
           <CalendarClock className='mb-8 size-12 text-green-500' />
           <span>
             Your schedule is so clear, it&apos;s making the calendar jealous.

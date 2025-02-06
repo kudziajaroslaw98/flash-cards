@@ -309,7 +309,7 @@ export default function SetHardlinkPage() {
       </div>
 
       {setFlashcards.length === 0 && (
-        <div className='flex w-full flex-col items-center justify-center py-10'>
+        <div className='flex w-full flex-col items-center justify-center py-10 text-center'>
           <Cookie className='mb-8 size-12 text-green-500' />
           <span>
             This set is as empty as a cookie jar after a midnight snack.

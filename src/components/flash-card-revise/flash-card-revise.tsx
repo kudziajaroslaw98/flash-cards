@@ -366,7 +366,7 @@ export default function FlashcardReviseComponent() {
     </div>
   ) : (
     <div className='flex h-full w-full flex-col items-center justify-center gap-4'>
-      <div className='flex w-full flex-col items-center justify-center py-10'>
+      <div className='flex w-full flex-col items-center justify-center py-10 text-center'>
         <Coffee className='mb-8 size-12 text-green-500' />
         <span>This review session is a no-show</span>
         <span>your flashcards must be off on a coffee break.</span>
