@@ -232,16 +232,16 @@ export default function DateTimePicker({
                 initial={{ opacity: 0, scale: 0.9, y: -40 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: -40 }}
-                className='absolute mt-1 h-auto w-full rounded border border-gray-200 bg-white shadow-lg'
+                className='absolute mt-1 h-auto w-full rounded border border-gray-200 bg-gray-50 shadow-lg dark:border-slate-800 dark:bg-slate-950 md:w-auto'
               >
                 {/* Calendar Section */}
-                <div className='flex h-full flex-col gap-4 p-4 md:h-72 md:flex-row'>
+                <div className='flex h-full flex-col gap-4 p-4 md:h-80 md:flex-row'>
                   <div className='flex flex-col gap-1'>
                     {/* Month Navigation */}
                     <div className='flex items-center justify-between'>
                       <button
                         onClick={() => setCalendar(addMonths(calendar, -1))}
-                        className='rounded p-1 hover:bg-gray-100'
+                        className='rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:text-slate-600 dark:hover:bg-slate-900 dark:hover:text-slate-200'
                       >
                         <svg
                           className='h-5 w-5'
@@ -258,13 +258,13 @@ export default function DateTimePicker({
                         </svg>
                       </button>
 
-                      <span className='font-medium'>
+                      <span className='font-medium text-gray-600 dark:text-slate-300'>
                         {format(calendar, 'MMMM yyyy')}
                       </span>
 
                       <button
                         onClick={() => setCalendar(addMonths(calendar, 1))}
-                        className='rounded p-1 hover:bg-gray-100'
+                        className='rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:text-slate-600 dark:hover:bg-slate-900 dark:hover:text-slate-200'
                       >
                         <svg
                           className='h-5 w-5'
@@ -283,18 +283,18 @@ export default function DateTimePicker({
                     </div>
 
                     {/* Calendar Grid */}
-                    <div className='grid grid-cols-7 justify-items-center'>
+                    <div className='grid grid-cols-7 justify-items-center gap-1'>
                       {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
                         <div
                           key={day}
-                          className='flex size-8 items-center justify-center text-center text-xs text-gray-500'
+                          className='flex size-8 items-center justify-center text-center text-xs text-gray-500 dark:text-slate-300'
                         >
                           {day}
                         </div>
                       ))}
                     </div>
 
-                    <div className='grid grid-cols-7 justify-items-center'>
+                    <div className='grid grid-cols-7 justify-items-center gap-1'>
                       {rows.flat().map((d, i) => {
                         const isPast =
                           new Date(d).getTime() <
@@ -305,14 +305,15 @@ export default function DateTimePicker({
                             onClick={() => handleDateClick(d)}
                             disabled={isPast}
                             className={cn([
-                              'size-8 rounded text-sm hover:bg-gray-100',
-                              isPast && 'cursor-not-allowed text-gray-300',
+                              'size-8 rounded text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-900',
+                              isPast &&
+                                'cursor-not-allowed text-gray-300 dark:text-slate-800',
                               !isPast &&
                                 !isSameMonth(d, monthStart) &&
-                                'text-gray-400',
+                                'text-gray-300 dark:text-slate-800',
                               isSameDay(d, date) &&
                                 isSameMonth(d, date) &&
-                                'bg-blue-500 text-white',
+                                'bg-green-500 text-gray-50 hover:bg-green-600 dark:hover:bg-green-600',
                             ])}
                           >
                             {format(d, 'd')}
@@ -325,11 +326,13 @@ export default function DateTimePicker({
                   {/* Time Picker */}
                   <div className='flex flex-col gap-2 md:flex-row'>
                     <div className='flex flex-col md:items-center'>
-                      <span className='text-xs'>Hour</span>
+                      <span className='pb-1 text-xs dark:text-slate-300'>
+                        Hour
+                      </span>
 
                       <div
                         ref={hourColumnRef}
-                        className='h-auto w-full overflow-x-scroll rounded border border-gray-200 md:overflow-y-scroll'
+                        className='h-auto w-full overflow-x-scroll rounded border border-gray-200 dark:border-slate-800 md:overflow-y-scroll'
                       >
                         <DraggableScroll
                           direction='both'
@@ -349,10 +352,10 @@ export default function DateTimePicker({
                                   }
                                   data-value={i}
                                   onClick={() => updateHour(i)}
-                                  className={`!size-8 w-full rounded-md p-2 text-sm md:mx-1 ${
+                                  className={`!size-8 w-full rounded-md p-2 text-sm transition-colors md:mx-1 ${
                                     i === dateHours
-                                      ? 'bg-blue-500 text-white'
-                                      : 'text-gray-700 hover:bg-gray-100'
+                                      ? 'bg-green-500 text-gray-50 hover:bg-green-600 dark:hover:bg-green-600'
+                                      : 'text-gray-700 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-900'
                                   }`}
                                 >
                                   {i.toString().padStart(2, '0')}
@@ -364,11 +367,13 @@ export default function DateTimePicker({
                     </div>
 
                     <div className='flex flex-col md:items-center'>
-                      <span className='text-xs'>Minute</span>
+                      <span className='pb-1 text-xs dark:text-slate-300'>
+                        Minute
+                      </span>
 
                       <div
                         ref={minuteColumnRef}
-                        className='h-auto w-full overflow-x-scroll rounded border border-gray-200 md:overflow-y-scroll'
+                        className='h-auto w-full overflow-x-scroll rounded border border-gray-200 dark:border-slate-800 md:overflow-y-scroll'
                       >
                         <DraggableScroll
                           direction='both'
@@ -379,7 +384,7 @@ export default function DateTimePicker({
                             .map((i, index) => (
                               <div
                                 key={'minute-wrapper-' + index}
-                                className='flex !size-10 h-auto items-center'
+                                className='flex !size-10 h-auto items-center py-1'
                               >
                                 <button
                                   key={'minute-' + i}
@@ -388,10 +393,10 @@ export default function DateTimePicker({
                                     i === dateMinutes ? 'active-item' : 'item'
                                   }
                                   onClick={() => updateMinute(i)}
-                                  className={`!size-8 w-full rounded-md text-sm md:mx-1 ${
+                                  className={`!size-8 w-full rounded-md text-sm transition-colors md:mx-1 ${
                                     i === dateMinutes
-                                      ? 'bg-blue-500 text-white'
-                                      : 'text-gray-700 hover:bg-gray-100'
+                                      ? 'bg-green-500 text-gray-50 hover:bg-green-600 dark:hover:bg-green-600'
+                                      : 'text-gray-700 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-900'
                                   }`}
                                 >
                                   {i.toString().padStart(2, '0')}
@@ -405,7 +410,7 @@ export default function DateTimePicker({
                 </div>
 
                 {/* Footer */}
-                <div className='flex justify-between border-t border-gray-200 p-2'>
+                <div className='flex justify-between border-t border-gray-200 p-2 dark:border-slate-800'>
                   <Button
                     alt='Pick Now'
                     label='Now'
