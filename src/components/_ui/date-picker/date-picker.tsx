@@ -174,7 +174,7 @@ export default function DateTimePicker({
     if (onBlur) onBlur();
   });
 
-  useUpdatedFixPosition({
+  const { updatePopoverPosition } = useUpdatedFixPosition({
     visible: open,
     wrapperRef: datePickerWrapper,
     popoverRef,
@@ -238,6 +238,7 @@ export default function DateTimePicker({
                 exit={{ opacity: 0, scale: 0.9, y: -40 }}
                 className='fixed mt-1 h-auto w-full rounded border border-gray-200 bg-gray-50 shadow-lg dark:border-slate-800 dark:bg-slate-950 md:w-auto md:min-w-96'
                 ref={popoverRef}
+                onAnimationEnd={updatePopoverPosition}
               >
                 {/* Calendar Section */}
                 <div className='flex h-full flex-col gap-4 p-4 md:h-80 md:flex-row'>

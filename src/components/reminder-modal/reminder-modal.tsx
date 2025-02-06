@@ -9,13 +9,6 @@ import Modal from '../_ui/modal/modal';
 import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
 import FormComponent, { type FormMethods } from '../form-component/form';
 
-// export const NewFlashcardModal = ({
-//   handleNew,
-//   handleEdit,
-//   selected,
-//   trigger,
-//   isInEditMode = false,
-// }: ModalProps<T>) => {
 export function ReminderModal({
   handleNew,
   handleEdit,
@@ -27,14 +20,8 @@ export function ReminderModal({
   const [formValue, setFormValue] = useState<Partial<Reminder>>({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const submitRef = useRef<HTMLButtonElement>(null);
-
   const [values, setValues] = useState<Reminder[]>(selected);
-  // const [loadingGenerate, setLoadingGenerate] = useState(false);
-  // const { isLoggedIn, isPlanActive } = useSessionContext();
   const formRef = useRef<FormMethods<Reminder>>(null);
-  // const { completion, complete } = useCompletion({
-  //   api: API_ROUTES.ANSWER_GENERATE,
-  // });
 
   const getNewValue: () => Reminder = () => {
     return {
@@ -78,7 +65,7 @@ export function ReminderModal({
   };
 
   const handleDialogClose = () => {
-    window.umami.track('Flashcard dialog - closed', { isInEditMode });
+    window.umami.track('Reminder dialog - closed', { isInEditMode });
 
     setIsModalOpen(false);
     setCurrentIndex(0);
@@ -87,7 +74,7 @@ export function ReminderModal({
   };
 
   const handleDialogSubmit = async () => {
-    window.umami.track('Flashcard dialog - submitted', { isInEditMode });
+    window.umami.track('Reminder dialog - submitted', { isInEditMode });
 
     await formRef.current?.checkValidity();
 
@@ -126,7 +113,7 @@ export function ReminderModal({
   };
 
   const handleRightButtonClick = () => {
-    window.umami.track('Flashcard dialog - right button clicked');
+    window.umami.track('Reminder dialog - right button clicked');
     updateFormValue();
     if (currentIndex < values.length - 1) {
       setCurrentIndex(currentIndex + 1);
@@ -139,7 +126,7 @@ export function ReminderModal({
   };
 
   const handleLeftButtonClick = () => {
-    window.umami.track('Flashcard dialog - left button clicked');
+    window.umami.track('Reminder dialog - left button clicked');
 
     if (currentIndex > 0) {
       updateFormValue();
@@ -166,7 +153,7 @@ export function ReminderModal({
       >
         <Modal className='w-full'>
           <Modal.Header variant={'form'}>
-            {isInEditMode ? 'Edit flashcard' : 'Create new flashcard'}
+            {isInEditMode ? 'Edit reminder' : 'Create new reminder'}
           </Modal.Header>
 
           <Modal.Body

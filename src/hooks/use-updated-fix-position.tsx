@@ -14,12 +14,32 @@ export function useUpdatedFixPosition({
   const updatePopoverPosition = useCallback(() => {
     if (!wrapperRef.current || !popoverRef.current) return;
 
+    const windowHeight = window.outerHeight;
     const buttonRect = wrapperRef.current.getBoundingClientRect();
+    console.log(buttonRect);
     const top =
       (((wrapperRef.current.getBoundingClientRect().y as number) +
         wrapperRef.current.getBoundingClientRect().height) as number) + 8;
 
-    popoverRef.current.style.top = `${top}px`;
+    console.log(
+      top + popoverRef.current.getBoundingClientRect().height,
+      windowHeight,
+      window.innerHeight,
+    );
+    if (
+      top + popoverRef.current.getBoundingClientRect().height >
+      windowHeight
+    ) {
+      const offset = 16;
+      const difference =
+        top +
+        popoverRef.current.getBoundingClientRect().height -
+        (windowHeight - 8 - buttonRect.height - offset);
+
+      popoverRef.current.style.top = `${top - difference}px`;
+    } else {
+      popoverRef.current.style.top = `${top}px`;
+    }
     popoverRef.current.style.left = `${buttonRect.left + window.scrollX}px`;
     popoverRef.current.style.width = `${wrapperRef.current.getBoundingClientRect().width}px`;
   }, []);
@@ -38,4 +58,6 @@ export function useUpdatedFixPosition({
       window.removeEventListener('resize', updatePopoverPosition);
     };
   }, [visible, updatePopoverPosition]);
+
+  return { updatePopoverPosition };
 }
