@@ -136,6 +136,7 @@ export default function DateTimePicker({
     setDate(newDate);
     setDateMinutes(newDate.getMinutes());
     setDateHours(newDate.getHours());
+    setCalendar(newDate);
   };
 
   const updateHour = (hour: number) => {
@@ -234,10 +235,10 @@ export default function DateTimePicker({
                 className='absolute mt-1 h-auto w-full rounded border border-gray-200 bg-white shadow-lg'
               >
                 {/* Calendar Section */}
-                <div className='flex h-full flex-col gap-4 p-4 md:h-[340px] md:flex-row'>
-                  <div className='md:w-3/4'>
+                <div className='flex h-full flex-col gap-4 p-4 md:h-80 md:flex-row'>
+                  <div className='flex flex-col gap-1'>
                     {/* Month Navigation */}
-                    <div className='mb-4 flex items-center justify-between'>
+                    <div className='flex items-center justify-between'>
                       <button
                         onClick={() => setCalendar(addMonths(calendar, -1))}
                         className='rounded p-1 hover:bg-gray-100'
@@ -282,18 +283,18 @@ export default function DateTimePicker({
                     </div>
 
                     {/* Calendar Grid */}
-                    <div className='mb-2 grid grid-cols-7 gap-1'>
+                    <div className='grid grid-cols-7 justify-items-center'>
                       {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
                         <div
                           key={day}
-                          className='flex h-8 items-center justify-center text-center text-xs text-gray-500'
+                          className='flex size-8 items-center justify-center text-center text-xs text-gray-500'
                         >
                           {day}
                         </div>
                       ))}
                     </div>
 
-                    <div className='grid grid-cols-7 gap-1'>
+                    <div className='grid grid-cols-7 justify-items-center'>
                       {rows.flat().map((d, i) => {
                         const isPast =
                           new Date(d).getTime() <
@@ -304,7 +305,7 @@ export default function DateTimePicker({
                             onClick={() => handleDateClick(d)}
                             disabled={isPast}
                             className={cn([
-                              'h-8 rounded text-sm hover:bg-gray-100',
+                              'size-8 rounded text-sm hover:bg-gray-100',
                               isPast && 'cursor-not-allowed text-gray-300',
                               !isPast &&
                                 !isSameMonth(d, monthStart) &&
@@ -339,7 +340,7 @@ export default function DateTimePicker({
                             .map((i, index) => (
                               <div
                                 key={'hour-wrapper-' + index}
-                                className='flex !size-12 h-auto items-center py-1'
+                                className='flex !size-10 h-auto items-center py-1'
                               >
                                 <button
                                   key={'hour-' + i}
@@ -348,7 +349,7 @@ export default function DateTimePicker({
                                   }
                                   data-value={i}
                                   onClick={() => updateHour(i)}
-                                  className={`!size-10 w-full rounded-md p-2 text-sm md:mx-1 ${
+                                  className={`!size-8 w-full rounded-md p-2 text-sm md:mx-1 ${
                                     i === dateHours
                                       ? 'bg-blue-500 text-white'
                                       : 'text-gray-700 hover:bg-gray-100'
@@ -378,7 +379,7 @@ export default function DateTimePicker({
                             .map((i, index) => (
                               <div
                                 key={'minute-wrapper-' + index}
-                                className='flex !size-12 h-auto items-center'
+                                className='flex !size-10 h-auto items-center'
                               >
                                 <button
                                   key={'minute-' + i}
@@ -387,7 +388,7 @@ export default function DateTimePicker({
                                     i === dateMinutes ? 'active-item' : 'item'
                                   }
                                   onClick={() => updateMinute(i)}
-                                  className={`!size-10 w-full rounded-md text-sm md:mx-1 ${
+                                  className={`!size-8 w-full rounded-md text-sm md:mx-1 ${
                                     i === dateMinutes
                                       ? 'bg-blue-500 text-white'
                                       : 'text-gray-700 hover:bg-gray-100'

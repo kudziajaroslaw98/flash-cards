@@ -5,6 +5,8 @@ import React, {
   useRef,
 } from 'react';
 
+import * as m from 'motion/react-m';
+
 interface DraggableScrollProps {
   children: ReactNode;
   className?: string;
@@ -74,16 +76,16 @@ export const DraggableScroll: React.FC<DraggableScrollProps> = ({
   };
 
   return (
-    <div
+    <m.div
       ref={scrollRef}
       onMouseDown={mouseDownHandler}
-      className={`${className} no-scroll cursor-grab select-none`}
+      className={`${className} cursor-grab select-none`}
       style={{
         overflow: 'auto',
         cursor: 'grab',
       }}
     >
       {children}
-    </div>
+    </m.div>
   );
 };
