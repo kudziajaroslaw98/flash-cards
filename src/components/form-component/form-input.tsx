@@ -4,6 +4,7 @@ import isDropdown from '#/shared/guards/is-dropdown';
 import isInput from '#/shared/guards/is-input';
 import isTagInput from '#/shared/guards/is-tag-input';
 import isTextArea from '#/shared/guards/is-text-area';
+import isDateTimePicker from '#/shared/guards/it-datetime-picket';
 import type {
   ExtendedInputType,
   InputType,
@@ -11,6 +12,7 @@ import type {
 } from '#/types/form-scheme.type';
 import * as m from 'motion/react-m';
 import type { FormEvent } from 'react';
+import DateTimePicker from '../_ui/date-picker/date-picker';
 import Dropdown from '../_ui/dropdown/dropdown';
 import Input from '../_ui/input/input';
 import TagInput from '../_ui/tag-input/tag-input';
@@ -117,6 +119,21 @@ export default function FormInput<T>({
           error={touched ? error : null}
           touched={touched}
           value={(value as string[]) ?? []}
+          onChange={(value) => handleOnChange(value, inputName)}
+          onFocus={() => handleOnFocus(inputName)}
+          onBlur={handleOnBlur}
+          {...constaintProps}
+        />
+      )}
+
+      {isDateTimePicker(inputProps) && (
+        <DateTimePicker
+          {...inputProps}
+          key={`${inputName}-${index}`}
+          valid={touched ? valid : true}
+          error={touched ? error : null}
+          touched={touched}
+          value={(value as string) ?? []}
           onChange={(value) => handleOnChange(value, inputName)}
           onFocus={() => handleOnFocus(inputName)}
           onBlur={handleOnBlur}

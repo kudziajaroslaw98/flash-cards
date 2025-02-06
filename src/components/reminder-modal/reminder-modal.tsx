@@ -1,0 +1,202 @@
+import { useEffect, useRef, useState } from 'react';
+
+import uuid from '#/shared/utils/uuid.util';
+import { reminderScheme } from '#/shared/validation-schemes/reminder-scheme';
+import type { ModalProps } from '#/types/modal-props.type';
+import type { Reminder } from '#/types/reminder.type';
+import { Button } from '../_ui/button/button';
+import Modal from '../_ui/modal/modal';
+import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
+import FormComponent, { type FormMethods } from '../form-component/form';
+
+// export const NewFlashcardModal = ({
+//   handleNew,
+//   handleEdit,
+//   selected,
+//   trigger,
+//   isInEditMode = false,
+// }: ModalProps<T>) => {
+export function ReminderModal({
+  handleNew,
+  handleEdit,
+  selected,
+  trigger,
+  isInEditMode = false,
+}: ModalProps<Reminder>) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formValue, setFormValue] = useState<Partial<Reminder>>({});
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const submitRef = useRef<HTMLButtonElement>(null);
+
+  const [values, setValues] = useState<Reminder[]>(selected);
+  // const [loadingGenerate, setLoadingGenerate] = useState(false);
+  // const { isLoggedIn, isPlanActive } = useSessionContext();
+  const formRef = useRef<FormMethods<Reminder>>(null);
+  // const { completion, complete } = useCompletion({
+  //   api: API_ROUTES.ANSWER_GENERATE,
+  // });
+
+  const getNewValue: () => Reminder = () => {
+    return {
+      enabled: true,
+      frontUuid: uuid(),
+      repeat: 'none',
+      start: new Date().toISOString(),
+      synced: false,
+    } as Reminder;
+  };
+
+  const clearInitialValues = () => {
+    if (selected.length === 0) {
+      const newValue = getNewValue();
+      setValues([newValue]);
+      setFormValue(newValue);
+    } else {
+      setValues(selected);
+      setFormValue(selected[0]);
+    }
+  };
+
+  useEffect(() => {
+    if (selected.length === 0) {
+      setValues([getNewValue()]);
+    } else {
+      setValues(selected);
+    }
+  }, [selected]);
+
+  useEffect(() => {
+    setFormValue(selected[currentIndex]);
+  }, [selected, currentIndex]);
+
+  const updateFormValue = () => {
+    setValues((prev) =>
+      prev.map((item) =>
+        item.frontUuid === formValue.frontUuid ? (formValue as Reminder) : item,
+      ),
+    );
+  };
+
+  const handleDialogClose = () => {
+    window.umami.track('Flashcard dialog - closed', { isInEditMode });
+
+    setIsModalOpen(false);
+    setCurrentIndex(0);
+
+    clearInitialValues();
+  };
+
+  const handleDialogSubmit = async () => {
+    window.umami.track('Flashcard dialog - submitted', { isInEditMode });
+
+    await formRef.current?.checkValidity();
+
+    if (!formRef.current?.isValid()) {
+      return;
+    }
+
+    setIsModalOpen(false);
+
+    const currentFormValue = formValue as Reminder;
+    const mappedValues: Reminder[] = values.map((value) => {
+      const item =
+        value.frontUuid === currentFormValue.frontUuid
+          ? currentFormValue
+          : value;
+
+      return {
+        ...item,
+        enabled: item.enabled ?? true,
+        synced: item.synced ?? false,
+        repeat: item.repeat ?? 'none',
+        start: item.start ?? new Date().toISOString(),
+        frontUuid: item.frontUuid ?? uuid(),
+        setFrontUuid: item.setFrontUuid ?? uuid(),
+      };
+    });
+
+    if (isInEditMode) {
+      handleEdit(mappedValues);
+    } else {
+      handleNew(mappedValues);
+    }
+
+    clearInitialValues();
+    setCurrentIndex(0);
+  };
+
+  const handleRightButtonClick = () => {
+    window.umami.track('Flashcard dialog - right button clicked');
+    updateFormValue();
+    if (currentIndex < values.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      if (!isInEditMode) {
+        setValues((prev) => [...prev, getNewValue()]);
+        setCurrentIndex((prev) => prev + 1);
+      }
+    }
+  };
+
+  const handleLeftButtonClick = () => {
+    window.umami.track('Flashcard dialog - left button clicked');
+
+    if (currentIndex > 0) {
+      updateFormValue();
+      setCurrentIndex((prev) => prev - 1);
+    }
+  };
+
+  const getFormScheme = reminderScheme();
+
+  return (
+    <>
+      <MultiDialog
+        open={isModalOpen}
+        setOpen={setIsModalOpen}
+        trigger={trigger}
+        onDialogClose={handleDialogClose}
+        onDialogSubmit={handleDialogSubmit}
+        handleLeftButtonClick={handleLeftButtonClick}
+        handleRightButtonClick={handleRightButtonClick}
+        currentIndex={currentIndex}
+        maxIndex={values.length}
+        isInEditMode={isInEditMode}
+        submitRef={submitRef}
+      >
+        <Modal className='w-full'>
+          <Modal.Header variant={'form'}>
+            {isInEditMode ? 'Edit flashcard' : 'Create new flashcard'}
+          </Modal.Header>
+
+          <Modal.Body
+            variant={'form'}
+            className='flex flex-col items-center justify-center'
+          >
+            <FormComponent<Reminder>
+              ref={formRef}
+              className='w-full px-8'
+              emitFormValue={setFormValue}
+              scheme={getFormScheme}
+              initialValues={formValue as Reminder}
+            />
+          </Modal.Body>
+
+          <Modal.Footer
+            variant={'form'}
+            className='flex items-center justify-end gap-2'
+          >
+            <Button
+              ref={submitRef}
+              label={selected.length > 0 ? 'Edit' : 'Create'}
+              onClick={handleDialogSubmit}
+              size={'sm'}
+              variant={'primary-text'}
+              alt='Create new reminder'
+            ></Button>
+          </Modal.Footer>
+        </Modal>
+      </MultiDialog>
+    </>
+  );
+}

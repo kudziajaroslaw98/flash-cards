@@ -153,12 +153,18 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
         initialValids = { ...initialValids, [inputName]: true };
         initialErrors = { ...initialErrors, [inputName]: null };
 
-        const inputDefaultInitialValue = Array.isArray(
-          // @ts-expect-error Generic type generate error here
-          props.initialValues?.[inputName],
-        )
-          ? []
-          : '';
+        let inputDefaultInitialValue;
+
+        if (input?._internal_default_value) {
+          inputDefaultInitialValue = input._internal_default_value;
+        } else {
+          inputDefaultInitialValue = Array.isArray(
+            // @ts-expect-error Generic type generate error here
+            props.initialValues?.[inputName],
+          )
+            ? []
+            : '';
+        }
 
         tmpValues = {
           ...tmpValues,

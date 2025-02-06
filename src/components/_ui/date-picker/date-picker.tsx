@@ -1,4 +1,5 @@
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
+import { useUpdatedFixPosition } from '#/hooks/use-updated-fix-position';
 import { cn } from '#/shared/utils/cn.util';
 import {
   addDays,
@@ -53,8 +54,10 @@ export default function DateTimePicker({
   const hourColumnRef = useRef<HTMLDivElement | null>(null);
   const minuteColumnRef = useRef<HTMLDivElement | null>(null);
   const datePickerWrapper = useRef<HTMLDivElement | null>(null);
-  const [date, setDate] = useState(new Date());
-  const [calendar, setCalendar] = useState(new Date());
+  const popoverRef = useRef<HTMLDivElement | null>(null);
+
+  const [date, setDate] = useState(new Date(value ?? Date.now()));
+  const [calendar, setCalendar] = useState(new Date(value ?? Date.now()));
   const [dateMinutes, setDateMinutes] = useState(0);
   const [dateHours, setDateHours] = useState(0);
   const [open, setOpen] = useState(false);
@@ -62,12 +65,6 @@ export default function DateTimePicker({
   const [monthStart, setMonthStart] = useState(startOfMonth(date));
 
   // Calculate the calendar grid for the current month
-
-  useEffect(() => {
-    if (!value) return;
-    setCalendar(new Date(value));
-    setDate(new Date(value));
-  }, [value]);
 
   useEffect(() => {
     const monthStart = startOfMonth(calendar);
@@ -177,6 +174,12 @@ export default function DateTimePicker({
     if (onBlur) onBlur();
   });
 
+  useUpdatedFixPosition({
+    visible: open,
+    wrapperRef: datePickerWrapper,
+    popoverRef,
+  });
+
   return (
     <label
       className={`group relative flex w-full max-w-md flex-col ${label ? 'pt-2' : ''} ${className ?? ''}`}
@@ -216,6 +219,7 @@ export default function DateTimePicker({
         >
           {/* Trigger Button */}
           <Button
+            type='button'
             alt='Open date picker'
             icon={<Calendar className='h-4 w-4' />}
             loading={false}
@@ -230,9 +234,10 @@ export default function DateTimePicker({
             {open && (
               <m.div
                 initial={{ opacity: 0, scale: 0.9, y: -40 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
+                animate={{ opacity: 1, scale: 1, y: 0, zIndex: 50 }}
                 exit={{ opacity: 0, scale: 0.9, y: -40 }}
-                className='absolute mt-1 h-auto w-full rounded border border-gray-200 bg-gray-50 shadow-lg dark:border-slate-800 dark:bg-slate-950 md:w-auto'
+                className='fixed mt-1 h-auto w-full rounded border border-gray-200 bg-gray-50 shadow-lg dark:border-slate-800 dark:bg-slate-950 md:w-auto md:min-w-96'
+                ref={popoverRef}
               >
                 {/* Calendar Section */}
                 <div className='flex h-full flex-col gap-4 p-4 md:h-80 md:flex-row'>
@@ -241,6 +246,7 @@ export default function DateTimePicker({
                     <div className='flex items-center justify-between'>
                       <button
                         onClick={() => setCalendar(addMonths(calendar, -1))}
+                        type='button'
                         className='rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:text-slate-600 dark:hover:bg-slate-900 dark:hover:text-slate-200'
                       >
                         <svg
@@ -263,6 +269,7 @@ export default function DateTimePicker({
                       </span>
 
                       <button
+                        type='button'
                         onClick={() => setCalendar(addMonths(calendar, 1))}
                         className='rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:text-slate-600 dark:hover:bg-slate-900 dark:hover:text-slate-200'
                       >
@@ -301,11 +308,12 @@ export default function DateTimePicker({
                           new Date().setHours(0, 0, 0, 0);
                         return (
                           <button
+                            type='button'
                             key={i}
                             onClick={() => handleDateClick(d)}
                             disabled={isPast}
                             className={cn([
-                              'size-8 rounded text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-900',
+                              'size-8 rounded text-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-slate-500 dark:hover:bg-slate-900 dark:hover:text-slate-300',
                               isPast &&
                                 'cursor-not-allowed text-gray-300 dark:text-slate-800',
                               !isPast &&
@@ -313,7 +321,7 @@ export default function DateTimePicker({
                                 'text-gray-300 dark:text-slate-800',
                               isSameDay(d, date) &&
                                 isSameMonth(d, date) &&
-                                'bg-green-500 text-gray-50 hover:bg-green-600 dark:hover:bg-green-600',
+                                'bg-green-500 text-gray-50 hover:bg-green-600 dark:text-slate-300 dark:hover:bg-green-600',
                             ])}
                           >
                             {format(d, 'd')}
@@ -343,19 +351,20 @@ export default function DateTimePicker({
                             .map((i, index) => (
                               <div
                                 key={'hour-wrapper-' + index}
-                                className='flex !size-10 h-auto items-center py-1'
+                                className='flex !size-10 h-auto items-center justify-center py-1'
                               >
                                 <button
+                                  type='button'
                                   key={'hour-' + i}
                                   aria-labelledby={
                                     i === dateHours ? 'active-item' : 'item'
                                   }
                                   data-value={i}
                                   onClick={() => updateHour(i)}
-                                  className={`!size-8 w-full rounded-md p-2 text-sm transition-colors md:mx-1 ${
+                                  className={`!size-8 w-full rounded-md text-sm transition-colors md:mx-1 ${
                                     i === dateHours
                                       ? 'bg-green-500 text-gray-50 hover:bg-green-600 dark:hover:bg-green-600'
-                                      : 'text-gray-700 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-900'
+                                      : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-slate-500 dark:hover:bg-slate-900 dark:hover:text-slate-300'
                                   }`}
                                 >
                                   {i.toString().padStart(2, '0')}
@@ -384,9 +393,10 @@ export default function DateTimePicker({
                             .map((i, index) => (
                               <div
                                 key={'minute-wrapper-' + index}
-                                className='flex !size-10 h-auto items-center py-1'
+                                className='flex !size-10 h-auto items-center justify-center py-1'
                               >
                                 <button
+                                  type='button'
                                   key={'minute-' + i}
                                   data-value={i}
                                   aria-labelledby={
@@ -396,7 +406,7 @@ export default function DateTimePicker({
                                   className={`!size-8 w-full rounded-md text-sm transition-colors md:mx-1 ${
                                     i === dateMinutes
                                       ? 'bg-green-500 text-gray-50 hover:bg-green-600 dark:hover:bg-green-600'
-                                      : 'text-gray-700 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-900'
+                                      : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-slate-500 dark:hover:bg-slate-900 dark:hover:text-slate-300'
                                   }`}
                                 >
                                   {i.toString().padStart(2, '0')}
@@ -412,6 +422,7 @@ export default function DateTimePicker({
                 {/* Footer */}
                 <div className='flex justify-between border-t border-gray-200 p-2 dark:border-slate-800'>
                   <Button
+                    type='button'
                     alt='Pick Now'
                     label='Now'
                     size={'sm'}
@@ -428,6 +439,7 @@ export default function DateTimePicker({
                   />
 
                   <Button
+                    type='button'
                     alt='Accept'
                     label='Accept'
                     size={'sm'}
