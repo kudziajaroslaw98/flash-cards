@@ -55,7 +55,7 @@ export default function HamburgerMenuComponent() {
       type: 'item',
       label: 'Playground',
       href: '/playground',
-      visible: process.env.NODE_ENV === 'development' && true,
+      // visible: process.env.NODE_ENV === 'development' && true,
       icon: <PlayCircle className={`${iconSize} `} />,
     },
     {
