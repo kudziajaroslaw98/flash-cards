@@ -235,7 +235,7 @@ export default function DateTimePicker({
                 className='absolute mt-1 h-auto w-full rounded border border-gray-200 bg-white shadow-lg'
               >
                 {/* Calendar Section */}
-                <div className='flex h-full flex-col gap-4 p-4 md:h-80 md:flex-row'>
+                <div className='flex h-full flex-col gap-4 p-4 md:h-72 md:flex-row'>
                   <div className='flex flex-col gap-1'>
                     {/* Month Navigation */}
                     <div className='flex items-center justify-between'>
