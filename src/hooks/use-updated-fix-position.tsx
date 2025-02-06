@@ -16,16 +16,10 @@ export function useUpdatedFixPosition({
 
     const windowHeight = window.outerHeight;
     const buttonRect = wrapperRef.current.getBoundingClientRect();
-    console.log(buttonRect);
     const top =
       (((wrapperRef.current.getBoundingClientRect().y as number) +
         wrapperRef.current.getBoundingClientRect().height) as number) + 8;
 
-    console.log(
-      top + popoverRef.current.getBoundingClientRect().height,
-      windowHeight,
-      window.innerHeight,
-    );
     if (
       top + popoverRef.current.getBoundingClientRect().height >
       windowHeight

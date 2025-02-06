@@ -19,8 +19,8 @@ export function ReminderModal({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formValue, setFormValue] = useState<Partial<Reminder>>({});
   const [currentIndex, setCurrentIndex] = useState(0);
-  const submitRef = useRef<HTMLButtonElement>(null);
   const [values, setValues] = useState<Reminder[]>(selected);
+  const submitRef = useRef<HTMLButtonElement>(null);
   const formRef = useRef<FormMethods<Reminder>>(null);
 
   const getNewValue: () => Reminder = () => {
@@ -28,8 +28,14 @@ export function ReminderModal({
       enabled: true,
       frontUuid: uuid(),
       repeat: 'none',
-      start: new Date().toISOString(),
+      start: new Date(
+        new Date(new Date(new Date().setMilliseconds(0)).setSeconds(0)),
+      ).toISOString(),
       synced: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      description: '',
+      title: '',
     } as Reminder;
   };
 
@@ -53,15 +59,17 @@ export function ReminderModal({
   }, [selected]);
 
   useEffect(() => {
-    setFormValue(selected[currentIndex]);
-  }, [selected, currentIndex]);
+    setFormValue(values[currentIndex]);
+  }, [values, currentIndex]);
 
   const updateFormValue = () => {
-    setValues((prev) =>
-      prev.map((item) =>
+    setValues((prev) => {
+      const x = prev.map((item) =>
         item.frontUuid === formValue.frontUuid ? (formValue as Reminder) : item,
-      ),
-    );
+      );
+      console.log(x);
+      return x;
+    });
   };
 
   const handleDialogClose = () => {

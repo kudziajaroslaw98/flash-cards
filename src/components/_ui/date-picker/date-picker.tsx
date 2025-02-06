@@ -1,6 +1,7 @@
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import { useUpdatedFixPosition } from '#/hooks/use-updated-fix-position';
 import { cn } from '#/shared/utils/cn.util';
+import { isDifferent } from '#/shared/utils/is-different.util';
 import {
   addDays,
   addMonths,
@@ -8,8 +9,6 @@ import {
   format,
   isSameDay,
   isSameMonth,
-  setHours,
-  setMinutes,
   startOfMonth,
   startOfWeek,
 } from 'date-fns';
@@ -28,10 +27,10 @@ export interface DateTimePickerProps {
   error?: string | null;
   touched?: boolean;
   icon?: React.ReactNode;
-  value?: string | Date;
+  value?: string;
   required?: boolean;
   className?: string;
-  onChange?: (date: Date) => void;
+  onChange?: (date: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
 }
@@ -56,15 +55,88 @@ export default function DateTimePicker({
   const datePickerWrapper = useRef<HTMLDivElement | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
 
-  const [date, setDate] = useState(new Date(value ?? Date.now()));
-  const [calendar, setCalendar] = useState(new Date(value ?? Date.now()));
-  const [dateMinutes, setDateMinutes] = useState(0);
-  const [dateHours, setDateHours] = useState(0);
+  const valueRef = useRef<string | null>(null);
+
+  const [date, setDate] = useState(
+    new Date(new Date(new Date().setMilliseconds(0)).setSeconds(0)),
+  );
+  const [calendar, setCalendar] = useState(
+    new Date(new Date(new Date().setMilliseconds(0)).setSeconds(0)),
+  );
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState<Date[][]>([]);
   const [monthStart, setMonthStart] = useState(startOfMonth(date));
 
   // Calculate the calendar grid for the current month
+
+  const scrollToSelected = (ref: RefObject<HTMLDivElement | null>) => {
+    if (ref.current) {
+      const selected = ref.current.querySelector(
+        `[aria-labelledby="active-item"]`,
+      );
+      if (selected) {
+        selected.scrollIntoView({
+          block: 'center',
+          inline: 'center',
+          behavior: 'smooth',
+        });
+      }
+    }
+  };
+
+  const handleDateClick = (
+    selectedDay: Date,
+    hours?: number,
+    minutes?: number,
+  ) => {
+    const today = new Date();
+
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDay < today) return;
+
+    const newDate = new Date(
+      selectedDay.getFullYear(),
+      selectedDay.getMonth(),
+      selectedDay.getDate(),
+      hours ?? date.getHours(),
+      minutes ?? date.getMinutes(),
+      0,
+      0,
+    );
+
+    setDate(newDate);
+    setCalendar(newDate);
+    handleOnChange(newDate);
+  };
+
+  const handleOnChange = (newDate?: Date) => {
+    if (onChange) {
+      onChange((newDate ?? date).toISOString());
+    }
+  };
+
+  const handleAcceptClick = () => {
+    setOpen(false);
+    handleOnChange();
+  };
+
+  const handleOnWrapperClick = () => {
+    setOpen(!open);
+    if (!open && onFocus) {
+      onFocus();
+    } else if (open && onBlur) {
+      onBlur();
+    }
+  };
+
+  useEffect(() => {
+    if (open) {
+      // Scroll to selected time
+      scrollToSelected(hourColumnRef);
+      scrollToSelected(minuteColumnRef);
+    }
+  }, [open, date]);
 
   useEffect(() => {
     const monthStart = startOfMonth(calendar);
@@ -89,89 +161,17 @@ export default function DateTimePicker({
   }, [calendar]);
 
   useEffect(() => {
-    handleDateClick(date);
-  }, []);
-
-  const scrollToSelected = (ref: RefObject<HTMLDivElement | null>) => {
-    if (ref.current) {
-      const selected = ref.current.querySelector(
-        `[aria-labelledby="active-item"]`,
-      );
-      if (selected) {
-        selected.scrollIntoView({
-          block: 'center',
-          inline: 'center',
-          behavior: 'smooth',
-        });
-      }
+    if (
+      value === undefined ||
+      (valueRef.current !== null &&
+        !isDifferent(new Date(value).toISOString, date.toISOString()))
+    ) {
+      return;
     }
-  };
-
-  useEffect(() => {
-    if (open) {
-      // Scroll to selected time
-      scrollToSelected(hourColumnRef);
-      scrollToSelected(minuteColumnRef);
-    }
-  }, [open, date]);
-
-  const handleDateClick = (
-    selectedDay: Date,
-    hours?: number,
-    minutes?: number,
-  ) => {
-    const today = new Date();
-
-    today.setHours(0, 0, 0, 0);
-
-    if (selectedDay < today) return;
-
-    const newDate = new Date(
-      selectedDay.getFullYear(),
-      selectedDay.getMonth(),
-      selectedDay.getDate(),
-      hours ?? date.getHours(),
-      minutes ?? date.getMinutes(),
-    );
-
-    setDate(newDate);
-    setDateMinutes(newDate.getMinutes());
-    setDateHours(newDate.getHours());
-    setCalendar(newDate);
-  };
-
-  const updateHour = (hour: number) => {
-    setDate(setHours(date, hour));
-    setDateHours(hour);
-  };
-  const updateMinute = (minute: number) => {
-    setDate(setMinutes(date, minute));
-    setDateMinutes(minute);
-  };
-
-  const handleOnChange = () => {
-    if (onChange) {
-      onChange(date);
-    }
-  };
-
-  const handleAcceptClick = () => {
-    setOpen(false);
-    handleOnChange();
-  };
-
-  const handleOnWrapperClick = () => {
-    setOpen(!open);
-    if (!open && onFocus) {
-      onFocus();
-    } else if (open && onBlur) {
-      onBlur();
-    }
-  };
-
-  useEffect(() => {
-    handleOnChange();
-  }, [date]);
+    valueRef.current = value;
+    setDate(new Date(value));
+    setCalendar(new Date(value));
+  }, [value]);
 
   useOutsideAlerter(datePickerWrapper, () => {
     setOpen(false);
@@ -362,12 +362,13 @@ export default function DateTimePicker({
                                   type='button'
                                   key={'hour-' + i}
                                   aria-labelledby={
-                                    i === dateHours ? 'active-item' : 'item'
+                                    i === date.getHours()
+                                      ? 'active-item'
+                                      : 'item'
                                   }
-                                  data-value={i}
-                                  onClick={() => updateHour(i)}
+                                  onClick={() => handleDateClick(date, i)}
                                   className={`!size-8 w-full rounded-md text-sm transition-colors md:mx-1 ${
-                                    i === dateHours
+                                    i === date.getHours()
                                       ? 'bg-green-500 text-gray-50 hover:bg-green-600 dark:hover:bg-green-600'
                                       : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-slate-500 dark:hover:bg-slate-900 dark:hover:text-slate-300'
                                   }`}
@@ -403,13 +404,16 @@ export default function DateTimePicker({
                                 <button
                                   type='button'
                                   key={'minute-' + i}
-                                  data-value={i}
                                   aria-labelledby={
-                                    i === dateMinutes ? 'active-item' : 'item'
+                                    i === date.getMinutes()
+                                      ? 'active-item'
+                                      : 'item'
                                   }
-                                  onClick={() => updateMinute(i)}
+                                  onClick={() =>
+                                    handleDateClick(date, undefined, i)
+                                  }
                                   className={`!size-8 w-full rounded-md text-sm transition-colors md:mx-1 ${
-                                    i === dateMinutes
+                                    i === date.getMinutes()
                                       ? 'bg-green-500 text-gray-50 hover:bg-green-600 dark:hover:bg-green-600'
                                       : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-slate-500 dark:hover:bg-slate-900 dark:hover:text-slate-300'
                                   }`}

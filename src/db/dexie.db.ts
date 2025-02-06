@@ -1,8 +1,10 @@
 import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
 import { defaultMetadata } from '#/shared/defaults/default-metadata';
+import { defaultReminder } from '#/shared/defaults/default-reminder';
 import { defaultSet } from '#/shared/defaults/default-set';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { metadataMerge } from '#/shared/helpers/metadata-merge';
+import { remindersMerge } from '#/shared/helpers/reminders-merge';
 import { setsMerge } from '#/shared/helpers/sets-merge';
 import { calculateWeight } from '#/shared/utils/calculate-weight';
 import uuid from '#/shared/utils/uuid.util';
@@ -11,6 +13,7 @@ import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { Flashcard } from '#/types/flash-card.type';
 import type { FocusSession } from '#/types/focus-session.type';
 import type { Metadata } from '#/types/metadata.type';
+import type { Reminder } from '#/types/reminder.type';
 import type { ReviewLog } from '#/types/review-log.type';
 import Dexie from 'dexie';
 
@@ -21,6 +24,7 @@ export class AppDB extends Dexie {
   focusSessions!: Dexie.Table<FocusSession, string>;
   dailyStats!: Dexie.Table<DailyStat, string>;
   reviewLogs!: Dexie.Table<ReviewLog, string>;
+  reminders!: Dexie.Table<Reminder, string>;
 
   constructor() {
     super('FlashcardDB');
@@ -35,6 +39,8 @@ export class AppDB extends Dexie {
         focusSessions: 'frontUuid, timestamp, start, end, synced',
         reviewLogs:
           'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
+        reminders:
+          '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
       })
       .upgrade((transaction) => {
         transaction
@@ -68,6 +74,8 @@ export class AppDB extends Dexie {
         focusSessions: 'frontUuid, timestamp, start, end, synced',
         reviewLogs:
           'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
+        reminders:
+          '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
       })
       .upgrade((transaction) => {
         transaction
@@ -101,6 +109,8 @@ export class AppDB extends Dexie {
       focusSessions: 'frontUuid, timestamp, start, end, synced',
       reviewLogs:
         'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
+      reminders:
+        '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
     });
 
     this.version(4).stores({
@@ -112,6 +122,8 @@ export class AppDB extends Dexie {
       focusSessions: 'frontUuid, timestamp, start, end, synced',
       reviewLogs:
         'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
+      reminders:
+        '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
     });
 
     this.version(5)
@@ -124,6 +136,8 @@ export class AppDB extends Dexie {
         focusSessions: 'frontUuid, timestamp, start, end, synced',
         reviewLogs:
           'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
+        reminders:
+          '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
       })
       .upgrade((transaction) => {
         transaction
@@ -176,6 +190,8 @@ export class AppDB extends Dexie {
         focusSessions: 'frontUuid, timestamp, start, end, synced',
         reviewLogs:
           'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
+        reminders:
+          '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
       })
       .upgrade((transaction) => {
         transaction
@@ -185,6 +201,13 @@ export class AppDB extends Dexie {
             ...metadata,
             marketingConsent: true,
           }));
+
+        transaction
+          .table('reminders')
+          .toCollection()
+          .modify((reminder: Reminder) =>
+            remindersMerge(defaultReminder, reminder),
+          );
       });
 
     // Setup hooks
@@ -216,6 +239,15 @@ export class AppDB extends Dexie {
 
     this.sets.hook('creating', (primKey, set) => {
       set.synced = set.synced === true;
+    });
+
+    this.reminders.hook('updating', (modifications: Partial<Reminder>) => {
+      modifications.updatedAt = new Date().toISOString();
+      modifications.synced = false;
+    });
+
+    this.reminders.hook('creating', (primKey, reminder) => {
+      reminder.synced = reminder.synced === true;
     });
   }
 }

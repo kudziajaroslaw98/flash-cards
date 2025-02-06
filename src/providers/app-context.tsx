@@ -2,11 +2,13 @@ import { db } from '#/db/dexie.db';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
 import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
 import { defaultMetadata } from '#/shared/defaults/default-metadata';
+import { defaultReminder } from '#/shared/defaults/default-reminder';
 import { defaultSet } from '#/shared/defaults/default-set';
 import { FLASHCARDS_DB_DEFAULT } from '#/shared/defaults/flashcards-local-storage-init';
 import { SETS_DB_DEFAULT } from '#/shared/defaults/sets-local-storage-init';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { metadataMerge } from '#/shared/helpers/metadata-merge';
+import { remindersMerge } from '#/shared/helpers/reminders-merge';
 import { setsMerge } from '#/shared/helpers/sets-merge';
 import { localToRemoteDailyStatsSync } from '#/shared/helpers/sync/local-to-remote/daily-stats-sync';
 import { localToRemoteFlashcardsSync } from '#/shared/helpers/sync/local-to-remote/flashcards-sync';
@@ -28,6 +30,7 @@ import type { DictionaryValue } from '#/types/dictionary-value.type';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { Flashcard, FlashcardType } from '#/types/flash-card.type';
 import type { Metadata } from '#/types/metadata.type';
+import type { Reminder } from '#/types/reminder.type';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   createContext,
@@ -42,6 +45,7 @@ import { useSessionContext } from './session-provider.component';
 
 export type AppContextType = {
   flashcards: Flashcard[];
+  reminders: Reminder[];
   sets: FlashcardSet[];
   setsDictionary: DictionaryValue<string>[];
   categories: DictionaryValue<string>[];
@@ -60,10 +64,14 @@ export type AppContextType = {
   updateSet: (set: Partial<FlashcardSet>) => void;
   updateSets: (sets: Partial<FlashcardSet>[]) => void;
   updateMetadata: (metadata: Partial<Metadata>) => void;
+  addReminders: (reminders: Partial<Reminder>[]) => void;
+  removeReminders: (reminders: Reminder[]) => void;
+  updateReminders: (reminders: Partial<Reminder>[]) => void;
 };
 
 export const AppContext = createContext<AppContextType>({
   flashcards: [],
+  reminders: [],
   sets: [],
   setsDictionary: [],
   categories: [],
@@ -82,6 +90,9 @@ export const AppContext = createContext<AppContextType>({
   updateSet: () => null,
   updateSets: () => null,
   updateMetadata: () => null,
+  addReminders: () => null,
+  removeReminders: () => null,
+  updateReminders: () => null,
 });
 
 export default function AppProvider(props: PropsWithChildren) {
@@ -104,6 +115,7 @@ export default function AppProvider(props: PropsWithChildren) {
   const flashcardsArray =
     useLiveQuery(() => db.flashcards.toCollection().sortBy('order')) ?? [];
   const setsArray = useLiveQuery(() => db.sets.toArray()) ?? [];
+  const remindersArray = useLiveQuery(() => db.reminders.toArray()) ?? [];
   const metadata =
     useLiveQuery(() => db.metadata.get('current')) ??
     ({
@@ -354,6 +366,55 @@ export default function AppProvider(props: PropsWithChildren) {
 
   /////////////////
   // #endregion STATS MANAGEMENT
+  /////////////////
+
+  /////////////////
+  // #region REMINDERS MANAGEMENT
+  /////////////////
+
+  const addReminders = async (reminders: Partial<Reminder>[]) => {
+    const mappedReminders: Reminder[] = reminders.map((reminder) =>
+      remindersMerge(defaultReminder, reminder),
+    );
+
+    await db.reminders.bulkAdd(mappedReminders);
+
+    const bulkReminders = await db.reminders.bulkGet(
+      mappedReminders.map((item) => item.frontUuid),
+    );
+
+    //  await supabase.from('reminders').insert(
+    //    bulkReminders.map((item) => ({
+    //      ...item,
+    //      user_uuid: user?.id,
+    //    })),
+    //  );
+  };
+
+  const removeReminders = async (reminders: Reminder[]) => {
+    const remindersToDelete: string[] = reminders.map((item) => item.frontUuid);
+
+    await db.reminders.bulkDelete(remindersToDelete);
+
+    // await supabase.from('reminders').delete().in('frontUuid', remindersToDelete);
+  };
+
+  const updateReminders = async (reminders: Partial<Reminder>[]) => {
+    const mappedReminders: Reminder[] = reminders.map((reminder) =>
+      remindersMerge(defaultReminder, reminder),
+    );
+
+    await db.reminders.bulkPut(mappedReminders);
+
+    // await Promise.all(
+    //   mappedReminders.map((reminder) =>
+    //     supabase.from('reminders').update(reminder).eq('frontUuid', reminder.frontUuid),
+    //   ),
+    // );
+  };
+
+  /////////////////
+  // #endregion REMINDERS MANAGEMENT
   /////////////////
 
   /////////////////
@@ -629,6 +690,7 @@ export default function AppProvider(props: PropsWithChildren) {
   return (
     <AppContext.Provider
       value={{
+        reminders: remindersArray,
         flashcards: flashcardsArray.sort((a, b) => a.order - b.order),
         sets: setsArray,
         setsDictionary,
@@ -648,6 +710,9 @@ export default function AppProvider(props: PropsWithChildren) {
         updateSets,
         updateSet,
         updateMetadata,
+        addReminders,
+        removeReminders,
+        updateReminders,
       }}
     >
       {props.children}
