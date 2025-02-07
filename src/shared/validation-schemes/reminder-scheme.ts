@@ -5,18 +5,18 @@ import { z } from 'zod';
 export const reminderScheme = (): FormScheme<Reminder> => ({
   inputs: {
     title: {
+      _internal_constraints: [
+        {
+          type: 'validation',
+          key: 'title',
+          constraint: z.string().min(1, 'Title is required'),
+        },
+      ],
       type: 'text',
       name: 'title',
       label: 'Title',
       placeholder: 'Title',
-      required: false,
-    },
-    description: {
-      type: 'textarea',
-      name: 'description',
-      label: 'Description',
-      placeholder: 'Description',
-      required: false,
+      required: true,
     },
     repeat: {
       _internal_constraints: [
@@ -50,12 +50,42 @@ export const reminderScheme = (): FormScheme<Reminder> => ({
       ],
       required: true,
     },
-    start: {
+    enabled: {
+      type: 'switch',
+      name: 'enabled',
+      label: 'Activate reminder',
+      showLabel: true,
+      checkedLabel: 'Active',
+      uncheckedLabel: 'Inactive',
+      variant: 'vertical-reversed',
+      required: true,
       _internal_constraints: [
         {
           type: 'validation',
+          key: 'enabled',
+          constraint: z.boolean(),
+        },
+      ],
+    },
+    start: {
+      _internal_constraints: [
+        {
+          type: 'show',
+          key: 'enabled',
+          constraint: z.boolean().refine((value) => value, 'Required'),
+        },
+        {
+          type: 'validation',
           key: 'start',
-          constraint: z.date().min(new Date(), 'Date must be in the future'),
+          constraint: z
+            .string()
+            .min(1, 'Start is required')
+            .transform((value) => new Date(value))
+            .refine(
+              (date) => date instanceof Date && !isNaN(date.getTime()),
+              'Invalid date format',
+            )
+            .refine((date) => date > new Date(), 'Date must be in the future'),
         },
       ],
       type: 'datetime-picker',

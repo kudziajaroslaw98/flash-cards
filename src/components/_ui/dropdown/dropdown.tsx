@@ -337,6 +337,7 @@ export default function Dropdown<T>({
         labelClassName ?? '',
         visible ? 'z-50' : 'z-40',
       ])}
+      onFocus={handleClickOnDropdown}
     >
       {controlLabel && (
         <span

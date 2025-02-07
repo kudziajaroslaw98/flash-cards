@@ -1,6 +1,7 @@
 'use client';
 
 import DatePicker from '#/components/_ui/date-picker/date-picker';
+import { InputSwitch } from '#/components/_ui/input-switch/input-switch';
 
 export default function PlaygroundPage() {
   // const [message, setMessage] = useState(
@@ -47,6 +48,17 @@ export default function PlaygroundPage() {
       <DatePicker
         type={'datetime-picker'}
         valid={true}
+      />
+
+      <InputSwitch
+        type={'switch'}
+        valid={true}
+        value={true}
+        checkedLabel={'On'}
+        uncheckedLabel={'Off'}
+        variant={'vertical-reversed'}
+        showLabel
+        for='test'
       />
     </>
   );

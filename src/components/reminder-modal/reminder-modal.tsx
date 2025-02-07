@@ -34,7 +34,6 @@ export function ReminderModal({
       synced: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      description: '',
       title: '',
     } as Reminder;
   };
@@ -51,6 +50,7 @@ export function ReminderModal({
   };
 
   useEffect(() => {
+    console.log(selected);
     if (selected.length === 0) {
       setValues([getNewValue()]);
     } else {
@@ -109,6 +109,7 @@ export function ReminderModal({
         setFrontUuid: item.setFrontUuid ?? uuid(),
       };
     });
+    console.log(mappedValues);
 
     if (isInEditMode) {
       handleEdit(mappedValues);
@@ -174,6 +175,12 @@ export function ReminderModal({
               emitFormValue={setFormValue}
               scheme={getFormScheme}
               initialValues={formValue as Reminder}
+              debug={{
+                inputs: true,
+                validity: true,
+                errors: true,
+                values: true,
+              }}
             />
           </Modal.Body>
 
@@ -182,6 +189,7 @@ export function ReminderModal({
             className='flex items-center justify-end gap-2'
           >
             <Button
+              type='button'
               ref={submitRef}
               label={selected.length > 0 ? 'Edit' : 'Create'}
               onClick={handleDialogSubmit}

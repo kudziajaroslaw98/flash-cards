@@ -1,7 +1,8 @@
 import useLongPress from '#/hooks/use-long-press.hook';
 import { cn } from '#/shared/utils/cn.util';
 import type { Reminder } from '#/types/reminder.type';
-import { BadgeCheck } from 'lucide-react';
+import { format } from 'date-fns';
+import { BadgeCheck, Calendar, CircleSlash, Repeat } from 'lucide-react';
 import * as m from 'motion/react-m';
 import Card from '../_ui/card/card';
 
@@ -37,6 +38,23 @@ export function ReminderCard({
     },
   );
 
+  const getRepeatFromCode = (code: string) => {
+    switch (code) {
+      case 'none':
+        return 'No repeat';
+      case 'daily':
+        return 'Daily';
+      case 'weekly':
+        return 'Weekly';
+      case 'monthly':
+        return 'Monthly';
+      case 'yearly':
+        return 'Yearly';
+      default:
+        return 'No repeat';
+    }
+  };
+
   return (
     <m.div
       onMouseDown={(e) => onStart(e, reminder)}
@@ -46,6 +64,7 @@ export function ReminderCard({
       onTouchMove={onMove}
     >
       <m.div
+        layout
         animate={{
           translateY: '0%',
           opacity: 100,
@@ -67,22 +86,57 @@ export function ReminderCard({
         <Card
           tabIndex={0}
           className={cn([
-            'z-10 cursor-pointer flex-col items-center p-4 py-0 outline-none focus-visible:ring  focus-visible:ring-green-400/50',
+            'z-10 h-full w-full cursor-pointer flex-col items-center gap-4 p-4 outline-none transition focus-visible:ring focus-visible:ring-green-400/50',
             isSelected ? 'ring ring-green-400/60' : '',
+            !reminder.enabled &&
+              isSelected &&
+              'scale-100 opacity-100 blur-[0px] grayscale',
+            !reminder.enabled &&
+              !isSelected &&
+              'scale-95 opacity-75 blur-[1px] grayscale',
           ])}
           {...props}
         >
-          <span className={cn(['flex h-full w-full flex-col'])}>
-            <>
-              {isSelected && (
-                <BadgeCheck className='absolute -right-4 -top-4 h-6 w-6 fill-green-500 text-gray-50 dark:text-slate-950' />
+          {isSelected && (
+            <BadgeCheck className='absolute -right-4 -top-4 h-6 w-6 fill-green-500 text-gray-50 dark:text-slate-950' />
+          )}
+          <div className='flex h-full w-full flex-col justify-between'>
+            <div className='flex items-center gap-4 '>
+              <span className='text-5xl font-bold text-green-500'>
+                {new Date(reminder.start)
+                  .getHours()
+                  .toString()
+                  .padStart(2, '0')}{' '}
+                :{' '}
+                {new Date(reminder.start)
+                  .getMinutes()
+                  .toString()
+                  .padStart(2, '0')}
+              </span>
+            </div>
+            <h5 className='mt-1 text-base font-bold text-gray-800 dark:text-slate-200'>
+              {reminder.title === ''
+                ? 'No title'
+                : reminder.title.charAt(0).toUpperCase() +
+                  reminder.title.slice(1)}
+            </h5>
+            <span className='mt-4 flex items-center gap-2 text-sm font-semibold leading-5 text-gray-500'>
+              {reminder.repeat === 'none' ? (
+                <CircleSlash className='size-4 text-green-500' />
+              ) : (
+                <Repeat className='size-4 text-green-500' />
               )}
-              <h5>Reminder</h5>
-              <p className='text-gray-500 dark:text-slate-400'>
-                {reminder.title}
-              </p>
-            </>
-          </span>
+              <span>{getRepeatFromCode(reminder.repeat)}</span>
+            </span>
+            <span className='mt-1 flex items-center gap-2 text-sm font-semibold leading-5 text-gray-500'>
+              <Calendar className='size-4 text-green-500' />
+              <span>
+                <span>
+                  {format(new Date(reminder.start), 'yyyy-MM-dd HH:mm')}
+                </span>
+              </span>
+            </span>
+          </div>
         </Card>
       </m.div>
     </m.div>

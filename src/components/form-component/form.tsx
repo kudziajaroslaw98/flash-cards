@@ -158,12 +158,20 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
         if (input?._internal_default_value) {
           inputDefaultInitialValue = input._internal_default_value;
         } else {
-          inputDefaultInitialValue = Array.isArray(
-            // @ts-expect-error Generic type generate error here
-            props.initialValues?.[inputName],
-          )
-            ? []
-            : '';
+          // @ts-expect-error Generic type generate error here
+          switch (typeof props.initialValues?.[inputName]) {
+            case 'string':
+              inputDefaultInitialValue = '';
+              break;
+            case 'number':
+              inputDefaultInitialValue = 0;
+              break;
+            case 'boolean':
+              inputDefaultInitialValue = false;
+              break;
+            default:
+              inputDefaultInitialValue = [];
+          }
         }
 
         tmpValues = {
@@ -448,6 +456,9 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
         props.className,
       ])}
       ref={formRef}
+      onSubmit={(e) => {
+        e.preventDefault();
+      }}
     >
       <FormInputsComponent<T>
         inputs={props.scheme.inputs}

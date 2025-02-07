@@ -115,7 +115,8 @@ export default function AppProvider(props: PropsWithChildren) {
   const flashcardsArray =
     useLiveQuery(() => db.flashcards.toCollection().sortBy('order')) ?? [];
   const setsArray = useLiveQuery(() => db.sets.toArray()) ?? [];
-  const remindersArray = useLiveQuery(() => db.reminders.toArray()) ?? [];
+  const remindersArray =
+    useLiveQuery(() => db.reminders.toCollection().sortBy('createdAt')) ?? [];
   const metadata =
     useLiveQuery(() => db.metadata.get('current')) ??
     ({

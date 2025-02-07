@@ -30,6 +30,7 @@ export interface DateTimePickerProps {
   value?: string;
   required?: boolean;
   className?: string;
+  step?: number;
   onChange?: (date: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -45,6 +46,7 @@ export default function DateTimePicker({
   onFocus,
   onBlur,
   required,
+  step = 5,
   error = null,
   touched = false,
   className = '',
@@ -57,12 +59,25 @@ export default function DateTimePicker({
 
   const valueRef = useRef<string | null>(null);
 
-  const [date, setDate] = useState(
-    new Date(new Date(new Date().setMilliseconds(0)).setSeconds(0)),
-  );
-  const [calendar, setCalendar] = useState(
-    new Date(new Date(new Date().setMilliseconds(0)).setSeconds(0)),
-  );
+  const getParsedDate = (
+    dateToParse: Date,
+    hours?: number,
+    minutes?: number,
+  ) => {
+    const date = new Date(
+      dateToParse.getFullYear(),
+      dateToParse.getMonth(),
+      dateToParse.getDate(),
+      hours ?? dateToParse.getHours(),
+      minutes ?? dateToParse.getMinutes() - (dateToParse.getMinutes() % step),
+      0,
+      0,
+    );
+    return date;
+  };
+
+  const [date, setDate] = useState(getParsedDate(new Date()));
+  const [calendar, setCalendar] = useState(getParsedDate(new Date()));
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState<Date[][]>([]);
   const [monthStart, setMonthStart] = useState(startOfMonth(date));
@@ -95,15 +110,7 @@ export default function DateTimePicker({
 
     if (selectedDay < today) return;
 
-    const newDate = new Date(
-      selectedDay.getFullYear(),
-      selectedDay.getMonth(),
-      selectedDay.getDate(),
-      hours ?? date.getHours(),
-      minutes ?? date.getMinutes(),
-      0,
-      0,
-    );
+    const newDate = getParsedDate(selectedDay, hours, minutes);
 
     setDate(newDate);
     setCalendar(newDate);
@@ -112,8 +119,17 @@ export default function DateTimePicker({
 
   const handleOnChange = (newDate?: Date) => {
     if (onChange) {
-      onChange((newDate ?? date).toISOString());
+      onChange((newDate ?? date).toUTCString());
     }
+  };
+
+  const handleOnFocus = () => {
+    if (onFocus) onFocus();
+  };
+
+  const handleOnBlur = () => {
+    setOpen(false);
+    if (onBlur) onBlur();
   };
 
   const handleAcceptClick = () => {
@@ -169,8 +185,8 @@ export default function DateTimePicker({
       return;
     }
     valueRef.current = value;
-    setDate(new Date(value));
-    setCalendar(new Date(value));
+    setDate(getParsedDate(new Date(value)));
+    setCalendar(getParsedDate(new Date(value)));
   }, [value]);
 
   useOutsideAlerter(datePickerWrapper, () => {
@@ -232,6 +248,8 @@ export default function DateTimePicker({
             onClick={handleOnWrapperClick}
             label={format(date, 'yyyy-MM-dd HH:mm')}
             className='!w-full max-w-full justify-start outline-none !ring-0 focus:scale-100 active:scale-100'
+            onFocus={handleOnFocus}
+            onBlur={handleOnBlur}
           />
 
           <AnimatePresence>
@@ -394,8 +412,8 @@ export default function DateTimePicker({
                           direction='both'
                           className='flex h-auto w-full snap-x snap-mandatory items-center md:h-full md:w-auto md:snap-y md:flex-col'
                         >
-                          {Array.from<number>({ length: 60 })
-                            .map((i, index) => index)
+                          {Array.from<number>({ length: 60 / step })
+                            .map((i, index) => index * step)
                             .map((i, index) => (
                               <div
                                 key={'minute-wrapper-' + index}

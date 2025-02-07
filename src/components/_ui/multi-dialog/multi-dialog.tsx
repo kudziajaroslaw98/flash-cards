@@ -12,6 +12,7 @@ import {
   ArrowRight,
   Plus,
 } from 'lucide-react';
+import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import { useCallback, useMemo, useRef, type PropsWithChildren } from 'react';
 import { createPortal } from 'react-dom';
@@ -57,6 +58,9 @@ export const MultiDialog = ({
   ...props
 }: MultiDialogProps) => {
   const ref = useRef<HTMLDivElement>(null);
+  const direction = useRef(1);
+  // const [direction, setDirection] = useState<1 | -1>(1);
+  // const [direction, setDirection] = useState('right');
 
   useOutsideAlerter(ref, () => {
     window.umami.track('Dialog - backdrop clicked');
@@ -82,12 +86,16 @@ export const MultiDialog = ({
   const handleArrowRight = useCallback(() => {
     window.umami.track('Dialog - arrow right clicked');
     if (open && handleRightButtonClick) {
+      direction.current = 1;
+      // setDirection(1);
       handleRightButtonClick();
     }
   }, [open, handleRightButtonClick]);
 
   const handleArrowLeft = useCallback(() => {
     window.umami.track('Dialog - arrow left clicked');
+    direction.current = -1;
+    // setDirection(-1);
     if (open && handleLeftButtonClick) {
       handleLeftButtonClick();
     }
@@ -121,7 +129,14 @@ export const MultiDialog = ({
       variant={currentIndex === 0 ? 'disabled-fill' : 'primary'}
       disabled={currentIndex === 0}
       icon={<ArrowLeft className='h-4 w-4' />}
-      onClick={handleLeftButtonClick}
+      onClick={() => {
+        direction.current = -1;
+
+        // setDirection(-1);
+        if (handleLeftButtonClick) {
+          handleLeftButtonClick();
+        }
+      }}
       alt='Left button (back) for multi dialog'
     />
   );
@@ -138,7 +153,14 @@ export const MultiDialog = ({
           <ArrowRight className='h-4 w-4' />
         )
       }
-      onClick={handleRightButtonClick}
+      onClick={() => {
+        direction.current = 1;
+
+        // setDirection(1);
+        if (handleRightButtonClick) {
+          handleRightButtonClick();
+        }
+      }}
       alt='Right button ( next/add ) for multi dialog'
     />
   );
@@ -165,16 +187,31 @@ export const MultiDialog = ({
                 <span className='hidden md:flex'>{buttonLeft}</span>
 
                 <div className='flex w-full max-w-96 flex-col items-center justify-center gap-4'>
-                  <m.div
-                    transition={{ duration: 0.3 }}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, translateY: -100 }}
-                    key={currentIndex + '1'}
-                    className='w-full'
+                  <AnimatePresence
+                    mode='popLayout'
+                    initial={false}
                   >
-                    {props.children}
-                  </m.div>
+                    <m.div
+                      key={currentIndex}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      initial={{
+                        opacity: 0,
+                        x: direction.current * -100,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        x: 0,
+                      }}
+                      exit={{
+                        opacity: 0,
+                        x: direction.current * -100,
+                        zIndex: -1,
+                      }}
+                      className='w-full'
+                    >
+                      {props.children}
+                    </m.div>
+                  </AnimatePresence>
 
                   <div className='flex w-full items-center gap-4 md:hidden'>
                     {buttonLeft}

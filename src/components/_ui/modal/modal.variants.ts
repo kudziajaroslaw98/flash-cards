@@ -7,7 +7,7 @@ export const modalHeaderVariants = cva(
       variant: {
         default: 'px-6 py-4 pt-8',
         alert: 'justify-center px-6 pb-2 pt-4',
-        form: 'px-6 py-6',
+        form: 'px-6 py-4',
         compact: 'px-4 py-3',
       },
       borderVisible: {
@@ -51,7 +51,7 @@ export const modalFooterVariants = cva(
       variant: {
         default: 'px-6 py-4',
         alert: 'px-6 pb-4 pt-2 justify-center flex w-full gap-2',
-        form: 'px-6 py-6',
+        form: 'px-6 py-4',
         compact: 'px-4 py-3',
       },
       borderVisible: {

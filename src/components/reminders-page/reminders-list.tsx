@@ -3,7 +3,6 @@ import { cn } from '#/shared/utils/cn.util';
 import type { Reminder } from '#/types/reminder.type';
 import { CalendarClock } from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
-import * as m from 'motion/react-m';
 import { useCallback, useEffect, useState } from 'react';
 import { ReminderCard } from './reminder-card';
 
@@ -62,34 +61,27 @@ export function RemindersList({
         </div>
       )}
       {reminders.length > 0 && (
-        <div
-          className={cn([
-            'grid-cols-[repeat(auto-fit,11rem)]',
-            'grid h-auto w-full justify-center gap-4 transition-all',
-            filtered.length > 5 ? 'xl:justify-between' : 'xl:justify-start',
-          ])}
-        >
-          <AnimatePresence mode='popLayout'>
-            {/* {filtered.map((reminder) => ( */}
-            {reminders.map((reminder) => (
-              <m.div
-                key={reminder.frontUuid}
-                exit={{
-                  maxHeight: 0,
-                  height: 0,
-                }}
-                layout
-              >
-                <ReminderCard
-                  reminder={reminder}
-                  isSelected={isSelected(reminder)}
-                  onSelect={() => toggleSelected(reminder)}
-                  isInSelectionMode={isInSelectionMode}
-                />
-              </m.div>
+        <AnimatePresence mode='popLayout'>
+          <div
+            className={cn([
+              'grid h-auto w-full justify-center gap-4 transition-all',
+              'grid-cols-[repeat(auto-fit,minmax(10rem,20rem))]',
+              'sm:grid-cols-[repeat(auto-fit,minmax(10rem,14rem))]',
+              'xl:grid-cols-[repeat(4,minmax(10rem,1fr))]',
+              filtered.length > 5 ? 'xl:justify-between' : 'xl:justify-start',
+            ])}
+          >
+            {filtered.map((reminder) => (
+              <ReminderCard
+                key={'reminder-' + reminder.frontUuid}
+                reminder={reminder}
+                isSelected={isSelected(reminder)}
+                onSelect={() => toggleSelected(reminder)}
+                isInSelectionMode={isInSelectionMode}
+              />
             ))}
-          </AnimatePresence>
-        </div>
+          </div>
+        </AnimatePresence>
       )}
     </div>
   );
