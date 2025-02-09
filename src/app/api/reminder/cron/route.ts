@@ -1,15 +1,12 @@
+import { prepareNotification } from '#/shared/helpers/prepare-notification';
+import supabaseAdmin from '#/shared/utils/supabase/admin';
+import { webpush } from '#/shared/utils/webpush';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
     const INTERNAL_SECRET = process.env.INTERNAL_SECRET;
 
-    console.log('[reminder/cron] Received request');
-    console.log('[reminder/cron] headers', JSON.stringify(request.headers));
-    console.log(
-      '[reminder/cron] secret',
-      request?.headers?.get('x-internal-secret'),
-    );
     // Get the header value from the request
     const token = request.headers.get('x-internal-secret');
 
@@ -19,7 +16,29 @@ export async function POST(request: Request) {
       throw new Error('Unauthorized');
     }
 
-    console.log('[reminder/cron] Token matches; Authorized;');
+    const notification = prepareNotification();
+    const { userUuid } = await request.json();
+
+    const { data: subscriptions } = await supabaseAdmin
+      .from('subscriptions')
+      .select('subscription')
+      .eq('user_uuid', userUuid);
+
+    if (!subscriptions || subscriptions.length === 0) {
+      console.error(
+        '[notifications/send] User [',
+        userUuid,
+        '] has no subscription; Not sending notification',
+      );
+      throw new Error('User has no subscription');
+    }
+
+    const notifications = subscriptions.map((subscription) => {
+      const parsedSubscription = subscription.subscription;
+      return webpush.sendNotification(parsedSubscription, notification);
+    });
+
+    await Promise.all(notifications);
 
     return NextResponse.json({ message: 'Notification sent' }, { status: 200 });
   } catch (error) {
