@@ -4,6 +4,12 @@ export async function POST(request: Request) {
   try {
     const INTERNAL_SECRET = process.env.INTERNAL_SECRET;
 
+    console.log('[reminder/cron] Received request');
+    console.log('[reminder/cron] headers', JSON.stringify(request.headers));
+    console.log(
+      '[reminder/cron] secret',
+      request?.headers?.get('x-internal-secret'),
+    );
     // Get the header value from the request
     const token = request.headers.get('x-internal-secret');
 
