@@ -26,7 +26,20 @@ const withBundleAnalyzer = NextBundleAnalyzer({
 const withMDX = createMDX();
 
 //TODO: change n8n domain
-const cspHeader = `
+const cspHeader =
+  process.env.NODE_ENV === 'development'
+    ? `default-src 'self' https://umami.finalphase.app https://supabase.finalphase.app wss://supabase.finalphase.app https://n8n-hc0sc0wskgo4cckgck8ks8ss.finalphase.app ws://localhost:54321 http://localhost:54321;
+    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://umami.finalphase.app https://js.stripe.com blob:;
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' avatars.githubusercontent.com lh3.googleusercontent.com blob: data: https://*.stripe.com;
+    font-src 'self';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self' https://checkout.stripe.com https://js.stripe.com;
+    frame-src 'self' https://checkout.stripe.com;
+    frame-ancestors 'none';
+    upgrade-insecure-requests;`
+    : `
     default-src 'self' https://umami.finalphase.app https://supabase.finalphase.app wss://supabase.finalphase.app https://n8n-hc0sc0wskgo4cckgck8ks8ss.finalphase.app;
     script-src 'self' 'unsafe-eval' 'unsafe-inline' https://umami.finalphase.app https://js.stripe.com blob:;
     style-src 'self' 'unsafe-inline';

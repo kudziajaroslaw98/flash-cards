@@ -209,6 +209,35 @@ export class AppDB extends Dexie {
             remindersMerge(defaultReminder, reminder),
           );
       });
+    this.version(7)
+      .stores({
+        flashcards:
+          '&frontUuid, tags, createdAt, updatedAt, *sets, spacedRepetition.dueDate, spacedRepetition.easeFactor, [setUuids+spacedRepetition.dueDate], synced',
+        sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards, synced',
+        metadata: 'key, synced',
+        dailyStats: 'frontUuid, updatedAt, date, synced',
+        focusSessions: 'frontUuid, timestamp, start, end, synced',
+        reviewLogs:
+          'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
+        reminders:
+          '&frontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
+      })
+      .upgrade((transaction) => {
+        transaction
+          .table('metadata')
+          .toCollection()
+          .modify((metadata: Metadata) => ({
+            ...metadata,
+            marketingConsent: true,
+          }));
+
+        transaction
+          .table('reminders')
+          .toCollection()
+          .modify((reminder: Reminder) =>
+            remindersMerge(defaultReminder, reminder),
+          );
+      });
 
     // Setup hooks
     this.setupHooks();

@@ -106,10 +106,8 @@ export function ReminderModal({
         repeat: item.repeat ?? 'none',
         start: item.start ?? new Date().toISOString(),
         frontUuid: item.frontUuid ?? uuid(),
-        setFrontUuid: item.setFrontUuid ?? uuid(),
       };
     });
-    console.log(mappedValues);
 
     if (isInEditMode) {
       handleEdit(mappedValues);
@@ -175,12 +173,6 @@ export function ReminderModal({
               emitFormValue={setFormValue}
               scheme={getFormScheme}
               initialValues={formValue as Reminder}
-              debug={{
-                inputs: true,
-                validity: true,
-                errors: true,
-                values: true,
-              }}
             />
           </Modal.Body>
 

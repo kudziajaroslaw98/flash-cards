@@ -170,7 +170,12 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
               inputDefaultInitialValue = false;
               break;
             default:
-              inputDefaultInitialValue = [];
+              // @ts-expect-error Generic type generate error here
+              if (Array.isArray(props.initialValues?.[inputName])) {
+                inputDefaultInitialValue = [];
+              } else {
+                inputDefaultInitialValue = '';
+              }
           }
         }
 

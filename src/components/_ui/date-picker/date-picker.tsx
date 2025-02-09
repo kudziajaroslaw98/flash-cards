@@ -123,15 +123,6 @@ export default function DateTimePicker({
     }
   };
 
-  const handleOnFocus = () => {
-    if (onFocus) onFocus();
-  };
-
-  const handleOnBlur = () => {
-    setOpen(false);
-    if (onBlur) onBlur();
-  };
-
   const handleAcceptClick = () => {
     setOpen(false);
     handleOnChange();
@@ -248,8 +239,6 @@ export default function DateTimePicker({
             onClick={handleOnWrapperClick}
             label={format(date, 'yyyy-MM-dd HH:mm')}
             className='!w-full max-w-full justify-start outline-none !ring-0 focus:scale-100 active:scale-100'
-            onFocus={handleOnFocus}
-            onBlur={handleOnBlur}
           />
 
           <AnimatePresence>

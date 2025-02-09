@@ -3,7 +3,7 @@ import { cn } from '#/shared/utils/cn.util';
 import type { Reminder } from '#/types/reminder.type';
 import { CalendarClock } from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ReminderCard } from './reminder-card';
 
 export function RemindersList({
@@ -17,6 +17,10 @@ export function RemindersList({
 }) {
   const { reminders } = useAppContext();
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
+  const sortedFiltered = useMemo(
+    () => filtered.sort((a, b) => (a.enabled ? -1 : 1) - (b.enabled ? -1 : 1)),
+    [filtered],
+  );
 
   const isSelected = useCallback(
     (reminder: Reminder) => {
@@ -71,7 +75,7 @@ export function RemindersList({
               filtered.length > 5 ? 'xl:justify-between' : 'xl:justify-start',
             ])}
           >
-            {filtered.map((reminder) => (
+            {sortedFiltered.map((reminder) => (
               <ReminderCard
                 key={'reminder-' + reminder.frontUuid}
                 reminder={reminder}

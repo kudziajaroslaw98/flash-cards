@@ -384,12 +384,14 @@ export default function AppProvider(props: PropsWithChildren) {
       mappedReminders.map((item) => item.frontUuid),
     );
 
-    //  await supabase.from('reminders').insert(
-    //    bulkReminders.map((item) => ({
-    //      ...item,
-    //      user_uuid: user?.id,
-    //    })),
-    //  );
+    const { error } = await supabase.from('reminders').insert(
+      bulkReminders.map((item) => ({
+        ...item,
+        user_uuid: user?.id,
+      })),
+    );
+
+    console.log(bulkReminders, error);
   };
 
   const removeReminders = async (reminders: Reminder[]) => {
@@ -397,7 +399,10 @@ export default function AppProvider(props: PropsWithChildren) {
 
     await db.reminders.bulkDelete(remindersToDelete);
 
-    // await supabase.from('reminders').delete().in('frontUuid', remindersToDelete);
+    await supabase
+      .from('reminders')
+      .delete()
+      .in('frontUuid', remindersToDelete);
   };
 
   const updateReminders = async (reminders: Partial<Reminder>[]) => {
@@ -407,11 +412,14 @@ export default function AppProvider(props: PropsWithChildren) {
 
     await db.reminders.bulkPut(mappedReminders);
 
-    // await Promise.all(
-    //   mappedReminders.map((reminder) =>
-    //     supabase.from('reminders').update(reminder).eq('frontUuid', reminder.frontUuid),
-    //   ),
-    // );
+    await Promise.all(
+      mappedReminders.map((reminder) =>
+        supabase
+          .from('reminders')
+          .update(reminder)
+          .eq('frontUuid', reminder.frontUuid),
+      ),
+    );
   };
 
   /////////////////

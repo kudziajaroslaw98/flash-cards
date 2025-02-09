@@ -203,9 +203,7 @@ export default function Dropdown<T>({
   useEffect(() => {
     setFilteredItems(
       items?.filter((item) =>
-        item.label
-          ?.toLocaleLowerCase()
-          ?.includes(searchValue?.toLocaleLowerCase()),
+        item?.label?.toLowerCase()?.includes(searchValue?.toLowerCase()),
       ),
     );
 

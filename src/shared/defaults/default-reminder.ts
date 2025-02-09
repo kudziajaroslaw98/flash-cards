@@ -7,6 +7,5 @@ export const defaultReminder: Omit<Reminder, 'frontUuid' | 'setFrontUuid'> = {
   synced: false,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  description: '',
   title: '',
 };
