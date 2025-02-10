@@ -46,7 +46,6 @@ export const prepareNotification = () => {
   const payload = JSON.stringify({
     lang: 'en',
     icon: '/icon-192x192.png',
-    badge: '/icon-192x192.png',
     vibrate: [100, 50, 100],
     actions: [
       {
