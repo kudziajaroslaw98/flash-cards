@@ -86,6 +86,7 @@ export default function HamburgerMenuComponent() {
           label: 'Reminders',
           href: APP_ROUTES.flashcards.reminders,
           icon: <Clock className={iconSize} />,
+          visible: isLoggedIn,
         },
       ],
     },
