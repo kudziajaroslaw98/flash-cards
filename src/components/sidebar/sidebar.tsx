@@ -74,7 +74,7 @@ export default function SidebarComponent() {
       type: 'item',
       label: 'Playground',
       href: '/playground',
-      visible: process.env.NODE_ENV === 'development' && true,
+      visible: process.env.NODE_ENV === 'development',
       icon: <PlayCircle className={`${iconSize} `} />,
     },
     {
