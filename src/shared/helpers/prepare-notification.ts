@@ -47,6 +47,7 @@ export const prepareNotification = () => {
     lang: 'en',
     icon: '/icon-192x192.png',
     vibrate: [100, 50, 100],
+    badge: '/flash-cards-badge.webp',
     actions: [
       {
         action: 'open',
