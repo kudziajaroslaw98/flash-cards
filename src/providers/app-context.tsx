@@ -14,12 +14,14 @@ import { localToRemoteDailyStatsSync } from '#/shared/helpers/sync/local-to-remo
 import { localToRemoteFlashcardsSync } from '#/shared/helpers/sync/local-to-remote/flashcards-sync';
 import { localToRemoteFocusSessionsSync } from '#/shared/helpers/sync/local-to-remote/focus-sessions-sync';
 import { localToRemoteMetadataSync } from '#/shared/helpers/sync/local-to-remote/metadata-sync';
+import { localToRemoteRemindersSync } from '#/shared/helpers/sync/local-to-remote/reminders-sync';
 import { localToRemoteReviewLogsSync } from '#/shared/helpers/sync/local-to-remote/review-logs-sync';
 import { localToRemoteSetsSync } from '#/shared/helpers/sync/local-to-remote/sets-sync';
 import { remoteToLocalDailyStatsSync } from '#/shared/helpers/sync/remote-to-local/daily-stats-sync';
 import { remoteToLocalFlashcardsSync } from '#/shared/helpers/sync/remote-to-local/flashcards-sync';
 import { remoteToLocalFocusSessionsSync } from '#/shared/helpers/sync/remote-to-local/focus-sessions-sync';
 import { remoteToLocalMetadataSync } from '#/shared/helpers/sync/remote-to-local/metadata-sync';
+import { remoteToLocalRemindersSync } from '#/shared/helpers/sync/remote-to-local/reminders-sync';
 import { remoteToLocalReviewLogsSync } from '#/shared/helpers/sync/remote-to-local/review-logs-sync';
 import { remoteToLocalSetsSync } from '#/shared/helpers/sync/remote-to-local/sets-sync';
 import { generateHash } from '#/shared/utils/generate-hash';
@@ -545,8 +547,10 @@ export default function AppProvider(props: PropsWithChildren) {
       // DAILY STATS
       localToRemoteDailyStatsSync(supabase, user),
 
-      // REVIEW LOGS
+      // REMINDERS
+      localToRemoteRemindersSync(supabase, user),
     ]);
+    // REVIEW LOGS
     await localToRemoteReviewLogsSync(supabase, user);
   };
 
@@ -586,8 +590,10 @@ export default function AppProvider(props: PropsWithChildren) {
       // DAILY STATS
       remoteToLocalDailyStatsSync(supabase, lastSyncAt),
 
-      // REVIEW LOGS
+      // REMINDERS
+      remoteToLocalRemindersSync(supabase, lastSyncAt),
     ]);
+    // REVIEW LOGS
     await remoteToLocalReviewLogsSync(supabase, lastSyncAt);
 
     await db.metadata.update('current', {
