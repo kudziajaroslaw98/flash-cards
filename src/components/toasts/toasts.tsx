@@ -9,7 +9,7 @@ import {
   Info,
   LoaderCircle,
 } from 'lucide-react';
-import { m } from 'motion/react';
+import * as m from 'motion/react-m';
 
 export default function ToastsComponent() {
   const { toasts, close } = useToastContext();

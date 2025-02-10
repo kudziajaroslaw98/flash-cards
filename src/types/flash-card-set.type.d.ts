@@ -8,4 +8,6 @@ export type FlashcardSet = {
   hardlink: string;
   createdAt: string;
   updatedAt: string;
+  synced: boolean;
+  reminders: string[];
 };

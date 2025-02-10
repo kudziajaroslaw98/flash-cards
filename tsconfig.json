@@ -28,7 +28,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/(pages)/guide/page.tsx"
+    "src/app/(pages)/guide/page.tsx",
+    "src/shared/utils/webpush.tjs"
   ],
   "exclude": ["node_modules"]
 }

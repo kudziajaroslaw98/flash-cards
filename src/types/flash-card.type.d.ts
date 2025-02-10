@@ -9,6 +9,8 @@ type BaseFlashcard = {
   keyPoints?: string;
   synonyms?: string;
   relatedFacts?: string;
+  tags: string[];
+  synced: boolean;
 };
 
 export type SpacedRepetition = {
@@ -17,6 +19,11 @@ export type SpacedRepetition = {
   lastReviewAt: string | Date;
   dueDate: string | Date;
   reviews: number;
+  weight: number;
+  reversedWeight: number;
+  culmulativeWeight: number;
+  totalTimeSpent: number; // in seconds
+  incorrectCount: number;
 };
 
 export type FlashcardType = 'index' | 'single' | 'question';

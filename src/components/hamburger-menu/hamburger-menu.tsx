@@ -13,13 +13,13 @@ import type { NavigationGroup } from '#/types/navigation-group.type';
 import {
   ArrowUp,
   BookOpenText,
+  Clock,
   GraduationCap,
+  House,
   Languages,
   Layers,
-  LayoutDashboard,
+  PlayCircle,
   Settings,
-  UserRound,
-  Zap,
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -35,15 +35,14 @@ export default function HamburgerMenuComponent() {
   const router = useRouter();
   const pathName = usePathname();
   const iconSize = 'size-4';
-  const groupIconSize = 'size-5';
 
   const navigationItems: (NavigationItem | NavigationGroup)[] = [
     {
       type: 'item',
       label: 'Dashboard',
       href: APP_ROUTES.dashboard,
-      visible: false,
-      icon: <LayoutDashboard className={`${iconSize} fill-current`} />,
+      visible: true,
+      icon: <House className={`${iconSize}`} />,
     },
     {
       type: 'item',
@@ -53,9 +52,15 @@ export default function HamburgerMenuComponent() {
       icon: <BookOpenText className={`${iconSize} `} />,
     },
     {
+      type: 'item',
+      label: 'Playground',
+      href: '/playground',
+      // visible: process.env.NODE_ENV === 'development' && true,
+      icon: <PlayCircle className={`${iconSize} `} />,
+    },
+    {
       type: 'group',
       label: 'Flashcards',
-      icon: <Zap className={`${groupIconSize} fill-current`} />,
       visible: true,
       items: [
         {
@@ -76,12 +81,18 @@ export default function HamburgerMenuComponent() {
           href: APP_ROUTES.flashcards.revise,
           icon: <Languages className={iconSize} />,
         },
+        {
+          type: 'item',
+          label: 'Reminders',
+          href: APP_ROUTES.flashcards.reminders,
+          icon: <Clock className={iconSize} />,
+          visible: isLoggedIn,
+        },
       ],
     },
     {
       type: 'group',
       label: 'Account',
-      icon: <UserRound className={`${groupIconSize}`} />,
       visible: isLoggedIn,
       items: [
         {
@@ -89,6 +100,19 @@ export default function HamburgerMenuComponent() {
           label: 'Settings',
           href: APP_ROUTES.account.settings,
           icon: <Settings className={iconSize} />,
+        },
+      ],
+    },
+    {
+      type: 'group',
+      label: 'Premium',
+      visible: true && !isPlanActive,
+      items: [
+        {
+          type: 'item',
+          label: 'Upgrade plan',
+          href: APP_ROUTES.pricing,
+          icon: <ArrowUp className={iconSize} />,
         },
       ],
     },
@@ -109,17 +133,6 @@ export default function HamburgerMenuComponent() {
       document.removeEventListener('click', handler);
     };
   }, []);
-
-  const handlePlanUpgrade = () => {
-    window.umami.track('Upgrade plan clicked');
-
-    if (!isLoggedIn) {
-      router.push(APP_ROUTES.signIn + '?redirect=pricing');
-      return;
-    } else {
-      router.push(APP_ROUTES.pricing);
-    }
-  };
 
   const mapToContextMenuItem = (
     items: (NavigationItem | NavigationGroup)[],
@@ -179,16 +192,6 @@ export default function HamburgerMenuComponent() {
         }
         afterMenuItems={
           <div className='flex w-full flex-col items-center justify-center gap-4'>
-            {!isPlanActive && (
-              <Button
-                icon={<ArrowUp className='size-6' />}
-                onClick={handlePlanUpgrade}
-                label={'Upgrade Plan'}
-                size={'default'}
-                variant={'secondary-text'}
-                alt='Upgrade plan'
-              />
-            )}
             <ThemeSwitchComponent showLabel />
           </div>
         }

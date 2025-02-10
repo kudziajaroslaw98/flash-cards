@@ -1,10 +1,10 @@
-import { DEFAULT_METADATA } from '#/shared/defaults/stats.default';
-import checkValidity from '#/shared/utils/check-validity.util';
-import { createClient } from '#/shared/utils/supabase/server';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { defaultMetadata } from '#/shared/defaults/default-metadata';
 import { RateLimit } from '#/shared/utils/api-limiter';
-import type { Metadata } from '#/types/metadata.type';
+import checkValidity from '#/shared/utils/check-validity.util';
 import omit from '#/shared/utils/omit.util';
+import { createClient } from '#/shared/utils/supabase/server';
+import type { Metadata } from '#/types/metadata.type';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 type requestBody = {
@@ -58,7 +58,7 @@ async function fetchDataFromDb(
     metadata:
       metadata.data !== null
         ? (updatedMetadata as Metadata)
-        : { ...DEFAULT_METADATA, theme: 'dark', lastSyncAt: newLastSyncAt },
+        : { ...defaultMetadata, theme: 'dark', lastSyncAt: newLastSyncAt },
   };
 }
 

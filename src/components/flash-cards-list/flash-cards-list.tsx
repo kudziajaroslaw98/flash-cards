@@ -9,6 +9,7 @@ import { useAppContext } from '#/providers/app-context';
 import { cn } from '#/shared/utils/cn.util';
 import type { Flashcard } from '#/types/flash-card.type';
 
+import { TreePalm } from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 
@@ -59,6 +60,13 @@ export default function FlashcardsList({
 
   return (
     <div className='relative flex h-full w-full flex-col'>
+      {flashcards.length === 0 && (
+        <div className='flex flex-col items-center justify-center py-10'>
+          <TreePalm className='mb-8 size-12 text-green-500' />
+          <span>Looks like your flashcards are on vacation.</span>
+          <span>Time to bring them back!</span>
+        </div>
+      )}
       {flashcards.length > 0 && (
         <div
           className={cn([

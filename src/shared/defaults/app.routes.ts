@@ -5,6 +5,7 @@ export const APP_ROUTES = {
     learn: '/flashcards/learn',
     revise: '/flashcards/revise',
     sets: '/flashcards/sets',
+    reminders: '/flashcards/reminders',
   },
   account: {
     profile: '/account/profile',

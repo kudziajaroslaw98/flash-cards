@@ -27,6 +27,7 @@ export const ModalHeader = ({
 
       {isCloseButtonVisible && (
         <Button
+          type='button'
           variant='destructive-text'
           size='icon-sm'
           icon={<X className='h-4 w-4' />}

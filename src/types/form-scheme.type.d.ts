@@ -1,7 +1,5 @@
-import type { DropdownProps } from '#/components/_ui/dropdown/dropdown';
-import type { InputComponentProps } from '#/components/_ui/input/input';
-import type { TextAreaProps } from '#/components/_ui/text-area/text-area';
 import type { ZodEffects, ZodObject, ZodTypeAny } from 'zod';
+import type { InputDefinitions } from './input-types';
 
 type ZodSchemaFromBaseObject<T> =
   | ZodObject<Record<keyof T, ZodTypeAny>>
@@ -27,12 +25,10 @@ export type InternalConstraint<T = unknown> = {
 
 export type InternalCommands<T> = {
   _internal_constraints?: InternalConstraint<T>[];
+  _internal_default_value?: unknown;
 };
 
-export type InputType =
-  | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
-  | TextAreaProps
-  | DropdownProps<unknown>;
+export type InputType = InputDefinitions;
 
 export type ExtendedInputType<T, K> = T & InternalCommands<K>;
 

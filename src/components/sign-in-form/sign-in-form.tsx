@@ -3,7 +3,7 @@
 import { Button } from '#/components/_ui/button/button';
 import { createClient } from '#/shared/utils/supabase/client';
 import { ArrowLeftIcon, Fingerprint, Github } from 'lucide-react';
-import { m } from 'motion/react';
+import * as m from 'motion/react-m';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
@@ -200,12 +200,15 @@ export default function SignInComponent() {
           <>
             <Button
               variant={'primary-outline'}
-              onClick={() =>
-                supabase.auth.signInWithPassword({
+              onClick={async () => {
+                const response = await supabase.auth.signInWithPassword({
                   email: 'test@test.com',
                   password: 'test',
-                })
-              }
+                });
+                if (response) {
+                  window.location.reload();
+                }
+              }}
               disabled={isLoading ?? false}
               loading={isLoading ?? false}
               iconPosition='left'
@@ -216,12 +219,15 @@ export default function SignInComponent() {
 
             <Button
               variant={'primary-outline'}
-              onClick={() =>
-                supabase.auth.signInWithPassword({
+              onClick={async () => {
+                const response = await supabase.auth.signInWithPassword({
                   email: 'test2@test.com',
                   password: 'test',
-                })
-              }
+                });
+                if (response) {
+                  window.location.reload();
+                }
+              }}
               disabled={isLoading ?? false}
               loading={isLoading ?? false}
               iconPosition='left'

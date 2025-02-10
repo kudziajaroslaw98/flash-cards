@@ -5,7 +5,7 @@ import { cn } from '#/shared/utils/cn.util';
 import { isDifferent } from '#/shared/utils/is-different.util';
 import { DictionaryValue } from '#/types//dictionary-value.type';
 import { cva, VariantProps } from 'class-variance-authority';
-import { Search } from 'lucide-react';
+import { Eraser, Plus, Search } from 'lucide-react';
 import * as m from 'motion/react-m';
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '../button/button';
@@ -103,6 +103,7 @@ export default function Dropdown<T>({
   const configRef = useRef<DictionaryValue<T>[] | null>(null);
   const valueRef = useRef<T | T[] | null | undefined>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
+  const hasFocus = useRef(false);
 
   // TODO: How to animate this?
   // const dropdownPopupStyles = useMemo(() => {
@@ -136,6 +137,7 @@ export default function Dropdown<T>({
       window.umami.track('Dropdown - Click outside');
       setVisible(false);
       setSearchValue('');
+      hasFocus.current = false;
       if (onBlur) {
         onBlur();
       }
@@ -201,9 +203,7 @@ export default function Dropdown<T>({
   useEffect(() => {
     setFilteredItems(
       items?.filter((item) =>
-        item.label
-          ?.toLocaleLowerCase()
-          ?.includes(searchValue?.toLocaleLowerCase()),
+        item?.label?.toLowerCase()?.includes(searchValue?.toLowerCase()),
       ),
     );
 
@@ -282,6 +282,7 @@ export default function Dropdown<T>({
   };
 
   const handleClickOnDropdown = () => {
+    hasFocus.current = true;
     if (onFocus) {
       onFocus();
     }
@@ -334,6 +335,7 @@ export default function Dropdown<T>({
         labelClassName ?? '',
         visible ? 'z-50' : 'z-40',
       ])}
+      onFocus={handleClickOnDropdown}
     >
       {controlLabel && (
         <span
@@ -350,17 +352,23 @@ export default function Dropdown<T>({
         <div
           ref={dropdownLabelRef}
           className={cn([
-            'group relative flex h-10 cursor-pointer items-center justify-center rounded-md border text-sm outline-none focus:ring focus:ring-green-400/50',
+            'border-gray-300 text-gray-500 dark:border-slate-800 dark:text-slate-400',
+            'group relative flex h-10 w-full cursor-pointer items-center justify-center rounded-md border text-sm outline-none group-has-[:focus]:ring',
+            hasFocus.current ? 'ring' : '',
             'transition',
-            selected.length > 0
-              ? 'border-green-500 text-green-500'
-              : 'border-gray-300  text-gray-500 dark:border-slate-800 ',
+            touched && !valid
+              ? 'border-red-400 text-red-400 ring-red-400/50 dark:border-red-400'
+              : '',
+            touched && valid
+              ? 'border-green-500 text-green-500 ring-green-400/50'
+              : '',
             error ? 'border-red-400 text-red-400 dark:border-red-400' : '',
             disabled
               ? 'bg-gray-100 text-gray-200 dark:bg-slate-900 dark:text-slate-800'
               : '',
           ])}
-          onClick={() => {
+          onClick={(e) => {
+            e.preventDefault();
             handleClickOnDropdown();
             toggleDropdown();
           }}
@@ -374,7 +382,6 @@ export default function Dropdown<T>({
         >
           {multiple ? (
             <DropdownLabel
-              onClick={() => {}}
               visible={visible}
               selectedCount={selected.length}
               label={selected[0]?.label ?? label}
@@ -401,7 +408,7 @@ export default function Dropdown<T>({
             exit={{ opacity: 0, y: -10 }}
           >
             {props.searchable && (
-              <div className='min-w-fit rounded-t-md border-b bg-gray-100 p-1 dark:border-slate-800/40 dark:bg-slate-900 '>
+              <div className='min-w-fit rounded-t-md border-b bg-gray-50 p-2 dark:border-slate-800/40 dark:bg-slate-950 '>
                 <Input
                   type='text'
                   value={searchValue}
@@ -447,19 +454,19 @@ export default function Dropdown<T>({
             </div>
             {props.addNew && !isInAddNewMode && (
               <div
-                className='flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-100  px-4 py-2 text-gray-500 outline-none transition hover:text-green-400 focus:ring focus:ring-green-400/50  dark:border-slate-800/40 dark:bg-slate-900'
+                className='flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-50  px-4 py-2 text-gray-500 outline-none transition hover:text-green-400 focus:ring focus:ring-green-400/50  dark:border-slate-800/40 dark:bg-slate-950'
                 onClick={() => handleToggleAddNew()}
                 onKeyDown={(event) =>
                   event.key === 'Enter' && handleToggleAddNew('Enter')
                 }
                 tabIndex={0}
               >
-                Add new
+                <Plus className='mr-2 h-4 w-4' /> Add new
               </div>
             )}
             {props.addNew && isInAddNewMode && (
               <div>
-                <div className='min-w-fit  bg-gray-100 p-1 py-2 outline-none focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-900'>
+                <div className='min-w-fit  bg-gray-50 p-1 py-2 outline-none focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-950'>
                   <Input
                     type='text'
                     value={newItemValue}
@@ -475,7 +482,7 @@ export default function Dropdown<T>({
                   />
                 </div>
 
-                <div className='flex h-11 w-full cursor-pointer items-center justify-center gap-2 border-t bg-gray-100 px-4 py-6 text-gray-500 transition hover:text-green-400 dark:border-slate-800/40  dark:bg-slate-900'>
+                <div className='flex h-11 w-full cursor-pointer items-center justify-center gap-2 border-t bg-gray-50 px-4 py-6 text-gray-500 transition hover:text-green-400 dark:border-slate-800/40  dark:bg-slate-950'>
                   <Button
                     label='Cancel'
                     onClick={() => handleToggleAddNew()}
@@ -483,7 +490,7 @@ export default function Dropdown<T>({
                       event.key === 'Enter' &&
                       handleToggleAddNew('Enter', 'Cancel')
                     }
-                    variant={'destructive-outline'}
+                    variant={'destructive-text'}
                     size={'sm'}
                     className='!w-full'
                     alt='Cancel'
@@ -495,7 +502,7 @@ export default function Dropdown<T>({
                     onKeyDown={(event) =>
                       event.key === 'Enter' && handleAddNewElement('Enter')
                     }
-                    variant={'primary'}
+                    variant={'primary-text'}
                     size={'sm'}
                     className='!w-full'
                     alt='Add new element'
@@ -506,14 +513,14 @@ export default function Dropdown<T>({
 
             {props.clearAll && (
               <div
-                className='flex h-11 w-full cursor-pointer items-center justify-center rounded-b-md border-t bg-gray-100 px-4 py-2 text-gray-500 outline-none transition  hover:text-green-400 focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-900'
+                className='flex h-11 w-full cursor-pointer items-center justify-center rounded-b-md border-t bg-gray-50 px-4 py-2 text-gray-500 outline-none transition  hover:text-green-400 focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-950'
                 onClick={() => clearPicked()}
                 onKeyDown={(event) =>
                   event.key === 'Enter' && clearPicked('Enter')
                 }
                 tabIndex={0}
               >
-                Clear All
+                <Eraser className='mr-2 h-4 w-4' /> Clear All
               </div>
             )}
           </m.div>

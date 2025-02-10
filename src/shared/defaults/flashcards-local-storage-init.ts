@@ -1,57 +1,28 @@
-export const FLASHCARDS_LOCAL_STORAGE_INIT = {
-  'c5f20e37-c4c6-4a76-b987-4ab0adcf1ae5': {
+import type { Flashcard } from '#/types/flash-card.type';
+import { flashcardsMerge } from '../helpers/flashcards-merge';
+import uuid from '../utils/uuid.util';
+import { defaultFlashcard } from './default-flashcard';
+
+export const FLASHCARDS_DB_DEFAULT: Flashcard[] = [
+  flashcardsMerge(defaultFlashcard, {
     type: 'index' as const,
-    frontUuid: 'c5f20e37-c4c6-4a76-b987-4ab0adcf1ae5',
-    query: '',
+    frontUuid: uuid(),
     context: 'Lazy',
-    definition: '',
     order: 1,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: ['8059ca9e-15ec-42d2-9291-c76f0bece6d7'],
-  },
-  '4d49e5e0-54e9-44de-b4b8-c654c95878fd': {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'index' as const,
-    frontUuid: '4d49e5e0-54e9-44de-b4b8-c654c95878fd',
-    query: '',
+    frontUuid: uuid(),
     context: 'Bright',
-    definition: '',
     order: 2,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: ['8059ca9e-15ec-42d2-9291-c76f0bece6d7'],
-  },
-  '757a6f43-2dc2-4d58-ba2d-5694defa0eab': {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'single' as const,
-    frontUuid: '757a6f43-2dc2-4d58-ba2d-5694defa0eab',
+    frontUuid: uuid(),
     query: "What's the meaning of word below?",
     context: 'Quick',
     definition: 'Happening or done with great speed.',
     order: 3,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: ['8059ca9e-15ec-42d2-9291-c76f0bece6d7'],
     examples:
       'He made a quick decision to avoid further problems; The quick fox jumped over the lazy dog.',
 
@@ -61,24 +32,14 @@ export const FLASHCARDS_LOCAL_STORAGE_INIT = {
     synonyms: 'fast, swift, speedy, rapid',
     relatedFacts:
       'The word "quick" originates from Old English "cwic," meaning alive or moving; Often used in idioms like "quick as a flash."',
-  },
-  'b03e05d5-c42d-4808-a621-1ac2fc4abed6': {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'single' as const,
-    frontUuid: 'b03e05d5-c42d-4808-a621-1ac2fc4abed6',
+    frontUuid: uuid(),
     query: "What's the meaning of word below?",
     context: 'Happy',
     definition: 'Feeling or showing pleasure or contentment.',
     order: 4,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: ['8059ca9e-15ec-42d2-9291-c76f0bece6d7'],
     examples:
       'She felt happy after hearing the good news; The children were happy to play outside.',
 
@@ -88,113 +49,43 @@ export const FLASHCARDS_LOCAL_STORAGE_INIT = {
     synonyms: 'joyful, content, cheerful, pleased',
     relatedFacts:
       'The word "happy" has roots in Middle English, derived from "hap," meaning luck or fortune; Commonly used in phrases like "happy-go-lucky" or "happy ending."',
-  },
-  'aa7054e8-277b-432c-be39-5696351d1767': {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'question' as const,
-    frontUuid: 'aa7054e8-277b-432c-be39-5696351d1767',
+    frontUuid: uuid(),
     query: "What's the meaning of word below?",
-    context: '',
     definition: 'Not hard or firm to the touch.',
     order: 5,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: ['8059ca9e-15ec-42d2-9291-c76f0bece6d7'],
-  },
-  'b5cc2f5e-c7fb-4f88-b9ec-b6259ac97da2': {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'question' as const,
-    frontUuid: 'b5cc2f5e-c7fb-4f88-b9ec-b6259ac97da2',
+    frontUuid: uuid(),
     query: "What's the meaning of word below?",
-    context: '',
     definition: 'Tidy and organized.',
     order: 6,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: ['8059ca9e-15ec-42d2-9291-c76f0bece6d7'],
-  },
-  '288a8828-25aa-4ee0-9ac3-b038a5ee4314': {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'index' as const,
-    frontUuid: '288a8828-25aa-4ee0-9ac3-b038a5ee4314',
-    query: '',
+    frontUuid: uuid(),
     context: 'Kind',
-    definition: '',
     order: 7,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
-  },
-  'c9ac5033-4bff-4cbf-9cf1-18e1581e658d': {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'index' as const,
-    frontUuid: 'c9ac5033-4bff-4cbf-9cf1-18e1581e658d',
-    query: '',
+    frontUuid: uuid(),
     context: 'Quickly',
-    definition: '',
     order: 8,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
-  },
-  '05b49a47-00f1-4fe0-87c9-d1b435fa7043': {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'index' as const,
-    frontUuid: '05b49a47-00f1-4fe0-87c9-d1b435fa7043',
-    query: '',
+    frontUuid: uuid(),
     context: 'Cold',
-    definition: '',
     order: 9,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
-  },
-  'c3b37bbc-266e-4326-934d-886a385d1996': {
+  }),
+  flashcardsMerge(defaultFlashcard, {
     type: 'index' as const,
-    frontUuid: 'c3b37bbc-266e-4326-934d-886a385d1996',
-    query: '',
+    frontUuid: uuid(),
     context: 'Funny',
-    definition: '',
     order: 10,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
-  },
-};
+  }),
+];

@@ -31,6 +31,7 @@ export function ReviseItem({ clicked, revisedCard }: ReviewItem) {
             key={revisedCard.frontUuid}
             flashcard={revisedCard}
             flipBlocked={!clicked}
+            size='md'
           />
         ) : (
           <Card className='h-96 w-80' />

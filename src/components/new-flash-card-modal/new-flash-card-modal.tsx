@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useSessionContext } from '#/providers/session-provider.component';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
+import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
+import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import uuid from '#/shared/utils/uuid.util';
 import { newFlashcardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';
 import type { Flashcard } from '#/types/flash-card.type';
@@ -31,7 +33,7 @@ export const NewFlashcardModal = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formValue, setFormValue] = useState<Partial<Flashcard>>({});
   const [flashcards, setFlashcards] =
-    useState<Omit<Flashcard, 'weight' | 'order'>[]>(selectedFlashcards);
+    useState<Omit<Flashcard, 'order'>[]>(selectedFlashcards);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loadingGenerate, setLoadingGenerate] = useState(false);
   const { isLoggedIn, isPlanActive } = useSessionContext();
@@ -41,35 +43,21 @@ export const NewFlashcardModal = ({
     api: API_ROUTES.ANSWER_GENERATE,
   });
 
-  const getNewFlashcard: () => Omit<Flashcard, 'order'> = () => ({
-    type: 'index' as const,
-    frontUuid: uuid(),
-    query: '',
-    context: '',
-    definition: '',
-    examples: '',
-    keyPoints: '',
-    synonyms: '',
-    relatedFacts: '',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      lastReviewAt: new Date().toISOString(),
-      dueDate: new Date(Date.now()).toISOString(),
-    },
-    sets: [],
-  });
+  const getNewFlashcard: () => Omit<Flashcard, 'order'> = () =>
+    flashcardsMerge(defaultFlashcard, {
+      type: 'index' as const,
+      frontUuid: uuid(),
+    });
 
   const clearInitialValues = () => {
     if (selectedFlashcards.length === 0) {
-      setFlashcards([getNewFlashcard()]);
+      const newFlashcard = getNewFlashcard();
+      setFlashcards([newFlashcard]);
+      setFormValue(newFlashcard);
     } else {
       setFlashcards(selectedFlashcards);
+      setFormValue(selectedFlashcards[0]);
     }
-    setFormValue({});
   };
 
   useEffect(() => {
@@ -81,6 +69,10 @@ export const NewFlashcardModal = ({
   }, [selectedFlashcards]);
 
   useEffect(() => {
+    setFormValue(flashcards[currentIndex]);
+  }, [flashcards, currentIndex]);
+
+  useEffect(() => {
     setFormValue((prev) => ({
       ...prev,
       definition: completion,
@@ -88,12 +80,11 @@ export const NewFlashcardModal = ({
   }, [completion]);
 
   const updateFormValue = () => {
-    const currentFormValue = formRef.current?.value as Omit<Flashcard, 'order'>;
-
-    setFormValue(currentFormValue);
     setFlashcards((prev) =>
       prev.map((item) =>
-        item.frontUuid === currentFormValue.frontUuid ? currentFormValue : item,
+        item.frontUuid === formValue.frontUuid
+          ? (formValue as Flashcard)
+          : item,
       ),
     );
   };
@@ -118,7 +109,7 @@ export const NewFlashcardModal = ({
 
     setIsModalOpen(false);
 
-    const currentFormValue = formRef.current?.value as Omit<Flashcard, 'order'>;
+    const currentFormValue = formValue as Omit<Flashcard, 'order'>;
     const mappedFlashcards: Omit<Flashcard, 'order'>[] = flashcards.map(
       (flashcard) => {
         const item =
@@ -224,8 +215,9 @@ export const NewFlashcardModal = ({
             <FormComponent<Flashcard | Omit<Flashcard, 'order'>>
               ref={formRef}
               className='w-full px-8'
+              emitFormValue={setFormValue}
               scheme={getFormScheme}
-              initialValues={flashcards[currentIndex]}
+              initialValues={formValue as Flashcard}
             />
           </Modal.Body>
 

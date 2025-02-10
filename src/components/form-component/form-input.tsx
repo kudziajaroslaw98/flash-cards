@@ -2,7 +2,10 @@
 
 import isDropdown from '#/shared/guards/is-dropdown';
 import isInput from '#/shared/guards/is-input';
+import isInputSwitch from '#/shared/guards/is-switch-input';
+import isTagInput from '#/shared/guards/is-tag-input';
 import isTextArea from '#/shared/guards/is-text-area';
+import isDateTimePicker from '#/shared/guards/it-datetime-picket';
 import type {
   ExtendedInputType,
   InputType,
@@ -10,8 +13,11 @@ import type {
 } from '#/types/form-scheme.type';
 import * as m from 'motion/react-m';
 import type { FormEvent } from 'react';
+import DateTimePicker from '../_ui/date-picker/date-picker';
 import Dropdown from '../_ui/dropdown/dropdown';
+import { InputSwitch } from '../_ui/input-switch/input-switch';
 import Input from '../_ui/input/input';
+import TagInput from '../_ui/tag-input/tag-input';
 import TextArea from '../_ui/text-area/text-area';
 
 type FormInputProps<T> = {
@@ -101,6 +107,51 @@ export default function FormInput<T>({
           touched={touched}
           value={(value as string) ?? ''}
           onInput={(e) => handleOnInput(e, inputName)}
+          onFocus={() => handleOnFocus(inputName)}
+          onBlur={handleOnBlur}
+          {...constaintProps}
+        />
+      )}
+
+      {isTagInput(inputProps) && (
+        <TagInput
+          {...inputProps}
+          key={`${inputName}-${index}`}
+          valid={touched ? valid : true}
+          error={touched ? error : null}
+          touched={touched}
+          value={(value as string[]) ?? []}
+          onChange={(value) => handleOnChange(value, inputName)}
+          onFocus={() => handleOnFocus(inputName)}
+          onBlur={handleOnBlur}
+          {...constaintProps}
+        />
+      )}
+
+      {isDateTimePicker(inputProps) && (
+        <DateTimePicker
+          {...inputProps}
+          key={`${inputName}-${index}`}
+          valid={touched ? valid : true}
+          error={touched ? error : null}
+          touched={touched}
+          value={(value as string) ?? []}
+          onChange={(value) => handleOnChange(value, inputName)}
+          onFocus={() => handleOnFocus(inputName)}
+          onBlur={handleOnBlur}
+          {...constaintProps}
+        />
+      )}
+
+      {isInputSwitch(inputProps) && (
+        <InputSwitch
+          {...inputProps}
+          key={`${inputName}-${index}`}
+          valid={touched ? valid : true}
+          error={touched ? error : null}
+          touched={touched}
+          value={(value as boolean) ?? false}
+          onChange={(value) => handleOnChange(value, inputName)}
           onFocus={() => handleOnFocus(inputName)}
           onBlur={handleOnBlur}
           {...constaintProps}

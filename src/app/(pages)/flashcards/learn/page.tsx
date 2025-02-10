@@ -61,7 +61,7 @@ export const metadata: Metadata = {
 
 export default async function LearnPage() {
   return (
-    <div className='flex h-full w-full flex-col items-center gap-16'>
+    <div className='flex h-full w-full grow flex-col items-center md:pb-12'>
       <FlashcardsPage />
     </div>
   );

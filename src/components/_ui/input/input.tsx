@@ -78,9 +78,13 @@ function Input({
 
       <span
         className={cn([
-          'flex h-10 w-full items-center gap-4 rounded-md border border-gray-300  p-2 px-4 transition-shadow has-[:focus]:ring has-[:focus]:ring-green-400/50 dark:border-slate-800',
-          touched && !valid ? '!border-red-400' : '',
-          touched && valid ? '!border-green-400' : '',
+          'flex h-10 w-full items-center gap-4 rounded-md border border-gray-300  p-2 px-4 transition-shadow has-[:focus]:ring  dark:border-slate-800',
+          touched && !valid
+            ? '!border-red-400 has-[:focus]:ring-red-400/50'
+            : '',
+          touched && valid
+            ? '!border-green-400 has-[:focus]:ring-green-400/50'
+            : '',
         ])}
       >
         {icon && (

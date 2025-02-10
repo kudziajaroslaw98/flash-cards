@@ -10,17 +10,22 @@ import FlashcardComponent from '#/components/flash-card/flash-card';
 import { FloatingButtons } from '#/components/floating-buttons/floating-buttons';
 import { NewFlashcardModal } from '#/components/new-flash-card-modal/new-flash-card-modal';
 import { NewSetModal } from '#/components/new-set-modal/new-set-modal';
+import { db } from '#/db/dexie.db';
 import useFetch from '#/hooks/use-fetch.hook';
 import { useAppContext } from '#/providers/app-context';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
+import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
+import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { cn } from '#/shared/utils/cn.util';
 import uuid from '#/shared/utils/uuid.util';
 import type { ApiResponse } from '#/types/api-response.type';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { Flashcard } from '#/types/flash-card.type';
+import { useLiveQuery } from 'dexie-react-hooks';
 import {
   ArrowLeft,
+  Cookie,
   CopyCheck,
   CopyMinus,
   Download,
@@ -34,7 +39,7 @@ import {
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function SetHardlinkPage() {
   const setHardLink = useParams()?.hardlink as string;
@@ -58,13 +63,11 @@ export default function SetHardlinkPage() {
   );
   const [selected, setSelected] = useState<Flashcard[]>([]);
 
-  const setFlashcards = useMemo(
-    () =>
-      flashcards.filter((flashcard) =>
-        set?.flashcards?.includes(flashcard.frontUuid),
-      ),
-    [flashcards, set],
-  );
+  const setFlashcards =
+    useLiveQuery(
+      () => db.flashcards.where('sets').anyOf([set?.frontUuid]).toArray(),
+      [set?.frontUuid],
+    ) ?? [];
 
   const handleAssignCards = (flashcards: string[]) => {
     window.umami.track('flashcard assigned to set');
@@ -152,25 +155,17 @@ export default function SetHardlinkPage() {
     const flashcardsResponse: Record<'word' | 'definition', string>[] =
       response as Record<'word' | 'definition', string>[];
 
-    const mappedFlashcards = flashcardsResponse.map(
+    const mappedFlashcards: Flashcard[] = flashcardsResponse.map(
       (flashcard, index) =>
-        ({
+        flashcardsMerge(defaultFlashcard, {
           type: 'single',
           query: 'What is the definition of word below?',
           context: flashcard.word,
           definition: flashcard.definition,
           frontUuid: uuid(),
           order: flashcards.length + index,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          spacedRepetition: {
-            interval: 1 * 24 * 60,
-            easeFactor: 1.3,
-            lastReviewAt: new Date().toISOString(),
-            dueDate: new Date().toISOString(),
-            reviews: 0,
-          },
-        }) as const,
+          sets: [set.frontUuid],
+        }),
     );
 
     if (flashcardsResponse.length > 0) {
@@ -192,7 +187,9 @@ export default function SetHardlinkPage() {
 
     if (newFlashcards.length > 0) {
       window.umami.track('Add flashcards', { count: newFlashcards.length });
-      addFlashcards(newFlashcards);
+      addFlashcards(
+        newFlashcards.map((f) => ({ ...f, sets: [set.frontUuid] })),
+      );
 
       updateMetadata({
         ...metadata,
@@ -311,9 +308,13 @@ export default function SetHardlinkPage() {
         </span>
       </div>
 
-      {set?.flashcards?.length === 0 && (
-        <div className='text-gray-600 dark:text-slate-300'>
-          <span>No assigned cards</span>
+      {setFlashcards.length === 0 && (
+        <div className='flex w-full flex-col items-center justify-center py-10 text-center'>
+          <Cookie className='mb-8 size-12 text-green-500' />
+          <span>
+            This set is as empty as a cookie jar after a midnight snack.
+          </span>
+          <span>Let&apos;s fill it up!</span>
         </div>
       )}
 

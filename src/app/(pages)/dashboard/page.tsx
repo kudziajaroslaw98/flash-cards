@@ -1,4 +1,4 @@
-import StatsListComponent from '#/components/stats-list/stats-list';
+import { Dashboard } from '#/components/dashboard/dashboard';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -58,9 +58,5 @@ export const metadata: Metadata = {
 };
 
 export default function DashboardPage() {
-  return (
-    <div className='flex h-full w-full flex-col items-center justify-center gap-16'>
-      <StatsListComponent />
-    </div>
-  );
+  return <Dashboard />;
 }

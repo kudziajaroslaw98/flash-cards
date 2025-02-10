@@ -18,6 +18,7 @@ export const newFlashcardScheme = (
     | 'synonyms'
     | 'relatedFacts'
     | 'type'
+    | 'tags'
   >
 > => ({
   inputs: {
@@ -136,6 +137,23 @@ export const newFlashcardScheme = (
       name: 'query',
       label: 'Question',
       placeholder: 'What is the definition of word below?',
+    },
+    tags: {
+      type: 'tags',
+      name: 'tags',
+      label: 'Tags',
+      required: true,
+      placeholder: 'Add tags by pressing enter or coma',
+      _internal_constraints: [
+        {
+          type: 'validation',
+          key: 'tags',
+          constraint: z
+            .array(z.string().min(1, 'Tag is required'))
+            .min(1, 'At least one tag is required')
+            .max(3, 'Too many tags'),
+        },
+      ],
     },
     examples: {
       type: 'textarea',

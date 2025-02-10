@@ -1,5 +1,13 @@
 'use client';
 
+import { db } from '#/db/dexie.db';
+import useFetch from '#/hooks/use-fetch.hook';
+import { API_ROUTES } from '#/shared/defaults/api-routes';
+import { defaultMetadata } from '#/shared/defaults/default-metadata';
+import { createClient } from '#/shared/utils/supabase/client';
+import type { ApiResponse } from '#/types//api-response.type';
+import type { User, UserAttributes } from '@supabase/supabase-js';
+import { usePathname } from 'next/navigation';
 import {
   createContext,
   PropsWithChildren,
@@ -8,12 +16,6 @@ import {
   useEffect,
   useState,
 } from 'react';
-import type { User, UserAttributes } from '@supabase/supabase-js';
-import { createClient } from '#/shared/utils/supabase/client';
-import type { ApiResponse } from '#/types//api-response.type';
-import { API_ROUTES } from '#/shared/defaults/api-routes';
-import useFetch from '#/hooks/use-fetch.hook';
-import { usePathname } from 'next/navigation';
 
 export type SessionContextType = {
   isLoggedIn: boolean;
@@ -47,7 +49,12 @@ export default function SessionProvider(props: Readonly<PropsWithChildren>) {
   const logOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
-    localStorage.clear();
+    db.flashcards.clear();
+    db.sets.clear();
+    db.metadata.update('current', defaultMetadata);
+    db.dailyStats.clear();
+    db.focusSessions.clear();
+    db.reviewLogs.clear();
     window.location.reload();
   };
 
@@ -75,6 +82,13 @@ export default function SessionProvider(props: Readonly<PropsWithChildren>) {
     if (response.success) {
       await supabase.auth.signOut();
       setUser(null);
+      db.flashcards.clear();
+      db.sets.clear();
+      db.metadata.update('current', defaultMetadata);
+      db.dailyStats.clear();
+      db.focusSessions.clear();
+      db.reviewLogs.clear();
+      window.location.reload();
     }
   };
 

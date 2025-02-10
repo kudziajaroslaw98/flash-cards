@@ -109,7 +109,7 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
       let initialInputs: string[] = [];
       let initialValids: Record<string, boolean> = {};
       let initialErrors: Record<string, string | null> = {};
-      let tmpValues: Record<string, string> = {};
+      let tmpValues: Record<string, string | unknown[]> = {};
       let initialVisibility: Record<string, boolean> = {};
       let initialValidations: Record<string, InputValidation<T>[]> = {};
 
@@ -152,20 +152,47 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
         initialInputs = [...initialInputs, inputName];
         initialValids = { ...initialValids, [inputName]: true };
         initialErrors = { ...initialErrors, [inputName]: null };
+
+        let inputDefaultInitialValue;
+
+        if (input?._internal_default_value) {
+          inputDefaultInitialValue = input._internal_default_value;
+        } else {
+          // @ts-expect-error Generic type generate error here
+          switch (typeof props.initialValues?.[inputName]) {
+            case 'string':
+              inputDefaultInitialValue = '';
+              break;
+            case 'number':
+              inputDefaultInitialValue = 0;
+              break;
+            case 'boolean':
+              inputDefaultInitialValue = false;
+              break;
+            default:
+              // @ts-expect-error Generic type generate error here
+              if (Array.isArray(props.initialValues?.[inputName])) {
+                inputDefaultInitialValue = [];
+              } else {
+                inputDefaultInitialValue = '';
+              }
+          }
+        }
+
         tmpValues = {
           ...tmpValues,
           // @ts-expect-error Generic type generate error here
           [inputName]: props.initialValues?.[inputName]
             ? // @ts-expect-error  Generic type generate error here
               props.initialValues?.[inputName]
-            : '',
+            : inputDefaultInitialValue,
         };
       });
 
-      const initialValues: Record<keyof T, string> = {
+      const initialValues: Record<keyof T, string | unknown[]> = {
         ...props.initialValues,
         ...tmpValues,
-      } as Record<keyof T, string>;
+      } as Record<keyof T, unknown[]>;
 
       setFormInputs(initialInputs);
       setInputsValidity(initialValids);
@@ -282,25 +309,41 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
       let formValid = true;
 
       inputs.forEach((inputName) => {
-        const validations = inputValidations[inputName].filter((validation) => {
-          return (
-            validation.whenConstraint &&
-            validation.whenKey &&
-            validation.whenConstraint.safeParse(
-              formValues[validation.whenKey as string],
-            ).success
+        const dependentValidations = inputValidations[inputName].filter(
+          (validation) => {
+            return (
+              validation.whenConstraint &&
+              validation.whenKey &&
+              validation.whenConstraint.safeParse(
+                formValues[validation.whenKey as string],
+              ).success
+            );
+          },
+        );
+        const independentValidations = inputValidations[inputName].filter(
+          (validation) => !validation.whenConstraint || !validation.whenKey,
+        );
+
+        const dependentOutputs: (
+          | SafeParseSuccess<unknown>
+          | SafeParseError<unknown>
+        )[] = dependentValidations.map((validation) => {
+          return validation.constraint.safeParse(
+            formValues[validation.key as string],
           );
         });
 
-        const outputs: (SafeParseSuccess<unknown> | SafeParseError<unknown>)[] =
-          validations.map((validation) => {
-            return validation.constraint.safeParse(
-              formValues[validation.key as string],
-            );
-          });
+        const independentOutputs: (
+          | SafeParseSuccess<unknown>
+          | SafeParseError<unknown>
+        )[] = independentValidations.map((validation) => {
+          return validation.constraint.safeParse(
+            formValues[validation.key as string],
+          );
+        });
 
         if (newTouched ?? touchedInputs[inputName]) {
-          outputs.forEach((output) => {
+          [...dependentOutputs, ...independentOutputs].forEach((output) => {
             if (!output.success) {
               formValid = false;
               const issues = output?.error?.issues;
@@ -399,8 +442,8 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
     }));
   };
 
-  const handleOnBlur = () => {
-    checkFormValidity();
+  const handleOnBlur = async () => {
+    await checkFormValidity();
   };
 
   const handleOnFocus = (inputName: string) => {
@@ -418,6 +461,9 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
         props.className,
       ])}
       ref={formRef}
+      onSubmit={(e) => {
+        e.preventDefault();
+      }}
     >
       <FormInputsComponent<T>
         inputs={props.scheme.inputs}

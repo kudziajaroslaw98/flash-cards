@@ -1,3 +1,5 @@
+import type { StudySession } from './study-session.type';
+
 export type Metadata = {
   answers: number;
   correctAnswers: number;
@@ -5,6 +7,11 @@ export type Metadata = {
   createdFlashCards: number;
   accuracy: number;
   streak: number;
-  lastSyncAt: Date | null;
+  lastSyncAt: Date | string | null;
   theme?: 'dark' | 'light';
+  synced: boolean;
+  activeStudyPlan?: StudySession;
+  notificationPermission: 'granted' | 'denied' | 'default';
+  marketingConsent: boolean;
+  updatedAt: Date;
 };

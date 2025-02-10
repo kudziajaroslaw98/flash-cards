@@ -1,5 +1,7 @@
+import { db } from '#/db/dexie.db';
 import { useAppContext } from '#/providers/app-context';
 import type { Flashcard } from '#/types/flash-card.type';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { Pencil, Plus, Trash } from 'lucide-react';
 import { AlertDialog } from '../_ui/alert-dialog/alert-dialog';
 import { Button } from '../_ui/button/button';
@@ -21,6 +23,16 @@ export default function FlashcardsActions({
     updateMetadata,
     removeFlashcards,
   } = useAppContext();
+
+  const updatedSelected =
+    useLiveQuery(
+      () =>
+        db.flashcards
+          .where('frontUuid')
+          .anyOf(selected.map((f) => f.frontUuid))
+          .toArray(),
+      [selected],
+    ) ?? [];
 
   const addNewRecord = (flashcards: Partial<Flashcard>[]) => {
     window.umami.track('Add flashcards', { count: flashcards.length });
@@ -71,7 +83,7 @@ export default function FlashcardsActions({
           <NewFlashcardModal
             handleNewFlashcard={() => null}
             handleEditFlashcard={editSelectedRecords}
-            selectedFlashcards={selected}
+            selectedFlashcards={updatedSelected}
             isInEditMode={true}
             trigger={
               <Button

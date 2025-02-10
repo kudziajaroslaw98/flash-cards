@@ -17,6 +17,7 @@ export const newSetFormScheme = (
       name: 'name',
       label: 'Set name',
       placeholder: 'Wild Animals',
+      required: true,
       _internal_constraints: [
         {
           type: 'validation',
@@ -24,7 +25,6 @@ export const newSetFormScheme = (
           constraint: z.string().min(1, 'Name is required'),
         },
       ],
-      required: true,
     },
     description: {
       _internal_constraints: [
@@ -41,24 +41,16 @@ export const newSetFormScheme = (
       name: 'description',
       label: 'Description',
       placeholder: 'Set description',
-      required: true,
       handleGenerate: handleGenerate,
       loadingGenerate: loadingGenerate,
       blockGenerate: !isLoggedIn || !isPlanActive,
     },
     category: {
-      _internal_constraints: [
-        {
-          type: 'validation',
-          key: 'category',
-          constraint: z.string().optional(),
-        },
-      ],
+      name: 'category',
       type: 'dropdown',
       multiple: false,
       label: 'Category',
       controlLabel: 'Category',
-      required: false,
       config: dictionaryItems,
       addNew: true,
       clearAll: true,
