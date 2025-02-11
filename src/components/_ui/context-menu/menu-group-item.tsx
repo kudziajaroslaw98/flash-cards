@@ -15,7 +15,7 @@ export default function MenuGroupItem(props: PropsWithChildren<MenuItemProps>) {
       <>
         <li
           className={`
-         flex w-full items-center gap-4 bg-gray-50 px-4 py-3 text-sm text-green-400 last:border-none dark:border-b-slate-800 dark:bg-slate-900 dark:text-green-400
+         flex w-full items-center gap-4 bg-gray-50 px-4 py-2 text-sm text-green-400 last:border-none dark:border-b-slate-800 dark:bg-slate-900 dark:text-green-400
          ${className ?? ''}`}
         >
           {children}

@@ -1,85 +1,20 @@
 'use client';
-import { db } from '#/db/dexie.db';
+import { useClientPermissions } from '#/hooks/use-client-permissions';
 import { useAppContext } from '#/providers/app-context';
-import { useSessionContext } from '#/providers/session-provider.component';
 import type { Reminder } from '#/types/reminder.type';
 import { BellOff, BellPlus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '../_ui/button/button';
 import { ReminderActions } from './reminder-actions';
 import { ReminderFilters } from './reminder-filters';
 import { RemindersList } from './reminders-list';
 
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-
 export function Reminders() {
+  const { notificationPermission, pushSubcribed, permissionRequest } =
+    useClientPermissions();
   const [selected, setSelected] = useState<Reminder[]>([]);
   const [filtered, setFiltered] = useState<Reminder[]>([]);
-  const [permission, setPermission] = useState<
-    'granted' | 'denied' | 'default'
-  >();
   const { reminders } = useAppContext();
-  const { user } = useSessionContext();
-
-  useEffect(() => {
-    const handleNotificationPermission = async () => {
-      const registration = await navigator.serviceWorker.ready;
-      const pushManager = registration.pushManager;
-      const subscription = await pushManager.getSubscription();
-
-      if (subscription) {
-        setPermission('granted');
-        db.metadata.update('current', {
-          notificationPermission: 'granted',
-        });
-      } else {
-        setPermission('denied');
-        db.metadata.update('current', {
-          notificationPermission: 'denied',
-        });
-      }
-    };
-    handleNotificationPermission();
-  }, []);
-
-  const handleNotificationChange = async () => {
-    await Notification.requestPermission().then(async (result) => {
-      if (result === 'granted') {
-        setPermission('granted');
-        db.metadata.update('current', { notificationPermission: 'granted' });
-        const subscribeToNotifications = async () => {
-          if (
-            !('serviceWorker' in navigator) ||
-            !('PushManager' in window) ||
-            !VAPID_PUBLIC_KEY ||
-            !user
-          ) {
-            return;
-          }
-
-          const registration = await navigator.serviceWorker.ready;
-          const subscription = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: VAPID_PUBLIC_KEY,
-          });
-
-          const response = await fetch('/api/notification/subscribe', {
-            method: 'POST',
-            body: JSON.stringify({ subscription }), // Send user ID
-            headers: { 'Content-Type': 'application/json' },
-          }).then((res) => res.json());
-
-          if (response.success) {
-            // TODO: todo: add toast
-          }
-        };
-
-        subscribeToNotifications();
-      } else if (result === 'denied') {
-        db.metadata.update('current', { notificationPermission: 'denied' });
-      }
-    });
-  };
 
   return (
     <div className='flex w-full flex-col gap-6'>
@@ -91,12 +26,12 @@ export function Reminders() {
           </span>
         </div>
 
-        {permission === 'granted' && (
+        {notificationPermission === 'granted' && (
           <ReminderFilters setFiltered={setFiltered} />
         )}
       </div>
 
-      {permission === 'granted' ? (
+      {notificationPermission === 'granted' && pushSubcribed ? (
         <>
           <RemindersList
             selected={selected}
@@ -111,18 +46,34 @@ export function Reminders() {
         </>
       ) : (
         <div className='flex flex-col items-center justify-center py-10 text-center'>
-          <BellOff className='mb-8 size-12 text-green-500' />
-          <span>You need to allow notifications to use this feature.</span>
-          <span className='mt-4'>
-            <Button
-              alt='Allow notifications'
-              onClick={handleNotificationChange}
-              label='Allow notifications'
-              size={'sm'}
-              iconPosition='right'
-              icon={<BellPlus className='size-4' />}
-            />
-          </span>
+          {notificationPermission === 'default' ? (
+            <>
+              <BellOff className='mb-8 size-12 text-green-500' />
+              <span>You need to allow notifications to use this feature.</span>
+              <span className='mt-4'>
+                <Button
+                  alt='Allow notifications'
+                  onClick={permissionRequest}
+                  label='Allow notifications'
+                  size={'sm'}
+                  iconPosition='right'
+                  icon={<BellPlus className='size-4' />}
+                />
+              </span>
+            </>
+          ) : (
+            <>
+              <BellOff className='mb-8 size-12 text-green-500' />
+              <span>
+                You have blocked the notifications, you need to allow them{' '}
+                <b className='text-gray-800 dark:text-slate-200'>
+                  {' '}
+                  in the settings{' '}
+                </b>{' '}
+                to use this feature.
+              </span>
+            </>
+          )}
         </div>
       )}
     </div>

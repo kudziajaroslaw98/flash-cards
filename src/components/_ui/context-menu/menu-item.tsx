@@ -36,7 +36,7 @@ export default function MenuItem(props: PropsWithChildren<MenuItemProps>) {
             ? 'cursor-pointer hover:bg-green-400 hover:text-green-50 dark:hover:bg-slate-800 dark:hover:text-green-50'
             : ''
         }
-         flex w-full items-center gap-4  border-b border-b-slate-200 bg-gray-50 px-4 py-3  text-sm text-green-400 last:border-b-0 dark:border-b-slate-800 dark:bg-slate-900 dark:text-green-400
+         flex w-full items-center gap-4  border-b border-b-slate-200 bg-gray-50 px-4 py-2  text-sm text-green-400 last:border-b-0 dark:border-b-slate-800 dark:bg-slate-900 dark:text-green-400
          ${className ?? ''}`}
       >
         {children}
