@@ -1,13 +1,14 @@
 import type { FocusSession } from '#/types/focus-session.type';
+import { resetMiliseconds } from '../reset-date-miliseconds';
 
 export const getWeeklyFocusTrends = (sessions: FocusSession[]) => {
   const dailyMetrics: Record<string, { active: number; total: number }> = {};
 
   sessions.forEach((session) => {
-    const date = new Date(session.start);
-    const day = (date.getDay() - 1 + 7) % 7;
-    const sessionDuration =
-      (new Date(session.end).getTime() - date.getTime()) / 1000;
+    const start = resetMiliseconds(new Date(session.start));
+    const end = resetMiliseconds(new Date(session.end));
+    const day = (start.getDay() - 1 + 7) % 7;
+    const sessionDuration = (end.getTime() - start.getTime()) / 1000;
 
     if (!dailyMetrics[day]) {
       dailyMetrics[day] = { active: 0, total: 0 };

@@ -1,13 +1,14 @@
 import type { FocusSession } from '#/types/focus-session.type';
+import { resetMiliseconds } from '../reset-date-miliseconds';
 
 export const getPeakFocusTimes = (sessions: FocusSession[], topN = 3) => {
   const hourlyMetrics: Record<number, { active: number; total: number }> = {};
 
   sessions.forEach((session) => {
     const hour = new Date(session.start).getHours();
-    const sessionDuration =
-      (new Date(session.end).getTime() - new Date(session.start).getTime()) /
-      1000;
+    const start = resetMiliseconds(new Date(session.start));
+    const end = resetMiliseconds(new Date(session.end));
+    const sessionDuration = (end.getTime() - start.getTime()) / 1000;
 
     if (!hourlyMetrics[hour]) {
       hourlyMetrics[hour] = { active: 0, total: 0 };
