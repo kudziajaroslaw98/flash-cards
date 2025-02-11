@@ -30,10 +30,10 @@ export function ReminderModal({
       repeat: 'none',
       start: new Date(
         new Date(new Date(new Date().setMilliseconds(0)).setSeconds(0)),
-      ).toISOString(),
+      ).toUTCString(),
       synced: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: new Date().toUTCString(),
+      updatedAt: new Date().toUTCString(),
       title: '',
     } as Reminder;
   };
@@ -104,7 +104,7 @@ export function ReminderModal({
         enabled: item.enabled ?? true,
         synced: item.synced ?? false,
         repeat: item.repeat ?? 'none',
-        start: item.start ?? new Date().toISOString(),
+        start: item.start ?? new Date().toUTCString(),
         frontUuid: item.frontUuid ?? uuid(),
       };
     });
@@ -173,6 +173,10 @@ export function ReminderModal({
               emitFormValue={setFormValue}
               scheme={getFormScheme}
               initialValues={formValue as Reminder}
+              debug={{
+                inputs: true,
+                values: true,
+              }}
             />
           </Modal.Body>
 

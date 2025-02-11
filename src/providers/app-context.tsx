@@ -558,7 +558,7 @@ export default function AppProvider(props: PropsWithChildren) {
     if (!isLoggedIn || user === null) return;
 
     const metadata = await db.metadata.get('current');
-    const newLastSyncAt = new Date().toISOString();
+    const newLastSyncAt = new Date().toUTCString();
     const emptyMetadata = !metadata;
     let lastSyncAt: string;
 
@@ -568,10 +568,10 @@ export default function AppProvider(props: PropsWithChildren) {
       isNaN(new Date(metadata.lastSyncAt).getTime())
     ) {
       // First sync or invalid date: use epoch
-      lastSyncAt = new Date(0).toISOString();
+      lastSyncAt = new Date(0).toUTCString();
     } else {
       // Valid date: use ISO string
-      lastSyncAt = new Date(metadata.lastSyncAt).toISOString();
+      lastSyncAt = new Date(metadata.lastSyncAt).toUTCString();
     }
 
     await Promise.allSettled([

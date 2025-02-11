@@ -156,7 +156,7 @@ function TagInput({
       <div className='flex flex-col gap-2'>
         <span
           className={cn([
-            'flex h-10 w-full items-center gap-4 rounded-md border border-gray-300  p-2 px-4 transition-shadow has-[:focus]:ring  dark:border-slate-800',
+            'flex h-10 w-full items-center gap-4 rounded-md border border-gray-300 p-2 px-4 transition-shadow has-[:focus]:ring dark:border-slate-800',
             touched && !valid ? '!border-red-400 !ring-red-400/50' : '',
             touched && valid ? '!border-green-400 !ring-green-400/50' : '',
           ])}
@@ -209,7 +209,7 @@ function TagInput({
                   touched && valid
                     ? '!border-green-400 bg-green-100/25 !ring-green-400/50 dark:bg-green-950/25'
                     : '',
-                  'transition-colorsdark:border-slate-800 flex items-center gap-1 rounded-md border border-gray-300 py-1 pl-3 pr-1 text-xs font-semibold',
+                  'transition-colorsdark:border-slate-800 flex items-center gap-1 rounded-md border border-gray-300 py-1 pl-3 pr-1 text-xs font-semibold dark:border-slate-800',
                 )}
               >
                 <span className='flex h-full items-center justify-center'>

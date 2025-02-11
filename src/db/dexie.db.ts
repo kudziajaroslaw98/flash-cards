@@ -146,7 +146,9 @@ export class AppDB extends Dexie {
           .modify((stat: DailyStat) => {
             return {
               ...stat,
-              updatedAt: stat.updatedAt ? stat.updatedAt : new Date(),
+              updatedAt: stat.updatedAt
+                ? stat.updatedAt
+                : new Date().toUTCString(),
               frontUuid: stat.frontUuid ? stat.frontUuid : uuid(),
             };
           });
@@ -156,7 +158,9 @@ export class AppDB extends Dexie {
           .modify((metadata: Metadata) => {
             return {
               ...metadata,
-              updatedAt: metadata.updatedAt ? metadata.updatedAt : new Date(),
+              updatedAt: metadata.updatedAt
+                ? metadata.updatedAt
+                : new Date().toUTCString(),
             };
           });
         transaction
@@ -165,7 +169,9 @@ export class AppDB extends Dexie {
           .modify((session: FocusSession) => {
             return {
               ...session,
-              timestamp: session.timestamp ? session.timestamp : new Date(),
+              timestamp: session.timestamp
+                ? session.timestamp
+                : new Date().toUTCString(),
               frontUuid: session.frontUuid ? session.frontUuid : uuid(),
             };
           });
@@ -245,7 +251,7 @@ export class AppDB extends Dexie {
 
   private setupHooks() {
     this.flashcards.hook('updating', (modifications: Partial<Flashcard>) => {
-      modifications.updatedAt = new Date().toISOString();
+      modifications.updatedAt = new Date().toUTCString();
       modifications.synced = false;
     });
 
@@ -262,7 +268,7 @@ export class AppDB extends Dexie {
     });
 
     this.sets.hook('updating', (modifications: Partial<FlashcardSet>) => {
-      modifications.updatedAt = new Date().toISOString();
+      modifications.updatedAt = new Date().toUTCString();
       modifications.synced = false;
     });
 
@@ -271,7 +277,7 @@ export class AppDB extends Dexie {
     });
 
     this.reminders.hook('updating', (modifications: Partial<Reminder>) => {
-      modifications.updatedAt = new Date().toISOString();
+      modifications.updatedAt = new Date().toUTCString();
       modifications.synced = false;
     });
 
