@@ -97,21 +97,20 @@ export default function HamburgerMenuComponent() {
     {
       type: 'group',
       label: 'Account',
-      visible: isLoggedIn,
+      visible: true,
       items: [
         {
           type: 'item',
           label: 'Settings',
           href: APP_ROUTES.account.settings,
           icon: <Settings className={iconSize} />,
+          visible: isLoggedIn,
         },
         {
           type: 'action',
           label: 'Log out',
           icon: <LogOut className={iconSize} />,
-          onClick: () => {
-            logOut();
-          },
+          onClick: logOut,
           visible: isLoggedIn,
         },
         {
@@ -170,7 +169,7 @@ export default function HamburgerMenuComponent() {
             setOpen(false);
             toggle(false);
           },
-        } satisfies ContextMenuItem;
+        };
       } else if (item.type === 'group') {
         return {
           type: 'group',
@@ -186,13 +185,13 @@ export default function HamburgerMenuComponent() {
           icon: item.icon,
           visible: item.visible,
           onClick: () => {
-            if (item.onClick) {
+            if (item?.onClick) {
               item.onClick();
             }
             setOpen(false);
             toggle(false);
           },
-        } satisfies ContextMenuItem;
+        };
       }
     }) as ContextMenuItem[];
   };

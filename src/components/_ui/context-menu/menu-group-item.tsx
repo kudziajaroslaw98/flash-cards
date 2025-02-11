@@ -29,21 +29,36 @@ export default function MenuGroupItem(props: PropsWithChildren<MenuItemProps>) {
             key={`group-ul-item-${props.items[0].label}`}
             className='flex h-full w-full flex-col'
           >
-            {props.items
-              .filter((item) => item.type === 'item')
-              .map((item, index) => (
-                <MenuItem
-                  key={`group-item-${item.label}-${index}`}
-                  active={item.active}
-                  visible={item.visible}
-                  onClick={() => {
-                    item.onClick();
-                  }}
-                  className='border-l-2 border-l-slate-200 pl-4 dark:border-l-slate-800'
-                >
-                  {item.icon && item.icon} {item.label}
-                </MenuItem>
-              ))}
+            {props.items.map((item, index) => {
+              if (item.type === 'item') {
+                return (
+                  <MenuItem
+                    key={`group-item-${item.label}-${index}`}
+                    active={item.active}
+                    visible={item.visible}
+                    onClick={() => {
+                      item.onClick();
+                    }}
+                    className='border-l-2 border-l-slate-200 pl-4 dark:border-l-slate-800'
+                  >
+                    {item.icon && item.icon} {item.label}
+                  </MenuItem>
+                );
+              } else if (item.type === 'action') {
+                return (
+                  <MenuItem
+                    key={`group-action-${item.label}-${index}`}
+                    visible={item.visible}
+                    onClick={() => {
+                      item.onClick();
+                    }}
+                    className='border-l-2 border-l-slate-200 pl-4 dark:border-l-slate-800'
+                  >
+                    {item.icon && item.icon} {item.label}
+                  </MenuItem>
+                );
+              }
+            })}
           </ul>
         </li>
       </>

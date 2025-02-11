@@ -53,7 +53,6 @@ export type ContextMenuItem =
   | {
       type: 'action';
       label?: string;
-      items?: ContextMenuItem[];
       icon?: ReactNode;
       visible?: boolean;
       onClick: () => void;
@@ -125,7 +124,7 @@ export default function ContextMenu({
               if (item.type === 'group') {
                 return (
                   <MenuGroupItem
-                    key={`group-${item.label}-${index}`}
+                    key={`group-${item.label?.replaceAll(' ', '-')}-${index}`}
                     className='group'
                     visible={item.visible}
                     items={item.items || []}
@@ -136,7 +135,7 @@ export default function ContextMenu({
               } else if (item.type === 'item') {
                 return (
                   <MenuItem
-                    key={`item-${item.label}-${index}`}
+                    key={`item-${item.label?.replaceAll(' ', '-')}-${index}`}
                     active={item.active}
                     visible={item.visible}
                     onClick={() => {
@@ -149,7 +148,7 @@ export default function ContextMenu({
               } else {
                 return (
                   <MenuItem
-                    key={`item-${item.label}-${index}`}
+                    key={`action-${item.label?.replaceAll(' ', '-')}-${index}`}
                     visible={item.visible}
                     onClick={() => {
                       item.onClick();
