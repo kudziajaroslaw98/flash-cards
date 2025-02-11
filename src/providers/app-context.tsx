@@ -582,7 +582,7 @@ export default function AppProvider(props: PropsWithChildren) {
       remoteToLocalSetsSync(supabase, lastSyncAt),
 
       // METADATA
-      remoteToLocalMetadataSync(supabase, lastSyncAt, emptyMetadata),
+      remoteToLocalMetadataSync(supabase, lastSyncAt, emptyMetadata, metadata),
 
       // FOCUS SESSIONS
       remoteToLocalFocusSessionsSync(supabase, lastSyncAt),

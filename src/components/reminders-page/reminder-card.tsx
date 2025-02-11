@@ -90,10 +90,10 @@ export function ReminderCard({
             isSelected ? 'ring ring-green-400/60' : '',
             !reminder.enabled &&
               isSelected &&
-              'scale-100 opacity-100 blur-[0px] grayscale',
+              'scale-100 opacity-100 blur-[0px]',
             !reminder.enabled &&
               !isSelected &&
-              'scale-95 opacity-75 blur-[1px] grayscale',
+              'scale-95 opacity-75 blur-[1px]',
           ])}
           {...props}
         >
@@ -102,7 +102,12 @@ export function ReminderCard({
           )}
           <div className='flex h-full w-full flex-col justify-between'>
             <div className='flex items-center gap-4 '>
-              <span className='text-5xl font-bold text-green-500'>
+              <span
+                className={cn([
+                  'text-5xl font-bold text-green-500',
+                  !reminder.enabled && 'text-gray-200 dark:text-slate-900',
+                ])}
+              >
                 {new Date(reminder.start)
                   .getHours()
                   .toString()
@@ -114,22 +119,49 @@ export function ReminderCard({
                   .padStart(2, '0')}
               </span>
             </div>
-            <h5 className='mt-1 text-base font-bold text-gray-800 dark:text-slate-200'>
+            <h5
+              className={cn([
+                'mt-1 text-base font-bold text-gray-800 dark:text-slate-200',
+                !reminder.enabled && 'text-gray-400 dark:text-slate-700',
+              ])}
+            >
               {reminder.title === ''
                 ? 'No title'
                 : reminder.title.charAt(0).toUpperCase() +
                   reminder.title.slice(1)}
             </h5>
-            <span className='mt-4 flex items-center gap-2 text-sm font-semibold leading-5 text-gray-500'>
-              {reminder.repeat === 'none' ? (
-                <CircleSlash className='size-4 text-green-500' />
-              ) : (
-                <Repeat className='size-4 text-green-500' />
-              )}
+            <span
+              className={cn([
+                'mt-4 flex items-center gap-2 text-sm font-semibold leading-5 text-gray-500',
+                !reminder.enabled && 'text-gray-300 dark:text-slate-900',
+              ])}
+            >
+              <span
+                className={cn([
+                  'text-green-500',
+                  !reminder.enabled && 'text-gray-300 dark:text-slate-900',
+                ])}
+              >
+                {reminder.repeat === 'none' ? (
+                  <CircleSlash className='size-4' />
+                ) : (
+                  <Repeat className='size-4' />
+                )}
+              </span>
               <span>{getRepeatFromCode(reminder.repeat)}</span>
             </span>
-            <span className='mt-1 flex items-center gap-2 text-sm font-semibold leading-5 text-gray-500'>
-              <Calendar className='size-4 text-green-500' />
+            <span
+              className={cn([
+                'mt-1 flex items-center gap-2 text-sm font-semibold leading-5 text-gray-500',
+                !reminder.enabled && 'text-gray-300 dark:text-slate-900',
+              ])}
+            >
+              <Calendar
+                className={cn([
+                  'size-4 text-green-500',
+                  !reminder.enabled && 'text-gray-300 dark:text-slate-900',
+                ])}
+              />
               <span>
                 <span>
                   {format(new Date(reminder.start), 'yyyy-MM-dd HH:mm')}
