@@ -28,7 +28,7 @@ import { MenuIcon } from '../_ui/_icons/menu';
 import ThemeSwitchComponent from '../theme-switch/theme-switch';
 
 export default function HamburgerMenuComponent() {
-  const { isLoggedIn, user, logOut, isPlanActive } = useSessionContext();
+  const { isLoggedIn, logOut, isPlanActive } = useSessionContext();
   const [toggled, toggle] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
