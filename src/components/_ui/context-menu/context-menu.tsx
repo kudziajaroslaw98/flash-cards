@@ -49,6 +49,14 @@ export type ContextMenuItem =
       items?: ContextMenuItem[];
       icon?: ReactNode;
       visible?: boolean;
+    }
+  | {
+      type: 'action';
+      label?: string;
+      items?: ContextMenuItem[];
+      icon?: ReactNode;
+      visible?: boolean;
+      onClick: () => void;
     };
 
 interface ContextMenuProps
@@ -113,29 +121,45 @@ export default function ContextMenu({
               </MenuItem>
             )}
 
-            {props.menuItems.map((item: ContextMenuItem, index) =>
-              item.type === 'group' ? (
-                <MenuGroupItem
-                  key={`group-${item.label}-${index}`}
-                  className='group'
-                  visible={item.visible}
-                  items={item.items || []}
-                >
-                  {item.icon && item.icon} {item.label}
-                </MenuGroupItem>
-              ) : (
-                <MenuItem
-                  key={`item-${item.label}-${index}`}
-                  active={item.active}
-                  visible={item.visible}
-                  onClick={() => {
-                    item.onClick();
-                  }}
-                >
-                  {item.icon && item.icon} {item.label}
-                </MenuItem>
-              ),
-            )}
+            {props.menuItems.map((item: ContextMenuItem, index) => {
+              if (item.type === 'group') {
+                return (
+                  <MenuGroupItem
+                    key={`group-${item.label}-${index}`}
+                    className='group'
+                    visible={item.visible}
+                    items={item.items || []}
+                  >
+                    {item.icon && item.icon} {item.label}
+                  </MenuGroupItem>
+                );
+              } else if (item.type === 'item') {
+                return (
+                  <MenuItem
+                    key={`item-${item.label}-${index}`}
+                    active={item.active}
+                    visible={item.visible}
+                    onClick={() => {
+                      item.onClick();
+                    }}
+                  >
+                    {item.icon && item.icon} {item.label}
+                  </MenuItem>
+                );
+              } else {
+                return (
+                  <MenuItem
+                    key={`item-${item.label}-${index}`}
+                    visible={item.visible}
+                    onClick={() => {
+                      item.onClick();
+                    }}
+                  >
+                    {item.icon && item.icon} {item.label}
+                  </MenuItem>
+                );
+              }
+            })}
 
             {!!props.afterMenuItems && (
               <MenuItem

@@ -181,11 +181,14 @@ export default function HamburgerMenuComponent() {
         };
       } else {
         return {
-          type: 'item',
+          type: 'action',
           label: item.label,
           icon: item.icon,
           visible: item.visible,
           onClick: () => {
+            if (item.onClick) {
+              item.onClick();
+            }
             setOpen(false);
             toggle(false);
           },
