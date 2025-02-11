@@ -109,7 +109,9 @@ export default function HamburgerMenuComponent() {
           type: 'action',
           label: 'Log out',
           icon: <LogOut className={iconSize} />,
-          onClick: () => logOut(),
+          onClick: () => {
+            logOut();
+          },
           visible: isLoggedIn,
         },
         {
