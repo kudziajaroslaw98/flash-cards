@@ -6,7 +6,7 @@ import Tooltip from '../_ui/tooltip/tooltip';
 import { useStepper } from './stepper';
 
 export const StepperProgress = () => {
-  const { currentStep, totalSteps, isCompleted, steps } = useStepper();
+  const { currentStep, isCompleted, steps } = useStepper();
   const { isLightMode } = useThemeContext();
 
   const progressBarVariants = (completed: boolean, currentStep: boolean) => {

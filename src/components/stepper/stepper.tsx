@@ -12,11 +12,6 @@ import React, {
 } from 'react';
 import { StepperProgress } from './stepper-progress';
 
-type ProgressStep = ReactNode & {
-  stepLabel: string;
-  stepIdentificator: string;
-};
-
 type StepperContextType = {
   currentStep: number;
   totalSteps: number;
