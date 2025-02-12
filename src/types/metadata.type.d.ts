@@ -13,5 +13,5 @@ export type Metadata = {
   activeStudyPlan?: StudySession;
   notificationPermission: 'granted' | 'denied' | 'default';
   marketingConsent: boolean;
-  updatedAt: Date;
+  updatedAt: Date | string;
 };

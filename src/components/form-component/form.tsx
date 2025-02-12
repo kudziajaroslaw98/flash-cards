@@ -342,7 +342,10 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
           );
         });
 
-        if (newTouched ?? touchedInputs[inputName]) {
+        if (
+          (newTouched ?? touchedInputs[inputName]) &&
+          inputsVisibility[inputName]
+        ) {
           [...dependentOutputs, ...independentOutputs].forEach((output) => {
             if (!output.success) {
               formValid = false;
@@ -357,18 +360,21 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
               }
             }
           });
-        }
-
-        setInputsErrors(errors);
-        setInputsValidity(valids);
-        setTouchedInputs(newTouched ?? touchedInputs);
-
-        if (props.emitFormValid) {
-          props.emitFormValid(Object.values(valids).every((item) => item));
+        } else {
+          formValid = true;
+          valids = { ...valids, [inputName]: true };
+          errors = { ...errors, [inputName]: null };
         }
       });
 
+      setInputsErrors(errors);
+      setInputsValidity(valids);
+      setTouchedInputs(newTouched ?? touchedInputs);
       setFormValidity(formValid);
+
+      if (props.emitFormValid) {
+        props.emitFormValid(Object.values(valids).every((item) => item));
+      }
 
       for (const [key, value] of Object.entries(valids)) {
         if (!value) {

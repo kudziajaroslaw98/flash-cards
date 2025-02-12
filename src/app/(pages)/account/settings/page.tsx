@@ -8,116 +8,120 @@ import Switch from '#/components/_ui/switch/switch';
 import Tooltip from '#/components/_ui/tooltip/tooltip';
 import ThemeSwitchComponent from '#/components/theme-switch/theme-switch';
 import { db } from '#/db/dexie.db';
+import { useClientPermissions } from '#/hooks/use-client-permissions';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { capitalize } from '#/shared/utils/helpers';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Banknote, Bell, Info, Palette } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+import { useState } from 'react';
 
 export default function SettingsPage() {
   const { user, deleteUser, pickedPlan, isPlanActive } = useSessionContext();
+  const { notificationPermission, pushSubcribed, permissionRequest } =
+    useClientPermissions();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   // eslint-disable-next-line no-undef
-  const [permission, setPermission] = useState<
-    'granted' | 'denied' | 'default'
-  >();
   const metadata = useLiveQuery(() =>
     db.table('metadata').toCollection().first(),
   );
 
-  useEffect(() => {
-    const handleNotificationPermission = async () => {
-      const registration = await navigator.serviceWorker.ready;
-      const pushManager = registration.pushManager;
-      const subscription = await pushManager.getSubscription();
+  // useEffect(() => {
+  //   const handleNotificationPermission = async () => {
+  //     const registration = await navigator.serviceWorker.ready;
+  //     const pushManager = registration.pushManager;
+  //     const subscription = await pushManager.getSubscription();
 
-      if (subscription) {
-        setPermission('granted');
-        db.metadata.update('current', {
-          notificationPermission: 'granted',
-        });
-      } else {
-        setPermission('denied');
-        db.metadata.update('current', {
-          notificationPermission: 'denied',
-        });
-      }
-    };
-    handleNotificationPermission();
-  }, []);
+  //     if (subscription) {
+  //       setPermission('granted');
+  //       db.metadata.update('current', {
+  //         notificationPermission: 'granted',
+  //       });
+  //     } else {
+  //       setPermission('denied');
+  //       db.metadata.update('current', {
+  //         notificationPermission: 'denied',
+  //       });
+  //     }
+  //   };
+  //   handleNotificationPermission();
+  // }, []);
 
   const handleDeleteUser = () => {
     setIsDeleting(true);
     deleteUser();
   };
 
-  const handleNotificationChange = async () => {
-    if (permission === 'granted') {
-      const registration = await navigator.serviceWorker.ready;
-      const pushManager = registration.pushManager;
-      pushManager.getSubscription().then(async (subscription) => {
-        if (subscription) {
-          const response = await fetch('/api/notification/unsubscribe', {
-            method: 'POST',
-            body: JSON.stringify({ subscription }), // Send user ID
-            headers: { 'Content-Type': 'application/json' },
-          }).then((res) => res.json());
+  // const handleNotificationChange = async () => {
+  //   if (permission === 'granted') {
+  //     const registration = await navigator.serviceWorker.ready;
+  //     const pushManager = registration.pushManager;
+  //     pushManager.getSubscription().then(async (subscription) => {
+  //       if (subscription) {
+  //         const response = await fetch('/api/notification/unsubscribe', {
+  //           method: 'POST',
+  //           body: JSON.stringify({ subscription }), // Send user ID
+  //           headers: { 'Content-Type': 'application/json' },
+  //         }).then((res) => res.json());
 
-          if (response.success) {
-            subscription.unsubscribe();
-            // TODO: add toast
-          }
-        }
-      });
-      setPermission('denied');
-      db.metadata.update('current', { notificationPermission: 'denied' });
-      return;
-    } else if (permission === 'denied') {
-      setPermission('default');
-      db.metadata.update('current', { notificationPermission: 'default' });
-      return;
+  //         if (response.success) {
+  //           subscription.unsubscribe();
+  //           // TODO: add toast
+  //         }
+  //       }
+  //     });
+  //     setPermission('denied');
+  //     db.metadata.update('current', { notificationPermission: 'denied' });
+  //     return;
+  //   } else if (permission === 'denied') {
+  //     setPermission('default');
+  //     db.metadata.update('current', { notificationPermission: 'default' });
+  //     return;
+  //   }
+
+  //   await Notification.requestPermission().then(async (result) => {
+  //     if (result === 'granted') {
+  //       setPermission('granted');
+  //       db.metadata.update('current', { notificationPermission: 'granted' });
+  //       const subscribeToNotifications = async () => {
+  //         if (
+  //           !('serviceWorker' in navigator) ||
+  //           !('PushManager' in window) ||
+  //           !VAPID_PUBLIC_KEY ||
+  //           !user
+  //         ) {
+  //           return;
+  //         }
+
+  //         const registration = await navigator.serviceWorker.ready;
+  //         const subscription = await registration.pushManager.subscribe({
+  //           userVisibleOnly: true,
+  //           applicationServerKey: VAPID_PUBLIC_KEY,
+  //         });
+
+  //         const response = await fetch('/api/notification/subscribe', {
+  //           method: 'POST',
+  //           body: JSON.stringify({ subscription }), // Send user ID
+  //           headers: { 'Content-Type': 'application/json' },
+  //         }).then((res) => res.json());
+
+  //         if (response.success) {
+  //           // TODO: todo: add toast
+  //         }
+  //       };
+
+  //       subscribeToNotifications();
+  //     } else if (result === 'denied') {
+  //       db.metadata.update('current', { notificationPermission: 'denied' });
+  //     }
+  //   });
+  // };
+
+  const handleNotificationClick = () => {
+    if (notificationPermission !== 'granted') {
+      permissionRequest();
     }
-
-    await Notification.requestPermission().then(async (result) => {
-      if (result === 'granted') {
-        setPermission('granted');
-        db.metadata.update('current', { notificationPermission: 'granted' });
-        const subscribeToNotifications = async () => {
-          if (
-            !('serviceWorker' in navigator) ||
-            !('PushManager' in window) ||
-            !VAPID_PUBLIC_KEY ||
-            !user
-          ) {
-            return;
-          }
-
-          const registration = await navigator.serviceWorker.ready;
-          const subscription = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: VAPID_PUBLIC_KEY,
-          });
-
-          const response = await fetch('/api/notification/subscribe', {
-            method: 'POST',
-            body: JSON.stringify({ subscription }), // Send user ID
-            headers: { 'Content-Type': 'application/json' },
-          }).then((res) => res.json());
-
-          if (response.success) {
-            // TODO: todo: add toast
-          }
-        };
-
-        subscribeToNotifications();
-      } else if (result === 'denied') {
-        db.metadata.update('current', { notificationPermission: 'denied' });
-      }
-    });
   };
 
   const handleMarketingConsent = () => {
@@ -232,11 +236,22 @@ export default function SettingsPage() {
                 Notifications
               </span>
             </div>
-            <Switch
-              showLabel={false}
-              onClick={handleNotificationChange}
-              value={permission === 'granted'}
-            />
+            <Tooltip
+              show={notificationPermission !== 'default'}
+              content={
+                <span>
+                  To change this permission go to <b>Settings</b> on your device
+                </span>
+              }
+              className='w-52'
+              position='left'
+            >
+              <Switch
+                showLabel={false}
+                onClick={handleNotificationClick}
+                value={notificationPermission === 'granted' && pushSubcribed}
+              />
+            </Tooltip>
           </div>
 
           <div className='flex justify-between gap-2 rounded-md'>

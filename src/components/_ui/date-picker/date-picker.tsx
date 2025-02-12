@@ -171,13 +171,20 @@ export default function DateTimePicker({
     if (
       value === undefined ||
       (valueRef.current !== null &&
-        !isDifferent(new Date(value).toISOString, date.toISOString()))
+        !isDifferent(new Date(value).toUTCString(), date.toUTCString()))
     ) {
       return;
     }
-    valueRef.current = value;
-    setDate(getParsedDate(new Date(value)));
-    setCalendar(getParsedDate(new Date(value)));
+
+    if (new Date(value) > new Date()) {
+      valueRef.current = value;
+      setDate(getParsedDate(new Date(value)));
+      setCalendar(getParsedDate(new Date(value)));
+    } else {
+      valueRef.current = new Date().toUTCString();
+      setDate(getParsedDate(new Date()));
+      setCalendar(getParsedDate(new Date()));
+    }
   }, [value]);
 
   useOutsideAlerter(datePickerWrapper, () => {

@@ -12,8 +12,8 @@ export const flashcardsMerge = (
     context: flashcard.context ?? defaultFlashcard.context,
     definition: flashcard.definition ?? defaultFlashcard.definition,
     order: flashcard.order,
-    createdAt: flashcard.createdAt ?? new Date().toISOString(),
-    updatedAt: flashcard.updatedAt ?? new Date().toISOString(),
+    createdAt: flashcard.createdAt ?? new Date().toUTCString(),
+    updatedAt: flashcard.updatedAt ?? new Date().toUTCString(),
     spacedRepetition: {
       interval:
         flashcard?.spacedRepetition?.interval ??
@@ -22,10 +22,10 @@ export const flashcardsMerge = (
         flashcard?.spacedRepetition?.easeFactor ??
         defaultFlashcard.spacedRepetition.easeFactor,
       lastReviewAt:
-        flashcard?.spacedRepetition?.lastReviewAt ?? new Date().toISOString(),
+        flashcard?.spacedRepetition?.lastReviewAt ?? new Date().toUTCString(),
       dueDate:
         flashcard?.spacedRepetition?.dueDate ??
-        new Date(Date.now()).toISOString(),
+        new Date(Date.now()).toUTCString(),
       reviews:
         flashcard?.spacedRepetition?.reviews ??
         defaultFlashcard.spacedRepetition.reviews,

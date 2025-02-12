@@ -2,6 +2,7 @@
 
 import { NavigationGroup } from '#/types//navigation-group.type';
 import * as m from 'motion/react-m';
+import NavigationActionComponent from './navigation-action';
 import NavigationItemComponent from './navigation-item';
 
 export interface NavigationGroupProps {
@@ -51,14 +52,27 @@ export default function NavigationGroupComponent(props: NavigationGroupProps) {
         <div
           className={`flex flex-col gap-2 ${expanded && 'border-gray-100 dark:border-slate-900'}`}
         >
-          {group.items.map((item) => (
-            <NavigationItemComponent
-              key={item.href}
-              item={item}
-              expanded={expanded}
-              visible={item.visible}
-            />
-          ))}
+          {group.items.map((item) => {
+            if (item.type === 'item') {
+              return (
+                <NavigationItemComponent
+                  key={item.href}
+                  item={item}
+                  expanded={expanded}
+                  visible={item.visible}
+                />
+              );
+            } else {
+              return (
+                <NavigationActionComponent
+                  key={item.label}
+                  item={item}
+                  expanded={expanded}
+                  visible={item.visible}
+                />
+              );
+            }
+          })}
         </div>
       </div>
     )

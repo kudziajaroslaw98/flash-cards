@@ -1,14 +1,13 @@
 'use client';
 
-import { Button } from '#/components/_ui/button/button';
 import ContextMenu, {
   type ContextMenuItem,
 } from '#/components/_ui/context-menu/context-menu';
-import LinkComponent from '#/components/_ui/link/link';
 import ToggleButton from '#/components/_ui/toggle-button/toggle-button';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { APP_ROUTES } from '#/shared/defaults/app.routes';
 import { NavigationItem } from '#/types//navigation-item.type';
+import type { NavigationAction } from '#/types/navigation-action.type';
 import type { NavigationGroup } from '#/types/navigation-group.type';
 import {
   ArrowUp,
@@ -18,17 +17,18 @@ import {
   House,
   Languages,
   Layers,
+  LogIn,
+  LogOut,
   PlayCircle,
   Settings,
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { MenuIcon } from '../_ui/_icons/menu';
-import AvatarComponent from '../_ui/avatar/avatar';
 import ThemeSwitchComponent from '../theme-switch/theme-switch';
 
 export default function HamburgerMenuComponent() {
-  const { isLoggedIn, user, logOut, isPlanActive } = useSessionContext();
+  const { isLoggedIn, logOut, isPlanActive } = useSessionContext();
   const [toggled, toggle] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -36,7 +36,11 @@ export default function HamburgerMenuComponent() {
   const pathName = usePathname();
   const iconSize = 'size-4';
 
-  const navigationItems: (NavigationItem | NavigationGroup)[] = [
+  const navigationItems: (
+    | NavigationItem
+    | NavigationGroup
+    | NavigationAction
+  )[] = [
     {
       type: 'item',
       label: 'Dashboard',
@@ -93,13 +97,28 @@ export default function HamburgerMenuComponent() {
     {
       type: 'group',
       label: 'Account',
-      visible: isLoggedIn,
+      visible: true,
       items: [
         {
           type: 'item',
           label: 'Settings',
           href: APP_ROUTES.account.settings,
           icon: <Settings className={iconSize} />,
+          visible: isLoggedIn,
+        },
+        {
+          type: 'action',
+          label: 'Log out',
+          icon: <LogOut className={iconSize} />,
+          onClick: logOut,
+          visible: isLoggedIn,
+        },
+        {
+          type: 'item',
+          label: 'Log In',
+          href: APP_ROUTES.signIn,
+          icon: <LogIn className={iconSize} />,
+          visible: !isLoggedIn,
         },
       ],
     },
@@ -135,7 +154,7 @@ export default function HamburgerMenuComponent() {
   }, []);
 
   const mapToContextMenuItem = (
-    items: (NavigationItem | NavigationGroup)[],
+    items: (NavigationItem | NavigationGroup | NavigationAction)[],
   ): ContextMenuItem[] => {
     return items.map((item) => {
       if (item.type === 'item') {
@@ -150,14 +169,28 @@ export default function HamburgerMenuComponent() {
             setOpen(false);
             toggle(false);
           },
-        } satisfies ContextMenuItem;
-      } else {
+        };
+      } else if (item.type === 'group') {
         return {
           type: 'group',
           label: item.label,
           icon: item.icon,
           visible: item.visible,
           items: mapToContextMenuItem(item.items),
+        };
+      } else {
+        return {
+          type: 'action',
+          label: item.label,
+          icon: item.icon,
+          visible: item.visible,
+          onClick: () => {
+            if (item?.onClick) {
+              item.onClick();
+            }
+            setOpen(false);
+            toggle(false);
+          },
         };
       }
     }) as ContextMenuItem[];
@@ -195,55 +228,8 @@ export default function HamburgerMenuComponent() {
             <ThemeSwitchComponent showLabel />
           </div>
         }
-        beforeMenuItems={
-          <div className='w-full'>
-            {isLoggedIn && (
-              <div className='flex flex-col gap-3'>
-                <div className='flex w-full flex-col items-center justify-center gap-2'>
-                  <AvatarComponent
-                    className='h-12 w-12'
-                    imageAlt='User avatar'
-                    imageSrc={user?.user_metadata?.avatar_url}
-                  />
-
-                  <span className='text-inherit'>
-                    {user?.user_metadata?.name}
-                  </span>
-                </div>
-
-                <Button
-                  onClick={() => {
-                    logOut();
-                    setOpen(false);
-                    toggle(false);
-                  }}
-                  color='red'
-                  label='Log out'
-                  alt='Log out'
-                />
-              </div>
-            )}
-
-            {!isLoggedIn && (
-              <div className='flex flex-col gap-3'>
-                <div className='flex w-full flex-col items-center justify-center'>
-                  <span className='text-inherit'>You are not logged in.</span>
-                </div>
-
-                <LinkComponent
-                  label={'You can do it here'}
-                  onClick={() => {
-                    toggle(false);
-                    setOpen(false);
-                  }}
-                  href={'/sign-in'}
-                  className={'text-inherit underline'}
-                ></LinkComponent>
-              </div>
-            )}
-          </div>
-        }
         menuItems={mappedNavigationItems}
+        className='!w-52'
       ></ContextMenu>
     </div>
   );

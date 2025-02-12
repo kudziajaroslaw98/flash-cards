@@ -77,8 +77,8 @@ export function ReminderActions({
               />
             }
             handleEdit={handleEditRecords}
-            handleNew={handleNewRecords}
-            isInEditMode
+            handleNew={() => null}
+            isInEditMode={true}
             selected={updatedSelected}
           />
           <AlertDialog
