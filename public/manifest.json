@@ -1,4 +1,5 @@
 {
+  "id": "1fe3d5e7-78f9-468f-acc4-16ced50e7fe7",
   "name": "Flashcards - Learning Words Made Easy",
   "short_name": "flashcards",
   "description": "Flashcards by Jarosław Kudzia is the perfect tool for mastering vocabulary and learning words effortlessly.",
@@ -7,6 +8,13 @@
   "start_url": "/flashcards/learn",
   "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
+  "dir": "ltr",
+  "lang": "en",
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
   "icons": [
     {
       "src": "/icon-192x192.png",
@@ -27,6 +35,43 @@
       "src": "/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/app/screenshot-1.jpg",
+      "sizes": "1440x3088",
+      "type": "image/jpg"
+    },
+    {
+      "src": "/images/app/screenshot-2.jpg",
+      "sizes": "1440x3088",
+      "type": "image/jpg"
+    },
+    {
+      "src": "/images/app/screenshot-3.jpg",
+      "sizes": "1440x3088",
+      "type": "image/jpg"
+    },
+    {
+      "src": "/images/app/screenshot-4.jpg",
+      "sizes": "1440x3088",
+      "type": "image/jpg"
+    },
+    {
+      "src": "/images/app/screenshot-5.jpg",
+      "sizes": "1440x3088",
+      "type": "image/jpg"
+    },
+    {
+      "src": "/images/app/screenshot-6.jpg",
+      "sizes": "1440x3088",
+      "type": "image/jpg"
+    },
+    {
+      "src": "/images/app/screenshot-7.jpg",
+      "sizes": "1440x3088",
+      "type": "image/jpg"
     }
   ],
   "shortcuts": [

@@ -278,7 +278,7 @@ export default function SidebarComponent() {
                   className={`w-full max-w-32 flex-col ${expanded ? 'flex' : 'hidden'}`}
                 >
                   <span className='line-clamp-1  overflow-hidden text-ellipsis font-extrabold text-gray-600 dark:text-slate-300'>
-                    {isLoggedIn ? `${name}` : 'Guest'}
+                    {isLoggedIn ? `${name ?? 'No Name'}` : 'Guest'}
                   </span>
 
                   <span className='w-full overflow-hidden text-ellipsis text-xs text-gray-400 dark:text-slate-500'>
