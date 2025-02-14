@@ -46,7 +46,7 @@ export const StepperStep = ({ children, index }: StepperStepProps) => {
   if (currentStep !== index) return null;
 
   return (
-    <div className='space-y-6'>
+    <div className='w-full space-y-6'>
       {children}
       <div className='flex w-full justify-center gap-4'>
         <PrevButton />

@@ -4,7 +4,7 @@ import useLongPress from '#/hooks/use-long-press.hook';
 import { cn } from '#/shared/utils/cn.util';
 import type { Flashcard } from '#/types/flash-card.type';
 import { BadgeCheck } from 'lucide-react';
-import { m } from 'motion/react';
+import * as m from 'motion/react-m';
 import { useEffect, useState } from 'react';
 import Card from '../_ui/card/card';
 

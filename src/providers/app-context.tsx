@@ -4,8 +4,6 @@ import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
 import { defaultMetadata } from '#/shared/defaults/default-metadata';
 import { defaultReminder } from '#/shared/defaults/default-reminder';
 import { defaultSet } from '#/shared/defaults/default-set';
-import { FLASHCARDS_DB_DEFAULT } from '#/shared/defaults/flashcards-local-storage-init';
-import { SETS_DB_DEFAULT } from '#/shared/defaults/sets-local-storage-init';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { metadataMerge } from '#/shared/helpers/metadata-merge';
 import { remindersMerge } from '#/shared/helpers/reminders-merge';
@@ -635,13 +633,6 @@ export default function AppProvider(props: PropsWithChildren) {
       localStorage.removeItem('migrations');
       localStorage.removeItem('backup_pre_dexie');
 
-      // 2. Validate localStorage data
-      const flashcards = FLASHCARDS_DB_DEFAULT;
-      const sets = SETS_DB_DEFAULT;
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const metadata = defaultMetadata as any;
-
       // 3. Use explicit Dexie transaction
       await db.transaction(
         'rw',
@@ -655,11 +646,6 @@ export default function AppProvider(props: PropsWithChildren) {
             db.sets.clear(),
             db.metadata.clear(),
           ]);
-
-          // 4. Batch insert with validation
-          await db.flashcards.bulkPut(flashcards);
-          await db.sets.bulkPut(sets);
-          await db.metadata.put({ ...metadata, key: 'current' }, 'current');
 
           // 5. Mark migration complete
           localStorage.setItem('dexie_migrated', 'true');
