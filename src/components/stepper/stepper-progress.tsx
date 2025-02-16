@@ -3,7 +3,7 @@ import { cn } from '#/shared/utils/cn.util';
 import * as m from 'motion/react-m';
 import { Children } from 'react';
 import Tooltip from '../_ui/tooltip/tooltip';
-import { useStepper } from './stepper';
+import { useStepper } from './stepper-context';
 
 export const StepperProgress = () => {
   const { currentStep, isCompleted, steps } = useStepper();
@@ -73,7 +73,7 @@ export const StepperProgress = () => {
                   </span>
                 }
                 position='bottom'
-                className='w-32'
+                className='w-fit max-w-32'
               >
                 <m.div
                   className={cn([

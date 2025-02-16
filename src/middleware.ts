@@ -47,6 +47,20 @@ const pricingMiddleware = async (request: NextRequest) => {
   }
 };
 
+// const studyMiddleware = async (request: NextRequest) => {
+//   const supabase = await createClient();
+//   const {
+//     data: { user },
+//     error,
+//   } = await supabase.auth.getUser();
+
+//   if (user === null || error !== null) {
+//     return NextResponse.redirect(
+//       new URL('/sign-in?redirect=pricing', request.url),
+//     );
+//   }
+// };
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -92,6 +106,10 @@ export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/pricing')) {
     return pricingMiddleware(request);
   }
+
+  // if (request.nextUrl.pathname.startsWith('/study')) {
+  //   return studyMiddleware(request);
+  // }
 
   return NextResponse.next();
 }

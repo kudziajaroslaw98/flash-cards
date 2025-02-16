@@ -55,6 +55,10 @@ async function validateBody(body: Record<string, unknown>) {
         (value) => ['1', '3', '5', '7', '14', '30'].includes(value),
         'Duration is invalid',
       ),
+    flashcardsNeeded: z
+      .number()
+      .min(1, 'Flashcards Needed is required')
+      .max(500, 'Max 500 flashcards'),
   });
   const validityCheck = checkValidity(body, validationScheme);
 
@@ -112,6 +116,40 @@ export async function POST(req: NextRequest) {
     advanced: 'Advanced knows (76-90%) of the material',
     expert: 'Expert knows (91-100%) of the material',
   } as const;
+  const recommendedFlashcardsCount = {
+    overview: {
+      '1': [10, 15],
+      '3': [30, 45],
+      '5': [50, 75],
+      '7': [70, 100],
+      '14': [140, 200],
+      '30': [300, 450],
+    },
+    'deep-dive': {
+      '1': [10, 15],
+      '3': [25, 35],
+      '5': [40, 60],
+      '7': [60, 80],
+      '14': [120, 160],
+      '30': [250, 350],
+    },
+    'quick-review': {
+      '1': [5, 10],
+      '3': [15, 25],
+      '5': [25, 40],
+      '7': [40, 60],
+      '14': [80, 120],
+      '30': [150, 250],
+    },
+    'exam-prep': {
+      '1': [15, 20],
+      '3': [40, 50],
+      '5': [60, 80],
+      '7': [80, 120],
+      '14': [160, 240],
+      '30': [350, 500],
+    },
+  } as const;
 
   const {
     focusTags,
@@ -119,16 +157,24 @@ export async function POST(req: NextRequest) {
     knowledgeLevel,
     planType,
     duration,
+    flashcardsNeeded,
   }: {
     focusTags: string[];
     studyScope: keyof typeof studyScopes;
     knowledgeLevel: keyof typeof knowledgeLevels;
     planType: keyof typeof planTypes;
     duration: string;
+    flashcardsNeeded: number;
   } = await req.json();
 
   try {
-    validateBody({ focusTags, studyScope, planType, duration });
+    validateBody({
+      focusTags,
+      studyScope,
+      planType,
+      duration,
+      flashcardsNeeded,
+    });
   } catch {
     console.error(
       '${routePath} Invalid request body from user [',
@@ -146,7 +192,7 @@ export async function POST(req: NextRequest) {
 
   const prompt = `Analyze the user's existing flashcards: User don't have available flashcards. You need to generate recommendations for him.
 
-Based on the tags: [${focusTags.join(',')}], the selected plan type ${planTypes[planType]}, and user knowledge of the subject (${knowledgeLevels[knowledgeLevel]}) suggest 10 new flashcard, adjusted to knowledge level topics and for each topic, provide:
+Based on the tags: [${focusTags.join(',')}], the selected plan type ${planTypes[planType]}, and user knowledge of the subject (${knowledgeLevels[knowledgeLevel]}) suggest ${flashcardsNeeded} new flashcards, adjusted to knowledge level topics and for each topic, provide:
 
 Short unique random identifier max 6 characters (id)
 
@@ -192,12 +238,12 @@ Output the suggestions in a JSON array format, where each object in the array re
     output: 'array',
     temperature: 0.5,
     schema: z.object({
-      id: z.string().min(1, 'required'),
-      topic: z.string().min(1, 'required'),
-      query: z.string().min(1, 'required'),
-      context: z.string().min(1, 'required'),
-      definition: z.string().min(1, 'required'),
-      tags: z.array(z.string()).min(1, 'required'),
+      id: z.string(),
+      topic: z.string(),
+      query: z.string(),
+      context: z.string(),
+      definition: z.string(),
+      tags: z.array(z.string()),
       examples: z.string(),
       keyPoints: z.string(),
       synonyms: z.string(),

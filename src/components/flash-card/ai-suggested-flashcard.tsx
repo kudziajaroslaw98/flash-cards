@@ -1,9 +1,9 @@
+import useLongPress from '#/hooks/use-long-press.hook';
 import { cn } from '#/shared/utils/cn.util';
 import type { Flashcard } from '#/types/flash-card.type';
-import { BadgeCheck, Check, X } from 'lucide-react';
+import { BadgeCheck } from 'lucide-react';
 import * as m from 'motion/react-m';
-import { useState } from 'react';
-import { Button } from '../_ui/button/button';
+import { useEffect, useState } from 'react';
 import Card from '../_ui/card/card';
 
 export type AISuggestedFlashcardType = Pick<
@@ -22,19 +22,52 @@ export type AISuggestedFlashcardType = Pick<
 interface AISuggestedFlashcardProps {
   flashcard: AISuggestedFlashcardType;
   isSelected?: boolean;
+  onSelect?: (flashcard: AISuggestedFlashcardType) => void;
+  isInSelectionMode?: boolean;
 }
 
 export function AISuggestedFlashcard({
   isSelected,
   flashcard,
+  onSelect,
+  isInSelectionMode,
   ...props
 }: Readonly<AISuggestedFlashcardProps>) {
   const [isFlipped, setIsFlipped] = useState(false);
 
+  const [onStart, onEnd, onMove] = useLongPress<AISuggestedFlashcardType>(
+    (flashcard) => {
+      window.umami.track('Flashcard long pressed');
+      if (onSelect) {
+        onSelect(flashcard);
+      }
+    },
+    () => {
+      window.umami.track('Flashcard short pressed');
+      if (isInSelectionMode) {
+        window.umami.track('Flashcard selected');
+        if (onSelect) {
+          onSelect(flashcard);
+        }
+      } else {
+        setIsFlipped((prev) => !prev);
+      }
+    },
+  );
+
+  useEffect(() => {
+    if (isInSelectionMode) {
+      setIsFlipped(false);
+    }
+  }, [isInSelectionMode]);
+
   return (
     <m.div
-      onClick={() => setIsFlipped(!isFlipped)}
-      className='flex flex-col items-center gap-4'
+      onMouseDown={(e) => onStart(e, flashcard)}
+      onMouseUp={onEnd}
+      onTouchStart={(e) => onStart(e, flashcard)}
+      onTouchEnd={onEnd}
+      onTouchMove={onMove}
     >
       <m.div
         animate={{
@@ -57,6 +90,7 @@ export function AISuggestedFlashcard({
             'group relative z-10 cursor-pointer flex-col items-center p-4 py-0 outline-none focus-visible:ring  focus-visible:ring-green-400/50',
             isSelected ? 'ring ring-green-400/60' : '',
             'h-56 w-44',
+            '!h-44 !w-36',
           ])}
           {...props}
         >
@@ -70,8 +104,8 @@ export function AISuggestedFlashcard({
                 {flashcard.type !== 'index' && (
                   <h5
                     className={cn([
-                      'z-20 flex h-20 w-full flex-col items-center justify-center hyphens-auto text-center',
-                      'text-xs',
+                      'absolute left-0 top-0 z-20 flex h-16 w-full flex-col items-center justify-start hyphens-auto px-2 pt-4 text-center',
+                      'text-[0.7rem] leading-4',
                     ])}
                   >
                     {flashcard.query}
@@ -81,8 +115,8 @@ export function AISuggestedFlashcard({
                 {flashcard.type !== 'question' && (
                   <h2
                     className={cn([
-                      'z-20 flex h-full w-full flex-col items-center hyphens-auto py-2 text-center text-green-400 ',
-                      'text-2xl',
+                      'z-20 flex h-full w-full flex-col items-center justify-center hyphens-auto py-2 text-center text-green-400 ',
+                      'text-lg leading-5',
                       flashcard.type === 'single' && 'pt-8',
                     ])}
                   >
@@ -97,7 +131,7 @@ export function AISuggestedFlashcard({
             <div
               className={cn([
                 'scrollbar-hidden relative z-20 flex h-full w-full flex-col overflow-y-auto hyphens-auto py-6 text-gray-500 dark:text-slate-400',
-                'text-xs',
+                'text-[.7rem]',
               ])}
             >
               <div className='sticky top-0 w-full'>
@@ -182,41 +216,8 @@ export function AISuggestedFlashcard({
               </div>
             </div>
           )}
-
-          <div className='absolute bottom-0 right-[50%] z-50 hidden translate-x-1/2 translate-y-4 gap-4 opacity-0 transition group-hover:-translate-y-4 group-hover:opacity-100 group-focus:-translate-y-4 group-focus:opacity-100 md:flex'>
-            <Button
-              icon={<Check className='size-4' />}
-              size={'icon-sm'}
-              alt='accept suggestion'
-              onClick={() => setIsFlipped(false)}
-            />
-
-            <Button
-              icon={<X className='size-4' />}
-              size={'icon-sm'}
-              alt='reject suggestion'
-              onClick={() => setIsFlipped(false)}
-              variant={'destructive'}
-            />
-          </div>
         </Card>
       </m.div>
-      <div className='flex gap-4 md:hidden'>
-        <Button
-          icon={<Check className='size-4' />}
-          size={'icon-sm'}
-          alt='accept suggestion'
-          onClick={() => setIsFlipped(false)}
-        />
-
-        <Button
-          icon={<X className='size-4' />}
-          size={'icon-sm'}
-          alt='reject suggestion'
-          onClick={() => setIsFlipped(false)}
-          variant={'destructive'}
-        />
-      </div>
     </m.div>
   );
 }
