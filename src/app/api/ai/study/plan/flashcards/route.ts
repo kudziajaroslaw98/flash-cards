@@ -2,11 +2,9 @@ import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { createClient } from '#/shared/utils/supabase/server';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { streamObject } from 'ai';
+import { createDataStreamResponse, Output, streamText } from 'ai';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
-
-export const maxDuration = 30;
 
 const routePath = '[ai/study/plan/flashcards]';
 
@@ -63,13 +61,15 @@ async function validateBody(body: Record<string, unknown>) {
   const validityCheck = checkValidity(body, validationScheme);
 
   if (!validityCheck.valid) {
-    throw new Error(validityCheck.error);
+    return new Error(
+      `Error: ${validityCheck.error}, message: ${validityCheck.details}`,
+    );
   }
 }
 
 const rateLimit = new RateLimit(1, 10, `${routePath}`);
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest, res: NextRequest) {
   const supabase = await createClient();
   const user = (await supabase.auth.getUser()).data.user;
 
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  console.log(`${routePath} User [', user.id, '] is generating flashcards`);
+  console.log(`${routePath} User [ ${user.id} ] is generating flashcards`);
 
   const studyScopes = {
     default: 'Focus on Core Concepts',
@@ -168,18 +168,24 @@ export async function POST(req: NextRequest) {
   } = await req.json();
 
   try {
-    validateBody({
+    const error = await validateBody({
       focusTags,
       studyScope,
       planType,
+      knowledgeLevel,
       duration,
       flashcardsNeeded,
     });
-  } catch {
+
+    if (error) {
+      throw error;
+    }
+  } catch (error) {
     console.error(
-      '${routePath} Invalid request body from user [',
+      `${routePath} Invalid request body from user [`,
       user.id,
-      ']',
+      '], error: ',
+      JSON.stringify(error),
     );
 
     return new Response(
@@ -190,66 +196,303 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const prompt = `Analyze the user's existing flashcards: User don't have available flashcards. You need to generate recommendations for him.
+  const prompt = (
+    flashcardCount: number,
+    summaries: { topic: string; query: string; context: string }[],
+  ) => `
+It is crucial that you generate a substantial list of flashcard suggestions, aiming for approximately ${flashcardCount} high-quality flashcards. The goal is to create a set of flashcards covering all key aspects of the tags [${focusTags.join(',')}], for a "${planTypes[planType]}" study plan and  knowledge of the subject (${knowledgeLevels[knowledgeLevel]}).
+Important: AVOID GENERATING DUPLICATE OR NEAR-DUPLICATE FLASHCARDS.
+What is considered a duplicate?** Flashcards that test the same core concept or idea, even if worded slightly differently, are considered duplicates.  Simply rephrasing a definition or question is NOT creating a new, unique flashcard.
+Example of what to AVOID (Duplicates):
+- Duplicates:
+  - Flashcard 1 Query: "Define Photosynthesis"
+  - Flashcard 2 Query: "What is the definition of Photosynthesis?"
+  - Flashcard 3 Query: "Explain the process of Photosynthesis"  (All these are testing the same core concept)
 
-Based on the tags: [${focusTags.join(',')}], the selected plan type ${planTypes[planType]}, and user knowledge of the subject (${knowledgeLevels[knowledgeLevel]}) suggest ${flashcardsNeeded} new flashcards, adjusted to knowledge level topics and for each topic, provide:
+Example of good non-duplicates: 
+- Non-Duplicates (Good):
+  - Flashcard 1 Query: "Define Photosynthesis"
+  - Flashcard 2 Query: "What are the reactants of Photosynthesis?" (Different aspect - inputs)
+  - Flashcard 3 Query: "What are the products of Photosynthesis?" (Different aspect - outputs)
+  - Flashcard 4 Query: "Where does Photosynthesis occur in plant cells?" (Different aspect - location)
+Analyze the user's existing flashcards to not duplicate them:
+[START OF PREVIOUS FLASHCARD SUMMARIES]
+  ${summaries.length > 0 ? JSON.stringify(summaries, null, 2) : 'No previous flashcard summaries provided (this is the first iteration).'}
+[END OF PREVIOUS FLASHCARD SUMMARIES]
 
-Short unique random identifier max 6 characters (id)
-
+Based on the previous suggestions, tags: [${focusTags.join(',')}], the selected plan type ${planTypes[planType]}, and user knowledge of the subject (${knowledgeLevels[knowledgeLevel]}) suggest ${flashcardCount} new flashcards, adjusted to knowledge level topics and for each topic, provide non-duplicate:
+Short unique random identifier max 10 characters (id)
 A concise and clear question or term for the front of the flashcard (query).
-
 A brief and accurate definition or explanation for the back of the flashcard (definition).
-
 A word/term used to give context of the flashcards (context).
-
 A 1-3 tags related to this flashcard (tags).
-
 optional Examples of use separated by semicolon (;) (examples).
-
 optional A key points of these flashcards separated by semicolon (;) (keyPoints).
-
 optional Synonyms to this flashcard [to context] separated by semicolon (;) (synonyms).
-
-optional Related facts to this flashcard separated by semicolon  (;) (relatedFacts).
-
+optional Related facts to this flashcard separated by semicolon (;) (relatedFacts).
 Decide if optional fields bring value to the overall flashcard. For example, synonyms are required when the flashcard is about definition etc. Adjust flashcards to users knowledge level, keep it consistent with tags: [${focusTags.join(',')}],and the selected plan type ${planTypes[planType]}.
-
-Output the suggestions in a JSON array format, where each object in the array represents a flashcard suggestion with "id", "topic", "query","context", "examples","keyPoints","synonyms","relatedFacts", "definition",and "tags" fields. 
+Output the suggestions in a plain text JSON format, where each object represents a flashcard suggestion with "id", "topic", "query","context", "examples","keyPoints","synonyms","relatedFacts", "definition",and "tags" fields. 
       `;
 
   //   const openai = createOpenAI({
   //     apiKey: process.env.OPENAI_API_KEY,
   //   });
 
-  console.log(
-    `${new Date().toUTCString()}:[INFO]:Prompt used for ai:`,
-    prompt.replaceAll('\n', ' '),
-  );
+  // console.log(
+  //   `${new Date().toUTCString()}:[INFO]:Prompt used for ai:`,
+  //   prompt().replaceAll('\n', ' '),
+  // );
 
   const gemini = createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_AI_API_KEY,
   });
 
-  const result = streamObject({
-    model: gemini('gemini-2.0-flash-001'),
-    system:
-      "You are an expert flashcard content generator. Your task is to suggest new flashcard topics and content to fill gaps in a user's learning material.  Focus on creating concise and informative flashcards.",
-    prompt: prompt,
-    output: 'array',
-    temperature: 0.5,
-    schema: z.object({
-      id: z.string(),
-      topic: z.string(),
-      query: z.string(),
-      context: z.string(),
-      definition: z.string(),
-      tags: z.array(z.string()),
-      examples: z.string(),
-      keyPoints: z.string(),
-      synonyms: z.string(),
-      relatedFacts: z.string(),
-    }),
-  });
+  // const result = streamObject({
+  //   model: gemini('gemini-2.0-flash-001'),
+  //   system:
+  //     "You are an expert flashcard content generator. Your task is to suggest new flashcard topics and content to fill gaps in a user's learning material.  Focus on creating concise and informative flashcards.",
+  //   prompt: prompt.replaceAll('\n', ' ').trim(),
+  //   output: 'array',
+  //   temperature: 0.5,
+  //   schema: z.object({
+  //     id: z.string(),
+  //     topic: z.string(),
+  //     query: z.string(),
+  //     context: z.string(),
+  //     definition: z.string(),
+  //     tags: z.array(z.string()),
+  //     examples: z.string(),
+  //     keyPoints: z.string(),
+  //     synonyms: z.string(),
+  //     relatedFacts: z.string(),
+  //   }),
+  // });
 
-  return result.toTextStreamResponse();
+  // return result.toTextStreamResponse();
+  const batchSize = 40;
+
+  return createDataStreamResponse({
+    status: 200,
+    statusText: 'OK',
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+    },
+    async execute(dataStream) {
+      // const firstPrompt = `Analyze the user's existing flashcards: User don't have available flashcards. You need to generate recommendations for him.
+      // Based on the tags: [${focusTags.join(',')}], the selected plan type ${planTypes[planType]}, and user knowledge of the subject (${knowledgeLevels[knowledgeLevel]}) suggest ${batchCount} new flashcards, adjusted to knowledge level topics and for each topic, provide:
+      // ${prompt}
+      // Output the suggestions in a JSON array format, where each object in the array represents a flashcard suggestion with "id", "topic", "query","context", "examples","keyPoints","synonyms","relatedFacts", "definition",and "tags" fields.`;
+      //       const otherPrompt = `Analyze the user's existing flashcards: User don't have available flashcards. You need to generate recommendations for him.
+      // Based on the tags: [${focusTags.join(',')}], the selected plan type ${planTypes[planType]}, and user knowledge of the subject (${knowledgeLevels[knowledgeLevel]}) suggest ${batchCount} new flashcards, adjusted to knowledge level topics and for each topic, provide:
+      // ${prompt}
+      // Output the suggestions in a JSON format, where each object represents a flashcard suggestion with "id", "topic", "query","context", "examples","keyPoints","synonyms","relatedFacts", "definition",and "tags" fields.`;
+      // // Write data
+      // dataStream.writeData({ value: 'Hello' });
+
+      // // Write annotation
+      // dataStream.writeMessageAnnotation({
+      //   type: 'status',
+      //   value: 'processing',
+      // });
+
+      // Merge another stream
+      // const otherStream = getAnotherStream();
+
+      // for (let i = 0; i < batchCount; i++) {
+      // Merge another stream
+      // if (i === 0) {
+
+      const generateSeed = () => {
+        return Date.now();
+      };
+
+      let streamResult: string = await new Promise((resolve, reject) => {
+        const stream = streamText({
+          model: gemini('gemini-2.0-flash-001'),
+          prompt: prompt(batchSize, []).replaceAll('\n', ' ').trim(),
+          temperature: 0.7,
+          system:
+            "You are an expert flashcard content generator focused on creating UNIQUE and NON-REDUNDANT flashcards. Your primary goal is to expand the user's knowledge base with NEW and DISTINCT concepts related to the given topic.  Avoid generating flashcards that are semantically similar to concepts already covered. Prioritize novelty and comprehensive topic coverage.",
+          experimental_output: Output.object({
+            schema: z.array(
+              z.object({
+                id: z.string(),
+                topic: z.string(),
+                query: z.string(),
+                context: z.string(),
+                definition: z.string(),
+                tags: z.array(z.string()),
+                examples: z.string(),
+                keyPoints: z.string(),
+                synonyms: z.string(),
+                relatedFacts: z.string(),
+              }),
+            ),
+          }),
+          seed: generateSeed(),
+          onFinish: () => {
+            resolve(stream.text);
+          },
+          onError: () => {
+            reject(undefined);
+          },
+        });
+        stream.mergeIntoDataStream(dataStream);
+      });
+
+      let summaries = (
+        JSON.parse(streamResult) as {
+          id: string;
+          topic: string;
+          query: string;
+          context: string;
+          definition: string;
+          tags: string[];
+          examples: string;
+          keyPoints: string;
+          synonyms: string;
+          relatedFacts: string;
+        }[]
+      ).map((suggestion) => ({
+        topic: suggestion.topic,
+        query: suggestion.query,
+        context: suggestion.context,
+      }));
+
+      console.log(JSON.stringify(summaries));
+
+      streamResult = await new Promise((resolve, reject) => {
+        const stream = streamText({
+          model: gemini('gemini-2.0-flash-001'),
+          prompt: prompt(batchSize, summaries).replaceAll('\n', ' ').trim(),
+          system:
+            "You are an expert flashcard content generator focused on creating UNIQUE and NON-REDUNDANT flashcards. Your primary goal is to expand the user's knowledge base with NEW and DISTINCT concepts related to the given topic.  Avoid generating flashcards that are semantically similar to concepts already covered. Prioritize novelty and comprehensive topic coverage.",
+          temperature: 0.7,
+          experimental_output: Output.object({
+            schema: z.array(
+              z.object({
+                id: z.string(),
+                topic: z.string(),
+                query: z.string(),
+                context: z.string(),
+                definition: z.string(),
+                tags: z.array(z.string()),
+                examples: z.string(),
+                keyPoints: z.string(),
+                synonyms: z.string(),
+                relatedFacts: z.string(),
+              }),
+            ),
+          }),
+          seed: generateSeed(),
+          onFinish: () => {
+            resolve(stream.text);
+          },
+          onError: () => {
+            reject(undefined);
+          },
+        });
+        stream.mergeIntoDataStream(dataStream);
+      });
+
+      summaries = [
+        ...summaries,
+        ...(
+          JSON.parse(streamResult) as {
+            id: string;
+            topic: string;
+            query: string;
+            context: string;
+            definition: string;
+            tags: string[];
+            examples: string;
+            keyPoints: string;
+            synonyms: string;
+            relatedFacts: string;
+          }[]
+        ).map((suggestion) => ({
+          topic: suggestion.topic,
+          query: suggestion.query,
+          context: suggestion.context,
+        })),
+      ];
+
+      console.log(JSON.stringify(summaries));
+
+      streamResult = await new Promise((resolve, reject) => {
+        const stream = streamText({
+          model: gemini('gemini-2.0-flash-001'),
+          prompt: prompt(batchSize, summaries).replaceAll('\n', ' ').trim(),
+          system:
+            "You are an expert flashcard content generator focused on creating UNIQUE and NON-REDUNDANT flashcards. Your primary goal is to expand the user's knowledge base with NEW and DISTINCT concepts related to the given topic.  Avoid generating flashcards that are semantically similar to concepts already covered. Prioritize novelty and comprehensive topic coverage.",
+          temperature: 0.7,
+          experimental_output: Output.object({
+            schema: z.array(
+              z.object({
+                id: z.string(),
+                topic: z.string(),
+                query: z.string(),
+                context: z.string(),
+                definition: z.string(),
+                tags: z.array(z.string()),
+                examples: z.string(),
+                keyPoints: z.string(),
+                synonyms: z.string(),
+                relatedFacts: z.string(),
+              }),
+            ),
+          }),
+          seed: generateSeed(),
+          onFinish: () => {
+            resolve(stream.text);
+          },
+          onError: () => {
+            reject(undefined);
+          },
+        });
+        stream.mergeIntoDataStream(dataStream);
+      });
+      // }
+      // return textStream.toTextStreamResponse();
+      // const text2Stream = streamText({
+      //   model: gemini('gemini-2.0-flash-001'),
+      //   prompt: prompt.replaceAll('\n', ' ').trim(),
+      //   temperature: 0.5,
+      //   experimental_output: Output.object({
+      //     schema: z.array(
+      //       z.object({
+      //         id: z.string(),
+      //         topic: z.string(),
+      //         query: z.string(),
+      //         context: z.string(),
+      //         definition: z.string(),
+      //         tags: z.array(z.string()),
+      //         examples: z.string(),
+      //         keyPoints: z.string(),
+      //         synonyms: z.string(),
+      //         relatedFacts: z.string(),
+      //       }),
+      //     ),
+      //   }),
+      // });
+
+      // return textStream.toTextStreamResponse();
+      // text2Stream.pipeTextStreamToResponse(res);
+
+      // return res;
+      // text2Stream.mergeIntoDataStream(dataStream);
+      // }
+      // else {
+      //   const textStream = streamText({
+      //     model: gemini('gemini-2.0-flash-001'),
+      //     prompt: otherPrompt.replaceAll('\n', ' ').trim(),
+      //     temperature: 0.5,
+      //   });
+
+      //   textStream.mergeIntoDataStream(dataStream);
+      // }
+      // }
+    },
+    onError: (error) => `Custom error: ${error.message}`,
+  });
 }

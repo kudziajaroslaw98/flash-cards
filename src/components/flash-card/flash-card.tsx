@@ -87,7 +87,7 @@ export default function FlashcardComponent({
           className={cn([
             'z-10 cursor-pointer flex-col items-center p-4 py-0 outline-none focus-visible:ring  focus-visible:ring-green-400/50',
             isSelected ? 'ring ring-green-400/60' : '',
-            size === 'sm' && 'h-56 w-44',
+            size === 'sm' && 'h-44 w-36',
             size === 'md' && 'h-56 w-44',
             size === 'lg' && 'h-72 w-64',
           ])}
@@ -110,7 +110,7 @@ export default function FlashcardComponent({
                   <h5
                     className={cn([
                       'z-20 flex h-20 w-full flex-col items-center justify-center hyphens-auto text-center',
-                      size === 'sm' && 'text-xs',
+                      size === 'sm' && 'text-[0.7rem] leading-4',
                       size === 'md' && 'text-xs',
                       size === 'lg' && 'text-sm',
                       flashcard.type === 'question' &&
@@ -125,7 +125,7 @@ export default function FlashcardComponent({
                   <h2
                     className={cn([
                       'z-20 flex h-full w-full flex-col items-center hyphens-auto py-2 text-center text-green-400 ',
-                      size === 'sm' && 'text-2xl',
+                      size === 'sm' && 'text-lg leading-5',
                       size === 'md' && 'text-2xl',
                       size === 'lg' && 'text-3xl',
                       flashcard.type === 'index' && 'justify-center',
@@ -143,7 +143,7 @@ export default function FlashcardComponent({
             <div
               className={cn([
                 'scrollbar-hidden relative z-20 flex h-full w-full flex-col overflow-y-auto hyphens-auto py-6 text-gray-500 dark:text-slate-400',
-                size === 'sm' && 'text-xs',
+                size === 'sm' && 'text-[.7rem]',
                 size === 'md' && 'text-xs',
                 size === 'lg' && 'text-sm',
               ])}

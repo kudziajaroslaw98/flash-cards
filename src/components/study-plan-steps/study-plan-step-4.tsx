@@ -125,7 +125,7 @@ export function StudyPlanStep4({
           </div>
 
           {suggestions.length > 0 && (
-            <FloatingButtons className='flex-row gap-2'>
+            <FloatingButtons className='w-full !px-1 py-4'>
               <AnimatePresence mode='popLayout'>
                 {selectedSuggestions.length > 0 ? (
                   <m.div
@@ -133,7 +133,7 @@ export function StudyPlanStep4({
                     exit={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     initial={{ y: -10, opacity: 0 }}
-                    className='flex gap-2'
+                    className='flex w-full justify-center gap-2'
                   >
                     <Button
                       icon={<Check className='size-4' />}
@@ -166,14 +166,14 @@ export function StudyPlanStep4({
                     exit={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     initial={{ y: -10, opacity: 0 }}
-                    className='flex gap-2'
+                    className='flex w-full justify-center gap-4'
                   >
                     <Button
                       icon={<CheckCheck className='size-4' />}
                       alt='accept suggestion'
                       label='Accept All'
                       size={'sm'}
-                      className='flex-1'
+                      className='w-1/2'
                       onClick={acceptAllSuggestions}
                       disabled={isLoading}
                     />
@@ -184,7 +184,7 @@ export function StudyPlanStep4({
                       label='Reject All'
                       variant={'destructive'}
                       size='sm'
-                      className='flex-1'
+                      className='w-1/2'
                       onClick={rejectAllSuggestions}
                       disabled={isLoading}
                     />

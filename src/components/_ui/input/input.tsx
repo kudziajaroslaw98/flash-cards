@@ -7,6 +7,7 @@ export type InputValidation =
   | {
       valid: false;
       error: string;
+      details?: string;
     }
   | {
       valid: true;

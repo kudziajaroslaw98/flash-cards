@@ -13,11 +13,11 @@ import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import type { Flashcard } from '#/types/flash-card.type';
-import { experimental_useObject as useObject } from '@ai-sdk/react';
+import { useCompletion } from '@ai-sdk/react';
 import { useCallback, useEffect, useState } from 'react';
-import { z } from 'zod';
 
 export default function StudyPlanPage() {
+  const [isLoading, setIsLoading] = useState(false);
   const [state, setState] = useState({
     step1: {
       focusTags: [],
@@ -93,7 +93,42 @@ export default function StudyPlanPage() {
   };
 
   const generateSuggestions = () => {
-    submit({
+    setIsLoading(true);
+    complete('prompt');
+    // submit({
+    //   focusTags: state.step1.focusTags,
+    //   studyScope: state.step1.studyScope,
+    //   knowledgeLevel: state.step1.knowledgeLevel,
+    //   planType: state.step2.planType,
+    //   duration: state.step2.duration,
+    //   flashcardsNeeded:
+    //     getRecomendedFlashcardCount(
+    //       state.step2
+    //         .duration as keyof (typeof recommendedFlashcardsCount)[keyof typeof recommendedFlashcardsCount],
+    //       state.step2.planType as keyof typeof recommendedFlashcardsCount,
+    //     )?.[1] ?? flashcards.length - flashcards.length,
+    // });
+  };
+  // const { object, submit, isLoading } = useObject({
+  //   api: API_ROUTES.GENERATE_SUGGESTED_FLASHCARDS,
+  //   schema: z.array(
+  //     z.object({
+  //       id: z.string(),
+  //       topic: z.string(),
+  //       query: z.string(),
+  //       context: z.string(),
+  //       definition: z.string(),
+  //       tags: z.array(z.string()),
+  //       examples: z.string(),
+  //       keyPoints: z.string(),
+  //       synonyms: z.string(),
+  //       relatedFacts: z.string(),
+  //     }),
+  //   ),
+  // });
+  const { complete, completion } = useCompletion({
+    api: API_ROUTES.GENERATE_SUGGESTED_FLASHCARDS,
+    body: {
       focusTags: state.step1.focusTags,
       studyScope: state.step1.studyScope,
       knowledgeLevel: state.step1.knowledgeLevel,
@@ -105,38 +140,85 @@ export default function StudyPlanPage() {
             .duration as keyof (typeof recommendedFlashcardsCount)[keyof typeof recommendedFlashcardsCount],
           state.step2.planType as keyof typeof recommendedFlashcardsCount,
         )?.[1] ?? flashcards.length - flashcards.length,
-    });
-  };
-  const { object, submit, isLoading } = useObject({
-    api: API_ROUTES.GENERATE_SUGGESTED_FLASHCARDS,
-    schema: z.array(
-      z.object({
-        id: z.string(),
-        topic: z.string(),
-        query: z.string(),
-        context: z.string(),
-        definition: z.string(),
-        tags: z.array(z.string()),
-        examples: z.string(),
-        keyPoints: z.string(),
-        synonyms: z.string(),
-        relatedFacts: z.string(),
-      }),
-    ),
+    },
+    onFinish: () => {
+      setIsLoading(false);
+    },
   });
 
+  // function extractObjects(text: string): Record<string, unknown>[] | null {
+  //   const regex = '{(?:[^{}]|(?R))*}';
+  //   const matches = text.match(regex);
+
+  //   if (matches === null) {
+  //     return null;
+  //   }
+
+  //   const mappedJson = matches?.map((match) => {
+  //     console.log(match);
+  //     return JSON.parse(match);
+  //   });
+  //   return mappedJson as Record<string, unknown>[];
+  // }
+  function extractObjects(str: string): Record<string, unknown>[] | null {
+    console.log(str);
+    const objects = [];
+    let stack = [];
+    let startIndex = -1;
+
+    for (let i = 0; i < str.length; i++) {
+      if (str[i] === '{') {
+        if (stack.length === 0) startIndex = i;
+        stack.push(i);
+      } else if (str[i] === '}') {
+        stack.pop();
+        if (stack.length === 0 && startIndex !== -1) {
+          objects.push(str.slice(startIndex, i + 1));
+          startIndex = -1;
+        }
+      }
+    }
+
+    return objects?.map((match) => {
+      console.log(match);
+      return JSON.parse(match);
+    });
+  }
+
   useEffect(() => {
-    if (!object) return;
-    console.log(object);
+    const objects = extractObjects(completion);
+    const suggestionsLength = suggestions.length;
+
+    if (objects === null || suggestionsLength === objects?.length) {
+      return;
+    }
+
+    // const startIndex = suggestionsLength === 0 ? 0 : suggestionsLength - 1;
+    // const endIndex = objects.length - 1;
+
     setSuggestions(
-      object
-        ?.filter((flashcard) => flashcard)
-        ?.map((flashcard) => ({
-          type: 'single',
-          ...flashcard,
-        })) as AISuggestedFlashcardType[],
+      objects.map(
+        (element) =>
+          ({
+            ...element,
+            type: 'single',
+          }) as AISuggestedFlashcardType,
+      ),
     );
-  }, [object]);
+  }, [completion]);
+
+  // useEffect(() => {
+  //   if (!object) return;
+  //   console.log(object);
+  //   setSuggestions(
+  //     object
+  //       ?.filter((flashcard) => flashcard)
+  //       ?.map((flashcard) => ({
+  //         type: 'single',
+  //         ...flashcard,
+  //       })) as AISuggestedFlashcardType[],
+  //   );
+  // }, [object]);
 
   const [suggestedSelectionMode, setSuggestedSelectionMode] = useState(false);
 

@@ -115,6 +115,21 @@ export default function SidebarComponent() {
     },
     {
       type: 'group',
+      label: 'Study',
+      icon: <Zap className={`${groupIconSize}`} />,
+      visible: true,
+      items: [
+        {
+          type: 'item',
+          label: 'Plans',
+          href: APP_ROUTES.study.plans,
+          icon: <Layers className={iconSize} />,
+          indicator: setsLength,
+        },
+      ],
+    },
+    {
+      type: 'group',
       label: 'Account',
       icon: <UserRound className={`${groupIconSize}`} />,
       visible: isLoggedIn,

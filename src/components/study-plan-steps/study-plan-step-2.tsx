@@ -35,7 +35,6 @@ export function StudyPlanStep2({
     setIsValid(true);
     goToNext();
   };
-
   return (
     <div className='flex w-full flex-col items-start'>
       <h2 className='mb-4 text-2xl font-bold text-gray-700 dark:text-slate-400'>
@@ -116,7 +115,6 @@ export function StudyPlanStep2({
             emitFormValue={(value) =>
               setState((prev) => ({ ...prev, step2: value }))
             }
-            emitFormValid={(value) => setIsValid(value)}
             ref={formRef}
             initialValues={state?.step2}
           />
@@ -129,7 +127,6 @@ export function StudyPlanStep2({
               variant='secondary'
               icon={<ArrowRight className='size-4' />}
               iconPosition='right'
-              disabled={!isValid}
               size={'full'}
             />
           </div>

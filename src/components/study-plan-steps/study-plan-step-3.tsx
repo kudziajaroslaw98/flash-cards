@@ -175,7 +175,7 @@ export function StudyPlanStep3({
           className={cn([
             'grid h-auto w-full justify-center gap-4 transition-all',
             flashcards.length < 5 ? 'xl:justify-start' : 'xl:justify-center',
-            'grid-cols-[repeat(auto-fit,11rem)]',
+            'grid-cols-[repeat(auto-fit,9rem)]',
           ])}
         >
           <AnimatePresence mode='popLayout'>
@@ -189,7 +189,7 @@ export function StudyPlanStep3({
                 layout
               >
                 <FlashcardComponent
-                  size='md'
+                  size='sm'
                   key={flashcard?.frontUuid}
                   flashcard={flashcard}
                   isInSelectionMode={flashcardsSelectionMode}

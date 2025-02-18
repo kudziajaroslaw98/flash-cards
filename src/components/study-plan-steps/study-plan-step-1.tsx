@@ -174,7 +174,6 @@ export function StudyPlanStep1({
             emitFormValue={(value) =>
               setState((prev) => ({ ...prev, step1: value }))
             }
-            emitFormValid={(value) => setIsValid(value)}
             ref={formRef}
             initialValues={state?.step1}
           />
@@ -187,7 +186,6 @@ export function StudyPlanStep1({
               variant='secondary'
               icon={<ArrowRight className='size-4' />}
               iconPosition='right'
-              disabled={!isValid}
               size={'full'}
             />
           </div>
