@@ -115,7 +115,7 @@ export default function RootLayout({
       <head>
         <Script
           defer
-          src={`/xs.js`}
+          src={`/analytics.js`}
           data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID!}
           strategy='lazyOnload'
         />

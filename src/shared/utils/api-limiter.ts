@@ -1,3 +1,5 @@
+import { Logger } from '../helpers/logger/logger';
+
 const MIN_IN_MILLISECONDS = 60 * 1000;
 
 export class RateLimit {
@@ -37,7 +39,7 @@ export class RateLimit {
     if (
       this.requestsPerUserUuid.get(uuid)!.length >= this.maxRequestsPerWindow
     ) {
-      console.error(`${this.routePrefix} User [${uuid}] exceeded rate limit`);
+      Logger.error(`User [${uuid}] exceeded rate limit`, this.routePrefix);
       throw new Error('Rate limit exceeded');
     }
 

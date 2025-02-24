@@ -15,6 +15,9 @@ import type { FocusSession } from '#/types/focus-session.type';
 import type { Metadata } from '#/types/metadata.type';
 import type { Reminder } from '#/types/reminder.type';
 import type { ReviewLog } from '#/types/review-log.type';
+import type { StudyDay } from '#/types/study-day.type';
+import type { StudyPlan } from '#/types/study-plan.type';
+import type { StudySession } from '#/types/study-session.type';
 import Dexie from 'dexie';
 
 export class AppDB extends Dexie {
@@ -25,6 +28,9 @@ export class AppDB extends Dexie {
   dailyStats!: Dexie.Table<DailyStat, string>;
   reviewLogs!: Dexie.Table<ReviewLog, string>;
   reminders!: Dexie.Table<Reminder, string>;
+  studyPlans!: Dexie.Table<StudyPlan, string>;
+  studyDays!: Dexie.Table<StudyDay, string>;
+  studySessions!: Dexie.Table<StudySession, string>;
 
   constructor() {
     super('FlashcardDB');
@@ -41,13 +47,18 @@ export class AppDB extends Dexie {
           'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
         reminders:
           '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
+        studyPlans: '&id, synced, *focusTags, *days',
+        studySessions:
+          '&id, synced, *completedCards, currentDay, startDate, planId',
+        studyDays:
+          '&id, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
       })
       .upgrade((transaction) => {
         transaction
           .table('flashcards')
           .toCollection()
           .modify((card) => {
-            flashcardsMerge(defaultFlashcard, card);
+            flashcardsMerge(defaultFlashcard(), card);
           });
 
         transaction
@@ -76,13 +87,18 @@ export class AppDB extends Dexie {
           'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
         reminders:
           '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
+        studyPlans: '&id, synced, *focusTags, *days',
+        studySessions:
+          '&id, synced, *completedCards, currentDay, startDate, planId',
+        studyDays:
+          '&id, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
       })
       .upgrade((transaction) => {
         transaction
           .table('flashcards')
           .toCollection()
           .modify((card: Flashcard) => {
-            const x = flashcardsMerge(defaultFlashcard, {
+            const x = flashcardsMerge(defaultFlashcard(), {
               ...card,
               spacedRepetition: {
                 ...card.spacedRepetition,
@@ -111,6 +127,11 @@ export class AppDB extends Dexie {
         'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
       reminders:
         '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
+      studyPlans: '&id, synced, *focusTags, *days',
+      studySessions:
+        '&id, synced, *completedCards, currentDay, startDate, planId',
+      studyDays:
+        '&id, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
     });
 
     this.version(4).stores({
@@ -124,6 +145,11 @@ export class AppDB extends Dexie {
         'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
       reminders:
         '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
+      studyPlans: '&id, synced, *focusTags, *days',
+      studySessions:
+        '&id, synced, *completedCards, currentDay, startDate, planId',
+      studyDays:
+        '&id, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
     });
 
     this.version(5)
@@ -138,6 +164,11 @@ export class AppDB extends Dexie {
           'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
         reminders:
           '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
+        studyPlans: '&id, synced, *focusTags, *days',
+        studySessions:
+          '&id, synced, *completedCards, currentDay, startDate, planId',
+        studyDays:
+          '&id, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
       })
       .upgrade((transaction) => {
         transaction
@@ -198,6 +229,11 @@ export class AppDB extends Dexie {
           'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
         reminders:
           '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
+        studyPlans: '&id, synced, *focusTags, *days',
+        studySessions:
+          '&id, synced, *completedCards, currentDay, startDate, planId',
+        studyDays:
+          '&id, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
       })
       .upgrade((transaction) => {
         transaction
@@ -227,6 +263,11 @@ export class AppDB extends Dexie {
           'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
         reminders:
           '&frontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
+        studyPlans: '&id, synced, *focusTags, *days',
+        studySessions:
+          '&id, synced, *completedCards, currentDay, startDate, planId',
+        studyDays:
+          '&id, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
       })
       .upgrade((transaction) => {
         transaction
@@ -283,6 +324,36 @@ export class AppDB extends Dexie {
 
     this.reminders.hook('creating', (primKey, reminder) => {
       reminder.synced = reminder.synced === true;
+    });
+
+    this.studyPlans.hook('updating', (modifications: Partial<StudyPlan>) => {
+      modifications.updatedAt = new Date().toUTCString();
+      modifications.synced = false;
+    });
+
+    this.studyDays.hook('updating', (modifications: Partial<StudyDay>) => {
+      modifications.updatedAt = new Date().toUTCString();
+      modifications.synced = false;
+    });
+
+    this.studySessions.hook(
+      'updating',
+      (modifications: Partial<StudySession>) => {
+        modifications.updatedAt = new Date().toUTCString();
+        modifications.synced = false;
+      },
+    );
+
+    this.studyPlans.hook('creating', (primKey, plan) => {
+      plan.synced = plan.synced === true;
+    });
+
+    this.studyDays.hook('creating', (primKey, day) => {
+      day.synced = day.synced === true;
+    });
+
+    this.studySessions.hook('creating', (primKey, session) => {
+      session.synced = session.synced === true;
     });
   }
 }

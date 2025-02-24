@@ -25,7 +25,7 @@ export const flashcardsMerge = (
         flashcard?.spacedRepetition?.lastReviewAt ?? new Date().toUTCString(),
       dueDate:
         flashcard?.spacedRepetition?.dueDate ??
-        new Date(Date.now()).toUTCString(),
+        new Date(Date.now() + 1000 * 60 * 10).toUTCString(),
       reviews:
         flashcard?.spacedRepetition?.reviews ??
         defaultFlashcard.spacedRepetition.reviews,

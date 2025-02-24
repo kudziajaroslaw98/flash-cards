@@ -1,10 +1,12 @@
-import { createClient } from '#/shared/utils/supabase/server';
+import { Logger } from '#/shared/helpers/logger/logger';
 import { RateLimit } from '#/shared/utils/api-limiter';
+import { createClient } from '#/shared/utils/supabase/server';
 import { createOpenAI } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 
 export const maxDuration = 30;
-const rateLimit = new RateLimit(1, 10, '[ai/set/description/generate]');
+const routePath = 'ai/set/description/generate';
+const rateLimit = new RateLimit(1, 10, routePath);
 
 export async function POST(req: Request) {
   const supabase = await createClient();
@@ -12,13 +14,14 @@ export async function POST(req: Request) {
 
   try {
     if (user === null) {
-      console.error('[ai/set/description/generate] User not logged in');
+      Logger.error('User not logged in', routePath);
       throw new Error('User not logged in');
     }
 
     if (user.user_metadata?.stripe_subscription_status !== 'active') {
-      console.error(
-        `[ai/set/description/generate] User [${user.id}] is not subscribed to a paid plan`,
+      Logger.error(
+        ` User [${user.id}] is not subscribed to a paid plan`,
+        routePath,
       );
       throw new Error('User is not subscribed to a paid plan');
     }
@@ -33,11 +36,7 @@ export async function POST(req: Request) {
     );
   }
 
-  console.log(
-    '[ai/set/description/generate] User [',
-    user.id,
-    '] is generating',
-  );
+  Logger.info(`User [ ${user.id} ] is generating set description.`, routePath);
 
   const { prompt }: { prompt: string } = await req.json();
 
@@ -48,7 +47,7 @@ export async function POST(req: Request) {
   const result = streamText({
     model: openai('gpt-3.5-turbo-0125'),
     system:
-      'You are expert in english vocabulary, you are generating descriptiops for flashcard sets. You always give unique and fitting descriptions. Dont quote answer.',
+      'You are expert in english vocabulary, you are generating descriptions for flashcard sets. You always give unique and fitting descriptions. Dont quote answer.',
     prompt: prompt,
   });
 

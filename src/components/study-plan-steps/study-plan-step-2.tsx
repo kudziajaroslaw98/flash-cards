@@ -1,6 +1,10 @@
+import type { PlanSetupState } from '#/app/(pages)/study/plans/new/page';
+import { planDurationSchema } from '#/schemas/plan-durations.schema';
+import { planTypeSchema } from '#/schemas/plan-types.schema';
+import type { PlanDuration } from '#/types/plan-durations.type';
+import type { PlanType } from '#/types/plan-types.type';
 import { ArrowRight } from 'lucide-react';
 import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
-import { z } from 'zod';
 import { Button } from '../_ui/button/button';
 import type { FormMethods } from '../form-component/form';
 import FormComponent from '../form-component/form';
@@ -9,20 +13,16 @@ import { useStepper } from '../stepper/stepper-context';
 export function StudyPlanStep2({
   state,
   setState,
-  planTypes,
-  durations,
 }: {
-  state: any;
-  setState: Dispatch<SetStateAction<any>>;
-  planTypes: readonly ['overview', 'deep-dive', 'quick-review', 'exam-prep'];
-  durations: readonly ['1', '3', '5', '7', '14', '30'];
+  state: PlanSetupState;
+  setState: Dispatch<SetStateAction<PlanSetupState>>;
 }) {
   const [isValid, setIsValid] = useState(true);
   const { goToNext } = useStepper();
   const formRef = useRef<
     FormMethods<{
-      planType: 'overview' | 'deep-dive' | 'quick-revision' | 'exam-prep';
-      duration: 1 | 3 | 5 | 7 | 14 | 30;
+      planType: PlanType;
+      duration: PlanDuration;
     }>
   >(null);
 
@@ -49,8 +49,8 @@ export function StudyPlanStep2({
       <div className='flex w-full flex-col items-center justify-center py-12'>
         <div className='flex w-80 flex-col items-center justify-center gap-8'>
           <FormComponent<{
-            planType: 'overview' | 'deep-dive' | 'quick-revision' | 'exam-prep';
-            duration: 1 | 3 | 5 | 7 | 14 | 30;
+            planType: PlanType;
+            duration: PlanDuration;
           }>
             scheme={{
               inputs: {
@@ -62,7 +62,7 @@ export function StudyPlanStep2({
                       label: 'Comprehensive Overview',
                     },
                     { value: 'deep-dive', label: 'Deep Dive' },
-                    { value: 'quick-revision', label: 'Quick Revision' },
+                    { value: 'quick-review', label: 'Quick Revision' },
                     { value: 'exam-prep', label: 'Exam Preparation' },
                   ],
                   label: 'Study Plan Type',
@@ -72,13 +72,7 @@ export function StudyPlanStep2({
                     {
                       type: 'validation',
                       key: 'planType',
-                      constraint: z
-                        .string()
-                        .min(1, 'Plan type is required')
-                        .refine(
-                          (value) => planTypes.includes(value),
-                          'Plan type is required',
-                        ),
+                      constraint: planTypeSchema,
                     },
                   ],
                 },
@@ -99,13 +93,7 @@ export function StudyPlanStep2({
                     {
                       type: 'validation',
                       key: 'duration',
-                      constraint: z
-                        .string()
-                        .min(1, 'Duration is required')
-                        .refine(
-                          (value) => durations.includes(value),
-                          'Duration is required',
-                        ),
+                      constraint: planDurationSchema,
                     },
                   ],
                 },

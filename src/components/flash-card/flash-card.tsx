@@ -23,7 +23,7 @@ export default function FlashcardComponent({
   onSelect,
   isInSelectionMode,
   flipBlocked = false,
-  size = 'lg',
+  size = 'md',
   ...props
 }: Readonly<FlashcardProps>) {
   const [isFlipped, setIsFlipped] = useState(false);

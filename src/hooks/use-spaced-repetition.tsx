@@ -92,6 +92,8 @@ export default function useSpacedRepetition({
       }
     }
 
+    console.log('randomItems', randomItems);
+
     return randomItems.sort(
       (a, b) =>
         b.spacedRepetition.reversedWeight - a.spacedRepetition.reversedWeight,
@@ -271,6 +273,7 @@ export default function useSpacedRepetition({
     });
 
     setRandomItems(randomItems);
+    console.log(randomItems);
 
     return randomItems;
   };
@@ -280,6 +283,12 @@ export default function useSpacedRepetition({
       reroll();
     }
   }, [continueReroll]);
+
+  useEffect(() => {
+    if (array.length > 0) {
+      recalculateCulmulatives();
+    }
+  }, [array]);
 
   return {
     randomItems,

@@ -25,7 +25,7 @@ export default function FlashcardsList({
   const { flashcards } = useAppContext();
 
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
-  const [tileSize] = useState<'sm' | 'md' | 'lg'>('sm');
+  const [tileSize] = useState<'sm' | 'md' | 'lg'>('md');
 
   const isSelected = useCallback(
     (flashcard: Flashcard) => {

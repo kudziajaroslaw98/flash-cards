@@ -59,7 +59,7 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: `/xs.js`,
+        source: `/analytics.js`,
         destination: `${process.env.NEXT_PUBLIC_UMAMI_SRC}`,
       },
       {

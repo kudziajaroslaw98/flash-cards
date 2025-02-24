@@ -12,7 +12,9 @@ export const APP_ROUTES = {
     settings: '/account/settings',
   },
   study: {
-    plans: '/study/plan',
+    plans: '/study/plans',
+    newPlan: '/study/plans/new',
+    revise: '/study/revise',
   },
   pricing: '/pricing',
   signIn: '/sign-in',

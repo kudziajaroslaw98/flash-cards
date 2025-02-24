@@ -89,7 +89,7 @@ export const StepperProgress = () => {
                   animate={{ scale: 1, opacity: 1 }}
                 >
                   {/* @ts-expect-error prop required by component, always available */}
-                  {Children.only(step)?.props?.stepIdentificator}
+                  {Children.only(step)?.props?.stepIdentification}
                 </m.div>
               </Tooltip>
             </div>

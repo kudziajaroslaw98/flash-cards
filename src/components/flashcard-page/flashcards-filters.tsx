@@ -9,8 +9,10 @@ import Input from '../_ui/input/input';
 
 export default function FlashcardsFilters({
   setFilteredFlashcards,
+  setSelected,
 }: {
   setFilteredFlashcards: (flashcards: Flashcard[]) => void;
+  setSelected: (flashcards: Flashcard[]) => void;
 }) {
   const [searchedText, setSearchedText] = useState('');
   const [searchedSets, setSearchedSets] = useState<Array<string>>([]);
@@ -19,7 +21,7 @@ export default function FlashcardsFilters({
   const { flashcards, setsDictionary, flashcardTypeDictionaries } =
     useAppContext();
 
-  const handleFilterWithMultipleCryteria = useCallback(() => {
+  const handleFilterWithMultipleCriteria = useCallback(() => {
     const tmpFlashcards = flashcards
       .filter(
         (flashcard) =>
@@ -59,12 +61,27 @@ export default function FlashcardsFilters({
     setSearchedType(types);
   };
 
+  const handleSelectAll = () => {
+    setSelected(flashcards);
+  };
+
   useEffect(() => {
-    handleFilterWithMultipleCryteria();
+    handleFilterWithMultipleCriteria();
   }, [searchedText, searchedSets, searchedType, flashcards]);
 
   return (
     <div className='flex w-full flex-col flex-wrap items-center justify-center gap-2 text-sm sm:flex-row sm:justify-end'>
+      <span className='flex w-full justify-center sm:w-auto'>
+        <Input
+          type='checkbox'
+          valid={true}
+          for='selectAll'
+          className='size-10'
+          inputLabel='Select All'
+          onChange={handleSelectAll}
+        />
+      </span>
+
       <span className='flex w-full justify-center sm:w-auto'>
         <Input
           type='text'

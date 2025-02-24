@@ -1,36 +1,109 @@
+import { db } from '#/db/dexie.db';
+import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
+import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { cn } from '#/shared/utils/cn.util';
+import type { Flashcard } from '#/types/flash-card.type';
 import { ArrowRight, Check, CheckCheck, Eye, Pencil, X } from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import { Button } from '../_ui/button/button';
-import { AISuggestedFlashcard } from '../flash-card/ai-suggested-flashcard';
+import {
+  AISuggestedFlashcard,
+  type AISuggestedFlashcardType,
+} from '../flash-card/ai-suggested-flashcard';
 import { FloatingButtons } from '../floating-buttons/floating-buttons';
 import { useStepper } from '../stepper/stepper-context';
 
 export function StudyPlanStep4({
   isLoading,
   suggestions,
-  suggestedSelectionMode,
-  selectedSuggestions,
-  suggestedIsSelected,
-  toggleSuggestionSelected,
-  acceptSelectedSuggestions,
-  rejectSelectedSuggestions,
-  acceptAllSuggestions,
-  rejectAllSuggestions,
+  setSuggestions,
+  setFlashcards,
 }: {
   isLoading: boolean;
-  suggestions: any[];
-  suggestedSelectionMode: boolean;
-  selectedSuggestions: any[];
-  suggestedIsSelected: (flashcard: any) => boolean;
-  toggleSuggestionSelected: (flashcard: any) => void;
-  acceptSelectedSuggestions: () => void;
-  rejectSelectedSuggestions: () => void;
-  acceptAllSuggestions: () => void;
-  rejectAllSuggestions: () => void;
+  suggestions: AISuggestedFlashcardType[];
+  setFlashcards: Dispatch<SetStateAction<Flashcard[]>>;
+  setSuggestions: Dispatch<SetStateAction<AISuggestedFlashcardType[]>>;
 }) {
+  const [selectedSuggestions, setSelectedSuggestions] = useState<
+    AISuggestedFlashcardType[]
+  >([]);
+  const [suggestedSelectionMode, setSuggestedSelectionMode] = useState(false);
+
   const { goToNext, goToPrev } = useStepper();
+
+  const acceptSelectedSuggestions = useCallback(() => {
+    const mappedSuggestions = selectedSuggestions.map((suggestion) =>
+      flashcardsMerge(defaultFlashcard(), {
+        ...suggestion,
+        type: 'single',
+      }),
+    );
+    setFlashcards((prev) => [...prev, ...mappedSuggestions]);
+    setSuggestions((prev) => prev.filter((item) => !suggestedIsSelected(item)));
+    setSelectedSuggestions([]);
+
+    db.flashcards.bulkPut(mappedSuggestions);
+  }, [selectedSuggestions]);
+
+  const acceptAllSuggestions = useCallback(() => {
+    const mappedSuggestions = suggestions.map((suggestion) =>
+      flashcardsMerge(defaultFlashcard(), {
+        ...suggestion,
+        type: 'single',
+      }),
+    );
+    setFlashcards((prev) => [...prev, ...mappedSuggestions]);
+    setSuggestions([]);
+    setSelectedSuggestions([]);
+
+    db.flashcards.bulkPut(mappedSuggestions);
+  }, [suggestions]);
+
+  const suggestedIsSelected = useCallback(
+    (flashcard: AISuggestedFlashcardType) => {
+      return (
+        selectedSuggestions.findIndex((item) => item.id === flashcard.id) !== -1
+      );
+    },
+    [selectedSuggestions],
+  );
+
+  const toggleSuggestionSelected = useCallback(
+    (flashcard: AISuggestedFlashcardType) => {
+      if (suggestedIsSelected(flashcard)) {
+        setSelectedSuggestions((prev) =>
+          prev.filter((item) => flashcard.id !== item.id),
+        );
+      } else {
+        setSelectedSuggestions((prev) => [...prev, flashcard]);
+      }
+    },
+    [suggestedIsSelected],
+  );
+
+  const rejectAllSuggestions = () => {
+    setSuggestions([]);
+    setSelectedSuggestions([]);
+  };
+
+  const rejectSelectedSuggestions = () => {
+    setSuggestions((prev) =>
+      prev.filter(
+        (suggestion) =>
+          selectedSuggestions.findIndex((item) => item.id === suggestion.id) ===
+          -1,
+      ),
+    );
+    setSelectedSuggestions([]);
+  };
 
   const handleContinueClick = () => {
     goToNext();
@@ -38,6 +111,14 @@ export function StudyPlanStep4({
   const handleGoBack = () => {
     goToPrev();
   };
+
+  useEffect(() => {
+    if (selectedSuggestions.length > 0) {
+      setSuggestedSelectionMode(true);
+    } else {
+      setSuggestedSelectionMode(false);
+    }
+  }, [selectedSuggestions]);
 
   return (
     <div className='flex w-full flex-col items-start'>
@@ -100,7 +181,7 @@ export function StudyPlanStep4({
             className={cn([
               'grid h-auto w-full justify-center gap-4 transition-all',
               suggestions.length < 5 ? 'xl:justify-start' : 'xl:justify-center',
-              'grid-cols-[repeat(auto-fit,9rem)]',
+              'grid-cols-[repeat(auto-fit,11rem)]',
             ])}
           >
             <AnimatePresence mode='popLayout'>

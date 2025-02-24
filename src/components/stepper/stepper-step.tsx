@@ -6,13 +6,13 @@ type StepperStepProps = {
   children: React.ReactNode;
   index: number;
   stepLabel: string;
-  stepIdentificator: string;
+  stepIdentification: string;
 };
 export const StepperStep = ({ children, index }: StepperStepProps) => {
   const { currentStep } = useStepper();
   if (currentStep !== index) return null;
 
   return (
-    <div className='juctify-center flex w-full flex-col py-6'>{children}</div>
+    <div className='flex w-full flex-col justify-center py-6'>{children}</div>
   );
 };

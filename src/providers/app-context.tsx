@@ -59,6 +59,10 @@ export type AppContextType = {
   updateFlashcards: (flashcards: Partial<Flashcard>[]) => void;
   updateFlashcard: (flashcard: Partial<Flashcard>) => void;
   assignFlashcardsToSet: (flashcardUuids: string[], setUuid: string) => void;
+  unassignFlashcardsFromSet: (
+    flashcardUuids: string[],
+    setUuid: string,
+  ) => void;
   addSets: (set: Partial<FlashcardSet>[]) => void;
   removeSets: (set: FlashcardSet[]) => void;
   updateSet: (set: Partial<FlashcardSet>) => void;
@@ -85,6 +89,7 @@ export const AppContext = createContext<AppContextType>({
   updateFlashcards: () => null,
   updateFlashcard: () => null,
   assignFlashcardsToSet: () => null,
+  unassignFlashcardsFromSet: () => null,
   addSets: () => null,
   removeSets: () => null,
   updateSet: () => null,
@@ -113,7 +118,7 @@ export default function AppProvider(props: PropsWithChildren) {
 
   const [avatarSeed, setAvatarSeed] = useState<string>('');
   const flashcardsArray =
-    useLiveQuery(() => db.flashcards.toCollection().sortBy('order')) ?? [];
+    useLiveQuery(() => db.flashcards.toCollection().sortBy('createdAt')) ?? [];
   const setsArray = useLiveQuery(() => db.sets.toArray()) ?? [];
   const remindersArray =
     useLiveQuery(() => db.reminders.toCollection().sortBy('createdAt')) ?? [];
@@ -179,7 +184,7 @@ export default function AppProvider(props: PropsWithChildren) {
   const addFlashcards = async (flashcards: Partial<Flashcard>[]) => {
     const mappedFlashcards: Flashcard[] = flashcards.map((flashcard, index) => {
       const flashcardUuid = flashcard.frontUuid ?? uuid();
-      return flashcardsMerge(defaultFlashcard, {
+      return flashcardsMerge(defaultFlashcard(), {
         ...flashcard,
         frontUuid: flashcardUuid,
         order: flashcardsArray.length + index,
@@ -231,7 +236,7 @@ export default function AppProvider(props: PropsWithChildren) {
 
   const updateFlashcards = async (flashcards: Partial<Flashcard>[]) => {
     const mappedFlashcards: Flashcard[] = flashcards.map((flashcard) =>
-      flashcardsMerge(defaultFlashcard, flashcard),
+      flashcardsMerge(defaultFlashcard(), flashcard),
     );
 
     db.flashcards.bulkPut(mappedFlashcards);
@@ -283,6 +288,32 @@ export default function AppProvider(props: PropsWithChildren) {
       flashcards.map((flashcard) => ({
         ...flashcard,
         sets: [...(flashcard?.sets ?? []), setUuid],
+      })) as Flashcard[],
+    );
+  };
+
+  const unassignFlashcardsFromSet = async (
+    flashcardUuids: string[],
+    setUuid: string,
+  ) => {
+    const set = await db.sets.get(setUuid);
+    const flashcards = await db.flashcards.bulkGet(flashcardUuids);
+
+    if (!set) {
+      console.warn('Set not found');
+      return;
+    }
+
+    await db.sets.update(setUuid, {
+      flashcards: set.flashcards.filter(
+        (flashcard) => !flashcardUuids.includes(flashcard),
+      ),
+    });
+
+    await db.flashcards.bulkPut(
+      flashcards.map((flashcard) => ({
+        ...flashcard,
+        sets: [...(flashcard?.sets ?? [])].filter((set) => set !== setUuid),
       })) as Flashcard[],
     );
   };
@@ -706,6 +737,7 @@ export default function AppProvider(props: PropsWithChildren) {
         updateFlashcards: updateFlashcards,
         updateFlashcard: updateFlashcard,
         assignFlashcardsToSet: assignFlashcardsToSet,
+        unassignFlashcardsFromSet: unassignFlashcardsFromSet,
         addSets,
         removeSets,
         updateSets,

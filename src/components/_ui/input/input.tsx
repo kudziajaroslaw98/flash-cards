@@ -1,7 +1,11 @@
 'use client';
 
 import { cn } from '#/shared/utils/cn.util';
-import type { HTMLInputTypeAttribute, InputHTMLAttributes } from 'react';
+import {
+  useRef,
+  type HTMLInputTypeAttribute,
+  type InputHTMLAttributes,
+} from 'react';
 
 export type InputValidation =
   | {
@@ -30,6 +34,8 @@ export interface InputComponentProps
   > {
   type: HTMLInputTypeAttribute;
   label?: string;
+  inputLabel?: string;
+  input?: string;
   for?: string;
   valid: boolean;
   error?: string | null;
@@ -42,6 +48,7 @@ function Input({
   for: forProp,
   valid,
   label,
+  inputLabel,
   required,
   touched = false,
   error = null,
@@ -50,6 +57,7 @@ function Input({
   icon,
   ...props
 }: InputComponentProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     window.umami.track('Focus input', { name: props.name });
     if (props.onFocus) props.onFocus(e);
@@ -60,10 +68,19 @@ function Input({
     if (props.onBlur) props.onBlur(e);
   };
 
+  const handleClick = () => {
+    window.umami.track('Click input', { name: props.name });
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.click();
+    }
+  };
+
   return (
     <label
       className={`group relative flex w-full max-w-md flex-col ${label ? 'pt-2' : ''} ${className ?? ''}`}
       htmlFor={forProp}
+      onClick={handleClick}
     >
       {label && (
         <span
@@ -94,6 +111,7 @@ function Input({
 
         <input
           {...props}
+          ref={inputRef}
           type={type}
           tabIndex={props.tabIndex ?? 0}
           className={cn([
@@ -107,6 +125,12 @@ function Input({
           onBlur={handleBlur}
           aria-invalid={touched && !valid ? 'true' : 'false'}
         />
+
+        {inputLabel && (
+          <span className='pointer-events-none flex w-full text-nowrap text-gray-500 dark:text-gray-500'>
+            {inputLabel}
+          </span>
+        )}
       </span>
 
       <span

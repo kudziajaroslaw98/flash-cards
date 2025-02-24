@@ -11,6 +11,7 @@ import type { NavigationAction } from '#/types/navigation-action.type';
 import type { NavigationGroup } from '#/types/navigation-group.type';
 import {
   ArrowUp,
+  BookA,
   BookOpenText,
   Clock,
   GraduationCap,
@@ -75,7 +76,7 @@ export default function HamburgerMenuComponent() {
         },
         {
           type: 'item',
-          label: 'Learn',
+          label: 'Flashcards',
           href: APP_ROUTES.flashcards.learn,
           icon: <GraduationCap className={iconSize} />,
         },
@@ -91,6 +92,26 @@ export default function HamburgerMenuComponent() {
           href: APP_ROUTES.flashcards.reminders,
           icon: <Clock className={iconSize} />,
           visible: isLoggedIn,
+        },
+      ],
+    },
+    {
+      type: 'group',
+      label: 'Study',
+      visible: true,
+      items: [
+        {
+          type: 'item',
+          label: 'Plans',
+          href: APP_ROUTES.study.plans,
+          icon: <BookA className={iconSize} />,
+        },
+        {
+          type: 'item',
+          label: 'Revise plan',
+          href: APP_ROUTES.study.revise,
+          icon: <Languages className={iconSize} />,
+          indicator: 'new',
         },
       ],
     },

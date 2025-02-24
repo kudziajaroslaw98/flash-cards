@@ -4,19 +4,19 @@ import uuid from '../utils/uuid.util';
 import { defaultFlashcard } from './default-flashcard';
 
 export const FLASHCARDS_DB_DEFAULT: Flashcard[] = [
-  flashcardsMerge(defaultFlashcard, {
+  flashcardsMerge(defaultFlashcard(), {
     type: 'index' as const,
     frontUuid: uuid(),
     context: 'Lazy',
     order: 1,
   }),
-  flashcardsMerge(defaultFlashcard, {
+  flashcardsMerge(defaultFlashcard(), {
     type: 'index' as const,
     frontUuid: uuid(),
     context: 'Bright',
     order: 2,
   }),
-  flashcardsMerge(defaultFlashcard, {
+  flashcardsMerge(defaultFlashcard(), {
     type: 'single' as const,
     frontUuid: uuid(),
     query: "What's the meaning of word below?",
@@ -33,7 +33,7 @@ export const FLASHCARDS_DB_DEFAULT: Flashcard[] = [
     relatedFacts:
       'The word "quick" originates from Old English "cwic," meaning alive or moving; Often used in idioms like "quick as a flash."',
   }),
-  flashcardsMerge(defaultFlashcard, {
+  flashcardsMerge(defaultFlashcard(), {
     type: 'single' as const,
     frontUuid: uuid(),
     query: "What's the meaning of word below?",
@@ -50,39 +50,39 @@ export const FLASHCARDS_DB_DEFAULT: Flashcard[] = [
     relatedFacts:
       'The word "happy" has roots in Middle English, derived from "hap," meaning luck or fortune; Commonly used in phrases like "happy-go-lucky" or "happy ending."',
   }),
-  flashcardsMerge(defaultFlashcard, {
+  flashcardsMerge(defaultFlashcard(), {
     type: 'question' as const,
     frontUuid: uuid(),
     query: "What's the meaning of word below?",
     definition: 'Not hard or firm to the touch.',
     order: 5,
   }),
-  flashcardsMerge(defaultFlashcard, {
+  flashcardsMerge(defaultFlashcard(), {
     type: 'question' as const,
     frontUuid: uuid(),
     query: "What's the meaning of word below?",
     definition: 'Tidy and organized.',
     order: 6,
   }),
-  flashcardsMerge(defaultFlashcard, {
+  flashcardsMerge(defaultFlashcard(), {
     type: 'index' as const,
     frontUuid: uuid(),
     context: 'Kind',
     order: 7,
   }),
-  flashcardsMerge(defaultFlashcard, {
+  flashcardsMerge(defaultFlashcard(), {
     type: 'index' as const,
     frontUuid: uuid(),
     context: 'Quickly',
     order: 8,
   }),
-  flashcardsMerge(defaultFlashcard, {
+  flashcardsMerge(defaultFlashcard(), {
     type: 'index' as const,
     frontUuid: uuid(),
     context: 'Cold',
     order: 9,
   }),
-  flashcardsMerge(defaultFlashcard, {
+  flashcardsMerge(defaultFlashcard(), {
     type: 'index' as const,
     frontUuid: uuid(),
     context: 'Funny',

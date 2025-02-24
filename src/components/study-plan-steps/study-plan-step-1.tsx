@@ -1,7 +1,12 @@
 'use client';
 
+import type { PlanSetupState } from '#/app/(pages)/study/plans/new/page';
+import { knowledgeLevelSchema } from '#/schemas/knowledge-level.schema';
+import { planStudyScopeSchema } from '#/schemas/plan-study-scope.schema';
+import type { KnowledgeLevel } from '#/types/knowledge-level.type';
+import type { PlanStudyScope } from '#/types/plan-study-scope.type';
 import { ArrowRight } from 'lucide-react';
-import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import { useRef, type Dispatch, type SetStateAction } from 'react';
 import { z } from 'zod';
 import { Button } from '../_ui/button/button';
 import FormComponent, { type FormMethods } from '../form-component/form';
@@ -11,32 +16,23 @@ export function StudyPlanStep1({
   state,
   setState,
 }: {
-  state: any;
-  setState: Dispatch<SetStateAction<any>>;
+  state: PlanSetupState;
+  setState: Dispatch<SetStateAction<PlanSetupState>>;
 }) {
-  const [isValid, setIsValid] = useState(true);
   const { goToNext } = useStepper();
   const formRef = useRef<
     FormMethods<{
       focusTags: string[];
-      studyScope: 'default' | 'comprehensive' | 'specific';
-      knowledgeLevel:
-        | 'unfamiliar'
-        | 'beginner'
-        | 'developing'
-        | 'proficient'
-        | 'advanced'
-        | 'expert';
+      studyScope: PlanStudyScope;
+      knowledgeLevel: KnowledgeLevel;
     }>
   >(null);
 
   const handleOnClick = async () => {
     await formRef.current?.checkValidity();
     if (!formRef.current?.isValid()) {
-      setIsValid(false);
       return;
     }
-    setIsValid(true);
     goToNext();
   };
 
@@ -55,14 +51,8 @@ export function StudyPlanStep1({
         <div className='flex w-80 flex-col items-center justify-center gap-8'>
           <FormComponent<{
             focusTags: string[];
-            studyScope: 'default' | 'comprehensive' | 'specific';
-            knowledgeLevel:
-              | 'unfamiliar'
-              | 'beginner'
-              | 'developing'
-              | 'proficient'
-              | 'advanced'
-              | 'expert';
+            studyScope: PlanStudyScope;
+            knowledgeLevel: KnowledgeLevel;
           }>
             scheme={{
               inputs: {
@@ -81,35 +71,6 @@ export function StudyPlanStep1({
                     { value: 'Fundamentals', label: 'Fundamentals' },
                     { value: 'Anatomy', label: 'Anatomy' },
                     { value: 'Human', label: 'Human' },
-                    { value: 'Statystyka', label: 'Statystyka' },
-                    {
-                      value: 'Logistyka dystrybucji',
-                      label: 'Logistyka dystrybucji',
-                    },
-                    {
-                      value: 'Metody zarządzania jakością',
-                      label: 'Metody zarządzania jakością',
-                    },
-                    {
-                      value: 'Gospodarka Magazynowa',
-                      label: 'Gospodarka Magazynowa',
-                    },
-                    {
-                      value: 'linq',
-                      label: 'linq',
-                    },
-                    {
-                      value: 'entity framework',
-                      label: 'entity framework',
-                    },
-                    {
-                      value: 'ado.net',
-                      label: 'ado.net',
-                    },
-                    {
-                      value: 'orm',
-                      label: 'orm',
-                    },
                   ],
                   multiple: true,
                   multipleLabel: 'Tags',
@@ -145,9 +106,7 @@ export function StudyPlanStep1({
                     {
                       type: 'validation',
                       key: 'knowledgeLevel',
-                      constraint: z
-                        .string()
-                        .min(1, 'Knowledge Level is required'),
+                      constraint: knowledgeLevelSchema,
                     },
                   ],
                 },
@@ -167,6 +126,13 @@ export function StudyPlanStep1({
                     },
                   ],
                   _internal_default_value: 'default',
+                  _internal_constraints: [
+                    {
+                      type: 'validation',
+                      key: 'studyScope',
+                      constraint: planStudyScopeSchema,
+                    },
+                  ],
                 },
               },
             }}

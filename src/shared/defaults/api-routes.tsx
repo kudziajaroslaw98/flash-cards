@@ -8,4 +8,5 @@ export const API_ROUTES = {
   SET_DESCRIPTION: '/api/ai/set/description/generate',
   SET_FLASHCARDS: '/api/ai/set/flashcards/generate',
   GENERATE_SUGGESTED_FLASHCARDS: '/api/ai/study/plan/flashcards',
+  GENERATE_PLAN: '/api/ai/study/plan',
 } as const;

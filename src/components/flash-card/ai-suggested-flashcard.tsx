@@ -89,8 +89,8 @@ export function AISuggestedFlashcard({
           className={cn([
             'group relative z-10 cursor-pointer flex-col items-center p-4 py-0 outline-none focus-visible:ring  focus-visible:ring-green-400/50',
             isSelected ? 'ring ring-green-400/60' : '',
-            'h-56 w-44',
-            '!h-44 !w-36',
+            '!h-56 !w-44',
+            // '!h-44 !w-36',
           ])}
           {...props}
         >

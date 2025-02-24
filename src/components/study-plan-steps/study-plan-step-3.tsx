@@ -15,27 +15,20 @@ export function StudyPlanStep3({
   flashcards,
   suggestions,
   isLoading,
-  state,
   setFlashcards,
-  selectedFlashcards,
-  recommendedFlashcardsCount,
-  getRecomendedFlashcardCount,
-  setSelectedFlashcards,
+  flashcardCount,
   generateSuggestions,
 }: {
   flashcards: Flashcard[];
   suggestions: AISuggestedFlashcardType[];
   isLoading: boolean;
-  state: any;
-  selectedFlashcards: Flashcard[];
-  recommendedFlashcardsCount: any;
-  getRecomendedFlashcardCount: (duration: any, planType: any) => number[];
+  flashcardCount: [number, number];
   setFlashcards: React.Dispatch<React.SetStateAction<Flashcard[]>>;
-  setSelectedFlashcards: React.Dispatch<React.SetStateAction<Flashcard[]>>;
   generateSuggestions: () => void;
 }) {
   const { goToIndex } = useStepper();
   const [flashcardsSelectionMode, setFlashcardsSelectionMode] = useState(false);
+  const [selectedFlashcards, setSelectedFlashcards] = useState<Flashcard[]>([]);
 
   const rejectAllFlashcards = () => {
     setFlashcards([]);
@@ -106,11 +99,7 @@ export function StudyPlanStep3({
           </span>
           <span className='text-xs'>|</span>
           <span className='text-xs'>
-            Minimum-Recommended:{' '}
-            {getRecomendedFlashcardCount(
-              state?.step2?.duration,
-              state?.step2?.planType,
-            )?.join('-')}
+            Minimum-Recommended: {flashcardCount.join('-')}
           </span>
         </div>
 
@@ -141,15 +130,11 @@ export function StudyPlanStep3({
 
           {suggestions.length === 0 &&
             !isLoading &&
-            flashcards.length >
-              getRecomendedFlashcardCount(
-                state?.step2?.duration,
-                state?.step2?.planType,
-              )[0] && (
+            flashcards.length > flashcardCount[0] && (
               <div className='flex w-full flex-col items-center justify-center gap-4 py-8'>
                 <span className='max-w-sm text-center text-sm'>
-                  Alrighty, this is a list of your flashcards for this plan.
-                  Feel free to continue when you are done.
+                  Alright, this is a list of your flashcards for this plan. Feel
+                  free to continue when you are done.
                 </span>
 
                 <div className='flex w-full max-w-64 flex-col gap-4'>
@@ -203,11 +188,7 @@ export function StudyPlanStep3({
 
         {suggestions.length === 0 &&
           !isLoading &&
-          flashcards.length >
-            getRecomendedFlashcardCount(
-              state?.step2?.duration,
-              state?.step2?.planType,
-            )[0] && (
+          flashcards.length > flashcardCount[0] && (
             <div className='flex w-full flex-col items-center justify-center gap-4 py-8'>
               <span className='max-w-sm text-center text-sm'>
                 Don&apos; worry we got you, continue is also here for you
@@ -227,40 +208,35 @@ export function StudyPlanStep3({
             </div>
           )}
 
-        {flashcards.length > 0 &&
-          flashcards.length <
-            getRecomendedFlashcardCount(
-              state?.step2?.duration,
-              state?.step2?.planType,
-            )[0] && (
-            <FloatingButtons className='flex-row gap-2'>
-              {selectedFlashcards.length > 0 ? (
-                <>
-                  <Button
-                    icon={<X className='size-4' />}
-                    alt='reject suggestion'
-                    variant={'destructive'}
-                    size='icon-square'
-                    onClick={rejectSelectedFlashcards}
-                    disabled={isLoading}
-                  />
-                </>
-              ) : (
-                <>
-                  <Button
-                    icon={<X className='size-4' />}
-                    alt='reject suggestion'
-                    label='Reject All'
-                    variant={'destructive'}
-                    size='sm'
-                    className='w-1/2'
-                    onClick={rejectAllFlashcards}
-                    disabled={isLoading}
-                  />
-                </>
-              )}
-            </FloatingButtons>
-          )}
+        {flashcards.length > 0 && flashcards.length < flashcardCount[0] && (
+          <FloatingButtons className='flex-row gap-2'>
+            {selectedFlashcards.length > 0 ? (
+              <>
+                <Button
+                  icon={<X className='size-4' />}
+                  alt='reject suggestion'
+                  variant={'destructive'}
+                  size='icon-square'
+                  onClick={rejectSelectedFlashcards}
+                  disabled={isLoading}
+                />
+              </>
+            ) : (
+              <>
+                <Button
+                  icon={<X className='size-4' />}
+                  alt='reject suggestion'
+                  label='Reject All'
+                  variant={'destructive'}
+                  size='sm'
+                  className='w-1/2'
+                  onClick={rejectAllFlashcards}
+                  disabled={isLoading}
+                />
+              </>
+            )}
+          </FloatingButtons>
+        )}
       </div>
     </div>
   );

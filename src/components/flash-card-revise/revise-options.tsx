@@ -53,7 +53,7 @@ export function ReviseOptions({
   }, [randomItems]);
 
   return (
-    <div className='mt-8 grid w-full grid-cols-[repeat(1,1fr)] items-center justify-items-center gap-2 lg:w-auto lg:grid-cols-[repeat(2,minmax(20rem,1fr))]'>
+    <div className='mt-8 grid w-full grid-cols-[repeat(1,1fr)] items-stretch justify-items-center gap-2 lg:w-auto lg:grid-cols-[repeat(2,minmax(20rem,1fr))]'>
       {(revisedCard?.type === 'index' || revisedCard?.type === 'question') && (
         <>
           {spaceRepetitionOptions.map((option, index) => (

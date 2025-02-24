@@ -10,6 +10,7 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUp,
+  BookA,
   BookOpenText,
   Clock,
   GraduationCap,
@@ -20,8 +21,6 @@ import {
   LogOut,
   PlayCircle,
   Settings,
-  UserRound,
-  Zap,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -53,7 +52,6 @@ export default function SidebarComponent() {
   const name = user?.user_metadata?.name;
 
   const iconSize = expanded ? 'size-4' : 'size-5';
-  const groupIconSize = 'size-3';
 
   const navigation: (NavigationItem | NavigationGroup)[] = [
     {
@@ -80,7 +78,6 @@ export default function SidebarComponent() {
     {
       type: 'group',
       label: 'Flashcards',
-      icon: <Zap className={`${groupIconSize}`} />,
       visible: true,
       items: [
         {
@@ -92,7 +89,7 @@ export default function SidebarComponent() {
         },
         {
           type: 'item',
-          label: 'Learn',
+          label: 'Flashcards',
           href: APP_ROUTES.flashcards.learn,
           icon: <GraduationCap className={iconSize} />,
           indicator: flashcardsLength,
@@ -116,22 +113,26 @@ export default function SidebarComponent() {
     {
       type: 'group',
       label: 'Study',
-      icon: <Zap className={`${groupIconSize}`} />,
       visible: true,
       items: [
         {
           type: 'item',
           label: 'Plans',
           href: APP_ROUTES.study.plans,
-          icon: <Layers className={iconSize} />,
-          indicator: setsLength,
+          icon: <BookA className={iconSize} />,
+        },
+        {
+          type: 'item',
+          label: 'Revise plan',
+          href: APP_ROUTES.study.revise,
+          icon: <Languages className={iconSize} />,
+          indicator: 'new',
         },
       ],
     },
     {
       type: 'group',
       label: 'Account',
-      icon: <UserRound className={`${groupIconSize}`} />,
       visible: isLoggedIn,
       items: [
         {
@@ -145,7 +146,6 @@ export default function SidebarComponent() {
     {
       type: 'group',
       label: 'Premium',
-      icon: <UserRound className={`${groupIconSize}`} />,
       visible: true && !isPlanActive,
       items: [
         {

@@ -1,4 +1,6 @@
 export type StudyDay = {
+  id: string;
+  planId: string;
   dayNumber: number;
   objectives: string[];
   cardsToReview: string[]; // frontUuid of flashcards
@@ -7,4 +9,7 @@ export type StudyDay = {
     targetRetention: number;
     maxStudyTime: number; // minutes
   };
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  synced: boolean;
 };

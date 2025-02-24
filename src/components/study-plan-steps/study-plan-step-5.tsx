@@ -1,13 +1,258 @@
-export function StudyPlanStep5() {
+import { db } from '#/db/dexie.db';
+import { API_ROUTES } from '#/shared/defaults/api-routes';
+import { cn } from '#/shared/utils/cn.util';
+import uuid from '#/shared/utils/uuid.util';
+import type { Flashcard } from '#/types/flash-card.type';
+import { StudyDay } from '#/types/study-day.type';
+import type { StudyPlan } from '#/types/study-plan.type';
+import type { StudySession } from '#/types/study-session.type';
+import { experimental_useObject as useObject } from '@ai-sdk/react';
+import { Check, LoaderCircle } from 'lucide-react';
+import * as m from 'motion/react-m';
+import { useEffect, useRef, useState } from 'react';
+import { z } from 'zod';
+import { Button } from '../_ui/button/button';
+import FlashcardComponent from '../flash-card/flash-card';
+import { FloatingButtons } from '../floating-buttons/floating-buttons';
+
+export function StudyPlanStep5({
+  focusTags,
+  flashcards,
+  summaries,
+  planType,
+  duration,
+}: {
+  focusTags: string[];
+  flashcards: Flashcard[];
+  summaries: {
+    frontUuid: string;
+    context: string;
+    query: string;
+    definition: string;
+  }[];
+  planType: string;
+  duration: string;
+}) {
+  const [planDays, setPlanDays] = useState<StudyDay[]>([]);
+  const initialLoadReg = useRef<boolean>(false);
+  const { submit, isLoading, object } = useObject({
+    api: API_ROUTES.GENERATE_PLAN,
+    schema: z.array(
+      z.object({
+        dayNumber: z.number(),
+        objectives: z.array(z.string()),
+        cardsToReview: z
+          .array(z.string())
+          .describe('Array of flashcards frontUuids'),
+        newCards: z
+          .array(z.string())
+          .describe('Array of flashcards frontUuids'),
+        metrics: z.object({
+          targetRetention: z.number(),
+          maxStudyTime: z.number(),
+        }),
+      }),
+    ),
+  });
+
+  useEffect(() => {
+    if (summaries && planType && duration && initialLoadReg.current === false) {
+      initialLoadReg.current = true;
+      submit({
+        summaries,
+        planType,
+        duration,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!object) return;
+    setPlanDays(object?.filter((plan) => plan) as StudyDay[]);
+  }, [object]);
+
+  const handleAcceptPlan = () => {
+    const planId = uuid();
+    const sessionId = uuid();
+    const dateNow = new Date().toUTCString();
+
+    const studyPlan: StudyPlan = {
+      id: planId,
+      durationDays: parseInt(duration),
+      days: planDays,
+      focusTags: focusTags,
+      totalCards: flashcards.length,
+      createdAt: dateNow,
+      updatedAt: dateNow,
+      synced: false,
+    };
+
+    const session: StudySession = {
+      id: sessionId,
+      planId,
+      synced: false,
+      currentDay: 0,
+      startDate: new Date().toUTCString(),
+      completedCards: [],
+      createdAt: dateNow,
+      updatedAt: dateNow,
+    };
+
+    const studyPlanDays: StudyDay[] = planDays.map((day) => {
+      const id = uuid();
+
+      return {
+        id,
+        planId,
+        dayNumber: day.dayNumber,
+        objectives: day.objectives,
+        cardsToReview: day.cardsToReview,
+        newCards: day.newCards,
+        metrics: {
+          targetRetention: day.metrics.targetRetention,
+          maxStudyTime: day.metrics.maxStudyTime,
+        },
+        synced: false,
+        createdAt: dateNow,
+        updatedAt: dateNow,
+      };
+    });
+
+    db.studyPlans.add(studyPlan);
+    db.studySessions.add(session);
+    db.studyDays.bulkAdd(studyPlanDays);
+  };
+
   return (
     <div className='flex w-full flex-col items-start'>
-      <h2 className='mb-4 text-2xl font-bold text-gray-700 dark:text-slate-400'>
+      <h2 className='mb-4 w-full text-center text-2xl font-bold text-gray-700 dark:text-slate-400 md:text-left'>
         Get Your Personalized Study Plan
       </h2>
-      <p className='size-sm text-gray-500'>
+
+      <p className='size-sm w-full text-center text-gray-500 md:text-left'>
         Review Your Study Plan - Ready to Learn!
       </p>
-      {/* Your form fields here */}
+
+      {isLoading && (
+        <div className='flex w-full flex-col items-center justify-center gap-4'>
+          <LoaderCircle className='size-6 animate-spin' />
+          <span className='flex w-full animate-pulse justify-center py-4 text-center text-lg md:text-left'>
+            Generating personalized plan...
+          </span>
+        </div>
+      )}
+
+      {!isLoading && (
+        <div className='flex w-full flex-col items-center justify-center gap-4'>
+          <span className='flex w-full flex-col justify-center py-4 text-center text-lg'>
+            <span>Your personalized plan is ready.</span>
+
+            <span>
+              You can look at it below. Accept whenever you are ready.
+            </span>
+          </span>
+        </div>
+      )}
+
+      {planDays.map((day, index) => (
+        <m.div
+          key={`day-${index}`}
+          className='flex w-full flex-col gap-2 pt-8'
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <h4 className='text-xl text-green-400'>Day {day.dayNumber}</h4>
+
+          <div className='flex w-full flex-col gap-4'>
+            <div className='flex flex-col gap-2'>
+              <h5 className='text-lg text-gray-600'>Objectives</h5>
+
+              <ul className='flex list-disc flex-col gap-2 pl-4 text-sm'>
+                {day.objectives.map((objective, index) => (
+                  <li key={'objective-' + index}>{objective}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className='flex flex-col gap-2'>
+              <h5 className='text-lg text-gray-600'>Metrics</h5>
+
+              <ul className='flex list-disc flex-col gap-2 pl-4 text-sm'>
+                <li>Target Retention: {day.metrics.targetRetention}%</li>
+
+                <li>Max Study Time: {day.metrics.maxStudyTime} minutes</li>
+              </ul>
+            </div>
+
+            <div className='flex w-full flex-col gap-2'>
+              <h5 className='text-lg text-gray-600'>Assigned Cards</h5>
+
+              <div className='flex w-full flex-col gap-4'>
+                <div className='gap- flex flex-col gap-2'>
+                  <h6 className='text-base text-gray-500'>Review Cards</h6>
+
+                  <div
+                    className={cn([
+                      'grid h-auto w-full justify-center gap-4 transition-all',
+                      day.cardsToReview.length < 5
+                        ? 'xl:justify-start'
+                        : 'xl:justify-center',
+                      'grid-cols-[repeat(auto-fit,9rem)]',
+                    ])}
+                  >
+                    {flashcards
+                      .filter((card) =>
+                        day.cardsToReview.includes(card.frontUuid),
+                      )
+                      .map((card) => (
+                        <FlashcardComponent
+                          key={'review-card-' + card.frontUuid}
+                          flashcard={card}
+                          size='sm'
+                        />
+                      ))}
+                  </div>
+                </div>
+
+                <div className='flex flex-col gap-2'>
+                  <h6 className='text-base text-gray-500'>New Cards</h6>
+
+                  <div
+                    className={cn([
+                      'grid h-auto w-full justify-center gap-4 transition-all',
+                      day.newCards.length < 5
+                        ? 'xl:justify-start'
+                        : 'xl:justify-center',
+                      'grid-cols-[repeat(auto-fit,9rem)]',
+                    ])}
+                  >
+                    {flashcards
+                      .filter((card) => day.newCards.includes(card.frontUuid))
+                      .map((card) => (
+                        <FlashcardComponent
+                          key={'new-card-' + card.frontUuid}
+                          flashcard={card}
+                          size='sm'
+                        />
+                      ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </m.div>
+      ))}
+
+      <FloatingButtons>
+        <Button
+          alt='Accept Plan'
+          onClick={handleAcceptPlan}
+          label='Accept Plan'
+          icon={<Check className='size-4' />}
+          iconPosition='right'
+          disabled={isLoading}
+        />
+      </FloatingButtons>
     </div>
   );
 }

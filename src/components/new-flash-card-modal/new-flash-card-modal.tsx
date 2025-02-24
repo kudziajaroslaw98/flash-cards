@@ -44,7 +44,7 @@ export const NewFlashcardModal = ({
   });
 
   const getNewFlashcard: () => Omit<Flashcard, 'order'> = () =>
-    flashcardsMerge(defaultFlashcard, {
+    flashcardsMerge(defaultFlashcard(), {
       type: 'index' as const,
       frontUuid: uuid(),
     });
@@ -171,7 +171,7 @@ export const NewFlashcardModal = ({
     ) {
       setLoadingGenerate(true);
       await complete(
-        `generate ${formValue.type === 'question' ? 'answer' : 'description'} to: '${formValue.type === 'question' ? formValue.query : formValue.context}'`,
+        `generate ${formValue.type === 'question' ? 'answer' : 'description'} to: '${formValue.type === 'question' ? formValue.query : formValue.context}'; Do not repeat words from the prompt as this will break the flashcard.`,
       );
       setLoadingGenerate(false);
     }
