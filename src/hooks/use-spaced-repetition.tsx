@@ -23,6 +23,7 @@ export default function useSpacedRepetition({
   numberOfItems = 4,
 }: UseSpacedRepetitionProps) {
   const todayItemsRef = useRef<number | null>(null);
+  const workerRef = useRef<Worker | null>(null);
   const [randomItems, setRandomItems] = useState<Flashcard[] | null>(null);
   const [continueReroll, setContinueReroll] = useState(false);
   const todayItems = useMemo(
@@ -60,28 +61,31 @@ export default function useSpacedRepetition({
   }) {
     const MAX_RETRIES = 10;
 
+    const itemsCopy = [...items];
     const randomItems: Flashcard[] = [];
     const max = items[items.length - 1]?.spacedRepetition?.culmulativeWeight;
 
     let retries = 0;
 
     while (randomItems.length < numberOfItems && retries < MAX_RETRIES) {
-      if (items.length <= numberOfItems) {
-        return items;
+      if (itemsCopy.length <= numberOfItems) {
+        return itemsCopy;
       }
 
       const randomNumber = getRandomRangedNumber(0, max);
       const foundIndex = binarySearch(
-        items,
+        itemsCopy,
         'spacedRepetition.culmulativeWeight',
         randomNumber,
       );
 
       if (foundIndex >= 0) {
-        const item = items[foundIndex];
+        const item = itemsCopy[foundIndex];
 
         if (!randomItems.includes(item) && item) {
           randomItems.push(item);
+          itemsCopy.splice(foundIndex, 1);
+          retries = 0;
         } else {
           retries++;
           continue;
@@ -91,8 +95,6 @@ export default function useSpacedRepetition({
         continue;
       }
     }
-
-    console.log('randomItems', randomItems);
 
     return randomItems.sort(
       (a, b) =>
@@ -148,17 +150,34 @@ export default function useSpacedRepetition({
       .toCollection()
       .sortBy('spacedRepetition.dueDate');
 
-    const worker = new Worker(
-      new URL('../workers/space-repetition-worker.ts', import.meta.url),
-    );
+    if (items.length === 0 || !workerRef.current) return;
 
-    worker.postMessage({ action: 'calculate-culmilative', items });
+    // const mappedItems: Flashcard[] = await new Promise((resolve) => {
+    //   workerRef.current!.postMessage({
+    //     action: 'calculate-reversed-weight',
+    //     items,
+    //   });
+    //   workerRef.current!.onmessage = function (event) {
+    //     if (event.data.action === 'calculate-reversed-weight') {
+    //       console.log('calculate-reversed-weight');
+    //       resolve(event.data.mappedItems);
+    //     }
+    //   };
+    // });
 
-    worker.onmessage = function (event) {
-      db.flashcards.bulkUpdate(event.data.mappedItems);
-    };
-
-    worker.terminate();
+    await new Promise((resolve) => {
+      workerRef.current!.postMessage({
+        action: 'calculate-culmilative',
+        items: items,
+      });
+      workerRef.current!.onmessage = async function (event) {
+        if (event.data.action === 'calculate-culmilative') {
+          console.log('calculate-culmilative');
+          await db.flashcards.bulkPut(event.data.mappedItems);
+        }
+        resolve(event.data.mappedItems);
+      };
+    });
   };
 
   const calculateRepetition = async (
@@ -233,27 +252,6 @@ export default function useSpacedRepetition({
     recalculateCulmulatives();
   };
 
-  useEffect(() => {
-    if (todayItems.length > 0 && todayItemsRef.current === null) {
-      todayItemsRef.current = todayItems.length;
-    }
-  }, [todayItems]);
-
-  useEffect(() => {
-    if (array.length === 0 || (todayItems.length === 0 && !continueReroll)) {
-      return;
-    }
-
-    const { randomItems } = spaceRepetitionAlgorithm({
-      items: todayItems.length > 0 ? todayItems : array,
-      numberOfItems,
-    });
-
-    if ((todayItems.length === 0 && continueReroll) || todayItems.length > 0) {
-      setRandomItems(randomItems);
-    }
-  }, [array, numberOfItems, todayItems, continueReroll]);
-
   const reroll = () => {
     if (todayItems.length === 0) {
       if (!continueReroll) {
@@ -279,6 +277,27 @@ export default function useSpacedRepetition({
   };
 
   useEffect(() => {
+    if (todayItems.length > 0 && todayItemsRef.current === null) {
+      todayItemsRef.current = todayItems.length;
+    }
+  }, [todayItems]);
+
+  useEffect(() => {
+    if (array.length === 0 || (todayItems.length === 0 && !continueReroll)) {
+      return;
+    }
+
+    const { randomItems } = spaceRepetitionAlgorithm({
+      items: todayItems.length > 0 ? todayItems : array,
+      numberOfItems,
+    });
+
+    if ((todayItems.length === 0 && continueReroll) || todayItems.length > 0) {
+      setRandomItems(randomItems);
+    }
+  }, [array, numberOfItems, todayItems, continueReroll]);
+
+  useEffect(() => {
     if (continueReroll) {
       reroll();
     }
@@ -288,7 +307,16 @@ export default function useSpacedRepetition({
     if (array.length > 0) {
       recalculateCulmulatives();
     }
-  }, [array]);
+  }, []);
+
+  useEffect(() => {
+    const worker = new Worker(
+      new URL('../workers/space-repetition-worker.ts', import.meta.url),
+    );
+
+    workerRef.current = worker;
+    return () => worker.terminate();
+  }, []);
 
   return {
     randomItems,
