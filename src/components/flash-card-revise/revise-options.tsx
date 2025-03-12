@@ -7,9 +7,7 @@ type ReviseOptionsProps = {
   revisedCard: Flashcard | undefined;
   clickedOption: string | undefined;
   spaceRepetitionClick: (value: 'again' | 'hard' | 'good' | 'easy') => void;
-  clickedCard: Flashcard | undefined;
-  randomItems: Flashcard[] | null;
-  changeClicked: (flashcard: Flashcard, key?: string) => void;
+  changeClicked: (answer: string, key?: string) => void;
 };
 
 export function ReviseOptions({
@@ -17,10 +15,10 @@ export function ReviseOptions({
   revisedCard,
   clickedOption,
   spaceRepetitionClick,
-  clickedCard,
-  randomItems,
   changeClicked,
 }: ReviseOptionsProps) {
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [clickedAnswer, setClickedAnswer] = useState<string | undefined>();
   const spaceRepetitionOptions = [
     {
       value: 'easy',
@@ -44,13 +42,17 @@ export function ReviseOptions({
     },
   ] as const;
 
-  const [randomItemsOptions, setRandomItemsOptions] = useState<Flashcard[]>([]);
-
   useEffect(() => {
-    if (!randomItems) return;
-    const arrayCopy = [...randomItems];
-    setRandomItemsOptions(arrayCopy.sort(() => Math.random() - 0.5));
-  }, [randomItems]);
+    const answers = [
+      revisedCard?.answer1 ?? null,
+      revisedCard?.answer2 ?? null,
+      revisedCard?.answer3 ?? null,
+      revisedCard?.answer4 ?? null,
+    ]
+      .filter((answer) => answer !== null)
+      .sort(() => Math.random() - 0.5) as string[];
+    setAnswers(answers);
+  }, [revisedCard]);
 
   return (
     <div className='mt-8 grid w-full grid-cols-[repeat(1,1fr)] items-stretch justify-items-center gap-2 lg:w-auto lg:grid-cols-[repeat(2,minmax(20rem,1fr))]'>
@@ -104,34 +106,64 @@ export function ReviseOptions({
         </>
       )}
 
-      {revisedCard?.type === 'single' && randomItemsOptions !== null && (
+      {revisedCard?.type === 'single' && (
         <>
-          {randomItemsOptions.map((flashcard, index) => (
+          {answers.map((answer, index) => (
             <div
               className={cn([
                 'flex w-[320px] cursor-pointer gap-4 rounded-md border border-gray-200 p-4 transition hover:bg-gray-100 dark:dark:border-slate-800/40 dark:hover:bg-slate-800',
                 clicked &&
-                  clickedCard?.frontUuid === flashcard.frontUuid &&
-                  clickedCard?.frontUuid === revisedCard?.frontUuid &&
+                  answer === revisedCard.answer1 &&
+                  clickedAnswer === answer &&
                   'border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
                 clicked &&
-                  clickedCard?.frontUuid === flashcard.frontUuid &&
-                  clickedCard?.frontUuid !== revisedCard?.frontUuid &&
+                  answer !== revisedCard.answer1 &&
+                  clickedAnswer === answer &&
                   'border-red-400/50 bg-red-400/20 hover:!bg-red-100 dark:!border-red-400/40 dark:bg-red-400/20 dark:hover:!bg-red-400/20',
               ])}
-              key={`answer-${index}`}
-              onClick={() => changeClicked(flashcard)}
+              key={`answer-${index + 1}`}
+              onClick={() => {
+                changeClicked(answer);
+                setClickedAnswer(answer);
+              }}
             >
               <span className='flex size-8 min-h-8 min-w-8 items-center justify-center rounded-md bg-green-400 text-gray-100 dark:text-slate-900'>
                 {index + 1}
               </span>
 
               <span className='flex w-[280px] text-sm text-gray-600 dark:text-slate-400'>
-                {flashcard.definition}
+                {answer}
               </span>
             </div>
           ))}
         </>
+        // <>
+        //   {randomItemsOptions.map((flashcard, index) => (
+        //     <div
+        //       className={cn([
+        //         'flex w-[320px] cursor-pointer gap-4 rounded-md border border-gray-200 p-4 transition hover:bg-gray-100 dark:dark:border-slate-800/40 dark:hover:bg-slate-800',
+        //         clicked &&
+        //           clickedCard?.frontUuid === flashcard.frontUuid &&
+        //           clickedCard?.frontUuid === revisedCard?.frontUuid &&
+        //           'border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
+        //         clicked &&
+        //           clickedCard?.frontUuid === flashcard.frontUuid &&
+        //           clickedCard?.frontUuid !== revisedCard?.frontUuid &&
+        //           'border-red-400/50 bg-red-400/20 hover:!bg-red-100 dark:!border-red-400/40 dark:bg-red-400/20 dark:hover:!bg-red-400/20',
+        //       ])}
+        //       key={`answer-${index}`}
+        //       onClick={() => changeClicked(flashcard)}
+        //     >
+        //       <span className='flex size-8 min-h-8 min-w-8 items-center justify-center rounded-md bg-green-400 text-gray-100 dark:text-slate-900'>
+        //         {index + 1}
+        //       </span>
+
+        //       <span className='flex w-[280px] text-sm text-gray-600 dark:text-slate-400'>
+        //         {revisedCard[`answer${index + 1}`]}
+        //       </span>
+        //     </div>
+        //   ))}
+        // </>
       )}
     </div>
   );

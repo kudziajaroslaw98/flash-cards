@@ -19,6 +19,7 @@ import {
   Layers,
   LogIn,
   LogOut,
+  MessagesSquare,
   PlayCircle,
   Settings,
 } from 'lucide-react';
@@ -42,6 +43,7 @@ export default function SidebarComponent() {
   const { isLoggedIn, user, logOut, isPlanActive } = useSessionContext();
   const flashcardsLength = useLiveQuery(() => db.flashcards.count());
   const setsLength = useLiveQuery(() => db.sets.count());
+  const plansLength = useLiveQuery(() => db.studyPlans.count());
   const dueFlashcards = useLiveQuery(() =>
     db.flashcards
       .filter(
@@ -74,6 +76,13 @@ export default function SidebarComponent() {
       href: '/playground',
       visible: process.env.NODE_ENV === 'development',
       icon: <PlayCircle className={`${iconSize} `} />,
+    },
+    {
+      type: 'item',
+      label: 'Feedback',
+      href: APP_ROUTES.feedback,
+      visible: true,
+      icon: <MessagesSquare className={iconSize} />,
     },
     {
       type: 'group',
@@ -120,6 +129,7 @@ export default function SidebarComponent() {
           label: 'Plans',
           href: APP_ROUTES.study.plans,
           icon: <BookA className={iconSize} />,
+          indicator: plansLength,
         },
         {
           type: 'item',

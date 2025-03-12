@@ -11,11 +11,17 @@ import { StudyPlanStep4 } from '#/components/study-plan-steps/study-plan-step-4'
 import { StudyPlanStep5 } from '#/components/study-plan-steps/study-plan-step-5';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { extractObjectsFromString } from '#/shared/utils/extract-objects-from-string';
+import type { CardLength } from '#/types/card-length.type';
+import type { ContentEmphasis } from '#/types/content-emphasis.type';
+import type { DifficultyDistribution } from '#/types/difficulty-distribution.type';
 import type { Flashcard } from '#/types/flash-card.type';
 import type { KnowledgeLevel } from '#/types/knowledge-level.type';
+import type { LearningStyleAdaptation } from '#/types/learning-style.type';
+import type { MnemonicPreferences } from '#/types/mnemonic-preference.type';
 import type { PlanDuration } from '#/types/plan-durations.type';
 import type { PlanStudyScope } from '#/types/plan-study-scope.type';
 import type { PlanType } from '#/types/plan-types.type';
+import type { PreferredQuestionFormats } from '#/types/preferred-question-formats.type';
 import { useCompletion } from '@ai-sdk/react';
 import { useEffect, useState } from 'react';
 
@@ -24,6 +30,12 @@ export interface PlanSetupState {
     focusTags: string[];
     studyScope: PlanStudyScope;
     knowledgeLevel: KnowledgeLevel;
+    preferredFormat?: PreferredQuestionFormats;
+    contentEmphasis?: ContentEmphasis;
+    learningStyle?: LearningStyleAdaptation;
+    difficultyDistribution?: DifficultyDistribution;
+    cardLength?: CardLength;
+    mnemonicPreference?: MnemonicPreferences;
   };
   step2: {
     duration: PlanDuration;
@@ -40,7 +52,7 @@ export default function NewStudyPlanPage() {
       knowledgeLevel: 'beginner',
     },
     step2: {
-      duration: '1',
+      duration: '3',
       planType: 'overview',
     },
   });
@@ -49,7 +61,6 @@ export default function NewStudyPlanPage() {
     Record<PlanDuration, [number, number]>
   > = {
     overview: {
-      '1': [10, 15],
       '3': [30, 45],
       '5': [50, 75],
       '7': [70, 100],
@@ -57,7 +68,6 @@ export default function NewStudyPlanPage() {
       '30': [300, 450],
     },
     'deep-dive': {
-      '1': [10, 15],
       '3': [25, 35],
       '5': [40, 60],
       '7': [60, 80],
@@ -65,7 +75,6 @@ export default function NewStudyPlanPage() {
       '30': [250, 350],
     },
     'quick-review': {
-      '1': [5, 10],
       '3': [15, 25],
       '5': [25, 40],
       '7': [40, 60],
@@ -73,7 +82,6 @@ export default function NewStudyPlanPage() {
       '30': [150, 250],
     },
     'exam-prep': {
-      '1': [15, 20],
       '3': [40, 50],
       '5': [60, 80],
       '7': [80, 120],
@@ -126,6 +134,8 @@ export default function NewStudyPlanPage() {
     if (objects === null || suggestionsLength === objects?.length) {
       return;
     }
+
+    console.log('🚀 ~ :119 ~ useEffect ~ objects:', objects);
 
     setSuggestions(
       objects.map(

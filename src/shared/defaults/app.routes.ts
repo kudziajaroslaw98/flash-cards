@@ -16,6 +16,7 @@ export const APP_ROUTES = {
     newPlan: '/study/plans/new',
     revise: '/study/revise',
   },
+  feedback: '/feedback',
   pricing: '/pricing',
   signIn: '/sign-in',
   signUp: '/sign-up',

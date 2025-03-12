@@ -4,6 +4,7 @@ import {
   calculateReversedWeight,
   calculateWeight,
 } from '#/shared/utils/calculate-weight';
+import { getRandomArrayItems } from '#/shared/utils/get-random-array-items';
 import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
 import type { Flashcard } from '#/types/flash-card.type';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -106,13 +107,6 @@ export default function useSpacedRepetition({
     return getRandomArrayItems(array, numberOfItems);
   }
 
-  function getRandomArrayItems(
-    array: Flashcard[],
-    itemsCount: number,
-  ): Flashcard[] {
-    return array.sort(() => Math.random() - 0.5).slice(0, itemsCount);
-  }
-
   function spaceRepetitionAlgorithm({
     items,
     numberOfItems = 4,
@@ -152,32 +146,13 @@ export default function useSpacedRepetition({
 
     if (items.length === 0 || !workerRef.current) return;
 
-    // const mappedItems: Flashcard[] = await new Promise((resolve) => {
-    //   workerRef.current!.postMessage({
-    //     action: 'calculate-reversed-weight',
-    //     items,
-    //   });
-    //   workerRef.current!.onmessage = function (event) {
-    //     if (event.data.action === 'calculate-reversed-weight') {
-    //       console.log('calculate-reversed-weight');
-    //       resolve(event.data.mappedItems);
-    //     }
-    //   };
-    // });
-
-    await new Promise((resolve) => {
-      workerRef.current!.postMessage({
-        action: 'calculate-culmilative',
-        items: items,
-      });
-      workerRef.current!.onmessage = async function (event) {
-        if (event.data.action === 'calculate-culmilative') {
-          console.log('calculate-culmilative');
-          await db.flashcards.bulkPut(event.data.mappedItems);
-        }
-        resolve(event.data.mappedItems);
-      };
+    workerRef.current!.postMessage({
+      action: 'calculate-culmilative',
+      items: items,
     });
+    workerRef.current!.onmessage = async function (event) {
+      await db.flashcards.bulkPut(event.data.mappedItems);
+    };
   };
 
   const calculateRepetition = async (

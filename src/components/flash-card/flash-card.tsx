@@ -10,7 +10,7 @@ import Card from '../_ui/card/card';
 
 interface FlashcardProps {
   flashcard: Flashcard;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'horizontal-sm';
   isSelected?: boolean;
   onSelect?: (flashcard: Flashcard) => void;
   isInSelectionMode?: boolean;
@@ -90,6 +90,7 @@ export default function FlashcardComponent({
             size === 'sm' && 'h-44 w-36',
             size === 'md' && 'h-56 w-44',
             size === 'lg' && 'h-72 w-64',
+            size === 'horizontal-sm' && 'h-44 w-72',
           ])}
           {...props}
         >
@@ -111,6 +112,7 @@ export default function FlashcardComponent({
                     className={cn([
                       'z-20 flex h-20 w-full flex-col items-center justify-center hyphens-auto text-center',
                       size === 'sm' && 'text-[0.7rem] leading-4',
+                      size === 'horizontal-sm' && 'text-[0.7rem] leading-4',
                       size === 'md' && 'text-xs',
                       size === 'lg' && 'text-sm',
                       flashcard.type === 'question' &&
@@ -126,6 +128,7 @@ export default function FlashcardComponent({
                     className={cn([
                       'z-20 flex h-full w-full flex-col items-center hyphens-auto py-2 text-center text-green-400 ',
                       size === 'sm' && 'text-lg leading-5',
+                      size === 'horizontal-sm' && 'text-lg leading-5',
                       size === 'md' && 'text-2xl',
                       size === 'lg' && 'text-3xl',
                       flashcard.type === 'index' && 'justify-center',
@@ -144,6 +147,7 @@ export default function FlashcardComponent({
               className={cn([
                 'scrollbar-hidden relative z-20 flex h-full w-full flex-col overflow-y-auto hyphens-auto py-6 text-gray-500 dark:text-slate-400',
                 size === 'sm' && 'text-[.7rem]',
+                size === 'horizontal-sm' && 'text-[.7rem]',
                 size === 'md' && 'text-xs',
                 size === 'lg' && 'text-sm',
               ])}

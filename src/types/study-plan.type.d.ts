@@ -2,6 +2,7 @@ import type { StudyDay } from './study-day.type';
 export type StudyPlan = {
   id: string;
   durationDays: number;
+  name: string;
   days: StudyDay[];
   focusTags: string[];
   totalCards: number;

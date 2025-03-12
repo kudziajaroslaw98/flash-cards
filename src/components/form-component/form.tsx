@@ -155,7 +155,7 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
 
         let inputDefaultInitialValue;
 
-        if (input?._internal_default_value) {
+        if (input?._internal_default_value !== undefined) {
           inputDefaultInitialValue = input._internal_default_value;
         } else {
           // @ts-expect-error Generic type generate error here

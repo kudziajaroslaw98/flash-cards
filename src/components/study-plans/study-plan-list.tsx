@@ -82,7 +82,7 @@ export function StudyPlanList({
       {studyPlans.length > 0 && (
         <div className='mt-8 grid w-full grid-cols-[repeat(auto-fit,minmax(20rem,1fr))] gap-4 lg:grid-cols-[repeat(2,minmax(20rem,1fr))] 2xl:grid-cols-[repeat(3,minmax(20rem,1fr))]'>
           <AnimatePresence mode='popLayout'>
-            {filteredPlans.map((plan, index) => (
+            {filteredPlans.map((plan) => (
               <m.div
                 key={plan.id}
                 initial={{ translateY: '10%', opacity: 0, zIndex: -20 }}
@@ -116,7 +116,7 @@ export function StudyPlanList({
 
                   <div className='flex flex-col gap-4'>
                     <h5 className='text-base font-bold text-gray-800 dark:text-slate-200'>
-                      Plan {index + 1}
+                      {plan.name ?? 'Untitled plan'}
                     </h5>
 
                     <div className='flex flex-col gap-1 text-sm text-gray-500 dark:text-slate-500'>

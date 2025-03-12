@@ -148,59 +148,71 @@ export async function POST(req: NextRequest) {
   const prompt = (
     flashcardCount: number,
     summaries: { id: string; topic: string; query: string; context: string }[],
-  ) => `**Objective**: Generate ${flashcardCount} unique flashcards covering [${focusTags.join(',')}] for a ${planTypes[planType]} study plan (${knowledgeLevels[knowledgeLevel]} level) and study scope: ${studyScopes[studyScope]}. 
+  ) => `
+  Generate ${flashcardCount} unique flashcards covering [${focusTags.join(',')}] for a "${planTypes[planType]}" study plan, knowledge level "${knowledgeLevels[knowledgeLevel]}" and study scope: "${studyScopes[studyScope]}". 
 
-**Critical Requirements**:
-1. STRICTLY AVOID DUPLICATES: 
-   - Never repeat core concepts from existing flashcards (analyzed below)
-   - No conceptual duplicates even with different wording
-   - No rephrased versions of same question
+  **User Preferences**:
+    ${preferredFormats ? `• Question formats: ${preferredFormats}` : ''}
+    ${contentEmphasis ? `• Emphasize: ${contentEmphasis}` : ''}
+    ${learningStyle ? `• Learning style: ${learningStyle}` : ''}
+    ${difficultyDistribution ? `• Difficulty: ${difficultyDistribution}` : ''}
+    ${contextSetting ? `• Context: ${contextSetting}` : ''}
+    ${cardLength ? `• Length: ${cardLength}` : ''}
+    ${mnemonicPreference ? `• Mnemonics: ${mnemonicPreference}` : ''}
+    ${blacklist ? `• AVOID topics: ${blacklist}` : ''}
 
-2. Concept Mapping Approach:
-   - First analyze existing flashcards' CORE CONCEPTS (below)
-   - Identify gaps in these areas: ${focusTags.join(', ')}
-   - Generate NEW angles/perspectives for each tag
+  **Existing Cards** (DO NOT DUPLICATE):
+${summaries
+  .map(
+    (summary) =>
+      `• ID: ${summary.id}, Topic: ${summary.topic}, Question: ${summary.query}, Context: ${summary.context}`,
+  )
+  .join('\n')}
 
-**Existing Flashcards Analysis** (DO NOT REPEAT THESE CORE CONCEPTS):
-[START PREVIOUS]
-${summaries.length > 0 ? summaries.map((s) => `- ${s.id} - ${s.topic}; ${s.context}; ${s.query}`).join('\n') : 'No previous flashcards'}
-[END PREVIOUS]
+  **Critical Requirements**:
+1. ADAPTIVE QUESTION FORMATS - Select based on subject matter:
+   • TECHNICAL: How/why mechanisms, comparisons, applications, consequences, components
+   • VOCABULARY: Contextual meaning, word relationships, usage, distinctions, register
+   • PROCEDURAL: Sequential steps, preparations, tools, outcomes, troubleshooting
+   • FACTUAL: Temporal/spatial knowledge, attributes, classifications, measurements
 
-**Generation Rules**:
-- Each flashcard must test DISTINCT knowledge components
-- Required differentiation methods:
-  * Different abstraction levels (macro vs micro)
-  * Different relationships (cause-effect vs comparison)
-  * Different knowledge types (fact vs application)
-  * Different cognitive levels (recall vs analysis)
+2. ANSWER QUALITY:
+   • NO terms from questions in answers - avoid hint words
+   • Wrong answers: plausible but clearly incorrect to experts
+   • Match complexity precisely to knowledge level ${knowledgeLevels[knowledgeLevel]} - especially for expert level
+   • For vocabulary: semantically related but distinct distractors
 
-**Examples** (BAD vs GOOD):
-BAD DUPLICATES: "Define X", "What is X?", "Explain X"
-GOOD UNIQUE: 
-1. "X vs Y comparison" 
-2. "Practical application of X"
-3. "Components of X system"
+3. PLAN-SPECIFIC APPROACH:
+   For "${planTypes[planType]}":
+   • Overview: Broad concept coverage across cognitive levels
+   • Deep-Dive: Complex relationships and detailed mechanisms
+   • Quick-Revision: Essential definitions and high-yield distinctions
+   • Exam-Prep: Application scenarios and analysis questions
 
-Suggestion structure: 
-Short unique number identifier (do not duplicate with previous id's) (id)
-A concise and clear question or term for the front of the flashcard (query).
-A brief and accurate definition or explanation for the back of the flashcard (definition).
-A word/term used to give context of the flashcards (context).
-A 1-3 tags related to this flashcard (tags).
-optional Examples of use separated by semicolon (;) (examples).
-optional A key points of these flashcards separated by semicolon (;) (keyPoints).
-optional Synonyms to this flashcard [to context] separated by semicolon (;) (synonyms).
-optional Related facts to this flashcard separated by semicolon (;) (relatedFacts).
-Decide if optional fields bring value to the overall flashcard. For example, synonyms are required when the flashcard is about definition etc. Adjust flashcards to users knowledge level, keep it consistent with tags: [${focusTags.join(',')}],and the selected plan type ${planTypes[planType]} and study scope: ${studyScopes[studyScope]}.
-Output the suggestions in a plain text JSON format, where each object represents a flashcard suggestion with "id", "topic", "query","context", "examples","keyPoints","synonyms","relatedFacts", "definition",and "tags" fields. 
+   JSON OUTPUT per card:
+{
+  "id": "unique_ID",
+  "topic": "main_subject",
+  "query": "clear_question",
+  "definition": "explanation",
+  "context": "domain",
+  "tags": ["relevant_tags"],
+  "answer1": "correct_answer",
+  "answer2-4": ["wrong_answers"],
+  "examples": "optional_usage",
+  "keyPoints": "optional_notes",
+  "synonyms": "optional_terms",
+  "relatedFacts": "optional_connections"
+}
 
+Only include optional fields when they add significant value.
 `;
 
   const gemini = createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_AI_API_KEY,
   });
 
-  const batchSize = 40;
+  const batchSize = 20;
 
   return createDataStreamResponse({
     status: 200,
@@ -257,8 +269,19 @@ Output the suggestions in a plain text JSON format, where each object represents
             model: gemini('gemini-2.0-flash-001'),
             prompt: prompt(chunk, summaries).replaceAll('\n', ' ').trim(),
             temperature: 0.7,
-            system:
-              "You are an expert flashcard content generator focused on creating UNIQUE and NON-REDUNDANT flashcards. Your primary goal is to expand the user's knowledge base with NEW and DISTINCT concepts related to the given topic.  Avoid generating flashcards that are semantically similar to concepts already covered. Prioritize novelty and comprehensive topic coverage.",
+            system: `You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards. Your primary responsibilities are:
+
+1. UNIQUENESS: Generate flashcards that explore DISTINCT concepts, avoiding semantic overlap or reformulation of existing content.
+
+2. PEDAGOGICAL VARIETY: Craft questions across multiple cognitive domains (from basic recall to complex evaluation) and diverse formats (definitions, applications, comparisons, problem-solving).
+
+3. KNOWLEDGE CALIBRATION: Precisely match content difficulty to the specified knowledge level - from foundational concepts for beginners to cutting-edge applications for experts.
+
+4. SUBJECT ADAPTABILITY: Tailor your approach based on subject matter (technical concepts, vocabulary, procedures, factual content) and study purpose (comprehensive overview, deep dive, revision, exam prep).
+
+5. ANSWER QUALITY: Create clearly correct answers and plausible but definitively incorrect distractors that don't hint at the correct response.
+
+Your expertise spans disciplines from technical fields to languages, sciences to humanities. For each flashcard set, you analyze existing content to identify knowledge gaps, then strategically fill those gaps with carefully crafted new cards that expand the user's understanding in meaningful ways.`,
             experimental_output: Output.object({
               schema: z.array(
                 z.object({
@@ -272,6 +295,10 @@ Output the suggestions in a plain text JSON format, where each object represents
                   keyPoints: z.string(),
                   synonyms: z.string(),
                   relatedFacts: z.string(),
+                  answer1: z.string(),
+                  answer2: z.string(),
+                  answer3: z.string(),
+                  answer4: z.string(),
                 }),
               ),
             }),

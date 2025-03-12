@@ -25,7 +25,9 @@ export default function FlashcardsList({
   const { flashcards } = useAppContext();
 
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
-  const [tileSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [tileSize] = useState<'sm' | 'md' | 'lg' | 'horizontal-sm'>(
+    'horizontal-sm',
+  );
 
   const isSelected = useCallback(
     (flashcard: Flashcard) => {
@@ -72,11 +74,13 @@ export default function FlashcardsList({
           className={cn([
             'grid h-auto w-full justify-center gap-4 transition-all',
             filteredFlashcards.length > 5
-              ? 'xl:justify-between'
+              ? 'xl:justify-center'
               : 'xl:justify-start',
-            tileSize === 'sm' && 'grid-cols-[repeat(auto-fit,11rem)]',
+            tileSize === 'sm' && 'grid-cols-[repeat(auto-fit,9rem)]',
             tileSize === 'md' && 'grid-cols-[repeat(auto-fit,11rem)]',
             tileSize === 'lg' && 'grid-cols-[repeat(auto-fit,16rem)]',
+            tileSize === 'horizontal-sm' &&
+              'grid-cols-[repeat(auto-fit,17rem)]',
           ])}
         >
           <AnimatePresence mode='popLayout'>

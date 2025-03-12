@@ -5,6 +5,8 @@ export type StudyDay = {
   objectives: string[];
   cardsToReview: string[]; // frontUuid of flashcards
   newCards: string[];
+  correctCards: string[];
+  incorrectCards: string[];
   metrics: {
     targetRetention: number;
     maxStudyTime: number; // minutes

@@ -1,3 +1,5 @@
+import { planDurationSchema } from '#/schemas/plan-durations.schema';
+import { planTypeSchema } from '#/schemas/plan-types.schema';
 import { Logger } from '#/shared/helpers/logger/logger';
 import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
@@ -11,23 +13,8 @@ const routePath = 'ai/study/plan/flashcards';
 
 async function validateBody(body: Record<string, unknown>) {
   const validationScheme = z.object({
-    planType: z
-      .string()
-      .min(1, 'Plan Type is required')
-      .refine(
-        (value) =>
-          ['overview', 'deep-dive', 'quick-review', 'exam-prep'].includes(
-            value,
-          ),
-        'Plan Type is invalid',
-      ),
-    duration: z
-      .string()
-      .min(1, 'Duration is required')
-      .refine(
-        (value) => ['1', '3', '5', '7', '14', '30'].includes(value),
-        'Duration is invalid',
-      ),
+    planType: planTypeSchema,
+    duration: planDurationSchema,
     summaries: z.array(
       z.object({
         frontUuid: z.string(),
@@ -150,6 +137,7 @@ export async function POST(req: NextRequest) {
 
       Structure the plan into daily study sessions. For each day, provide:
       - Day number
+      - Short plan name based on the summaries provided. For example: "Variables and Data Types"
       - A list of flashcard topics to review (based on spaced repetition principles, if applicable, and the provided summaries).
       - A list of new flashcard topics to learn.
       - 2-3 summaries of day learning objectives.
@@ -179,6 +167,11 @@ export async function POST(req: NextRequest) {
     schema: z.object({
       dayNumber: z.number(),
       objectives: z.array(z.string()),
+      name: z
+        .string()
+        .describe(
+          'Short plan name based on the summaries provided. For example: "Variables and Data Types"',
+        ),
       cardsToReview: z
         .array(z.string())
         .describe('Array of flashcards frontUuids'),

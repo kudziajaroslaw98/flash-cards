@@ -19,7 +19,11 @@ export const newFlashcardScheme = (
     | 'relatedFacts'
     | 'type'
     | 'tags'
-  >
+    | 'answer1'
+    | 'answer2'
+    | 'answer3'
+    | 'answer4'
+  > & { showAnswers: boolean }
 > => ({
   inputs: {
     type: {
@@ -152,6 +156,102 @@ export const newFlashcardScheme = (
             .array(z.string().min(1, 'Tag is required'))
             .min(1, 'At least one tag is required')
             .max(3, 'Too many tags'),
+        },
+      ],
+    },
+    showAnswers: {
+      type: 'switch',
+      showLabel: true,
+      name: 'showAnswers',
+      label: 'Include answers',
+      required: false,
+      checkedLabel: 'Include answers',
+      uncheckedLabel: 'No answers',
+      _internal_constraints: [
+        {
+          type: 'show',
+          key: 'type',
+          constraint: z
+            .string()
+            .includes('single')
+            .or(z.string().includes('question')),
+        },
+      ],
+    },
+    answer1: {
+      type: 'textarea',
+      name: 'answer1',
+      label: 'Correct Answer',
+      placeholder: 'Type correct answer here',
+      required: true,
+      _internal_constraints: [
+        {
+          type: 'show',
+          key: 'showAnswers',
+          constraint: z.boolean().refine((value) => value === true),
+        },
+        {
+          type: 'validation',
+          key: 'answer1',
+          constraint: z.string().min(1, 'Answer is required'),
+          whenKey: 'showAnswers',
+          whenConstraint: z.boolean().refine((value) => value === true),
+        },
+      ],
+    },
+    answer2: {
+      type: 'textarea',
+      name: 'answer2',
+      label: 'Incorrect Answer 1',
+      placeholder: 'Type incorrect answer here',
+      required: true,
+      _internal_constraints: [
+        {
+          type: 'show',
+          key: 'showAnswers',
+          constraint: z.boolean().refine((value) => value === true),
+        },
+        {
+          type: 'validation',
+          key: 'answer1',
+          constraint: z.string().min(1, 'Answer is required'),
+          whenKey: 'showAnswers',
+          whenConstraint: z.boolean().refine((value) => value === true),
+        },
+      ],
+    },
+    answer3: {
+      type: 'textarea',
+      name: 'answer3',
+      label: 'Incorrect Answer 2',
+      placeholder: 'Type incorrect answer here',
+      required: true,
+      _internal_constraints: [
+        {
+          type: 'show',
+          key: 'showAnswers',
+          constraint: z.boolean().refine((value) => value === true),
+        },
+        {
+          type: 'validation',
+          key: 'answer1',
+          constraint: z.string().min(1, 'Answer is required'),
+          whenKey: 'showAnswers',
+          whenConstraint: z.boolean().refine((value) => value === true),
+        },
+      ],
+    },
+    answer4: {
+      type: 'textarea',
+      name: 'answer4',
+      label: 'Incorrect Answer 3',
+      placeholder: 'Type incorrect answer here',
+      required: false,
+      _internal_constraints: [
+        {
+          type: 'show',
+          key: 'showAnswers',
+          constraint: z.boolean().refine((value) => value === true),
         },
       ],
     },

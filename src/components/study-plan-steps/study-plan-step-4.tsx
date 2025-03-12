@@ -60,6 +60,11 @@ export function StudyPlanStep4({
         type: 'single',
       }),
     );
+    console.log(
+      '🚀 ~ :63 ~ acceptAllSuggestions ~ mappedSuggestions:',
+      mappedSuggestions,
+    );
+
     setFlashcards((prev) => [...prev, ...mappedSuggestions]);
     setSuggestions([]);
     setSelectedSuggestions([]);

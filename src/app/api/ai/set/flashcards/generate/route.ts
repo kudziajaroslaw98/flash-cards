@@ -144,6 +144,8 @@ flashcard structure:
 - A brief and accurate definition or explanation for the back of the flashcard (definition).
 - A word/term/topic of the flashcard (topic).
 - A 1-3 tags related to this flashcard (tags).
+- A correct answer to the question (answer1)
+- 3 incorrect answers to the question (answer2, answer3, answer4)
 - *optional* Examples of use separated by semicolon (;) (examples).
 - *optional* A key points of these flashcards separated by semicolon (;) (keyPoints).
 - *optional* Synonyms to this flashcard [to context] separated by semicolon (;) (synonyms).
@@ -168,6 +170,10 @@ Decide if optional fields bring value to the overall flashcard. For example, syn
       keyPoints: z.string(),
       synonyms: z.string(),
       relatedFacts: z.string(),
+      answer1: z.string(),
+      answer2: z.string(),
+      answer3: z.string(),
+      answer4: z.string(),
     }),
     system: `You are an expert flashcard content generator focused on creating UNIQUE and NON-REDUNDANT flashcards. Your primary goal is to expand the user's decks with NEW and DISTINCT concepts/words/information related to the given deck: [name: ${setName}; description: ${setDescription}].  Avoid generating flashcards that are semantically similar to concepts/words/information already covered. Prioritize novelty and comprehensive topic coverage.`,
     prompt: prompt,

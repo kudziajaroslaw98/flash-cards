@@ -76,9 +76,9 @@ export default function FlashcardsFilters({
           type='checkbox'
           valid={true}
           for='selectAll'
-          className='size-10'
           inputLabel='Select All'
           onChange={handleSelectAll}
+          className='!w-full !max-w-80 sm:!w-56'
         />
       </span>
 

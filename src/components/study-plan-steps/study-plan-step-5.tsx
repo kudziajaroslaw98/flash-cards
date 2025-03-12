@@ -9,6 +9,7 @@ import type { StudySession } from '#/types/study-session.type';
 import { experimental_useObject as useObject } from '@ai-sdk/react';
 import { Check, LoaderCircle } from 'lucide-react';
 import * as m from 'motion/react-m';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { Button } from '../_ui/button/button';
@@ -33,14 +34,16 @@ export function StudyPlanStep5({
   planType: string;
   duration: string;
 }) {
-  const [planDays, setPlanDays] = useState<StudyDay[]>([]);
+  const [planDays, setPlanDays] = useState<(StudyDay & { name: string })[]>([]);
   const initialLoadReg = useRef<boolean>(false);
+  const router = useRouter();
   const { submit, isLoading, object } = useObject({
     api: API_ROUTES.GENERATE_PLAN,
     schema: z.array(
       z.object({
         dayNumber: z.number(),
         objectives: z.array(z.string()),
+        name: z.string(),
         cardsToReview: z
           .array(z.string())
           .describe('Array of flashcards frontUuids'),
@@ -68,7 +71,9 @@ export function StudyPlanStep5({
 
   useEffect(() => {
     if (!object) return;
-    setPlanDays(object?.filter((plan) => plan) as StudyDay[]);
+    setPlanDays(
+      object?.filter((plan) => plan) as (StudyDay & { name: string })[],
+    );
   }, [object]);
 
   const handleAcceptPlan = () => {
@@ -79,6 +84,7 @@ export function StudyPlanStep5({
     const studyPlan: StudyPlan = {
       id: planId,
       durationDays: parseInt(duration),
+      name: planDays[planDays.length - 1].name,
       days: planDays,
       focusTags: focusTags,
       totalCards: flashcards.length,
@@ -91,8 +97,12 @@ export function StudyPlanStep5({
       id: sessionId,
       planId,
       synced: false,
-      currentDay: 0,
+      currentDay: 1,
+      stage: 0,
       startDate: new Date().toUTCString(),
+      nextRevisionDate: new Date().toUTCString(),
+      correctCards: [],
+      incorrectCards: [],
       completedCards: [],
       createdAt: dateNow,
       updatedAt: dateNow,
@@ -108,6 +118,8 @@ export function StudyPlanStep5({
         objectives: day.objectives,
         cardsToReview: day.cardsToReview,
         newCards: day.newCards,
+        correctCards: [],
+        incorrectCards: [],
         metrics: {
           targetRetention: day.metrics.targetRetention,
           maxStudyTime: day.metrics.maxStudyTime,
@@ -121,6 +133,8 @@ export function StudyPlanStep5({
     db.studyPlans.add(studyPlan);
     db.studySessions.add(session);
     db.studyDays.bulkAdd(studyPlanDays);
+
+    router.push(`/study/plans/`);
   };
 
   return (

@@ -15,7 +15,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@ai-sdk/google": "^1.1.14",
+    "@ai-sdk/google": "^1.1.17",
     "@ai-sdk/openai": "^1.1.5",
     "@dicebear/collection": "^9.2.2",
     "@dicebear/core": "^9.2.2",
@@ -32,7 +32,7 @@
     "@tailwindcss/typography": "^0.5.16",
     "@types/d3": "^7.4.3",
     "@types/mdx": "^2.0.13",
-    "ai": "^4.1.41",
+    "ai": "^4.1.47",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -72,7 +72,7 @@
     "prettier-plugin-organize-attributes": "^1.0.0",
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-tailwindcss": "^0.5.14",
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.2"
   },
   "overrides": {
     "@types/react": "19.0.6",

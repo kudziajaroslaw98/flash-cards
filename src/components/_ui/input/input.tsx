@@ -118,7 +118,8 @@ function Input({
             label
               ? 'placeholder:text-gray-400 dark:placeholder:text-slate-700'
               : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
-            'peer w-full text-sm text-gray-800',
+            'peer text-sm text-gray-800',
+            type === 'checkbox' ? 'w-auto' : 'w-full',
             'bg-transparent text-inherit outline-none transition-all dark:text-slate-200',
           ])}
           onFocus={handleFocus}
