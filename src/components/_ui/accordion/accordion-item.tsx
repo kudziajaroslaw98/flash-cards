@@ -59,20 +59,25 @@ import { useAccordionContext } from './accordion-context';
 //   },
 // },
 
-const accordionVariants = cva('overflow-hidden rounded-md border', {
-  variants: {
-    variant: {
-      default: 'border-gray-300 dark:border-slate-800',
-      destructive: 'border-red-500 dark:border-red-500',
-    },
-  },
-});
-
-const accordionLabelVariants = cva(
-  'flex w-full items-center justify-between p-2 transition-colors hover:bg-gray-100 dark:hover:bg-slate-900',
+const accordionVariants = cva(
+  'overflow-hidden rounded-md border outline-none',
   {
     variants: {
       variant: {
+        form: 'border-gray-300 dark:border-slate-800',
+        default: 'border-gray-300 dark:border-slate-800',
+        destructive: 'border-red-500 dark:border-red-500',
+      },
+    },
+  },
+);
+
+const accordionLabelVariants = cva(
+  'group flex w-full items-center justify-between p-2 transition-colors hover:bg-gray-100 dark:hover:bg-slate-900 outline-none',
+  {
+    variants: {
+      variant: {
+        form: 'text-gray-500 dark:text-slate-400 p-3',
         default: 'text-gray-500 dark:text-slate-400',
         destructive: 'text-red-500 dark:text-red-400',
       },
@@ -83,7 +88,7 @@ const accordionLabelVariants = cva(
 interface AccordionItemProps {
   title: string;
   children: React.ReactNode;
-  variant?: 'default' | 'destructive';
+  variant?: 'default' | 'destructive' | 'form';
 }
 
 export const AccordionItem = ({
@@ -109,8 +114,9 @@ export const AccordionItem = ({
         <m.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
+          tabIndex={1}
         >
-          <ChevronDownIcon className='h-5 w-5' />
+          <ChevronDownIcon className='h-5 w-5 rounded-md outline-0 ring-0 ring-green-400/50 group-focus:ring' />
         </m.div>
       </m.button>
 
@@ -121,7 +127,10 @@ export const AccordionItem = ({
           opacity: isOpen ? 1 : 0,
         }}
         transition={{ duration: 0.2, ease: 'easeInOut' }}
-        className='overflow-hidden px-4'
+        className={cn([
+          'overflow-hidden px-4',
+          isOpen ? 'pointer-events-auto' : 'pointer-events-none',
+        ])}
       >
         <div className='pb-4 pt-2 text-gray-500 dark:text-slate-400'>
           {children}

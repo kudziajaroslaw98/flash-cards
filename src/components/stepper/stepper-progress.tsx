@@ -6,7 +6,7 @@ import Tooltip from '../_ui/tooltip/tooltip';
 import { useStepper } from './stepper-context';
 
 export const StepperProgress = () => {
-  const { currentStep, isCompleted, steps } = useStepper();
+  const { currentStep, currentStepChild, isCompleted, steps } = useStepper();
   const { isLightMode } = useThemeContext();
 
   const progressBarVariants = (completed: boolean, currentStep: boolean) => {
@@ -94,6 +94,15 @@ export const StepperProgress = () => {
               </Tooltip>
             </div>
           );
+        })}
+      </div>
+
+      <div className='flex w-full justify-center pt-2'>
+        Step {currentStep} of {steps.length}:{' '}
+        {steps.map((step, index) => {
+          /* @ts-expect-error prop required by component, always available */
+          const stepLabel = Children.only(step)?.props?.stepLabel;
+          return index === currentStep - 1 ? stepLabel : null;
         })}
       </div>
     </div>

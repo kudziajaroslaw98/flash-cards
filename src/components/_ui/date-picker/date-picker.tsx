@@ -23,6 +23,7 @@ export interface DateTimePickerProps {
   type: 'datetime-picker';
   label?: string;
   for?: string;
+  name?: string;
   valid: boolean;
   error?: string | null;
   touched?: boolean;

@@ -1,11 +1,23 @@
+import { cardLengthSchema } from '#/schemas/card-length.schema';
+import { contentEmphasisSchema } from '#/schemas/content-emphasis.schema';
+import { difficultyDistributionSchema } from '#/schemas/difficulty-distribution.schema';
 import { knowledgeLevelSchema } from '#/schemas/knowledge-level.schema';
+import { learningStyleAdaptationSchema } from '#/schemas/learning-style-adaptation.schema';
+import { mnemonicPreferencesSchema } from '#/schemas/mnemonic-preferences.schema';
 import { planDurationSchema } from '#/schemas/plan-durations.schema';
 import { planStudyScopeSchema } from '#/schemas/plan-study-scope.schema';
 import { planTypeSchema } from '#/schemas/plan-types.schema';
+import { preferredQuestionFormatsSchema } from '#/schemas/preferred-question-formats.schema';
 import { Logger } from '#/shared/helpers/logger/logger';
 import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { createClient } from '#/shared/utils/supabase/server';
+import type { CardLength } from '#/types/card-length.type';
+import type { ContentEmphasis } from '#/types/content-emphasis.type';
+import type { DifficultyDistribution } from '#/types/difficulty-distribution.type';
+import type { LearningStyleAdaptation } from '#/types/learning-style.type';
+import type { MnemonicPreferences } from '#/types/mnemonic-preference.type';
+import type { PreferredQuestionFormats } from '#/types/preferred-question-formats.type';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createDataStreamResponse, Output, streamText } from 'ai';
 import type { NextRequest } from 'next/server';
@@ -27,6 +39,12 @@ async function validateBody(body: Record<string, unknown>) {
       .number()
       .min(1, 'Flashcards Needed is required')
       .max(500, 'Max 500 flashcards'),
+    preferredFormat: preferredQuestionFormatsSchema.nullish(),
+    contentEmphasis: contentEmphasisSchema.nullish(),
+    learningStyle: learningStyleAdaptationSchema.nullish(),
+    difficultyDistribution: difficultyDistributionSchema.nullish(),
+    cardLength: cardLengthSchema.nullish(),
+    mnemonicPreference: mnemonicPreferencesSchema.nullish(),
   });
   const validityCheck = checkValidity(body, validationScheme);
 
@@ -94,6 +112,12 @@ export async function POST(req: NextRequest) {
     planType,
     duration,
     flashcardsNeeded,
+    preferredFormat,
+    contentEmphasis,
+    learningStyle,
+    difficultyDistribution,
+    cardLength,
+    mnemonicPreference,
   }: {
     focusTags: string[];
     studyScope: keyof typeof studyScopes;
@@ -101,6 +125,12 @@ export async function POST(req: NextRequest) {
     planType: keyof typeof planTypes;
     duration: string;
     flashcardsNeeded: number;
+    preferredFormat?: PreferredQuestionFormats;
+    contentEmphasis?: ContentEmphasis;
+    learningStyle?: LearningStyleAdaptation;
+    difficultyDistribution?: DifficultyDistribution;
+    cardLength?: CardLength;
+    mnemonicPreference?: MnemonicPreferences;
   } = await req.json();
 
   try {
@@ -140,6 +170,12 @@ export async function POST(req: NextRequest) {
         knowledgeLevel,
         duration,
         flashcardsNeeded,
+        preferredFormat,
+        contentEmphasis,
+        learningStyle,
+        difficultyDistribution,
+        cardLength,
+        mnemonicPreference,
       },
     )}`,
     routePath,
@@ -152,14 +188,12 @@ export async function POST(req: NextRequest) {
   Generate ${flashcardCount} unique flashcards covering [${focusTags.join(',')}] for a "${planTypes[planType]}" study plan, knowledge level "${knowledgeLevels[knowledgeLevel]}" and study scope: "${studyScopes[studyScope]}". 
 
   **User Preferences**:
-    ${preferredFormats ? `• Question formats: ${preferredFormats}` : ''}
+    ${preferredFormat ? `• Question formats: ${preferredFormat}` : ''}
     ${contentEmphasis ? `• Emphasize: ${contentEmphasis}` : ''}
     ${learningStyle ? `• Learning style: ${learningStyle}` : ''}
     ${difficultyDistribution ? `• Difficulty: ${difficultyDistribution}` : ''}
-    ${contextSetting ? `• Context: ${contextSetting}` : ''}
     ${cardLength ? `• Length: ${cardLength}` : ''}
     ${mnemonicPreference ? `• Mnemonics: ${mnemonicPreference}` : ''}
-    ${blacklist ? `• AVOID topics: ${blacklist}` : ''}
 
   **Existing Cards** (DO NOT DUPLICATE):
 ${summaries
@@ -178,6 +212,7 @@ ${summaries
 
 2. ANSWER QUALITY:
    • NO terms from questions in answers - avoid hint words
+   • Application doesn't have implemented multiple answers so only answer one is correct.
    • Wrong answers: plausible but clearly incorrect to experts
    • Match complexity precisely to knowledge level ${knowledgeLevels[knowledgeLevel]} - especially for expert level
    • For vocabulary: semantically related but distinct distractors
@@ -194,7 +229,7 @@ ${summaries
   "id": "unique_ID",
   "topic": "main_subject",
   "query": "clear_question",
-  "definition": "explanation",
+  "definition": "answer_explanation",
   "context": "domain",
   "tags": ["relevant_tags"],
   "answer1": "correct_answer",

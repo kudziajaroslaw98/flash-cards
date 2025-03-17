@@ -80,7 +80,7 @@ export default function FlashcardsList({
             tileSize === 'md' && 'grid-cols-[repeat(auto-fit,11rem)]',
             tileSize === 'lg' && 'grid-cols-[repeat(auto-fit,16rem)]',
             tileSize === 'horizontal-sm' &&
-              'grid-cols-[repeat(auto-fit,17rem)]',
+              'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4',
           ])}
         >
           <AnimatePresence mode='popLayout'>

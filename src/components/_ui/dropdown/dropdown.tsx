@@ -31,7 +31,7 @@ const DropdownVariants = cva(
 );
 
 interface BaseDropdownProps<T> extends VariantProps<typeof DropdownVariants> {
-  type?: 'dropdown';
+  type: 'dropdown';
   config: DictionaryValue<T>[];
   value?: T | T[];
   clearAll?: boolean;
@@ -54,7 +54,7 @@ interface BaseDropdownProps<T> extends VariantProps<typeof DropdownVariants> {
 
 export type DropdownProps<T> =
   | (BaseDropdownProps<T> & {
-      multiple?: false;
+      multiple: false;
       label?: string;
       multipleLabel?: string;
       onChange: (_value: DictionaryValue<T>['value']) => void;
@@ -67,7 +67,7 @@ export type DropdownProps<T> =
     });
 
 export default function Dropdown<T>({
-  multiple,
+  multiple = false,
   multipleLabel,
   controlLabel,
   label,
@@ -355,16 +355,29 @@ export default function Dropdown<T>({
       onFocus={handleClickOnDropdown}
     >
       {controlLabel && (
-        <span
-          className={cn([
-            touched && !valid ? '!text-red-400' : '',
-            touched && valid ? '!text-green-400' : '',
-            'w-auto pb-2  pl-2 text-sm text-gray-400',
-          ])}
-        >
-          {`${controlLabel}${required ? ' *' : ' (optional)'}`}
+        <span className='w-auto pb-2 pl-2 '>
+          <span
+            className={cn([
+              touched && !valid ? '!text-red-400' : '',
+              touched && valid ? '!text-green-400' : '',
+              'w-auto pb-2 pl-2 text-sm text-gray-500 dark:text-slate-500',
+            ])}
+          >
+            {controlLabel}
+          </span>
+          <span
+            className={cn([
+              'text-xs',
+              touched && !valid ? '!text-red-400' : '',
+              touched && valid ? '!text-green-400' : '',
+              'text-gray-400 dark:text-slate-600',
+            ])}
+          >
+            {required ? ' *' : ' (optional)'}
+          </span>
         </span>
       )}
+
       <div className='w-full'>
         <div
           ref={dropdownLabelRef}
@@ -426,9 +439,9 @@ export default function Dropdown<T>({
             exit={{ opacity: 0, y: -10 }}
           >
             {props.searchable && (
-              <div className='min-w-fit rounded-t-md border-b bg-gray-50 p-2 dark:border-slate-800/40 dark:bg-slate-950 '>
+              <div className='min-w-fit rounded-t-md border-b p-2 dark:border-slate-800/40'>
                 <Input
-                  type='text'
+                  inputType='text'
                   value={searchValue}
                   valid={true}
                   placeholder={`Search in ${multipleLabel ?? label}...`}
@@ -486,7 +499,7 @@ export default function Dropdown<T>({
               <div>
                 <div className='min-w-fit  bg-gray-50 p-1 py-2 outline-none focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-950'>
                   <Input
-                    type='text'
+                    inputType='text'
                     value={newItemValue}
                     valid={true}
                     placeholder='New element...'

@@ -6,20 +6,20 @@ export interface InputSwitchProps
     InputHTMLAttributes<HTMLInputElement>,
     'className' | 'required' | 'name' | 'onKeyDown' | 'tabIndex'
   > {
-  for: string;
-  valid: boolean;
+  for?: string;
+  valid?: boolean;
   label?: string;
   required?: boolean;
   touched?: boolean;
   error?: string | null;
   className?: string;
-  type?: 'switch';
+  type: 'switch';
   icon?: React.ReactNode;
   showLabel: true;
   value: boolean;
   checkedLabel: string;
   uncheckedLabel: string;
-  variant: 'vertical' | 'vertical-reversed';
+  variant?: 'vertical' | 'vertical-reversed';
   onChange?: (value: boolean) => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -79,14 +79,26 @@ export function InputSwitch({
       aria-labelledby={type}
     >
       {label && (
-        <span
-          className={cn([
-            touched && !valid ? '!text-red-400' : '',
-            touched && valid ? '!text-green-400' : '',
-            'w-auto pb-2 pl-2 text-sm text-gray-400',
-          ])}
-        >
-          {`${label}${required ? ' *' : ' (optional)'}`}
+        <span className='w-auto pb-2 pl-2 '>
+          <span
+            className={cn([
+              touched && !valid ? '!text-red-400' : '',
+              touched && valid ? '!text-green-400' : '',
+              'w-auto pb-2 pl-2 text-sm text-gray-500 dark:text-slate-500',
+            ])}
+          >
+            {label}
+          </span>
+          <span
+            className={cn([
+              'text-xs',
+              touched && !valid ? '!text-red-400' : '',
+              touched && valid ? '!text-green-400' : '',
+              'text-gray-400 dark:text-slate-600',
+            ])}
+          >
+            {required ? ' *' : ' (optional)'}
+          </span>
         </span>
       )}
 

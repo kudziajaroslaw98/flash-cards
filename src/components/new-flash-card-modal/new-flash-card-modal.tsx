@@ -212,12 +212,15 @@ export const NewFlashcardModal = ({
             variant={'form'}
             className='flex flex-col items-center justify-center'
           >
-            <FormComponent<Flashcard | Omit<Flashcard, 'order'>>
+            <FormComponent
               ref={formRef}
               className='w-full px-8'
               emitFormValue={setFormValue}
               scheme={getFormScheme}
               initialValues={formValue as Flashcard}
+              debug={{
+                values: true,
+              }}
             />
           </Modal.Body>
 

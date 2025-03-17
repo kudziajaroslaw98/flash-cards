@@ -32,7 +32,7 @@ export interface InputComponentProps
     | 'onKeyDown'
     | 'tabIndex'
   > {
-  type: HTMLInputTypeAttribute;
+  inputType: HTMLInputTypeAttribute;
   label?: string;
   inputLabel?: string;
   input?: string;
@@ -53,7 +53,7 @@ function Input({
   touched = false,
   error = null,
   className = '',
-  type = 'text',
+  inputType = 'text',
   icon,
   ...props
 }: InputComponentProps) {
@@ -83,14 +83,26 @@ function Input({
       onClick={handleClick}
     >
       {label && (
-        <span
-          className={cn([
-            touched && !valid ? '!text-red-400' : '',
-            touched && valid ? '!text-green-400' : '',
-            'w-auto pb-2 pl-2 text-sm text-gray-400',
-          ])}
-        >
-          {`${label}${required ? ' *' : ' (optional)'}`}
+        <span className='w-auto pb-2 pl-2 '>
+          <span
+            className={cn([
+              touched && !valid ? '!text-red-400' : '',
+              touched && valid ? '!text-green-400' : '',
+              'w-auto pb-2 pl-2 text-sm text-gray-500 dark:text-slate-500',
+            ])}
+          >
+            {label}
+          </span>
+          <span
+            className={cn([
+              'text-xs',
+              touched && !valid ? '!text-red-400' : '',
+              touched && valid ? '!text-green-400' : '',
+              'text-gray-400 dark:text-slate-600',
+            ])}
+          >
+            {required ? ' *' : ' (optional)'}
+          </span>
         </span>
       )}
 
@@ -112,14 +124,14 @@ function Input({
         <input
           {...props}
           ref={inputRef}
-          type={type}
+          type={inputType}
           tabIndex={props.tabIndex ?? 0}
           className={cn([
             label
               ? 'placeholder:text-gray-400 dark:placeholder:text-slate-700'
               : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
             'peer text-sm text-gray-800',
-            type === 'checkbox' ? 'w-auto' : 'w-full',
+            inputType === 'checkbox' ? 'w-auto' : 'w-full',
             'bg-transparent text-inherit outline-none transition-all dark:text-slate-200',
           ])}
           onFocus={handleFocus}

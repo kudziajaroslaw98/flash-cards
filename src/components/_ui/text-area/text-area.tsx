@@ -1,3 +1,4 @@
+import useAutosizeTextArea from '#/hooks/use-autosize-textarea';
 import { cn } from '#/shared/utils/cn.util';
 import { Sparkles } from 'lucide-react';
 import {
@@ -10,8 +11,8 @@ import {
 import { Button } from '../button/button';
 
 export type TextAreaProps = {
-  type?: 'textarea';
-  className: string;
+  type: 'textarea';
+  className?: string;
   valid: boolean;
   for?: string;
   label?: string;
@@ -20,9 +21,10 @@ export type TextAreaProps = {
   handleGenerate?: () => void;
   blockGenerate?: boolean;
   loadingGenerate?: boolean;
+  placeholder?: string;
+  value: string;
 } & Pick<
   TextareaHTMLAttributes<HTMLTextAreaElement>,
-  | 'value'
   | 'onChange'
   | 'onInput'
   | 'required'
@@ -50,6 +52,8 @@ export default function TextArea({
 }: TextAreaProps) {
   const [value, setValue] = useState(props.value);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  useAutosizeTextArea(textAreaRef.current, value);
 
   useEffect(() => {
     setValue(props.value);
@@ -90,16 +94,29 @@ export default function TextArea({
       htmlFor={forProp}
     >
       {label && (
-        <span
-          className={cn([
-            touched && !valid ? '!text-red-400' : '',
-            touched && valid ? '!text-green-400' : '',
-            'w-auto pb-2 pl-2 text-sm  text-gray-400 dark:text-slate-500',
-          ])}
-        >
-          {`${label}${required ? ' *' : ' (optional)'}`}
+        <span className='w-auto pb-2 pl-2 '>
+          <span
+            className={cn([
+              touched && !valid ? '!text-red-400' : '',
+              touched && valid ? '!text-green-400' : '',
+              'w-auto pb-2 pl-2 text-sm text-gray-500 dark:text-slate-500',
+            ])}
+          >
+            {label}
+          </span>
+          <span
+            className={cn([
+              'text-xs',
+              touched && !valid ? '!text-red-400' : '',
+              touched && valid ? '!text-green-400' : '',
+              'text-gray-400 dark:text-slate-600',
+            ])}
+          >
+            {required ? ' *' : ' (optional)'}
+          </span>
         </span>
       )}
+
       <span className='relative'>
         <textarea
           {...props}
@@ -107,7 +124,7 @@ export default function TextArea({
           className={cn([
             touched && !valid ? '!border-red-400 ring-red-400/50' : '',
             touched && valid ? '!border-green-400 ring-green-400/50' : '',
-            'relative flex w-full items-center gap-4 rounded-md border border-gray-300 bg-gray-100 p-2 px-4 dark:border-slate-800 dark:bg-slate-900',
+            'field-sizing-content relative flex w-full items-center gap-4 rounded-md border border-gray-300 bg-gray-100 p-2 px-4 dark:border-slate-800 dark:bg-slate-900',
             'h-auto resize-y text-sm outline-none transition-all focus:ring',
             label
               ? 'placeholder:text-gray-400  dark:placeholder:text-slate-700'

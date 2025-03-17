@@ -1,4 +1,6 @@
 import { db } from '#/db/dexie.db';
+import { useRevisePlanContext } from '#/providers/revise-plan-provider';
+import type { Flashcard } from '#/types/flash-card.type';
 import type { ReviseOptionsType } from '#/types/revise-options.type';
 import { useState } from 'react';
 import ProgressBar from '../_ui/progress-bar/progress-bar';
@@ -8,14 +10,20 @@ import { ReviseOptions } from '../flash-card-revise/revise-options';
 export function ReviseBody({
   clicked,
   setClicked,
-  currentDay,
-  currentSession,
-  totalCards,
-  reviewedCards,
-  recalled,
   revisedCard,
+}: {
+  clicked: boolean;
+  setClicked: (value: boolean) => void;
+  revisedCard: Flashcard | undefined;
 }) {
   const [clickedOption, setClickedOption] = useState<string>();
+  const { currentDay, currentSession } = useRevisePlanContext();
+
+  const reviewedCards = currentSession?.completedCards.length ?? 0;
+  const recalled = currentDay?.correctCards.length ?? 0;
+  const totalCards =
+    (currentDay?.cardsToReview.length ?? 0) +
+    (currentDay?.newCards.length ?? 0);
 
   const spaceRepetitionClick = (value: ReviseOptionsType) => {
     if (!revisedCard) {
@@ -50,7 +58,7 @@ export function ReviseBody({
   };
 
   const changeClicked = async (answer: string | undefined, key?: string) => {
-    if (!answer || !revisedCard || !currentDay) return;
+    if (!answer || !revisedCard || !currentDay || !currentSession) return;
 
     if (key) {
       window.umami.track('Answer clicked', { key });

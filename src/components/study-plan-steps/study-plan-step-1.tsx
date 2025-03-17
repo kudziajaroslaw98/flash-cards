@@ -1,6 +1,14 @@
 'use client';
 
 import type { PlanSetupState } from '#/app/(pages)/study/plans/new/page';
+import { cardLengthDictionary } from '#/dictionaries/card-length.dictionary';
+import { contentEmphasisDictionary } from '#/dictionaries/content-emphasis.dictionary';
+import { difficultyDistributionDictionary } from '#/dictionaries/difficulty-distribution.dictionary';
+import { knowledgeLevelDictionary } from '#/dictionaries/knowledge-level.dictionary';
+import { learningStyleDictionary } from '#/dictionaries/learning-style.dictionary';
+import { mnemonicPreferenceDictionary } from '#/dictionaries/mnemonic-preference.dictionary';
+import { preferredFormatDictionary } from '#/dictionaries/preferred-format.dictionary';
+import { studyScopeDictionary } from '#/dictionaries/study-scope.dictionary';
 import { cardLengthSchema } from '#/schemas/card-length.schema';
 import { contentEmphasisSchema } from '#/schemas/content-emphasis.schema';
 import { difficultyDistributionSchema } from '#/schemas/difficulty-distribution.schema';
@@ -59,11 +67,11 @@ export function StudyPlanStep1({
       <h2 className='mb-4 text-2xl font-bold text-gray-700 dark:text-slate-400'>
         Set Your Learning Focus & Knowledge Level
       </h2>
-      <p className='size-sm text-gray-500'>
+      <span className='size-xs text-gray-500'>
         Tell us what you want to study and your current knowledge level.
         Selecting tags defines your topic, and knowledge level helps the AI
         personalize the plan to your starting point.
-      </p>
+      </span>
 
       <div className='flex w-full flex-col items-center justify-center py-12'>
         <div className='flex w-80 flex-col items-center justify-center gap-8'>
@@ -115,17 +123,11 @@ export function StudyPlanStep1({
                 },
                 knowledgeLevel: {
                   type: 'dropdown',
+                  multiple: false,
                   required: true,
                   label: 'Your Knowledge Level',
                   controlLabel: 'Select your knowledge level:',
-                  config: [
-                    { value: 'unfamiliar', label: 'Unfamiliar (1-15%)' },
-                    { value: 'beginner', label: 'Beginner (16-30%)' },
-                    { value: 'developing', label: 'Developing (31-55%)' },
-                    { value: 'proficient', label: 'Proficient (56-75%)' },
-                    { value: 'advanced', label: 'Advanced (76-90%)' },
-                    { value: 'expert', label: 'Expert (91-100%)' },
-                  ],
+                  config: knowledgeLevelDictionary,
                   _internal_constraints: [
                     {
                       type: 'validation',
@@ -136,19 +138,10 @@ export function StudyPlanStep1({
                 },
                 studyScope: {
                   type: 'dropdown',
+                  multiple: false,
                   label: 'Study Scope',
                   controlLabel: 'Study Scope',
-                  config: [
-                    { value: 'default', label: 'Focus on Core Concepts' },
-                    {
-                      value: 'comprehensive',
-                      label: 'Comprehensive Coverage',
-                    },
-                    {
-                      value: 'specific',
-                      label: 'Specific Area within Tags',
-                    },
-                  ],
+                  config: studyScopeDictionary,
                   _internal_default_value: 'default',
                   _internal_constraints: [
                     {
@@ -158,49 +151,18 @@ export function StudyPlanStep1({
                     },
                   ],
                 },
+                _internal_separator_1: {
+                  type: '_internal_separator',
+                },
+                _internal_accordion_1: {
+                  type: '_internal_accordion',
+                },
                 preferredFormat: {
                   type: 'dropdown',
+                  multiple: false,
                   label: 'Preferred Format',
                   controlLabel: 'Preferred Format',
-                  config: [
-                    { value: 'balanced', label: 'Balanced mix of all formats' },
-                    {
-                      value: 'application',
-                      label: 'Focus on practical application questions',
-                    },
-                    {
-                      value: 'compare-contrast',
-                      label: 'Emphasize comparison questions',
-                    },
-                    {
-                      value: 'problem-solving',
-                      label: 'Prioritize problem-solving scenarios',
-                    },
-                    {
-                      value: 'definition',
-                      label: 'Concentrate on term definitions',
-                    },
-                    {
-                      value: 'cause-effect',
-                      label: 'Focus on cause and effect relationships',
-                    },
-                    {
-                      value: 'process',
-                      label: 'Emphasize process and mechanism questions',
-                    },
-                    {
-                      value: 'analysis',
-                      label: 'Focus on analytical breakdowns',
-                    },
-                    {
-                      value: 'evaluation',
-                      label: 'Prioritize evaluation and judgment questions',
-                    },
-                    {
-                      value: 'recall',
-                      label: 'Focus on factual recall questions',
-                    },
-                  ],
+                  config: preferredFormatDictionary,
                   _internal_default_value: null,
                   _internal_constraints: [
                     {
@@ -212,50 +174,10 @@ export function StudyPlanStep1({
                 },
                 contentEmphasis: {
                   type: 'dropdown',
+                  multiple: false,
                   label: 'Content Emphasis',
                   controlLabel: 'Content Emphasis',
-                  config: [
-                    {
-                      value: 'balanced',
-                      label: 'Balanced coverage across subtopics',
-                    },
-                    {
-                      value: 'fundamentals',
-                      label: 'Emphasize fundamental principles',
-                    },
-                    {
-                      value: 'edge-cases',
-                      label: 'Focus on edge cases and exceptions',
-                    },
-                    {
-                      value: 'current-trends',
-                      label: 'Highlight current trends and developments',
-                    },
-                    {
-                      value: 'historical',
-                      label: 'Include historical development and background',
-                    },
-                    {
-                      value: 'practical',
-                      label: 'Emphasize practical aspects and applications',
-                    },
-                    {
-                      value: 'theoretical',
-                      label: 'Focus on theoretical foundations',
-                    },
-                    {
-                      value: 'controversial',
-                      label: 'Include debated or controversial aspects',
-                    },
-                    {
-                      value: 'technical',
-                      label: 'Emphasize technical details and specifications',
-                    },
-                    {
-                      value: 'conceptual',
-                      label: 'Focus on high-level conceptual understanding',
-                    },
-                  ],
+                  config: contentEmphasisDictionary,
                   _internal_default_value: null,
                   _internal_constraints: [
                     {
@@ -267,44 +189,10 @@ export function StudyPlanStep1({
                 },
                 learningStyle: {
                   type: 'dropdown',
+                  multiple: false,
                   label: 'Learning Style',
                   controlLabel: 'Learning Style',
-                  config: [
-                    {
-                      value: 'balanced',
-                      label: 'Balanced for all learning styles',
-                    },
-                    {
-                      value: 'visual',
-                      label: 'Adapt for visual learners (examples, imagery)',
-                    },
-                    {
-                      value: 'auditory',
-                      label:
-                        'Adapt for auditory learners (verbal descriptions)',
-                    },
-                    {
-                      value: 'reading-writing',
-                      label: 'Adapt for reading/writing preference',
-                    },
-                    {
-                      value: 'kinesthetic',
-                      label:
-                        'Adapt for kinesthetic learners (practical scenarios)',
-                    },
-                    {
-                      value: 'logical',
-                      label: 'Adapt for logical/mathematical thinkers',
-                    },
-                    {
-                      value: 'social',
-                      label: 'Include collaborative or group contexts',
-                    },
-                    {
-                      value: 'solitary',
-                      label: 'Frame for individual study contexts',
-                    },
-                  ],
+                  config: learningStyleDictionary,
                   _internal_default_value: null,
                   _internal_constraints: [
                     {
@@ -317,46 +205,9 @@ export function StudyPlanStep1({
                 difficultyDistribution: {
                   type: 'dropdown',
                   label: 'Difficulty Distribution',
+                  multiple: false,
                   controlLabel: 'Difficulty Distribution',
-                  config: [
-                    {
-                      value: 'balanced',
-                      label:
-                        'Balanced difficulty (33% easy, 34% medium, 33% hard)',
-                    },
-                    {
-                      value: 'beginner-focused',
-                      label:
-                        'Beginner focused (50% easy, 30% medium, 20% hard)',
-                    },
-                    {
-                      value: 'advanced-focused',
-                      label:
-                        'Advanced focused (20% easy, 30% medium, 50% hard)',
-                    },
-                    {
-                      value: 'progressive',
-                      label: 'Progressive difficulty (easier to harder)',
-                    },
-                    {
-                      value: 'challenging',
-                      label:
-                        'Challenging throughout (10% easy, 40% medium, 50% hard)',
-                    },
-                    {
-                      value: 'accessible',
-                      label: 'More accessible (40% easy, 40% medium, 20% hard)',
-                    },
-                    {
-                      value: 'expert',
-                      label: 'Expert level (5% easy, 35% medium, 60% hard)',
-                    },
-                    {
-                      value: 'introductory',
-                      label:
-                        'Introductory level (60% easy, 30% medium, 10% hard)',
-                    },
-                  ],
+                  config: difficultyDistributionDictionary,
                   _internal_default_value: null,
                   _internal_constraints: [
                     {
@@ -369,27 +220,9 @@ export function StudyPlanStep1({
                 cardLength: {
                   type: 'dropdown',
                   label: 'Card Length',
+                  multiple: false,
                   controlLabel: 'Card Length',
-                  config: [
-                    { value: 'balanced', label: 'Balanced length' },
-                    {
-                      value: 'concise',
-                      label: 'Concise (shorter answers and explanations)',
-                    },
-                    {
-                      value: 'detailed',
-                      label:
-                        'Detailed (comprehensive answers and explanations)',
-                    },
-                    {
-                      value: 'very-concise',
-                      label: 'Very concise (minimum effective information)',
-                    },
-                    {
-                      value: 'comprehensive',
-                      label: 'Comprehensive (thorough and extensive)',
-                    },
-                  ],
+                  config: cardLengthDictionary,
                   _internal_default_value: null,
                   _internal_constraints: [
                     {
@@ -401,34 +234,10 @@ export function StudyPlanStep1({
                 },
                 mnemonicPreference: {
                   type: 'dropdown',
+                  multiple: false,
                   label: 'Mnemonic Preference',
                   controlLabel: 'Mnemonic Preference',
-                  config: [
-                    { value: 'none', label: 'No specific mnemonic techniques' },
-                    { value: 'acronyms', label: 'Include helpful acronyms' },
-                    {
-                      value: 'associations',
-                      label: 'Use association techniques',
-                    },
-                    { value: 'chunking', label: 'Employ information chunking' },
-                    {
-                      value: 'visualization',
-                      label: 'Include visualization cues',
-                    },
-                    {
-                      value: 'stories',
-                      label: 'Use narrative/story techniques',
-                    },
-                    { value: 'rhymes', label: 'Include rhymes or wordplay' },
-                    {
-                      value: 'mind-palace',
-                      label: 'Suggest memory palace techniques',
-                    },
-                    {
-                      value: 'mixed',
-                      label: 'Mix of different mnemonic techniques',
-                    },
-                  ],
+                  config: mnemonicPreferenceDictionary,
                   _internal_default_value: null,
                   _internal_constraints: [
                     {

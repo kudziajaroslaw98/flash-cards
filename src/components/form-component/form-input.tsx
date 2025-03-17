@@ -35,8 +35,8 @@ type FormInputProps<T> = {
   handleOnChange: (value: unknown | unknown[], key: string) => void;
   handleOnFocus: (key: string) => void;
   handleOnBlur: () => void;
-  inputProps: ExtendedInputType<InputType, T>;
-  constaintProps: InternalConstraint<T>[];
+  inputProps: ExtendedInputType<InputType<T>, T>;
+  constraintProps: InternalConstraint<T>[];
 };
 
 export default function FormInput<T>({
@@ -53,8 +53,11 @@ export default function FormInput<T>({
   inputProps,
   ...props
 }: FormInputProps<T>) {
-  const constaintProps = props.constaintProps
+  const constraintProps = props.constraintProps
     ?.filter((item) => item.type === 'prop')
+    .map(
+      (item) => item as { type: 'prop'; propName: string; propValue: unknown },
+    )
     .reduceRight(
       (acc, item) => ({
         ...acc,
@@ -67,6 +70,7 @@ export default function FormInput<T>({
     <m.div
       key={`${inputName}-${index}`}
       transition={{ duration: 0.2, ease: 'easeOut' }}
+      autoFocus={index === 0}
     >
       {isTextArea(inputProps) && (
         <TextArea
@@ -79,7 +83,7 @@ export default function FormInput<T>({
           onInput={(e) => handleOnInput(e, inputName)}
           onFocus={() => handleOnFocus(inputName)}
           onBlur={handleOnBlur}
-          {...constaintProps}
+          {...constraintProps}
         ></TextArea>
       )}
 
@@ -91,10 +95,10 @@ export default function FormInput<T>({
           valid={touched ? valid : true}
           error={touched ? error : null}
           touched={touched}
-          onChange={(e) => handleOnChange(e, inputName)}
+          onChange={(e: unknown) => handleOnChange(e, inputName)}
           onFocus={() => handleOnFocus(inputName)}
           onBlur={handleOnBlur}
-          {...constaintProps}
+          {...constraintProps}
         ></Dropdown>
       )}
 
@@ -109,7 +113,7 @@ export default function FormInput<T>({
           onInput={(e) => handleOnInput(e, inputName)}
           onFocus={() => handleOnFocus(inputName)}
           onBlur={handleOnBlur}
-          {...constaintProps}
+          {...constraintProps}
         />
       )}
 
@@ -124,7 +128,7 @@ export default function FormInput<T>({
           onChange={(value) => handleOnChange(value, inputName)}
           onFocus={() => handleOnFocus(inputName)}
           onBlur={handleOnBlur}
-          {...constaintProps}
+          {...constraintProps}
         />
       )}
 
@@ -139,7 +143,7 @@ export default function FormInput<T>({
           onChange={(value) => handleOnChange(value, inputName)}
           onFocus={() => handleOnFocus(inputName)}
           onBlur={handleOnBlur}
-          {...constaintProps}
+          {...constraintProps}
         />
       )}
 
@@ -154,7 +158,7 @@ export default function FormInput<T>({
           onChange={(value) => handleOnChange(value, inputName)}
           onFocus={() => handleOnFocus(inputName)}
           onBlur={handleOnBlur}
-          {...constaintProps}
+          {...constraintProps}
         />
       )}
     </m.div>

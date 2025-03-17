@@ -10,6 +10,7 @@ import {
 
 type StepperContextType = {
   currentStep: number;
+  currentStepChild: Exclude<ReactNode, boolean | null | undefined>;
   totalSteps: number;
   steps: Exclude<ReactNode, boolean | null | undefined>[];
   goToNext: () => void;
@@ -60,6 +61,7 @@ export const StepperProvider = ({ children }: PropsWithChildren) => {
 
   const value = useMemo(
     () => ({
+      currentStepChild: stepsRef.current[currentStep - 1],
       currentStep,
       totalSteps,
       goToNext,

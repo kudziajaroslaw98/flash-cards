@@ -1,9 +1,7 @@
 import type { Flashcard } from '#/types/flash-card.type';
-import type { StudyDay } from '#/types/study-day.type';
-import type { StudySession } from '#/types/study-session.type';
 // import { experimental_useObject as useObject } from '@ai-sdk/react';
 import { db } from '#/db/dexie.db';
-import { endOfToday } from 'date-fns/endOfToday';
+import { useRevisePlanContext } from '#/providers/revise-plan-provider';
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from '../_ui/button/button';
@@ -14,26 +12,21 @@ import { ReviseBody } from './revise-body';
 import { ReviseIncorrectSummary } from './revise-incorrect-summary';
 
 export function ReviseStages({
-  stage,
   clicked,
   setClicked,
-  setStage,
-  currentDay,
-  currentSession,
-  completed,
-  reviewFlashcards,
-  newFlashcards,
 }: {
-  stage: number;
   clicked: boolean;
   setClicked: (value: boolean) => void;
-  setStage: (value: number) => void;
-  currentDay: StudyDay;
-  currentSession: StudySession;
-  completed: Flashcard[];
-  reviewFlashcards: Flashcard[];
-  newFlashcards: Flashcard[];
 }) {
+  const {
+    reviseStage: stage,
+    setReviseStage: setStage,
+    completedFlashcards: completed,
+    currentDay,
+    currentSession,
+    reviewFlashcards,
+    newFlashcards,
+  } = useRevisePlanContext();
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [revisedCard, setRevisedCard] = useState<Flashcard>();
 
@@ -53,15 +46,7 @@ export function ReviseStages({
     );
 
     if (leftCards.length === 0) {
-      const newStage = stage + 1;
-      setStage(newStage);
-
-      if (newStage === 6) {
-        db.studySessions.update(currentSession.id, {
-          currentDay: currentDay.dayNumber + 1,
-          nextRevisionDate: endOfToday().toUTCString(),
-        });
-      }
+      setStage((prev) => prev + 1);
     }
 
     setRevisedCard(leftCards[0]);
@@ -94,7 +79,7 @@ export function ReviseStages({
       setNewCorrect(newCorrect);
       setReviewCorrect(reviewCorrect);
     }
-  }, [currentDay, currentDay.correctCards]);
+  }, [currentDay, currentDay?.correctCards]);
 
   useEffect(() => {
     if (!currentDay) {
@@ -111,7 +96,7 @@ export function ReviseStages({
       setReviewIncorrect(reviewIncorrect);
       setNewIncorrect(newIncorrect);
     }
-  }, [currentDay, currentDay.incorrectCards]);
+  }, [currentDay, currentDay?.incorrectCards]);
 
   useEffect(() => {
     if (!reviewFlashcards || !newFlashcards || clicked) {
@@ -164,7 +149,7 @@ export function ReviseStages({
   }, [reviewFlashcards, newFlashcards, completed]);
 
   useEffect(() => {
-    if (revisedCard) {
+    if (revisedCard || !currentSession || !currentDay) {
       return;
     }
 
@@ -199,11 +184,6 @@ export function ReviseStages({
         <ReviseBody
           clicked={clicked}
           setClicked={setClicked}
-          currentDay={currentDay}
-          currentSession={currentSession}
-          recalled={currentDay?.correctCards.length}
-          reviewedCards={completed.length}
-          totalCards={flashcards.length}
           revisedCard={revisedCard}
         />
         <FloatingButtons>
@@ -239,11 +219,6 @@ export function ReviseStages({
         <ReviseBody
           clicked={clicked}
           setClicked={setClicked}
-          currentDay={currentDay}
-          currentSession={currentSession}
-          recalled={currentDay?.correctCards.length}
-          reviewedCards={completed.length}
-          totalCards={flashcards.length}
           revisedCard={revisedCard}
         />
         <FloatingButtons>
@@ -279,13 +254,6 @@ export function ReviseStages({
         <ReviseBody
           clicked={clicked}
           setClicked={setClicked}
-          currentDay={currentDay}
-          currentSession={currentSession}
-          recalled={currentDay?.correctCards.length}
-          reviewedCards={currentSession.completedCards.length}
-          totalCards={
-            currentDay.cardsToReview.length + currentDay.newCards.length
-          }
           revisedCard={revisedCard}
         />
         <FloatingButtons>

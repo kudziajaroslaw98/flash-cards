@@ -1,4 +1,6 @@
 import type { PlanSetupState } from '#/app/(pages)/study/plans/new/page';
+import { durationDictionary } from '#/dictionaries/duration.dictionary';
+import { planTypeDictionary } from '#/dictionaries/plan-type.dictionary';
 import { planDurationSchema } from '#/schemas/plan-durations.schema';
 import { planTypeSchema } from '#/schemas/plan-types.schema';
 import type { PlanDuration } from '#/types/plan-durations.type';
@@ -56,15 +58,8 @@ export function StudyPlanStep2({
               inputs: {
                 planType: {
                   type: 'dropdown',
-                  config: [
-                    {
-                      value: 'overview',
-                      label: 'Comprehensive Overview',
-                    },
-                    { value: 'deep-dive', label: 'Deep Dive' },
-                    { value: 'quick-review', label: 'Quick Revision' },
-                    { value: 'exam-prep', label: 'Exam Preparation' },
-                  ],
+                  multiple: false,
+                  config: planTypeDictionary,
                   label: 'Study Plan Type',
                   controlLabel: 'Plan Type',
                   required: true,
@@ -78,16 +73,11 @@ export function StudyPlanStep2({
                 },
                 duration: {
                   type: 'dropdown',
+                  multiple: false,
                   label: 'Duration',
                   controlLabel: 'Plan Duration',
                   required: true,
-                  config: [
-                    { value: '3', label: '3 days' },
-                    { value: '5', label: '5 days' },
-                    { value: '7', label: '7 days' },
-                    { value: '14', label: '14 days' },
-                    { value: '30', label: '30 days' },
-                  ],
+                  config: durationDictionary,
                   _internal_constraints: [
                     {
                       type: 'validation',

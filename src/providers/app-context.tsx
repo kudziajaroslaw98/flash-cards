@@ -253,7 +253,7 @@ export default function AppProvider(props: PropsWithChildren) {
 
   const updateFlashcard = async (flashcard: Partial<Flashcard>) => {
     const updatedFlashcard: Flashcard = flashcardsMerge(
-      defaultFlashcard,
+      defaultFlashcard(),
       flashcard,
     );
 
@@ -714,6 +714,16 @@ export default function AppProvider(props: PropsWithChildren) {
       }
     };
   }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const umamiBlocked = window.localStorage.getItem('umami.disabled');
+
+      if (!umamiBlocked) {
+        window.localStorage.setItem('umami.disabled', '1');
+      }
+    }
+  }, []);
 
   /////////////////
   // #endregion MUTATIONS

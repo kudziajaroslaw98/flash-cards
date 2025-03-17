@@ -90,7 +90,7 @@ export default function FlashcardComponent({
             size === 'sm' && 'h-44 w-36',
             size === 'md' && 'h-56 w-44',
             size === 'lg' && 'h-72 w-64',
-            size === 'horizontal-sm' && 'h-44 w-72',
+            size === 'horizontal-sm' && 'h-44 w-80',
           ])}
           {...props}
         >
@@ -110,9 +110,10 @@ export default function FlashcardComponent({
                 {flashcard.type !== 'index' && (
                   <h5
                     className={cn([
-                      'z-20 flex h-20 w-full flex-col items-center justify-center hyphens-auto text-center',
-                      size === 'sm' && 'text-[0.7rem] leading-4',
-                      size === 'horizontal-sm' && 'text-[0.7rem] leading-4',
+                      'z-20 flex h-20 w-full flex-col items-center justify-center text-center',
+                      size === 'sm' && 'text-[0.6875rem] leading-[120%]',
+                      size === 'horizontal-sm' &&
+                        'text-[0.6875rem] leading-[120%]',
                       size === 'md' && 'text-xs',
                       size === 'lg' && 'text-sm',
                       flashcard.type === 'question' &&
@@ -127,8 +128,8 @@ export default function FlashcardComponent({
                   <h2
                     className={cn([
                       'z-20 flex h-full w-full flex-col items-center hyphens-auto py-2 text-center text-green-400 ',
-                      size === 'sm' && 'text-lg leading-5',
-                      size === 'horizontal-sm' && 'text-lg leading-5',
+                      size === 'sm' && 'text-lg leading-[120%]',
+                      size === 'horizontal-sm' && 'text-lg leading-[120%]',
                       size === 'md' && 'text-2xl',
                       size === 'lg' && 'text-3xl',
                       flashcard.type === 'index' && 'justify-center',
@@ -145,7 +146,7 @@ export default function FlashcardComponent({
           {isFlipped && !isInSelectionMode && (
             <div
               className={cn([
-                'scrollbar-hidden relative z-20 flex h-full w-full flex-col overflow-y-auto hyphens-auto py-6 text-gray-500 dark:text-slate-400',
+                'scrollbar-hidden relative z-20 flex h-full w-full snap-y snap-mandatory scroll-pt-8 flex-col overflow-y-auto scroll-smooth hyphens-auto py-6 text-gray-500 dark:text-slate-400',
                 size === 'sm' && 'text-[.7rem]',
                 size === 'horizontal-sm' && 'text-[.7rem]',
                 size === 'md' && 'text-xs',
@@ -159,13 +160,27 @@ export default function FlashcardComponent({
               </div>
 
               <div className='flex flex-col gap-4'>
-                <div className='flex flex-col gap-1'>
+                <div className='flex snap-start snap-always scroll-pt-8 flex-col gap-1'>
                   <span className='text-gray-400'>Definition:</span>
                   <span>{flashcard?.definition}</span>
                 </div>
 
+                {flashcard?.answer1 && (
+                  <div className='flex snap-start snap-always flex-col gap-1'>
+                    <span className='text-gray-400'>Answer:</span>
+                    <ul className='flex list-inside !list-disc flex-col gap-1 '>
+                      <li
+                        className='list-item decoration-gray-600'
+                        key={flashcard.answer1.trim()}
+                      >
+                        {flashcard.answer1.trim()}
+                      </li>
+                    </ul>
+                  </div>
+                )}
+
                 {flashcard?.examples && (
-                  <div className='flex flex-col gap-1'>
+                  <div className='flex snap-start snap-always flex-col gap-1'>
                     <span className='text-gray-400'>Examples:</span>
                     <ul className='flex list-inside !list-disc flex-col gap-1 '>
                       {flashcard?.examples.split(';').map((example) => (
@@ -180,7 +195,7 @@ export default function FlashcardComponent({
                   </div>
                 )}
                 {flashcard?.synonyms && (
-                  <div className='flex flex-col gap-1'>
+                  <div className='flex snap-start snap-always flex-col gap-1'>
                     <span className='text-gray-400'>Synonyms:</span>
                     <ul className='flex list-inside !list-disc flex-col gap-1 '>
                       {flashcard?.synonyms.split(';').map((synonym) => (
@@ -195,7 +210,7 @@ export default function FlashcardComponent({
                   </div>
                 )}
                 {flashcard?.keyPoints && (
-                  <div className='flex flex-col gap-1'>
+                  <div className='flex snap-start snap-always flex-col gap-1'>
                     <span className='text-gray-400'>Key Points:</span>
                     <ul className='flex list-inside !list-disc flex-col gap-1 '>
                       {flashcard?.keyPoints.split(';').map((keyPoint) => (
@@ -211,7 +226,7 @@ export default function FlashcardComponent({
                 )}
 
                 {flashcard?.relatedFacts && (
-                  <div className='flex flex-col gap-1'>
+                  <div className='flex snap-start snap-always flex-col gap-1'>
                     <span className='text-gray-400'>Related Facts:</span>
                     <ul className='flex list-inside !list-disc flex-col gap-1 '>
                       {flashcard?.relatedFacts.split(';').map((fact) => (

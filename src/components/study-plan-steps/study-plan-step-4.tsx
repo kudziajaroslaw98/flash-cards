@@ -186,7 +186,8 @@ export function StudyPlanStep4({
             className={cn([
               'grid h-auto w-full justify-center gap-4 transition-all',
               suggestions.length < 5 ? 'xl:justify-start' : 'xl:justify-center',
-              'grid-cols-[repeat(auto-fit,11rem)]',
+
+              'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4',
             ])}
           >
             <AnimatePresence mode='popLayout'>

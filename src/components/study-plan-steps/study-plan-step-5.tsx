@@ -98,7 +98,7 @@ export function StudyPlanStep5({
       planId,
       synced: false,
       currentDay: 1,
-      stage: 0,
+      stage: 3,
       startDate: new Date().toUTCString(),
       nextRevisionDate: new Date().toUTCString(),
       correctCards: [],
@@ -211,7 +211,7 @@ export function StudyPlanStep5({
                       day.cardsToReview.length < 5
                         ? 'xl:justify-start'
                         : 'xl:justify-center',
-                      'grid-cols-[repeat(auto-fit,9rem)]',
+                      'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4',
                     ])}
                   >
                     {flashcards
@@ -222,7 +222,7 @@ export function StudyPlanStep5({
                         <FlashcardComponent
                           key={'review-card-' + card.frontUuid}
                           flashcard={card}
-                          size='sm'
+                          size='horizontal-sm'
                         />
                       ))}
                   </div>
@@ -237,7 +237,7 @@ export function StudyPlanStep5({
                       day.newCards.length < 5
                         ? 'xl:justify-start'
                         : 'xl:justify-center',
-                      'grid-cols-[repeat(auto-fit,9rem)]',
+                      'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4',
                     ])}
                   >
                     {flashcards
@@ -246,7 +246,7 @@ export function StudyPlanStep5({
                         <FlashcardComponent
                           key={'new-card-' + card.frontUuid}
                           flashcard={card}
-                          size='sm'
+                          size='horizontal-sm'
                         />
                       ))}
                   </div>

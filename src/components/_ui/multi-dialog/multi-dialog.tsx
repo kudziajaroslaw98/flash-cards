@@ -186,7 +186,7 @@ export const MultiDialog = ({
               >
                 <span className='hidden md:flex'>{buttonLeft}</span>
 
-                <div className='flex w-full max-w-96 flex-col items-center justify-center gap-4'>
+                <div className='flex w-full max-w-[28rem] resize-x flex-col items-center justify-center gap-4'>
                   <AnimatePresence
                     mode='popLayout'
                     initial={false}
@@ -224,7 +224,7 @@ export const MultiDialog = ({
                   </div>
 
                   <ShortcutList
-                    className='hidden text-gray-300 md:flex'
+                    className='hidden max-w-96 text-gray-300 md:flex'
                     shortcuts={[
                       {
                         name: 'Close Dialog',

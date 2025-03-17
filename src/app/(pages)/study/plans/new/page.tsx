@@ -120,6 +120,12 @@ export default function NewStudyPlanPage() {
           state.step2.duration as PlanDuration,
           state.step2.planType as PlanType,
         )?.[1] ?? 0,
+      preferredFormat: state.step1.preferredFormat,
+      contentEmphasis: state.step1.contentEmphasis,
+      learningStyle: state.step1.learningStyle,
+      difficultyDistribution: state.step1.difficultyDistribution,
+      cardLength: state.step1.cardLength,
+      mnemonicPreference: state.step1.mnemonicPreference,
     },
     onFinish: () => {
       setIsLoading(false);
@@ -159,7 +165,7 @@ export default function NewStudyPlanPage() {
         <Stepper>
           <StepperStep
             index={1}
-            stepLabel='Study Goals'
+            stepLabel='General settings'
             stepIdentification='1'
           >
             <StudyPlanStep1

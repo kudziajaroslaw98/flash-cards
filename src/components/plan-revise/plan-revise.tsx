@@ -1,12 +1,9 @@
 'use client';
 
-import { db } from '#/db/dexie.db';
+import { useRevisePlanContext } from '#/providers/revise-plan-provider';
 import { APP_ROUTES } from '#/shared/defaults/app.routes';
-import { StudyDay } from '#/types/study-day.type';
 import type { StudyPlan } from '#/types/study-plan.type';
-import type { StudySession } from '#/types/study-session.type';
 import { format } from 'date-fns';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { AlarmClock, ArrowRight, PartyPopper } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -20,68 +17,15 @@ import { SwitchCase } from '../_ui/switch-case/switch-case';
 import { ReviseStages } from './revise-stages';
 
 export function PlanRevise() {
-  const [reviseStage, setReviseStage] = useState<number>(0);
-  const [pickedPlan, setPickedPlan] = useState<StudyPlan | null>(null);
+  const { setPickedPlan, pickedPlan, currentDay, currentSession, studyPlans } =
+    useRevisePlanContext();
   const [showHowDareYou, setShowHowDareYou] = useState(false);
   const [dropdownConfig, setDropdownConfig] = useState<
     { value: StudyPlan; label: string }[]
   >([]);
-  const [currentDay, setCurrentDay] = useState<StudyDay | null>(null);
-  const [currentSession, setCurrentSession] = useState<StudySession | null>(
-    null,
-  );
   const [clicked, setClicked] = useState(false);
 
   const router = useRouter();
-
-  const studySession = useLiveQuery(
-    () =>
-      db.studySessions
-        .where('planId')
-        .equals(pickedPlan?.id ?? '')
-        .first(),
-    [pickedPlan],
-  );
-  const studyDays = useLiveQuery(
-    () =>
-      db.studyDays
-        .where('planId')
-        .equals(pickedPlan?.id ?? '')
-        .toArray(),
-    [pickedPlan],
-  );
-  const studyPlans = useLiveQuery(() => db.studyPlans.toArray()) ?? [];
-  const reviewFlashcards =
-    useLiveQuery(() => {
-      if (!currentDay) {
-        return [];
-      }
-      return db.flashcards
-        .where('frontUuid')
-        .anyOf([...currentDay.cardsToReview])
-        .toArray();
-    }, [currentDay]) ?? [];
-  const newFlashcards =
-    useLiveQuery(() => {
-      if (!currentDay) {
-        return [];
-      }
-      return db.flashcards
-        .where('frontUuid')
-        .anyOf([...currentDay.newCards])
-        .toArray();
-    }, [currentDay]) ?? [];
-  const completedFlashcards =
-    useLiveQuery(() => {
-      if (!currentSession) {
-        return [];
-      }
-      console.log('🚀 ~ :84 ~ useLiveQuery ~ currentSession:', currentSession);
-      return db.flashcards
-        .where('frontUuid')
-        .anyOf([...currentSession.completedCards])
-        .toArray();
-    }, [currentSession]) ?? [];
 
   const handlePlanPick = (plan: StudyPlan) => {
     setPickedPlan(plan);
@@ -104,23 +48,6 @@ export function PlanRevise() {
       })),
     );
   }, [studyPlans]);
-
-  useEffect(() => {
-    if (studySession) {
-      const currentDayNumber =
-        studySession.currentDay === 0 ? 1 : studySession.currentDay;
-      const currentDay = studyDays?.find(
-        (day) => day.dayNumber === currentDayNumber,
-      );
-      if (currentDayNumber === 1 && studySession.stage === 0) {
-        setReviseStage(3);
-      } else {
-        setReviseStage(studySession.stage);
-      }
-      setCurrentSession(studySession);
-      setCurrentDay(currentDay ?? null);
-    }
-  }, [studySession, studyDays]);
 
   return (
     <div className='flex h-full w-full'>
@@ -209,15 +136,8 @@ export function PlanRevise() {
                   >
                     <Case caseValue={true}>
                       <ReviseStages
-                        stage={reviseStage}
-                        setStage={setReviseStage}
                         clicked={clicked}
                         setClicked={setClicked}
-                        currentDay={currentDay!}
-                        currentSession={studySession!}
-                        completed={completedFlashcards}
-                        reviewFlashcards={reviewFlashcards}
-                        newFlashcards={newFlashcards}
                       />
                     </Case>
 

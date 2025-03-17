@@ -17,6 +17,7 @@ export type AISuggestedFlashcardType = Pick<
   | 'context'
   | 'query'
   | 'definition'
+  | 'answer1'
 > & { id: 'string'; topic: 'string' };
 
 interface AISuggestedFlashcardProps {
@@ -89,8 +90,9 @@ export function AISuggestedFlashcard({
           className={cn([
             'group relative z-10 cursor-pointer flex-col items-center p-4 py-0 outline-none focus-visible:ring  focus-visible:ring-green-400/50',
             isSelected ? 'ring ring-green-400/60' : '',
-            '!h-56 !w-44',
+            // '!h-56 !w-44',?
             // '!h-44 !w-36',
+            'h-44 w-80',
           ])}
           {...props}
         >
@@ -105,7 +107,7 @@ export function AISuggestedFlashcard({
                   <h5
                     className={cn([
                       'absolute left-0 top-0 z-20 flex h-16 w-full flex-col items-center justify-start hyphens-auto px-2 pt-4 text-center',
-                      'text-[0.7rem] leading-4',
+                      'text-[0.6875rem] leading-[120%]',
                     ])}
                   >
                     {flashcard.query}
@@ -116,8 +118,7 @@ export function AISuggestedFlashcard({
                   <h2
                     className={cn([
                       'z-20 flex h-full w-full flex-col items-center justify-center hyphens-auto py-2 text-center text-green-400 ',
-                      'text-lg leading-5',
-                      flashcard.type === 'single' && 'pt-8',
+                      'text-lg leading-[120%]',
                     ])}
                   >
                     {flashcard.context}
@@ -145,6 +146,13 @@ export function AISuggestedFlashcard({
                   <span className='text-gray-400'>Definition:</span>
                   <span>{flashcard?.definition}</span>
                 </div>
+
+                {flashcard?.answer1 && (
+                  <div className='flex flex-col gap-1'>
+                    <span className='text-gray-400'>Answer:</span>
+                    <span>{flashcard?.answer1.trim()}</span>
+                  </div>
+                )}
 
                 {flashcard?.examples && (
                   <div className='flex flex-col gap-1'>
