@@ -54,7 +54,6 @@ export default function FlashcardReviseComponent() {
   const defaultSet = { value: 'default', label: 'All flashcards' };
   const [revisedCard, setRevisedCard] = useState<Flashcard>();
   const [revisedSet, setRevisedSet] = useState<string>(defaultSet.value);
-  const [clickedCard, setClickedCard] = useState<Flashcard>();
   const [clickedOption, setClickedOption] = useState<string>();
   const [clicked, setClicked] = useState(false);
   const cardsReviewed = useRef(0);
@@ -123,8 +122,8 @@ export default function FlashcardReviseComponent() {
     setClicked(true);
   };
 
-  const changeClicked = (flashCard: Flashcard | undefined, key?: string) => {
-    if (!flashCard || !revisedCard) return;
+  const changeClicked = (answer: string, key?: string) => {
+    if (!answer || !revisedCard) return;
 
     if (key) {
       window.umami.track('Answer clicked', { key });
@@ -136,11 +135,26 @@ export default function FlashcardReviseComponent() {
       return;
     }
 
-    const correct = revisedCard?.frontUuid === flashCard.frontUuid;
+    const correct = revisedCard?.answer1 === answer;
     const clonedStats = { ...metadata };
 
     cardsReviewed.current += 1;
     clonedStats.answers += 1;
+
+    const reviewLog: ReviewLog = {
+      frontUuid: uuid(),
+      timestamp: new Date().toISOString(),
+      sessionUuid: focusSession.current.frontUuid,
+      cardFrontUuid: revisedCard.frontUuid,
+      recalled: false,
+      timeSpent: Math.floor((Date.now() - cardTime.current.getTime()) / 1000),
+      tags: revisedCard.tags,
+      synced: false,
+    };
+
+    if (correct) {
+      reviewLog.recalled = true;
+    }
 
     if (revisedCard.type === 'single' && correct) {
       clonedStats.correctAnswers += 1;
@@ -155,8 +169,8 @@ export default function FlashcardReviseComponent() {
       (clonedStats.correctAnswers / clonedStats.answers).toFixed(2),
     );
 
+    db.reviewLogs.add(reviewLog);
     updateMetadata({ ...clonedStats });
-    setClickedCard(flashCard);
     setClicked(true);
   };
 
@@ -165,7 +179,6 @@ export default function FlashcardReviseComponent() {
     if (!clicked || !revisedCard) return;
 
     calculateRepetition(revisedCard, clickedOption as ReviseOptionsType);
-    setClickedCard(undefined);
     setRevisedCard(undefined);
     setClickedOption(undefined);
     setClicked(false);
@@ -178,7 +191,6 @@ export default function FlashcardReviseComponent() {
     if (!clicked || !revisedCard) return;
 
     calculateRepetition(revisedCard, clickedOption as ReviseOptionsType);
-    setClickedCard(undefined);
     setRevisedCard(undefined);
     setClickedOption(undefined);
     setClicked(false);
@@ -194,7 +206,6 @@ export default function FlashcardReviseComponent() {
 
   const continueRerollClick = () => {
     window.umami.track('Continue reshuffling');
-    setClickedCard(undefined);
     setRevisedCard(undefined);
     setClickedOption(undefined);
     setClicked(false);
@@ -206,7 +217,9 @@ export default function FlashcardReviseComponent() {
     if (revisedCard?.type === 'index' || revisedCard?.type === 'question') {
       spaceRepetitionClick(spaceRepetitionOptions[index].value);
     } else {
-      changeClicked(randomItems?.[index], key);
+      // TODO: Find better way to handle this type.
+      // @ts-expect-error tssd
+      changeClicked(revisedCard?.[`answer${index + 1}`] as string, key);
     }
   };
 
@@ -321,9 +334,7 @@ export default function FlashcardReviseComponent() {
 
             <ReviseOptions
               clicked={clicked}
-              clickedCard={clickedCard}
               clickedOption={clickedOption}
-              randomItems={randomItems}
               revisedCard={revisedCard}
               spaceRepetitionClick={spaceRepetitionClick}
               changeClicked={changeClicked}
@@ -355,6 +366,8 @@ export default function FlashcardReviseComponent() {
           />
 
           <Dropdown
+            type='dropdown'
+            multiple={false}
             config={[defaultSet, ...setsDictionary]}
             onChange={changeRevisedSet}
             value={defaultSet.value}

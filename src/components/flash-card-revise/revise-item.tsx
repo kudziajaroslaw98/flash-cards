@@ -25,7 +25,7 @@ export function ReviseItem({ clicked, revisedCard }: ReviewItem) {
         </span>
       </div>
 
-      <div>
+      <div className='max-w-96'>
         {revisedCard ? (
           <FlashcardComponent
             key={revisedCard.frontUuid}

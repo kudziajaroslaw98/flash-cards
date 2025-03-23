@@ -4,6 +4,7 @@ import useLongPress from '#/hooks/use-long-press.hook';
 import { cn } from '#/shared/utils/cn.util';
 import type { Flashcard } from '#/types/flash-card.type';
 import { BadgeCheck } from 'lucide-react';
+import type { Variant } from 'motion/react';
 import * as m from 'motion/react-m';
 import { useEffect, useState } from 'react';
 import Card from '../_ui/card/card';
@@ -55,6 +56,68 @@ export default function FlashcardComponent({
     }
   }, [isInSelectionMode]);
 
+  const FlashcardSection = ({
+    title,
+    data,
+    snap = true,
+  }: {
+    title: string;
+    data: string;
+    snap?: boolean;
+  }) => {
+    return (
+      <div
+        className={cn([
+          'flex flex-col gap-1',
+          snap && 'snap-start snap-always',
+        ])}
+      >
+        <span className='font-semibold text-gray-600 dark:text-slate-200'>
+          {title}
+        </span>
+        <ul className='flex list-inside !list-disc flex-col gap-1 '>
+          {data.split(';').map((chunk) => (
+            <li
+              className='list-item decoration-gray-600'
+              key={chunk.trim()}
+            >
+              {chunk.trim()}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
+  const cardVariants = {
+    hovered: {
+      top: 0,
+      left: 0,
+      position: 'absolute',
+      zIndex: 22,
+      height: '22.75rem',
+      width: '100%',
+    } as Variant,
+    unhovered: {
+      translateY: '0%',
+      opacity: 100,
+      height: '11rem',
+      width: '100%',
+      transitionEnd: {
+        position: 'relative',
+        zIndex: 21,
+      },
+    } as Variant,
+    initial: { translateY: '10%', opacity: 0, zIndex: -20 },
+    exit: {
+      translateY: '-5%',
+      opacity: 0,
+      zIndex: -20,
+      maxHeight: 0,
+      height: 0,
+    },
+  };
+
   return (
     <m.div
       onMouseDown={(e) => onStart(e, flashcard)}
@@ -62,35 +125,21 @@ export default function FlashcardComponent({
       onTouchStart={(e) => onStart(e, flashcard)}
       onTouchEnd={onEnd}
       onTouchMove={onMove}
+      className={cn(['relative flex'])}
     >
       <m.div
-        animate={{
-          translateY: '0%',
-          opacity: 100,
-          zIndex: 21,
-          maxHeight: '100%',
-          height: '100%',
-        }}
-        initial={{ translateY: '10%', opacity: 0, zIndex: -20 }}
-        exit={{
-          translateY: '-5%',
-          opacity: 0,
-          zIndex: -20,
-          maxHeight: 0,
-          height: 0,
-        }}
-        className='flex justify-center'
+        variants={cardVariants}
+        animate={'unhovered'}
+        initial={false}
+        exit={'exit'}
+        whileHover={isFlipped ? 'hovered' : ''}
         key={`${flashcard.frontUuid}:${isFlipped ? 'flipped' : 'unflipped'}`}
       >
         <Card
           tabIndex={0}
           className={cn([
-            'z-10 cursor-pointer flex-col items-center p-4 py-0 outline-none focus-visible:ring  focus-visible:ring-green-400/50',
+            'z-10 h-full cursor-pointer flex-col items-center p-4 py-0 outline-none focus-visible:ring  focus-visible:ring-green-400/50',
             isSelected ? 'ring ring-green-400/60' : '',
-            size === 'sm' && 'h-44 w-36',
-            size === 'md' && 'h-56 w-44',
-            size === 'lg' && 'h-72 w-64',
-            size === 'horizontal-sm' && 'h-44 w-80',
           ])}
           {...props}
         >
@@ -160,85 +209,46 @@ export default function FlashcardComponent({
               </div>
 
               <div className='flex flex-col gap-4'>
-                <div className='flex snap-start snap-always scroll-pt-8 flex-col gap-1'>
-                  <span className='text-gray-400'>Definition:</span>
+                <div className='flex snap-start scroll-pt-8 flex-col gap-1'>
+                  <span className='font-semibold text-gray-600 dark:text-slate-200'>
+                    Definition:
+                  </span>
                   <span>{flashcard?.definition}</span>
                 </div>
 
                 {flashcard?.answer1 && (
-                  <div className='flex snap-start snap-always flex-col gap-1'>
-                    <span className='text-gray-400'>Answer:</span>
-                    <ul className='flex list-inside !list-disc flex-col gap-1 '>
-                      <li
-                        className='list-item decoration-gray-600'
-                        key={flashcard.answer1.trim()}
-                      >
-                        {flashcard.answer1.trim()}
-                      </li>
-                    </ul>
-                  </div>
+                  <FlashcardSection
+                    title='Answer:'
+                    data={flashcard.answer1}
+                  />
                 )}
 
                 {flashcard?.examples && (
-                  <div className='flex snap-start snap-always flex-col gap-1'>
-                    <span className='text-gray-400'>Examples:</span>
-                    <ul className='flex list-inside !list-disc flex-col gap-1 '>
-                      {flashcard?.examples.split(';').map((example) => (
-                        <li
-                          className='list-item decoration-gray-600'
-                          key={example.trim()}
-                        >
-                          {example.trim()}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <FlashcardSection
+                    title='Examples:'
+                    data={flashcard.examples}
+                  />
                 )}
+
                 {flashcard?.synonyms && (
-                  <div className='flex snap-start snap-always flex-col gap-1'>
-                    <span className='text-gray-400'>Synonyms:</span>
-                    <ul className='flex list-inside !list-disc flex-col gap-1 '>
-                      {flashcard?.synonyms.split(';').map((synonym) => (
-                        <li
-                          className='list-item decoration-gray-600'
-                          key={synonym.trim()}
-                        >
-                          {synonym.trim()}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <FlashcardSection
+                    title='Synonyms:'
+                    data={flashcard.synonyms}
+                  />
                 )}
+
                 {flashcard?.keyPoints && (
-                  <div className='flex snap-start snap-always flex-col gap-1'>
-                    <span className='text-gray-400'>Key Points:</span>
-                    <ul className='flex list-inside !list-disc flex-col gap-1 '>
-                      {flashcard?.keyPoints.split(';').map((keyPoint) => (
-                        <li
-                          className='list-item decoration-gray-600'
-                          key={keyPoint.trim()}
-                        >
-                          {keyPoint.trim()}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <FlashcardSection
+                    title='Key Points:'
+                    data={flashcard.keyPoints}
+                  />
                 )}
 
                 {flashcard?.relatedFacts && (
-                  <div className='flex snap-start snap-always flex-col gap-1'>
-                    <span className='text-gray-400'>Related Facts:</span>
-                    <ul className='flex list-inside !list-disc flex-col gap-1 '>
-                      {flashcard?.relatedFacts.split(';').map((fact) => (
-                        <li
-                          className='list-item decoration-gray-600'
-                          key={fact.trim()}
-                        >
-                          {fact.trim()}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <FlashcardSection
+                    title='Related Facts:'
+                    data={flashcard.relatedFacts}
+                  />
                 )}
               </div>
 

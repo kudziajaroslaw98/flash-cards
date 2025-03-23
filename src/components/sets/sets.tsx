@@ -172,6 +172,7 @@ export default function Sets() {
 
           <span className='flex w-full flex-col items-center justify-center gap-2 sm:w-auto sm:flex-row'>
             <Dropdown
+              type='dropdown'
               config={categories}
               onChange={handleSearchCategoryChange}
               multiple
@@ -242,7 +243,7 @@ export default function Sets() {
                       {set.name}
                     </h5>
 
-                    <p className='text-sm text-gray-500 dark:text-slate-500'>
+                    <p className='text-sm text-gray-600 dark:text-slate-400'>
                       {set.description}
                     </p>
                   </div>

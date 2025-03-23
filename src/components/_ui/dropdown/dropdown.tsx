@@ -9,6 +9,7 @@ import { Eraser, Plus, Search } from 'lucide-react';
 import * as m from 'motion/react-m';
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '../button/button';
+import { FieldLabel } from '../field-label/field-label';
 import Input from '../input/input';
 import DropdownItem from './dropdown-item';
 import DropdownLabel from './dropdown-label';
@@ -164,6 +165,17 @@ export default function Dropdown<T>({
       popoverRef.current.style.top = `${top}px`;
       popoverRef.current.style.left = `${buttonRect.left + window.scrollX}px`;
       popoverRef.current.style.width = `${dropdownLabelRef.current.getBoundingClientRect().width}px`;
+
+      const availableSpace =
+        window.innerHeight -
+        popoverRef.current.getBoundingClientRect().bottom -
+        16 +
+        popoverRef.current.getBoundingClientRect().height;
+
+      if (popoverRef.current.getBoundingClientRect().height > availableSpace) {
+        popoverRef.current.style.height = `${availableSpace}px`;
+        popoverRef.current.style.maxHeight = `${availableSpace}px`;
+      }
     }
 
     if (contextPosition === 'top') {
@@ -176,6 +188,17 @@ export default function Dropdown<T>({
       popoverRef.current.style.top = `${top}px`;
       popoverRef.current.style.left = `${buttonRect.left + window.scrollX}px`;
       popoverRef.current.style.width = `${dropdownLabelRef.current.getBoundingClientRect().width}px`;
+
+      const availableSpace =
+        window.innerHeight -
+        popoverRef.current.getBoundingClientRect().top -
+        16 +
+        popoverRef.current.getBoundingClientRect().height;
+
+      if (popoverRef.current.getBoundingClientRect().height > availableSpace) {
+        popoverRef.current.style.height = `${availableSpace}px`;
+        popoverRef.current.style.maxHeight = `${availableSpace}px`;
+      }
     }
   }, [contextPosition]);
 
@@ -265,7 +288,9 @@ export default function Dropdown<T>({
 
       if (index === -1) {
         setSelected((prev) => [...prev, pickedItem]);
-        onChange([...selected, pickedItem].map((item) => item.value));
+        onChange(
+          [...selected, pickedItem].map((item) => item.value) as T & T[],
+        );
       } else {
         setSelected((prev) =>
           prev.filter((item) => item.value !== pickedItem.value),
@@ -273,7 +298,7 @@ export default function Dropdown<T>({
         onChange(
           selected
             .filter((item) => item.value !== pickedItem.value)
-            .map((item) => item.value),
+            .map((item) => item.value) as T & T[],
         );
       }
     } else {
@@ -281,7 +306,7 @@ export default function Dropdown<T>({
       setSelected([pickedItem]);
       setSearchValue('');
 
-      onChange(pickedItem.value);
+      onChange(pickedItem.value as T & T[]);
     }
   };
 
@@ -290,7 +315,7 @@ export default function Dropdown<T>({
     setSelected([]);
 
     if (multiple) {
-      onChange([]);
+      onChange([] as T & T[]);
     }
   };
 
@@ -332,9 +357,9 @@ export default function Dropdown<T>({
 
     if (multiple) {
       setSelected((prev) => [...prev, newItem]);
-      onChange([...selected, newItem].map((item) => item.value));
+      onChange([...selected, newItem].map((item) => item.value) as T & T[]);
     } else {
-      onChange(newItem.value);
+      onChange(newItem.value as T & T[]);
       setSelected([newItem]);
     }
   };
@@ -355,34 +380,19 @@ export default function Dropdown<T>({
       onFocus={handleClickOnDropdown}
     >
       {controlLabel && (
-        <span className='w-auto pb-2 pl-2 '>
-          <span
-            className={cn([
-              touched && !valid ? '!text-red-400' : '',
-              touched && valid ? '!text-green-400' : '',
-              'w-auto pb-2 pl-2 text-sm text-gray-500 dark:text-slate-500',
-            ])}
-          >
-            {controlLabel}
-          </span>
-          <span
-            className={cn([
-              'text-xs',
-              touched && !valid ? '!text-red-400' : '',
-              touched && valid ? '!text-green-400' : '',
-              'text-gray-400 dark:text-slate-600',
-            ])}
-          >
-            {required ? ' *' : ' (optional)'}
-          </span>
-        </span>
+        <FieldLabel
+          touched={touched}
+          valid={valid ?? true}
+          required={required ?? false}
+          label={controlLabel}
+        />
       )}
 
       <div className='w-full'>
         <div
           ref={dropdownLabelRef}
           className={cn([
-            'border-gray-300 text-gray-500 dark:border-slate-800 dark:text-slate-400',
+            'border-gray-300 text-gray-600 dark:border-slate-800 dark:text-slate-400',
             'group relative flex h-10 w-full cursor-pointer items-center justify-center rounded-md border text-sm outline-none group-has-[:focus]:ring',
             hasFocus.current ? 'ring' : '',
             'transition',
@@ -430,7 +440,7 @@ export default function Dropdown<T>({
             data-open={visible}
             className={cn([
               DropdownVariants({ contextPosition }),
-              'fixed border border-gray-300 dark:border-slate-900',
+              'fixed border border-gray-300 shadow-xl dark:border-slate-900 dark:shadow-black',
               contextClassName,
             ])}
             ref={popoverRef}
@@ -456,7 +466,7 @@ export default function Dropdown<T>({
             <div
               tabIndex={-1}
               className={cn([
-                'flex max-h-52 flex-col gap-1 overflow-y-auto p-2',
+                'flex h-full flex-col gap-1 overflow-y-auto p-2',
                 (props.searchable || props.clearAll) &&
                   items?.length > 0 &&
                   'py-3',

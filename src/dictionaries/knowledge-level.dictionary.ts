@@ -1,8 +1,8 @@
 export const knowledgeLevelDictionary = [
-  { value: 'unfamiliar', label: 'Unfamiliar (1-15%)' },
-  { value: 'beginner', label: 'Beginner (16-30%)' },
-  { value: 'developing', label: 'Developing (31-55%)' },
-  { value: 'proficient', label: 'Proficient (56-75%)' },
-  { value: 'advanced', label: 'Advanced (76-90%)' },
-  { value: 'expert', label: 'Expert (91-100%)' },
+  { value: 'unfamiliar', label: 'Unfamiliar - Completely new to me' },
+  { value: 'beginner', label: 'Beginner - Learning the basics' },
+  { value: 'developing', label: 'Developing - Moving beyond the basics' },
+  { value: 'proficient', label: 'Proficient - Can apply what I know' },
+  { value: 'advanced', label: 'Advanced - Strong understanding' },
+  { value: 'expert', label: 'Expert - Could teach this to others' },
 ];

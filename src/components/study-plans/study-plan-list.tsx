@@ -47,7 +47,9 @@ export function StudyPlanList({
 
   const isSelected = useCallback(
     (plan: StudyPlan) => {
-      return selected.findIndex((item) => item.id === plan.id) !== -1;
+      return (
+        selected.findIndex((item) => item.frontUuid === plan.frontUuid) !== -1
+      );
     },
     [selected],
   );
@@ -55,7 +57,9 @@ export function StudyPlanList({
   const toggleSelected = useCallback(
     (plan: StudyPlan) => {
       if (isSelected(plan)) {
-        setSelected((prev) => prev.filter((item) => item.id !== plan.id));
+        setSelected((prev) =>
+          prev.filter((item) => item.frontUuid !== plan.frontUuid),
+        );
       } else {
         setSelected((prev) => [...prev, plan]);
       }
@@ -85,7 +89,7 @@ export function StudyPlanList({
           <AnimatePresence mode='popLayout'>
             {filteredPlans.map((plan) => (
               <m.div
-                key={plan.id}
+                key={plan.frontUuid}
                 initial={{ translateY: '10%', opacity: 0, zIndex: -20 }}
                 animate={{
                   opacity: 1,
@@ -98,10 +102,10 @@ export function StudyPlanList({
                   translateY: '-10%',
                 }}
               >
-                <Link href={`/study/plans/${plan.id}/`}>
+                <Link href={`/study/plans/${plan.frontUuid}/`}>
                   <Card
                     tabIndex={0}
-                    key={plan.id}
+                    key={plan.frontUuid}
                     className={cn([
                       'flex h-full cursor-pointer flex-col justify-between gap-4 sm:min-h-44 sm:gap-4',
                       selected.includes(plan) ? 'ring ring-green-400/60' : '',
@@ -138,11 +142,13 @@ export function StudyPlanList({
                           <span className='font-semibold'>Current day:</span>
 
                           <span>
-                            {studySessions.find((s) => s.planId === plan.id)
-                              ?.currentDay === 0
+                            {studySessions.find(
+                              (s) => s.planId === plan.frontUuid,
+                            )?.currentDay === 0
                               ? 'Not started'
-                              : studySessions.find((s) => s.planId === plan.id)
-                                  ?.currentDay}
+                              : studySessions.find(
+                                  (s) => s.planId === plan.frontUuid,
+                                )?.currentDay}
                           </span>
                         </div>
                       </div>

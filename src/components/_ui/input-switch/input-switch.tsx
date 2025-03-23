@@ -1,5 +1,6 @@
 import { cn } from '#/shared/utils/cn.util';
 import { useEffect, useState, type InputHTMLAttributes } from 'react';
+import { FieldLabel } from '../field-label/field-label';
 
 export interface InputSwitchProps
   extends Pick<
@@ -79,27 +80,12 @@ export function InputSwitch({
       aria-labelledby={type}
     >
       {label && (
-        <span className='w-auto pb-2 pl-2 '>
-          <span
-            className={cn([
-              touched && !valid ? '!text-red-400' : '',
-              touched && valid ? '!text-green-400' : '',
-              'w-auto pb-2 pl-2 text-sm text-gray-500 dark:text-slate-500',
-            ])}
-          >
-            {label}
-          </span>
-          <span
-            className={cn([
-              'text-xs',
-              touched && !valid ? '!text-red-400' : '',
-              touched && valid ? '!text-green-400' : '',
-              'text-gray-400 dark:text-slate-600',
-            ])}
-          >
-            {required ? ' *' : ' (optional)'}
-          </span>
-        </span>
+        <FieldLabel
+          touched={touched}
+          valid={valid ?? true}
+          required={required ?? false}
+          label={label}
+        />
       )}
 
       <span

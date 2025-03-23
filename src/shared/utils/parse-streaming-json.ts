@@ -73,7 +73,7 @@ function extractPartialFields<T>(partialObjectText: string) {
   while ((match = keyValueRegex.exec(partialObjectText)) !== null) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_, key, value] = match;
-    result[key] = value as unknown as Partial<T>;
+    result[key as keyof T] = value as unknown as T[keyof T];
   }
 
   // Check for the last incomplete field
@@ -83,7 +83,7 @@ function extractPartialFields<T>(partialObjectText: string) {
   if (lastMatch) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_, key, partialValue] = lastMatch;
-    result[key] = partialValue as unknown as Partial<T>;
+    result[key as keyof T] = partialValue as unknown as T[keyof T];
   }
 
   return result;

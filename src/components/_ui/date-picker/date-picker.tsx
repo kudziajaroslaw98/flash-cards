@@ -18,6 +18,7 @@ import * as m from 'motion/react-m';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { Button } from '../button/button';
 import { DraggableScroll } from '../draggable-scroll/draggable-scroll';
+import { FieldLabel } from '../field-label/field-label';
 
 export interface DateTimePickerProps {
   type: 'datetime-picker';
@@ -206,15 +207,12 @@ export default function DateTimePicker({
       aria-labelledby={type}
     >
       {label && (
-        <span
-          className={cn([
-            touched && !valid ? '!text-red-400' : '',
-            touched && valid ? '!text-green-400' : '',
-            'w-auto pb-2 pl-2 text-sm text-gray-400',
-          ])}
-        >
-          {`${label}${required ? ' *' : ' (optional)'}`}
-        </span>
+        <FieldLabel
+          touched={touched}
+          valid={valid}
+          required={required ?? false}
+          label={label}
+        />
       )}
 
       <span

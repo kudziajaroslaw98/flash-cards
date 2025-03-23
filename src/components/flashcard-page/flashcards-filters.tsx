@@ -97,6 +97,7 @@ export default function FlashcardsFilters({
 
       <span className='flex w-full flex-col items-center justify-center gap-2 sm:w-auto sm:flex-row'>
         <Dropdown
+          type='dropdown'
           config={setsDictionary}
           onChange={handleSetsChange}
           multipleLabel='Sets'
@@ -109,6 +110,7 @@ export default function FlashcardsFilters({
         />
 
         <Dropdown
+          type='dropdown'
           config={flashcardTypeDictionaries}
           onChange={handleTypesChange}
           multipleLabel='Types'

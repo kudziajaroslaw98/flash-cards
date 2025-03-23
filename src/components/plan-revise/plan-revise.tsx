@@ -80,7 +80,7 @@ export function PlanRevise() {
 
                   <div className='mt-8 flex flex-col gap-2'>
                     <div className='flex gap-6'>
-                      <LinkComponent href='/study/plans/new'>
+                      <LinkComponent href='/study/new'>
                         <Button
                           label={'Be Responsible?'}
                           icon={<ArrowRight className='size-4' />}
@@ -105,6 +105,8 @@ export function PlanRevise() {
             <Case caseValue={false}>
               <div className='flex h-full w-full flex-col items-center pt-32'>
                 <Dropdown<StudyPlan>
+                  multiple={false}
+                  type='dropdown'
                   config={dropdownConfig}
                   onChange={handlePlanPick}
                   contextPosition={'bottom'}

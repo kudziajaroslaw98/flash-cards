@@ -4,7 +4,7 @@ import type { StudyPlan } from '#/types/study-plan.type';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Plus, Trash } from 'lucide-react';
 import Link from 'next/link';
-import { useState, type Dispatch, type SetStateAction } from 'react';
+import { type Dispatch, type SetStateAction } from 'react';
 import { AlertDialog } from '../_ui/alert-dialog/alert-dialog';
 import { Button } from '../_ui/button/button';
 import { FloatingButtons } from '../floating-buttons/floating-buttons';
@@ -17,7 +17,6 @@ export function StudyPlanActions({
   setSelected: Dispatch<SetStateAction<StudyPlan[]>>;
 }) {
   const studyPlans = useLiveQuery(() => db.studyPlans.toArray()) ?? [];
-  const [isInSelectionMode, setIsInSelectionMode] = useState(false);
 
   const removeSelected = () => {
     window.umami.track('Remove flashcards', { count: selected.length });

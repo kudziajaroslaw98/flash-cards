@@ -81,18 +81,18 @@ export function ReviseBody({
       // clonedStats.correctAnswers += 1;
       // cardsRecalled.current += 1;
       setClickedOption('easy');
-      await db.studyDays.update(currentDay.id, {
+      await db.studyDays.update(currentDay.frontUuid, {
         correctCards: [...currentDay.correctCards, revisedCard.frontUuid],
       });
     } else {
       setClickedOption('again');
-      await db.studyDays.update(currentDay.id, {
+      await db.studyDays.update(currentDay.frontUuid, {
         incorrectCards: [...currentDay.incorrectCards, revisedCard.frontUuid],
       });
       // clonedStats.incorrectAnswers += 1;
     }
 
-    await db.studySessions.update(currentSession.id, {
+    await db.studySessions.update(currentSession.frontUuid, {
       completedCards: [...currentSession.completedCards, revisedCard.frontUuid],
     });
 

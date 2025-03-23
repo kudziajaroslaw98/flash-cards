@@ -1,3 +1,6 @@
+import { knowledgeLevelDictionary } from '#/dictionaries/knowledge-level.dictionary';
+import { planTypeDictionary } from '#/dictionaries/plan-type.dictionary';
+import { studyScopeDictionary } from '#/dictionaries/study-scope.dictionary';
 import { cardLengthSchema } from '#/schemas/card-length.schema';
 import { contentEmphasisSchema } from '#/schemas/content-emphasis.schema';
 import { difficultyDistributionSchema } from '#/schemas/difficulty-distribution.schema';
@@ -12,14 +15,18 @@ import { Logger } from '#/shared/helpers/logger/logger';
 import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { createClient } from '#/shared/utils/supabase/server';
+import uuid from '#/shared/utils/uuid.util';
 import type { CardLength } from '#/types/card-length.type';
 import type { ContentEmphasis } from '#/types/content-emphasis.type';
 import type { DifficultyDistribution } from '#/types/difficulty-distribution.type';
+import type { KnowledgeLevel } from '#/types/knowledge-level.type';
 import type { LearningStyleAdaptation } from '#/types/learning-style.type';
 import type { MnemonicPreferences } from '#/types/mnemonic-preference.type';
+import type { PlanStudyScope } from '#/types/plan-study-scope.type';
+import type { PlanType } from '#/types/plan-types.type';
 import type { PreferredQuestionFormats } from '#/types/preferred-question-formats.type';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { createDataStreamResponse, Output, streamText } from 'ai';
+import { streamText } from 'ai';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -45,6 +52,11 @@ async function validateBody(body: Record<string, unknown>) {
     difficultyDistribution: difficultyDistributionSchema.nullish(),
     cardLength: cardLengthSchema.nullish(),
     mnemonicPreference: mnemonicPreferencesSchema.nullish(),
+    blacklist: z.array(z.string()).max(10, 'Too many tags').nullish(),
+    userPrompt: z
+      .string()
+      .max(200, 'Prompt is too long, max 200 characters')
+      .nullish(),
   });
   const validityCheck = checkValidity(body, validationScheme);
 
@@ -58,6 +70,7 @@ async function validateBody(body: Record<string, unknown>) {
 const rateLimit = new RateLimit(1, 10, `${routePath}`);
 
 export async function POST(req: NextRequest) {
+  const sessionId = uuid();
   const supabase = await createClient();
   const user = (await supabase.auth.getUser()).data.user;
 
@@ -85,25 +98,25 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const studyScopes = {
-    default: 'Focus on Core Concepts',
-    comprehensive: 'Comprehensive Coverage',
-    specific: 'Specific Area within Tags',
-  } as const;
-  const planTypes = {
-    overview: 'Comprehensive Overview',
-    'deep-dive': 'Deep Dive',
-    'quick-revision': 'Quick Revision',
-    'exam-prep': 'Exam Preparation',
-  } as const;
-  const knowledgeLevels = {
-    unfamiliar: 'Unfamiliar knows (1-15%) of the material',
-    beginner: 'Beginner knows (16-30%) of the material',
-    developing: 'Developing knows (31-55%) of the material',
-    proficient: 'Proficient knows (56-75%) of the material',
-    advanced: 'Advanced knows (76-90%) of the material',
-    expert: 'Expert knows (91-100%) of the material',
-  } as const;
+  // const studyScopes = {
+  //   default: 'Focus on Core Concepts',
+  //   comprehensive: 'Comprehensive Coverage',
+  //   specific: 'Specific Area within Tags',
+  // } as const;
+  // const planTypes = {
+  //   overview: 'Comprehensive Overview',
+  //   'deep-dive': 'Deep Dive',
+  //   'quick-revision': 'Quick Revision',
+  //   'exam-prep': 'Exam Preparation',
+  // } as const;
+  // const knowledgeLevels = {
+  //   unfamiliar: 'Unfamiliar knows (1-15%) of the material',
+  //   beginner: 'Beginner knows (16-30%) of the material',
+  //   developing: 'Developing knows (31-55%) of the material',
+  //   proficient: 'Proficient knows (56-75%) of the material',
+  //   advanced: 'Advanced knows (76-90%) of the material',
+  //   expert: 'Expert knows (91-100%) of the material',
+  // } as const;
 
   const {
     focusTags,
@@ -118,11 +131,13 @@ export async function POST(req: NextRequest) {
     difficultyDistribution,
     cardLength,
     mnemonicPreference,
+    userPrompt,
+    blacklist,
   }: {
     focusTags: string[];
-    studyScope: keyof typeof studyScopes;
-    knowledgeLevel: keyof typeof knowledgeLevels;
-    planType: keyof typeof planTypes;
+    studyScope: PlanStudyScope;
+    knowledgeLevel: KnowledgeLevel;
+    planType: PlanType;
     duration: string;
     flashcardsNeeded: number;
     preferredFormat?: PreferredQuestionFormats;
@@ -131,6 +146,8 @@ export async function POST(req: NextRequest) {
     difficultyDistribution?: DifficultyDistribution;
     cardLength?: CardLength;
     mnemonicPreference?: MnemonicPreferences;
+    userPrompt?: string;
+    blacklist?: string[];
   } = await req.json();
 
   try {
@@ -141,6 +158,14 @@ export async function POST(req: NextRequest) {
       knowledgeLevel,
       duration,
       flashcardsNeeded,
+      preferredFormat,
+      contentEmphasis,
+      learningStyle,
+      difficultyDistribution,
+      cardLength,
+      mnemonicPreference,
+      userPrompt,
+      blacklist,
     });
 
     if (error) {
@@ -176,24 +201,41 @@ export async function POST(req: NextRequest) {
         difficultyDistribution,
         cardLength,
         mnemonicPreference,
+        userPrompt,
+        blacklist,
       },
     )}`,
     routePath,
+  );
+
+  const pickedPlanType = planTypeDictionary.find(
+    (plan) => plan.value === planType,
+  );
+  const pickedStudyScope = studyScopeDictionary.find(
+    (scope) => scope.value === studyScope,
+  );
+  const pickedKnowledgeLevel = knowledgeLevelDictionary.find(
+    (level) => level.value === knowledgeLevel,
   );
 
   const prompt = (
     flashcardCount: number,
     summaries: { id: string; topic: string; query: string; context: string }[],
   ) => `
-  Generate ${flashcardCount} unique flashcards covering [${focusTags.join(',')}] for a "${planTypes[planType]}" study plan, knowledge level "${knowledgeLevels[knowledgeLevel]}" and study scope: "${studyScopes[studyScope]}". 
+  Generate ${flashcardCount} unique flashcards covering [${focusTags.join(',')}] for a "${pickedPlanType}" study plan, knowledge level "${pickedKnowledgeLevel}" and study scope: "${pickedStudyScope}". 
 
   **User Preferences**:
-    ${preferredFormat ? `• Question formats: ${preferredFormat}` : ''}
-    ${contentEmphasis ? `• Emphasize: ${contentEmphasis}` : ''}
-    ${learningStyle ? `• Learning style: ${learningStyle}` : ''}
-    ${difficultyDistribution ? `• Difficulty: ${difficultyDistribution}` : ''}
-    ${cardLength ? `• Length: ${cardLength}` : ''}
-    ${mnemonicPreference ? `• Mnemonics: ${mnemonicPreference}` : ''}
+    • Question formats: ${preferredFormat ?? 'Balanced mix of all formats (application | compare-contrast | problem-solving | definition | cause-effect | process | analysis | evaluation | recall)'}
+    • Emphasize: ${contentEmphasis ?? 'Balanced coverage across subtopics'}
+    • Learning style: ${learningStyle ?? 'Balanced for all learning styles (visual | auditory | reading-writing | kinesthetic | logical | social | solitary)'}
+    • Difficulty: ${difficultyDistribution ?? 'Balanced difficulty (33% easy, 34% medium, 33% hard)'}
+    • Length: ${cardLength ?? 'Balanced length'}
+    • Mnemonics: ${mnemonicPreference ?? 'No specific mnemonic techniques'}
+    ${userPrompt ? `• Additional instructions: ${userPrompt}` : ''}
+    
+
+**EXCLUDED TOPICS** (DO NOT generate cards related to these):
+${blacklist && blacklist.length > 0 ? blacklist.join(', ') : 'None specified'}
 
   **Existing Cards** (DO NOT DUPLICATE):
 ${summaries
@@ -214,31 +256,34 @@ ${summaries
    • NO terms from questions in answers - avoid hint words
    • Application doesn't have implemented multiple answers so only answer one is correct.
    • Wrong answers: plausible but clearly incorrect to experts
-   • Match complexity precisely to knowledge level ${knowledgeLevels[knowledgeLevel]} - especially for expert level
+   • Match complexity precisely to knowledge level ${knowledgeLevel} - especially for expert level
    • For vocabulary: semantically related but distinct distractors
 
 3. PLAN-SPECIFIC APPROACH:
-   For "${planTypes[planType]}":
+   For "${planType}":
    • Overview: Broad concept coverage across cognitive levels
    • Deep-Dive: Complex relationships and detailed mechanisms
    • Quick-Revision: Essential definitions and high-yield distinctions
    • Exam-Prep: Application scenarios and analysis questions
-
+   
    JSON OUTPUT per card:
 {
   "id": "unique_ID",
-  "topic": "main_subject",
-  "query": "clear_question",
+  "query": "clear_and_concise_question",
   "definition": "answer_explanation",
-  "context": "domain",
+  "context": "main_subject",
   "tags": ["relevant_tags"],
   "answer1": "correct_answer",
-  "answer2-4": ["wrong_answers"],
+  "answer2": "wrong_answer",
+  "answer3": "wrong_answer",
+  "answer4": "wrong_answer",
   "examples": "optional_usage",
   "keyPoints": "optional_notes",
   "synonyms": "optional_terms",
   "relatedFacts": "optional_connections"
 }
+
+You can include multiple examples/keyPoints/synonyms/relatedFacts by separating them with a semicolon.
 
 Only include optional fields when they add significant value.
 `;
@@ -247,64 +292,13 @@ Only include optional fields when they add significant value.
     apiKey: process.env.GOOGLE_AI_API_KEY,
   });
 
-  const batchSize = 20;
-
-  return createDataStreamResponse({
-    status: 200,
-    statusText: 'OK',
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-    },
-    async execute(dataStream) {
-      const generateSeed = () => {
-        return Date.now();
-      };
-
-      let streamResult = '';
-      let summaries: {
-        id: string;
-        topic: string;
-        query: string;
-        context: string;
-      }[] = [];
-
-      const splitNumberIntoChunksConcise = (): number[] =>
-        flashcardsNeeded <= 0 || batchSize <= 0
-          ? []
-          : Array.from(
-              { length: Math.ceil(flashcardsNeeded / batchSize) },
-              (_, i) => Math.min(batchSize, flashcardsNeeded - i * batchSize),
-            );
-
-      for (const chunk of splitNumberIntoChunksConcise()) {
-        if (streamResult && streamResult !== '') {
-          summaries = (
-            JSON.parse(streamResult) as {
-              id: string;
-              topic: string;
-              query: string;
-              context: string;
-              definition: string;
-              tags: string[];
-              examples: string;
-              keyPoints: string;
-              synonyms: string;
-              relatedFacts: string;
-            }[]
-          ).map((suggestion) => ({
-            id: suggestion.id,
-            topic: suggestion.topic,
-            query: suggestion.query,
-            context: suggestion.context,
-          }));
-        }
-
-        streamResult = await new Promise((resolve, reject) => {
-          const stream = streamText({
-            model: gemini('gemini-2.0-flash-001'),
-            prompt: prompt(chunk, summaries).replaceAll('\n', ' ').trim(),
-            temperature: 0.7,
-            system: `You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards. Your primary responsibilities are:
+  return streamText({
+    model: gemini('gemini-2.0-flash-thinking-exp-01-21'),
+    prompt: prompt(flashcardsNeeded, []).replaceAll('\n', ' ').trim(),
+    temperature: 0.8,
+    maxSteps: 5,
+    experimental_continueSteps: true,
+    system: `You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards. Your primary responsibilities are:
 
 1. UNIQUENESS: Generate flashcards that explore DISTINCT concepts, avoiding semantic overlap or reformulation of existing content.
 
@@ -317,37 +311,14 @@ Only include optional fields when they add significant value.
 5. ANSWER QUALITY: Create clearly correct answers and plausible but definitively incorrect distractors that don't hint at the correct response.
 
 Your expertise spans disciplines from technical fields to languages, sciences to humanities. For each flashcard set, you analyze existing content to identify knowledge gaps, then strategically fill those gaps with carefully crafted new cards that expand the user's understanding in meaningful ways.`,
-            experimental_output: Output.object({
-              schema: z.array(
-                z.object({
-                  id: z.string(),
-                  topic: z.string(),
-                  query: z.string(),
-                  context: z.string(),
-                  definition: z.string(),
-                  tags: z.array(z.string()),
-                  examples: z.string(),
-                  keyPoints: z.string(),
-                  synonyms: z.string(),
-                  relatedFacts: z.string(),
-                  answer1: z.string(),
-                  answer2: z.string(),
-                  answer3: z.string(),
-                  answer4: z.string(),
-                }),
-              ),
-            }),
-            seed: generateSeed(),
-            onFinish: () => {
-              resolve(stream.text);
-            },
-            onError: () => {
-              reject(undefined);
-            },
-          });
-          stream.mergeIntoDataStream(dataStream);
-        });
-      }
+    onFinish(response) {
+      Logger.info(
+        `Session ${sessionId} finished successfully ${JSON.stringify({ steps: response?.steps, finishReason: response?.finishReason, usage: response.usage })}`,
+        routePath,
+      );
     },
-  });
+    onError: (error) => {
+      Logger.error(`Session ${sessionId}`, routePath, JSON.stringify(error));
+    },
+  }).toDataStreamResponse();
 }

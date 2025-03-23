@@ -1,3 +1,5 @@
+import type { Flashcard } from '#/types/flash-card.type';
+
 export function getRandomArrayItems(
   array: Flashcard[],
   itemsCount: number,

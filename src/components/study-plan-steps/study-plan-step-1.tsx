@@ -1,6 +1,6 @@
 'use client';
 
-import type { PlanSetupState } from '#/app/(pages)/study/plans/new/page';
+import type { PlanSetupState } from '#/app/(pages)/study/new/page';
 import { cardLengthDictionary } from '#/dictionaries/card-length.dictionary';
 import { contentEmphasisDictionary } from '#/dictionaries/content-emphasis.dictionary';
 import { difficultyDistributionDictionary } from '#/dictionaries/difficulty-distribution.dictionary';
@@ -62,30 +62,29 @@ export function StudyPlanStep1({
     goToNext();
   };
 
+  const handleFormValueChange = (value: Partial<PlanSetupState['step1']>) => {
+    setState((prev) => ({ ...prev, step1: value }) as PlanSetupState);
+  };
+
   return (
     <div className='flex w-full flex-col items-start'>
-      <h2 className='mb-4 text-2xl font-bold text-gray-700 dark:text-slate-400'>
-        Set Your Learning Focus & Knowledge Level
-      </h2>
-      <span className='size-xs text-gray-500'>
-        Tell us what you want to study and your current knowledge level.
-        Selecting tags defines your topic, and knowledge level helps the AI
-        personalize the plan to your starting point.
-      </span>
+      <div className='flex w-full flex-col items-center justify-center py-4'>
+        <div className='flex w-full max-w-2xl flex-col justify-center px-4 '>
+          <h2 className='mb-4 text-xl font-bold text-gray-700 dark:text-slate-400'>
+            Personalize Your Learning Plan
+          </h2>
+
+          <span className='text-justify text-sm text-gray-500'>
+            Select tags to define your study topic and indicate your current
+            knowledge level. This helps our AI create the best starting point
+            for you.
+          </span>
+        </div>
+      </div>
 
       <div className='flex w-full flex-col items-center justify-center py-12'>
-        <div className='flex w-80 flex-col items-center justify-center gap-8'>
-          <FormComponent<{
-            focusTags: string[];
-            studyScope: PlanStudyScope;
-            knowledgeLevel: KnowledgeLevel;
-            preferredFormat?: PreferredQuestionFormats;
-            contentEmphasis?: ContentEmphasis;
-            learningStyle?: LearningStyleAdaptation;
-            difficultyDistribution?: DifficultyDistribution;
-            cardLength?: CardLength;
-            mnemonicPreference?: MnemonicPreferences;
-          }>
+        <div className='flex w-96 flex-col items-center justify-center gap-8'>
+          <FormComponent<PlanSetupState['step1']>
             scheme={{
               inputs: {
                 focusTags: {
@@ -106,7 +105,7 @@ export function StudyPlanStep1({
                   ],
                   multiple: true,
                   multipleLabel: 'Tags',
-                  label: 'Tags',
+                  label: 'Choose tags...',
                   controlLabel: 'Focus Tags',
                   addNew: true,
                   required: true,
@@ -125,7 +124,7 @@ export function StudyPlanStep1({
                   type: 'dropdown',
                   multiple: false,
                   required: true,
-                  label: 'Your Knowledge Level',
+                  label: 'Choose level...',
                   controlLabel: 'Select your knowledge level:',
                   config: knowledgeLevelDictionary,
                   _internal_constraints: [
@@ -139,7 +138,7 @@ export function StudyPlanStep1({
                 studyScope: {
                   type: 'dropdown',
                   multiple: false,
-                  label: 'Study Scope',
+                  label: 'Choose study scope...',
                   controlLabel: 'Study Scope',
                   config: studyScopeDictionary,
                   _internal_default_value: 'default',
@@ -151,108 +150,119 @@ export function StudyPlanStep1({
                     },
                   ],
                 },
-                _internal_separator_1: {
-                  type: '_internal_separator',
+                _internal_group_title_1: {
+                  type: '_internal_group_title',
+                  title: 'Advanced Options',
                 },
                 _internal_accordion_1: {
                   type: '_internal_accordion',
-                },
-                preferredFormat: {
-                  type: 'dropdown',
-                  multiple: false,
-                  label: 'Preferred Format',
-                  controlLabel: 'Preferred Format',
-                  config: preferredFormatDictionary,
-                  _internal_default_value: null,
-                  _internal_constraints: [
-                    {
-                      type: 'validation',
-                      key: 'preferredFormat',
-                      constraint: preferredQuestionFormatsSchema.nullish(),
+                  title: 'Content Preferences',
+                  name: 'contentSection',
+                  inputs: {
+                    preferredFormat: {
+                      type: 'dropdown',
+                      multiple: false,
+                      label: 'Choose preferred format...',
+                      controlLabel: 'Preferred Format',
+                      config: preferredFormatDictionary,
+                      _internal_default_value: 'balanced',
+                      _internal_constraints: [
+                        {
+                          type: 'validation',
+                          key: 'preferredFormat',
+                          constraint: preferredQuestionFormatsSchema.nullish(),
+                        },
+                      ],
                     },
-                  ],
-                },
-                contentEmphasis: {
-                  type: 'dropdown',
-                  multiple: false,
-                  label: 'Content Emphasis',
-                  controlLabel: 'Content Emphasis',
-                  config: contentEmphasisDictionary,
-                  _internal_default_value: null,
-                  _internal_constraints: [
-                    {
-                      type: 'validation',
-                      key: 'contentEmphasis',
-                      constraint: contentEmphasisSchema.nullish(),
+                    contentEmphasis: {
+                      type: 'dropdown',
+                      multiple: false,
+                      label: 'Choose content emphasis...',
+                      controlLabel: 'Content Emphasis',
+                      config: contentEmphasisDictionary,
+                      _internal_default_value: 'balanced',
+                      _internal_constraints: [
+                        {
+                          type: 'validation',
+                          key: 'contentEmphasis',
+                          constraint: contentEmphasisSchema.nullish(),
+                        },
+                      ],
                     },
-                  ],
-                },
-                learningStyle: {
-                  type: 'dropdown',
-                  multiple: false,
-                  label: 'Learning Style',
-                  controlLabel: 'Learning Style',
-                  config: learningStyleDictionary,
-                  _internal_default_value: null,
-                  _internal_constraints: [
-                    {
-                      type: 'validation',
-                      key: 'learningStyle',
-                      constraint: learningStyleAdaptationSchema.nullish(),
+                    cardLength: {
+                      type: 'dropdown',
+                      label: 'Choose card length...',
+                      multiple: false,
+                      controlLabel: 'Card Length',
+                      config: cardLengthDictionary,
+                      _internal_default_value: 'balanced',
+                      _internal_constraints: [
+                        {
+                          type: 'validation',
+                          key: 'cardLength',
+                          constraint: cardLengthSchema.nullish(),
+                        },
+                      ],
                     },
-                  ],
+                  },
                 },
-                difficultyDistribution: {
-                  type: 'dropdown',
-                  label: 'Difficulty Distribution',
-                  multiple: false,
-                  controlLabel: 'Difficulty Distribution',
-                  config: difficultyDistributionDictionary,
-                  _internal_default_value: null,
-                  _internal_constraints: [
-                    {
-                      type: 'validation',
-                      key: 'difficultyDistribution',
-                      constraint: difficultyDistributionSchema.nullish(),
+                _internal_accordion_2: {
+                  type: '_internal_accordion',
+                  title: 'Learning Style',
+                  name: 'learningStyleSection',
+                  inputs: {
+                    learningStyle: {
+                      type: 'dropdown',
+                      multiple: false,
+                      label: 'Choose learning style...',
+                      controlLabel: 'Learning Style',
+                      config: learningStyleDictionary,
+                      _internal_default_value: 'balanced',
+                      _internal_constraints: [
+                        {
+                          type: 'validation',
+                          key: 'learningStyle',
+                          constraint: learningStyleAdaptationSchema.nullish(),
+                        },
+                      ],
                     },
-                  ],
-                },
-                cardLength: {
-                  type: 'dropdown',
-                  label: 'Card Length',
-                  multiple: false,
-                  controlLabel: 'Card Length',
-                  config: cardLengthDictionary,
-                  _internal_default_value: null,
-                  _internal_constraints: [
-                    {
-                      type: 'validation',
-                      key: 'cardLength',
-                      constraint: cardLengthSchema.nullish(),
+                    difficultyDistribution: {
+                      type: 'dropdown',
+                      label: 'Choose difficulty distribution...',
+                      multiple: false,
+                      controlLabel: 'Difficulty Distribution',
+                      config: difficultyDistributionDictionary,
+                      _internal_default_value: 'balanced',
+                      _internal_constraints: [
+                        {
+                          type: 'validation',
+                          key: 'difficultyDistribution',
+                          constraint: difficultyDistributionSchema.nullish(),
+                        },
+                      ],
                     },
-                  ],
-                },
-                mnemonicPreference: {
-                  type: 'dropdown',
-                  multiple: false,
-                  label: 'Mnemonic Preference',
-                  controlLabel: 'Mnemonic Preference',
-                  config: mnemonicPreferenceDictionary,
-                  _internal_default_value: null,
-                  _internal_constraints: [
-                    {
-                      type: 'validation',
-                      key: 'mnemonicPreference',
-                      constraint: mnemonicPreferencesSchema.nullish(),
+
+                    mnemonicPreference: {
+                      type: 'dropdown',
+                      multiple: false,
+                      label: 'Choose mnemonic preference...',
+                      controlLabel: 'Mnemonic Preference',
+                      config: mnemonicPreferenceDictionary,
+                      _internal_default_value: 'none',
+                      _internal_constraints: [
+                        {
+                          type: 'validation',
+                          key: 'mnemonicPreference',
+                          constraint: mnemonicPreferencesSchema.nullish(),
+                        },
+                      ],
                     },
-                  ],
+                  },
                 },
               },
             }}
-            className='w-80'
-            emitFormValue={(value) =>
-              setState((prev) => ({ ...prev, step1: value }))
-            }
+            className='w-full px-4'
+            emitFormValue={handleFormValueChange}
             ref={formRef}
             initialValues={state?.step1}
             debug={{
@@ -261,17 +271,15 @@ export function StudyPlanStep1({
             }}
           />
 
-          <div className='w-full px-4'>
-            <Button
-              alt='Continue'
-              onClick={handleOnClick}
-              label='Continue'
-              variant='secondary'
-              icon={<ArrowRight className='size-4' />}
-              iconPosition='right'
-              size={'full'}
-            />
-          </div>
+          <Button
+            alt='Continue'
+            onClick={handleOnClick}
+            label='Continue'
+            variant='secondary'
+            icon={<ArrowRight className='size-4' />}
+            iconPosition='right'
+            size={'full'}
+          />
         </div>
       </div>
     </div>

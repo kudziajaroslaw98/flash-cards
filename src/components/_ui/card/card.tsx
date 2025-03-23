@@ -61,9 +61,6 @@ export default function Card({
       <m.div
         className='pointer-events-none absolute inset-0 -z-10 flex opacity-0 transition-all group-hover:opacity-100 dark:hidden'
         style={{
-          // TODO: check if its resolved in the future
-          // https://github.com/motiondivision/motion/issues/2887
-          // @ts-expect-error known typescript error even though its correct
           background: lightBackground,
         }}
       />
@@ -71,9 +68,6 @@ export default function Card({
       <m.div
         className='pointer-events-none absolute inset-0 -z-10 hidden opacity-0 transition-all group-hover:opacity-100 dark:flex'
         style={{
-          // TODO: check if its resolved in the future
-          // https://github.com/motiondivision/motion/issues/2887
-          // @ts-expect-error known typescript error even though its correct
           background: darkBackground,
         }}
       />

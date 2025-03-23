@@ -9,6 +9,7 @@ import {
   useState,
 } from 'react';
 import { Button } from '../button/button';
+import { FieldLabel } from '../field-label/field-label';
 
 export type TextAreaProps = {
   type: 'textarea';
@@ -94,27 +95,12 @@ export default function TextArea({
       htmlFor={forProp}
     >
       {label && (
-        <span className='w-auto pb-2 pl-2 '>
-          <span
-            className={cn([
-              touched && !valid ? '!text-red-400' : '',
-              touched && valid ? '!text-green-400' : '',
-              'w-auto pb-2 pl-2 text-sm text-gray-500 dark:text-slate-500',
-            ])}
-          >
-            {label}
-          </span>
-          <span
-            className={cn([
-              'text-xs',
-              touched && !valid ? '!text-red-400' : '',
-              touched && valid ? '!text-green-400' : '',
-              'text-gray-400 dark:text-slate-600',
-            ])}
-          >
-            {required ? ' *' : ' (optional)'}
-          </span>
-        </span>
+        <FieldLabel
+          touched={touched}
+          valid={valid}
+          required={required ?? false}
+          label={label}
+        />
       )}
 
       <span className='relative'>
@@ -127,7 +113,7 @@ export default function TextArea({
             'field-sizing-content relative flex w-full items-center gap-4 rounded-md border border-gray-300 bg-gray-100 p-2 px-4 dark:border-slate-800 dark:bg-slate-900',
             'h-auto resize-y text-sm outline-none transition-all focus:ring',
             label
-              ? 'placeholder:text-gray-400  dark:placeholder:text-slate-700'
+              ? 'placeholder:text-gray-400  dark:placeholder:text-slate-500'
               : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
             'text-gray-800 text-inherit dark:text-slate-200',
             className,

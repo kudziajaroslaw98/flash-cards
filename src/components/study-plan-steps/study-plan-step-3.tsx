@@ -83,51 +83,61 @@ export function StudyPlanStep3({
 
   return (
     <div className='flex w-full flex-col items-start'>
-      <h2 className='mb-4 text-2xl font-bold text-gray-700 dark:text-slate-400'>
-        Review Picked Flashcards
-      </h2>
+      <div className='flex w-full flex-col items-center justify-center py-4'>
+        <div className='flex w-full max-w-2xl flex-col justify-center px-4'>
+          <h2 className='mb-4 text-xl font-bold text-gray-700 dark:text-slate-400'>
+            Review Picked Flashcards
+          </h2>
 
-      <p className='size-sm text-gray-500'>
-        Review flashcards picked by AI and reject the ones that do not match
-        your vision for this plan.
-      </p>
-
-      <div className='flex w-full flex-col gap-6'>
-        <div className='flex gap-4 pt-1'>
-          <span className='text-xs'>
-            Flashcards Selected: {flashcards.length}
-          </span>
-          <span className='text-xs'>|</span>
-          <span className='text-xs'>
-            Minimum-Recommended: {flashcardCount.join('-')}
+          <span className='text-justify text-sm text-gray-500'>
+            Review flashcards picked by AI and reject the ones that do not match
+            your vision for this plan.
           </span>
         </div>
+      </div>
 
-        <div className='flex w-full justify-center'>
-          {flashcards.length === 0 && (
-            <div className='flex max-w-96 flex-col items-center justify-center gap-6 text-center'>
-              {suggestions.length === 0 && (
-                <span className='text-sm'>
-                  Looks like you don&apos;t have minimum required flashcards for
-                  effective plan generation. We highly recommend you to fill out
-                  space with generated flashcards
-                </span>
-              )}
+      <div className='flex w-full flex-col items-center justify-center'>
+        <div className='flex w-96 flex-col items-center justify-center px-4 lg:w-[28rem]'>
+          <div className='flex gap-4 py-2'>
+            <span className='text-xs'>
+              Flashcards Selected: {flashcards.length}
+            </span>
+            <span className='text-xs'>|</span>
+            <span className='text-xs'>
+              Minimum-Recommended: {flashcardCount.join('-')}
+            </span>
+          </div>
+        </div>
 
-              <Button
-                alt='generateFlashcards'
-                label='Generate Suggestions'
-                icon={<Sparkles className='size-4' />}
-                onClick={() => {
-                  generateSuggestions();
-                  goToIndex(4);
-                }}
-                loading={isLoading}
-                disabled={suggestions.length > 0}
-              />
-            </div>
-          )}
+        <div className='flex w-full flex-col items-center justify-center py-4'>
+          <div className='flex w-96 flex-col items-center justify-center px-4 lg:w-[28rem]'>
+            {flashcards.length === 0 && (
+              <div className='flex w-96 flex-col items-center justify-center gap-6'>
+                {suggestions.length === 0 && (
+                  <span className='text-center text-sm'>
+                    Looks like you don&apos;t have minimum required flashcards
+                    for effective plan generation. We highly recommend you to
+                    fill out space with generated flashcards
+                  </span>
+                )}
 
+                <Button
+                  alt='generateFlashcards'
+                  label='Generate Suggestions'
+                  icon={<Sparkles className='size-4' />}
+                  onClick={() => {
+                    generateSuggestions();
+                    goToIndex(4);
+                  }}
+                  loading={isLoading}
+                  disabled={suggestions.length > 0}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className='flex w-full flex-col items-center justify-center py-4'>
           {suggestions.length === 0 &&
             !isLoading &&
             flashcards.length > flashcardCount[0] && (
@@ -152,39 +162,45 @@ export function StudyPlanStep3({
             )}
         </div>
 
-        <div className='flex flex-col gap-2'>
-          <span>Your flashcards: </span>
-        </div>
+        {flashcards.length > 0 && (
+          <>
+            <div className='flex flex-col gap-2'>
+              <span>Your flashcards: </span>
+            </div>
 
-        <div
-          className={cn([
-            'grid h-auto w-full justify-center gap-4 transition-all',
-            flashcards.length < 5 ? 'xl:justify-start' : 'xl:justify-center',
-            'grid-cols-[repeat(auto-fit,9rem)]',
-          ])}
-        >
-          <AnimatePresence mode='popLayout'>
-            {flashcards.map((flashcard) => (
-              <m.div
-                key={flashcard.frontUuid}
-                exit={{
-                  maxHeight: 0,
-                  height: 0,
-                }}
-                layout
-              >
-                <FlashcardComponent
-                  size='sm'
-                  key={flashcard?.frontUuid}
-                  flashcard={flashcard}
-                  isInSelectionMode={flashcardsSelectionMode}
-                  onSelect={() => toggleFlashcardSelected(flashcard)}
-                  isSelected={flashcardIsSelected(flashcard)}
-                />
-              </m.div>
-            ))}
-          </AnimatePresence>
-        </div>
+            <div
+              className={cn([
+                'grid h-auto w-full justify-center gap-4 transition-all',
+                flashcards.length < 5
+                  ? 'xl:justify-start'
+                  : 'xl:justify-center',
+                'grid-cols-1 min-[600px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',
+              ])}
+            >
+              <AnimatePresence mode='popLayout'>
+                {flashcards.map((flashcard) => (
+                  <m.div
+                    key={flashcard.frontUuid}
+                    exit={{
+                      maxHeight: 0,
+                      height: 0,
+                    }}
+                    layout
+                  >
+                    <FlashcardComponent
+                      size='horizontal-sm'
+                      key={flashcard?.frontUuid}
+                      flashcard={flashcard}
+                      isInSelectionMode={flashcardsSelectionMode}
+                      onSelect={() => toggleFlashcardSelected(flashcard)}
+                      isSelected={flashcardIsSelected(flashcard)}
+                    />
+                  </m.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </>
+        )}
 
         {suggestions.length === 0 &&
           !isLoading &&

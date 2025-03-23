@@ -232,7 +232,7 @@ export default function SettingsPage() {
                 <span className='text-sm text-gray-700 dark:text-slate-200'>
                   Clearing local data will{' '}
                   <span className='font-bold text-red-500'>remove all</span>{' '}
-                  your local data.
+                  <b>your local data.</b>
                 </span>
               </p>
 
@@ -260,7 +260,7 @@ export default function SettingsPage() {
                 <span className='text-sm text-gray-700 dark:text-slate-200'>
                   Deleting your account will permanently{' '}
                   <span className='font-bold text-red-500'>remove all</span>{' '}
-                  your data.
+                  <b>your local + cloud data</b>.
                 </span>
               </p>
 

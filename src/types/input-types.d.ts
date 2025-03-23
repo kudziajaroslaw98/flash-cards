@@ -21,6 +21,11 @@ export type InternalAccordion<T> = {
   >;
 };
 
+export type InternalGroupTitle = {
+  type: '_internal_group_title';
+  title: string | React.ReactNode;
+};
+
 export type VanillaInputType = Omit<
   InputComponentProps,
   'value' | 'error' | 'valid'
@@ -38,4 +43,5 @@ export type InputDefinitions<T> =
   | Omit<DropdownProps<unknown>, 'onChange'>
   | Omit<DateTimePickerProps, 'value' | 'error' | 'valid'>
   | InternalSeparator
-  | InternalAccordion<T>;
+  | InternalAccordion<T>
+  | InternalGroupTitle;

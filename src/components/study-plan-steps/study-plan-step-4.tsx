@@ -3,7 +3,15 @@ import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { cn } from '#/shared/utils/cn.util';
 import type { Flashcard } from '#/types/flash-card.type';
-import { ArrowRight, Check, CheckCheck, Eye, Pencil, X } from 'lucide-react';
+import {
+  ArrowRight,
+  Check,
+  CheckCheck,
+  Eye,
+  LoaderCircle,
+  Pencil,
+  X,
+} from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import {
@@ -24,11 +32,13 @@ import { useStepper } from '../stepper/stepper-context';
 export function StudyPlanStep4({
   isLoading,
   suggestions,
+  flashcardCount,
   setSuggestions,
   setFlashcards,
 }: {
   isLoading: boolean;
   suggestions: AISuggestedFlashcardType[];
+  flashcardCount: [number, number];
   setFlashcards: Dispatch<SetStateAction<Flashcard[]>>;
   setSuggestions: Dispatch<SetStateAction<AISuggestedFlashcardType[]>>;
 }) {
@@ -127,32 +137,57 @@ export function StudyPlanStep4({
 
   return (
     <div className='flex w-full flex-col items-start'>
-      <h2 className='mb-4 text-2xl font-bold text-gray-700 dark:text-slate-400'>
-        Review & Enhance Flashcards
-      </h2>
+      <div className='flex w-full flex-col items-center justify-center py-4'>
+        <div className='flex w-full max-w-2xl flex-col justify-center px-4'>
+          <h2 className='mb-4 text-xl font-bold text-gray-700 dark:text-slate-400'>
+            Review & Enhance Flashcards
+          </h2>
 
-      <p className='size-sm text-gray-500'>
-        Click &apos;Generate Suggestions&apos; to get AI-powered flashcard
-        ideas. Review, edit, and accept to personalize your study set.
-      </p>
+          <span className='text-justify text-sm text-gray-500'>
+            Wait for your personalized flashcards to load.. Accept the ones that
+            you like to personalize your study set.
+          </span>
+        </div>
+      </div>
 
-      <div className='flex w-full flex-col gap-6'>
-        <div className='flex w-full flex-col gap-4'>
+      {(suggestions.length > 0 || isLoading) && (
+        <div className='flex w-full flex-col items-center justify-center py-4'>
+          <div className='flex w-96 flex-col items-center justify-center px-4 lg:w-[28rem]'>
+            <div className='flex gap-4 py-2'>
+              <span className='text-xs'>
+                Generated Suggestions: {suggestions.length}
+              </span>
+              {isLoading && (
+                <>
+                  <span className='text-xs'>|</span>
+                  <span className='text-xs'>
+                    Left to Generate: {flashcardCount[1] - suggestions.length}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className='flex w-full flex-col items-center justify-center py-4'>
+        <div className='flex w-96 flex-col justify-center px-4 py-4 lg:w-[28rem] '>
           {isLoading && (
-            <span className='flex w-full animate-pulse justify-center py-4 text-lg'>
-              Generating suggestions...
+            <span className='flex w-full flex-col items-center justify-center gap-2 text-center text-lg'>
+              <LoaderCircle className='size-6 animate-spin' />
+              <span className='animate-pulse'>Generating suggestions...</span>
             </span>
           )}
 
           {suggestions.length > 0 && !isLoading && (
-            <span className='text-sm'>
+            <span className='text-center text-sm'>
               Perfect, now accept suggestions to fill out the space before we
               continue
             </span>
           )}
 
           {suggestions.length === 0 && !isLoading && (
-            <div className='flex w-full flex-col items-center justify-center gap-4 py-8'>
+            <div className='flex w-full flex-col items-center justify-center gap-4'>
               <span className='max-w-sm text-center text-sm'>
                 Looks like you have managed to clear the suggestions. Would you
                 like to continue? or to take a look?
@@ -181,13 +216,17 @@ export function StudyPlanStep4({
               </div>
             </div>
           )}
+        </div>
+      </div>
 
+      <div className='flex w-full flex-col gap-6'>
+        <div className='flex w-full flex-col gap-4'>
           <div
             className={cn([
               'grid h-auto w-full justify-center gap-4 transition-all',
               suggestions.length < 5 ? 'xl:justify-start' : 'xl:justify-center',
 
-              'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4',
+              'grid-cols-1 min-[600px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',
             ])}
           >
             <AnimatePresence mode='popLayout'>

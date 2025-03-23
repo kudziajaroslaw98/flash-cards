@@ -1,6 +1,6 @@
 import type { StudyDay } from './study-day.type';
 export type StudyPlan = {
-  id: string;
+  frontUuid: string;
   durationDays: number;
   name: string;
   days: StudyDay[];

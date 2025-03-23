@@ -13,7 +13,7 @@ export const APP_ROUTES = {
   },
   study: {
     plans: '/study/plans',
-    newPlan: '/study/plans/new',
+    newPlan: '/study/new',
     revise: '/study/revise',
   },
   feedback: '/feedback',

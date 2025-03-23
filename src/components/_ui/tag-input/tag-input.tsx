@@ -4,6 +4,7 @@ import { cn } from '#/shared/utils/cn.util';
 import { PlusIcon, X } from 'lucide-react';
 import { useEffect, useRef, useState, type InputHTMLAttributes } from 'react';
 import { Button } from '../button/button';
+import { FieldLabel } from '../field-label/field-label';
 
 export type TagInputValidation =
   | {
@@ -142,27 +143,12 @@ function TagInput({
       htmlFor={forProp}
     >
       {label && (
-        <span className='w-auto pb-2 pl-2 '>
-          <span
-            className={cn([
-              touched && !valid ? '!text-red-400' : '',
-              touched && valid ? '!text-green-400' : '',
-              'w-auto pb-2 pl-2 text-sm text-gray-500 dark:text-slate-500',
-            ])}
-          >
-            {label}
-          </span>
-          <span
-            className={cn([
-              'text-xs',
-              touched && !valid ? '!text-red-400' : '',
-              touched && valid ? '!text-green-400' : '',
-              'text-gray-400 dark:text-slate-600',
-            ])}
-          >
-            {required ? ' *' : ' (optional)'}
-          </span>
-        </span>
+        <FieldLabel
+          touched={touched}
+          valid={valid}
+          required={required ?? false}
+          label={label}
+        />
       )}
 
       <div className='flex flex-col gap-2'>
@@ -184,7 +170,7 @@ function TagInput({
             value={inputValue}
             className={cn([
               label
-                ? 'placeholder:text-gray-400 dark:placeholder:text-slate-700'
+                ? 'placeholder:text-gray-400 dark:placeholder:text-slate-500'
                 : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
               'peer w-[90%] text-sm text-gray-800',
               'bg-transparent text-inherit outline-none transition-all dark:text-slate-200',

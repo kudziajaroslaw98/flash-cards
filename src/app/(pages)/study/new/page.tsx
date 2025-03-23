@@ -40,6 +40,8 @@ export interface PlanSetupState {
   step2: {
     duration: PlanDuration;
     planType: PlanType;
+    blacklist: string[];
+    userPrompt: string;
   };
 }
 
@@ -54,6 +56,8 @@ export default function NewStudyPlanPage() {
     step2: {
       duration: '3',
       planType: 'overview',
+      blacklist: [],
+      userPrompt: '',
     },
   });
   const recommendedFlashcardsCount: Record<
@@ -102,11 +106,6 @@ export default function NewStudyPlanPage() {
     return recommendedFlashcardsCount[planType ?? 'overview'][duration ?? '1'];
   };
 
-  const generateSuggestions = () => {
-    setIsLoading(true);
-    complete('prompt');
-  };
-
   const { complete, completion } = useCompletion({
     api: API_ROUTES.GENERATE_SUGGESTED_FLASHCARDS,
     body: {
@@ -126,11 +125,18 @@ export default function NewStudyPlanPage() {
       difficultyDistribution: state.step1.difficultyDistribution,
       cardLength: state.step1.cardLength,
       mnemonicPreference: state.step1.mnemonicPreference,
+      userPrompt: state.step2.userPrompt,
+      blacklist: state.step2.blacklist,
     },
     onFinish: () => {
       setIsLoading(false);
     },
   });
+
+  const generateSuggestions = () => {
+    setIsLoading(true);
+    complete('prompt');
+  };
 
   useEffect(() => {
     const objects =
@@ -211,6 +217,10 @@ export default function NewStudyPlanPage() {
             <StudyPlanStep4
               suggestions={suggestions}
               isLoading={isLoading}
+              flashcardCount={getRecommendedFlashcardCount(
+                state.step2.duration as PlanDuration,
+                state.step2.planType as PlanType,
+              )}
               setSuggestions={setSuggestions}
               setFlashcards={setFlashcards}
             />

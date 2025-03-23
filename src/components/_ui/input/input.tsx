@@ -6,6 +6,7 @@ import {
   type HTMLInputTypeAttribute,
   type InputHTMLAttributes,
 } from 'react';
+import { FieldLabel } from '../field-label/field-label';
 
 export type InputValidation =
   | {
@@ -83,27 +84,12 @@ function Input({
       onClick={handleClick}
     >
       {label && (
-        <span className='w-auto pb-2 pl-2 '>
-          <span
-            className={cn([
-              touched && !valid ? '!text-red-400' : '',
-              touched && valid ? '!text-green-400' : '',
-              'w-auto pb-2 pl-2 text-sm text-gray-500 dark:text-slate-500',
-            ])}
-          >
-            {label}
-          </span>
-          <span
-            className={cn([
-              'text-xs',
-              touched && !valid ? '!text-red-400' : '',
-              touched && valid ? '!text-green-400' : '',
-              'text-gray-400 dark:text-slate-600',
-            ])}
-          >
-            {required ? ' *' : ' (optional)'}
-          </span>
-        </span>
+        <FieldLabel
+          touched={touched}
+          valid={valid}
+          required={required ?? false}
+          label={label}
+        />
       )}
 
       <span
@@ -128,7 +114,7 @@ function Input({
           tabIndex={props.tabIndex ?? 0}
           className={cn([
             label
-              ? 'placeholder:text-gray-400 dark:placeholder:text-slate-700'
+              ? 'placeholder:text-gray-400 dark:placeholder:text-slate-500'
               : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
             'peer text-sm text-gray-800',
             inputType === 'checkbox' ? 'w-auto' : 'w-full',

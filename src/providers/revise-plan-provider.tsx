@@ -4,6 +4,7 @@ import type { Flashcard } from '#/types/flash-card.type';
 import type { StudyDay } from '#/types/study-day.type';
 import type { StudyPlan } from '#/types/study-plan.type';
 import type { StudySession } from '#/types/study-session.type';
+import { isAfter } from 'date-fns';
 import { endOfToday } from 'date-fns/endOfToday';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
@@ -62,7 +63,7 @@ export default function RevisePlanProvider(props: Readonly<PropsWithChildren>) {
     () =>
       db.studySessions
         .where('planId')
-        .equals(pickedPlan?.id ?? '')
+        .equals(pickedPlan?.frontUuid ?? '')
         .first(),
     [pickedPlan],
   );
@@ -71,7 +72,7 @@ export default function RevisePlanProvider(props: Readonly<PropsWithChildren>) {
       () =>
         db.studyDays
           .where('planId')
-          .equals(pickedPlan?.id ?? '')
+          .equals(pickedPlan?.frontUuid ?? '')
           .toArray(),
       [pickedPlan],
     ) ?? [];
@@ -127,15 +128,25 @@ export default function RevisePlanProvider(props: Readonly<PropsWithChildren>) {
 
   useEffect(() => {
     if (reviseStage === 6 && currentSession && currentDay) {
-      db.studySessions.update(currentSession.id, {
-        currentDay: currentDay.dayNumber + 1,
+      console.log(currentSession.currentDay + 1);
+      db.studySessions.update(currentSession.frontUuid, {
+        currentDay: currentSession.currentDay + 1,
         nextRevisionDate: endOfToday().toUTCString(),
         stage: 1,
       });
+      setReviseStage(1);
+      return;
     }
 
-    if (reviseStage !== 0 && currentSession) {
-      db.studySessions.update(currentSession?.id, { stage: reviseStage });
+    if (
+      reviseStage !== 0 &&
+      currentSession &&
+      isAfter(new Date(), new Date(currentSession.nextRevisionDate))
+    ) {
+      db.studySessions.update(currentSession?.frontUuid, {
+        stage: reviseStage,
+      });
+      return;
     }
   }, [reviseStage]);
 

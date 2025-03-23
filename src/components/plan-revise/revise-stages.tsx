@@ -111,7 +111,11 @@ export function ReviseStages({
       reviewFlashcards.length > 0 &&
       reviewFlashcards.length === reviewCompleted.length
     ) {
-      newStage = 2;
+      if (reviewIncorrect.length > 0) {
+        newStage = 2;
+      } else {
+        newStage = 3;
+      }
     }
 
     // all new
@@ -120,7 +124,11 @@ export function ReviseStages({
       newFlashcards.length > 0 &&
       newFlashcards.length === newCompleted.length
     ) {
-      newStage = 4;
+      if (newIncorrect.length > 0) {
+        newStage = 4;
+      } else {
+        newStage = 5;
+      }
     }
 
     if (newStage !== stage && newStage !== 6) {
@@ -165,14 +173,18 @@ export function ReviseStages({
         break;
       case 5:
         setFlashcards(allFlashcards);
-        db.studySessions.update(currentSession.id, {
+        db.studySessions.update(currentSession.frontUuid, {
           completedCards: currentSession.completedCards.filter(
             (c) => !allIncorrect.includes(c),
           ),
         });
-        db.studyDays.update(currentDay.id, {
+        db.studyDays.update(currentDay.frontUuid, {
           incorrectCards: [],
         });
+
+        if (allIncorrect.length === 0) {
+          setStage(6);
+        }
         break;
     }
   }, [stage, reviewFlashcards, newFlashcards]);
@@ -210,7 +222,7 @@ export function ReviseStages({
           retention={reviewCorrect.length / reviewFlashcards.length}
           flashcards={reviewFlashcards}
           incorrectFlashcards={reviewIncorrect}
-          setStage={() => setStage(3)}
+          onContinue={() => setStage(3)}
         />
       </Case>
 
@@ -245,7 +257,9 @@ export function ReviseStages({
           retention={newCorrect.length / newFlashcards.length}
           flashcards={newFlashcards}
           incorrectFlashcards={newIncorrect}
-          setStage={() => setStage(5)}
+          onContinue={() => {
+            setStage(5);
+          }}
         />
       </Case>
 

@@ -3,7 +3,7 @@ import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { createClient } from '#/shared/utils/supabase/server';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { createDataStreamResponse, Output, streamText } from 'ai';
+import { streamText } from 'ai';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -136,62 +136,107 @@ ${summaries
   `,
   )
   .join('\n')}
+  
+respond with plain JSON of array of objects, one object per card text:
+{
+  "id": "unique_ID",
+  "simplifiedDefinition": "brief_easy_explanation",
+  "commonMisconceptions": "frequent_incorrect_beliefs",
+  "contextualExample": "real_world_scenario_example",
+  "keyTakeaway": "most_important_point",
+  "relatedConcepts": "connected_concepts",
+  "visualExample": "diagram_image_link_or_desc"
+}
+
+ADDITIONAL INSTRUCTIONS:
+You can include multiple commonMisconceptions/contextualExample/keyTakeaway/relatedConcepts/visualExample by separating them with a semicolon.
+You can use markdown in this fields: commonMisconceptions/contextualExample/keyTakeaway/relatedConcepts/visualExample to highlight important points.
+
+IMPORTANT: 
+omit all \`\`\`json \`\`\`
+
+Finish generating all summaries. Add in the end: 
+'[FINISH] All summaries generated'
 `;
 
   const gemini = createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_AI_API_KEY,
   });
 
-  return createDataStreamResponse({
-    execute: async (dataStream) => {
-      const result = streamText({
-        model: gemini('gemini-2.0-flash-001'),
-        prompt: prompt,
-        temperature: 0.7,
-        system:
-          'You are a patient, expert tutor specializing in breaking down complex concepts into simple, memorable explanations. Your task is to help learners understand why their answer to a flashcard was incorrect, using analogies, mnemonics, and real-world examples.',
-        experimental_output: Output.object({
-          schema: z.array(
-            z.object({
-              simplifiedDefinition: z.string(),
-              commonMisconceptions: z.string(),
-              contextualExample: z.string().optional(),
-              keyTakeaway: z.string(),
-              relatedConcepts: z.string().optional(),
-              mnemonic: z.string().optional(),
-              visualExample: z.string().optional(),
-            }),
-          ),
-        }),
-      });
+  return streamText({
+    model: gemini('gemini-2.0-flash-thinking-exp-01-21'),
+    prompt: prompt,
+    temperature: 0.7,
+    experimental_continueSteps: true,
+    maxSteps: 5,
+    stopSequences: ['[FINISH] All summaries generated'],
+    system:
+      'You are a patient, expert tutor specializing in breaking down complex concepts into simple, memorable explanations. Your task is to help learners understand why their answer to a flashcard was incorrect, using analogies, mnemonics, and real-world examples.',
+    // experimental_output: Output.object({
+    //   schema: z.array(
+    //     z.object({
+    //       simplifiedDefinition: z.string(),
+    //       commonMisconceptions: z.string(),
+    //       contextualExample: z.string().optional(),
+    //       keyTakeaway: z.string(),
+    //       relatedConcepts: z.string().optional(),
+    //       mnemonic: z.string().optional(),
+    //       visualExample: z.string().optional(),
+    //     }),
+    //   ),
+    // }),
+  }).toDataStreamResponse();
 
-      result.mergeIntoDataStream(dataStream);
-      //   for await (const chunk of partialObjectStream) {
-      //     dataStream.writeData(chunk);
-      //     Logger.info(`${chunk}`);
-      //   }
-      //   const { partialObjectStream } = streamObject({
-      //     model: gemini('gemini-2.0-flash-001'),
-      //     prompt: prompt,
-      //     temperature: 0.7,
-      //     system:
-      //       'You are a patient, expert tutor specializing in breaking down complex concepts into simple, memorable explanations. Your task is to help learners understand why their answer to a flashcard was incorrect, using analogies, mnemonics, and real-world examples.',
-      //     output: 'array',
-      //     schema: z.object({
-      //       simplifiedDefinition: z.string(),
-      //       commonMisconceptions: z.string(),
-      //       contextualExample: z.string().optional(),
-      //       keyTakeaway: z.string(),
-      //       relatedConcepts: z.string().optional(),
-      //       mnemonic: z.string().optional(),
-      //       visualExample: z.string().optional(),
-      //     }),
-      //   });
+  // return createDataStreamResponse({
+  //   execute: async (dataStream) => {
+  //     const result = streamText({
+  //       model: gemini('gemini-2.0-flash-thinking-exp-01-21'),
+  //       prompt: prompt,
+  //       temperature: 0.7,
+  //       system:
+  //         'You are a patient, expert tutor specializing in breaking down complex concepts into simple, memorable explanations. Your task is to help learners understand why their answer to a flashcard was incorrect, using analogies, mnemonics, and real-world examples.',
+  //       // experimental_output: Output.object({
+  //       //   schema: z.array(
+  //       //     z.object({
+  //       //       simplifiedDefinition: z.string(),
+  //       //       commonMisconceptions: z.string(),
+  //       //       contextualExample: z.string().optional(),
+  //       //       keyTakeaway: z.string(),
+  //       //       relatedConcepts: z.string().optional(),
+  //       //       mnemonic: z.string().optional(),
+  //       //       visualExample: z.string().optional(),
+  //       //     }),
+  //       //   ),
+  //       // }),
+  //     });
 
-      //   for await (const chunk of partialObjectStream) {
-      //     dataStream.writeData(chunk);
-      //     Logger.info(`${chunk}`);
-      //   }
-    },
-  });
+  //     result.mergeIntoDataStream(dataStream);
+  //     //   for await (const chunk of partialObjectStream) {
+  //     //     dataStream.writeData(chunk);
+  //     //     Logger.info(`${chunk}`);
+  //     //   }
+  //     //   const { partialObjectStream } = streamObject({
+  //     //     model: gemini('gemini-2.0-flash-001'),
+  //     //     prompt: prompt,
+  //     //     temperature: 0.7,
+  //     //     system:
+  //     //       'You are a patient, expert tutor specializing in breaking down complex concepts into simple, memorable explanations. Your task is to help learners understand why their answer to a flashcard was incorrect, using analogies, mnemonics, and real-world examples.',
+  //     //     output: 'array',
+  //     //     schema: z.object({
+  //     //       simplifiedDefinition: z.string(),
+  //     //       commonMisconceptions: z.string(),
+  //     //       contextualExample: z.string().optional(),
+  //     //       keyTakeaway: z.string(),
+  //     //       relatedConcepts: z.string().optional(),
+  //     //       mnemonic: z.string().optional(),
+  //     //       visualExample: z.string().optional(),
+  //     //     }),
+  //     //   });
+
+  //     //   for await (const chunk of partialObjectStream) {
+  //     //     dataStream.writeData(chunk);
+  //     //     Logger.info(`${chunk}`);
+  //     //   }
+  //   },
+  // });
 }

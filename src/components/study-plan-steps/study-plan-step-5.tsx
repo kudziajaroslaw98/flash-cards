@@ -8,10 +8,10 @@ import type { StudyPlan } from '#/types/study-plan.type';
 import type { StudySession } from '#/types/study-session.type';
 import { experimental_useObject as useObject } from '@ai-sdk/react';
 import { Check, LoaderCircle } from 'lucide-react';
-import * as m from 'motion/react-m';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
+import { Accordion } from '../_ui/accordion/accordion';
 import { Button } from '../_ui/button/button';
 import FlashcardComponent from '../flash-card/flash-card';
 import { FloatingButtons } from '../floating-buttons/floating-buttons';
@@ -25,12 +25,12 @@ export function StudyPlanStep5({
 }: {
   focusTags: string[];
   flashcards: Flashcard[];
-  summaries: {
+  summaries: Partial<{
     frontUuid: string;
     context: string;
     query: string;
     definition: string;
-  }[];
+  }>[];
   planType: string;
   duration: string;
 }) {
@@ -74,6 +74,12 @@ export function StudyPlanStep5({
     setPlanDays(
       object?.filter((plan) => plan) as (StudyDay & { name: string })[],
     );
+    const uniqueFlashcards = new Set<string>();
+    object.forEach((day) => {
+      day?.newCards?.map((card) => uniqueFlashcards.add(card as string));
+      day?.cardsToReview?.map((card) => uniqueFlashcards.add(card as string));
+    });
+    console.log('usedUniqueFlashcards', uniqueFlashcards);
   }, [object]);
 
   const handleAcceptPlan = () => {
@@ -82,7 +88,7 @@ export function StudyPlanStep5({
     const dateNow = new Date().toUTCString();
 
     const studyPlan: StudyPlan = {
-      id: planId,
+      frontUuid: planId,
       durationDays: parseInt(duration),
       name: planDays[planDays.length - 1].name,
       days: planDays,
@@ -94,7 +100,7 @@ export function StudyPlanStep5({
     };
 
     const session: StudySession = {
-      id: sessionId,
+      frontUuid: sessionId,
       planId,
       synced: false,
       currentDay: 1,
@@ -109,10 +115,10 @@ export function StudyPlanStep5({
     };
 
     const studyPlanDays: StudyDay[] = planDays.map((day) => {
-      const id = uuid();
+      const frontUuid = uuid();
 
       return {
-        id,
+        frontUuid,
         planId,
         dayNumber: day.dayNumber,
         objectives: day.objectives,
@@ -139,134 +145,146 @@ export function StudyPlanStep5({
 
   return (
     <div className='flex w-full flex-col items-start'>
-      <h2 className='mb-4 w-full text-center text-2xl font-bold text-gray-700 dark:text-slate-400 md:text-left'>
-        Get Your Personalized Study Plan
-      </h2>
+      <div className='flex w-full flex-col items-center justify-center py-4'>
+        <div className='flex w-full max-w-2xl flex-col justify-center px-4'>
+          <h2 className='mb-4 text-xl font-bold text-gray-700 dark:text-slate-400'>
+            Get Your Personalized Study Plan
+          </h2>
 
-      <p className='size-sm w-full text-center text-gray-500 md:text-left'>
-        Review Your Study Plan - Ready to Learn!
-      </p>
-
-      {isLoading && (
-        <div className='flex w-full flex-col items-center justify-center gap-4'>
-          <LoaderCircle className='size-6 animate-spin' />
-          <span className='flex w-full animate-pulse justify-center py-4 text-center text-lg md:text-left'>
-            Generating personalized plan...
+          <span className='text-justify text-sm text-gray-500'>
+            Review Your Study Plan - Ready to Learn!
           </span>
         </div>
-      )}
+      </div>
 
-      {!isLoading && (
-        <div className='flex w-full flex-col items-center justify-center gap-4'>
-          <span className='flex w-full flex-col justify-center py-4 text-center text-lg'>
-            <span>Your personalized plan is ready.</span>
+      <div className='flex w-full flex-col items-center justify-center py-4'>
+        <div className='flex w-96 flex-col justify-center px-4 py-4 lg:w-[28rem] '>
+          {isLoading && (
+            <div className='flex w-full flex-col items-center justify-center gap-4'>
+              <LoaderCircle className='size-6 animate-spin' />
+              <span className='flex w-full animate-pulse justify-center py-4 text-center text-lg md:text-left'>
+                Generating personalized plan...
+              </span>
+            </div>
+          )}
 
-            <span>
-              You can look at it below. Accept whenever you are ready.
-            </span>
-          </span>
+          {!isLoading && (
+            <div className='flex w-full flex-col items-center justify-center gap-4'>
+              <span className='flex w-full flex-col justify-center text-center text-sm'>
+                <span>Your personalized plan is ready.</span>
+
+                <span>
+                  You can look at it below. Accept whenever you are ready.
+                </span>
+              </span>
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
-      {planDays.map((day, index) => (
-        <m.div
-          key={`day-${index}`}
-          className='flex w-full flex-col gap-2 pt-8'
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <h4 className='text-xl text-green-400'>Day {day.dayNumber}</h4>
-
-          <div className='flex w-full flex-col gap-4'>
-            <div className='flex flex-col gap-2'>
-              <h5 className='text-lg text-gray-600'>Objectives</h5>
-
-              <ul className='flex list-disc flex-col gap-2 pl-4 text-sm'>
-                {day.objectives.map((objective, index) => (
-                  <li key={'objective-' + index}>{objective}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className='flex flex-col gap-2'>
-              <h5 className='text-lg text-gray-600'>Metrics</h5>
-
-              <ul className='flex list-disc flex-col gap-2 pl-4 text-sm'>
-                <li>Target Retention: {day.metrics.targetRetention}%</li>
-
-                <li>Max Study Time: {day.metrics.maxStudyTime} minutes</li>
-              </ul>
-            </div>
-
-            <div className='flex w-full flex-col gap-2'>
-              <h5 className='text-lg text-gray-600'>Assigned Cards</h5>
-
+      {planDays.length > 0 && (
+        <Accordion className='w-full max-w-full'>
+          {planDays.map((day, index) => (
+            <Accordion.Item
+              key={`day-${index}`}
+              title={`Day ${index + 1}`}
+            >
               <div className='flex w-full flex-col gap-4'>
-                <div className='gap- flex flex-col gap-2'>
-                  <h6 className='text-base text-gray-500'>Review Cards</h6>
+                <div className='flex flex-col gap-2'>
+                  <h6 className=' text-gray-600'>Objectives</h6>
 
-                  <div
-                    className={cn([
-                      'grid h-auto w-full justify-center gap-4 transition-all',
-                      day.cardsToReview.length < 5
-                        ? 'xl:justify-start'
-                        : 'xl:justify-center',
-                      'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4',
-                    ])}
-                  >
-                    {flashcards
-                      .filter((card) =>
-                        day.cardsToReview.includes(card.frontUuid),
-                      )
-                      .map((card) => (
-                        <FlashcardComponent
-                          key={'review-card-' + card.frontUuid}
-                          flashcard={card}
-                          size='horizontal-sm'
-                        />
-                      ))}
-                  </div>
+                  <ul className='flex list-disc flex-col gap-1 pl-4 text-sm'>
+                    {day.objectives.map((objective, index) => (
+                      <li key={'objective-' + index}>{objective}</li>
+                    ))}
+                  </ul>
                 </div>
 
                 <div className='flex flex-col gap-2'>
-                  <h6 className='text-base text-gray-500'>New Cards</h6>
+                  <h6 className='text-gray-600'>Metrics</h6>
 
-                  <div
-                    className={cn([
-                      'grid h-auto w-full justify-center gap-4 transition-all',
-                      day.newCards.length < 5
-                        ? 'xl:justify-start'
-                        : 'xl:justify-center',
-                      'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4',
-                    ])}
-                  >
-                    {flashcards
-                      .filter((card) => day.newCards.includes(card.frontUuid))
-                      .map((card) => (
-                        <FlashcardComponent
-                          key={'new-card-' + card.frontUuid}
-                          flashcard={card}
-                          size='horizontal-sm'
-                        />
-                      ))}
+                  <ul className='flex list-disc flex-col gap-1 pl-4 text-sm'>
+                    <li>Target Retention: {day.metrics.targetRetention}%</li>
+
+                    <li>Max Study Time: {day.metrics.maxStudyTime} minutes</li>
+                  </ul>
+                </div>
+
+                <div className='flex w-full flex-col gap-2'>
+                  <div className='flex w-full flex-col gap-4'>
+                    {day.cardsToReview.length > 0 && (
+                      <div className='flex flex-col gap-2'>
+                        <h6 className='text-gray-600'>Review Cards</h6>
+
+                        <div
+                          className={cn([
+                            'grid h-auto w-full justify-center gap-4 transition-all',
+                            day.cardsToReview.length < 5
+                              ? 'xl:justify-start'
+                              : 'xl:justify-center',
+                            'grid-cols-1 min-[600px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',
+                          ])}
+                        >
+                          {flashcards
+                            .filter((card) =>
+                              day.cardsToReview.includes(card.frontUuid),
+                            )
+                            .map((card) => (
+                              <FlashcardComponent
+                                key={'review-card-' + card.frontUuid}
+                                flashcard={card}
+                                size='horizontal-sm'
+                              />
+                            ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className='flex flex-col gap-2'>
+                      <h6 className='text-gray-600'>New Cards</h6>
+
+                      <div
+                        className={cn([
+                          'grid h-auto w-full justify-center gap-4 transition-all',
+                          day.newCards.length < 5
+                            ? 'xl:justify-start'
+                            : 'xl:justify-center',
+                          'grid-cols-1 min-[600px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',
+                        ])}
+                      >
+                        {flashcards
+                          .filter((card) =>
+                            day.newCards.includes(card.frontUuid),
+                          )
+                          .map((card) => (
+                            <FlashcardComponent
+                              key={'new-card-' + card.frontUuid}
+                              flashcard={card}
+                              size='horizontal-sm'
+                            />
+                          ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </m.div>
-      ))}
+            </Accordion.Item>
+          ))}
+        </Accordion>
+      )}
 
-      <FloatingButtons>
-        <Button
-          alt='Accept Plan'
-          onClick={handleAcceptPlan}
-          label='Accept Plan'
-          icon={<Check className='size-4' />}
-          iconPosition='right'
-          disabled={isLoading}
-        />
-      </FloatingButtons>
+      {!isLoading && (
+        <FloatingButtons>
+          <Button
+            alt='Accept Plan'
+            onClick={handleAcceptPlan}
+            label='Accept Plan'
+            icon={<Check className='size-4' />}
+            iconPosition='right'
+            disabled={isLoading}
+          />
+        </FloatingButtons>
+      )}
     </div>
   );
 }

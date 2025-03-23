@@ -347,7 +347,7 @@ export default function SetHardlinkPage() {
         <div
           className={cn([
             'grid w-full justify-center gap-4 md:justify-start',
-            'grid-cols-[repeat(auto-fit,11rem)]',
+            'grid-cols-1 min-[600px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',
           ])}
         >
           <AnimatePresence mode='popLayout'>
@@ -358,7 +358,7 @@ export default function SetHardlinkPage() {
                   isSelected={isSelected(flashcard)}
                   onSelect={toggleSelected}
                   isInSelectionMode={selected.length > 0}
-                  size={'md'}
+                  size={'horizontal-sm'}
                 />
               </div>
             ))}
@@ -369,7 +369,7 @@ export default function SetHardlinkPage() {
                   isSelected={isSelected(flashcard)}
                   onSelect={toggleSelected}
                   isInSelectionMode={selected.length > 0}
-                  size={'md'}
+                  size={'horizontal-sm'}
                 />
               </div>
             ))}

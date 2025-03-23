@@ -44,7 +44,7 @@ export const newFlashcardScheme = (
       type: 'input',
       inputType: 'text',
       name: 'context',
-      label: 'Word / Sentence',
+      label: 'Context',
       placeholder: 'Prowess',
       required: true,
     },
@@ -141,6 +141,10 @@ export const newFlashcardScheme = (
         },
       ],
     },
+    _internal_separator_1: {
+      type: '_internal_separator',
+      name: '_internal_separator_1',
+    },
     _internal_showAnswers: {
       _internal_constraints: [
         {
@@ -156,17 +160,7 @@ export const newFlashcardScheme = (
       uncheckedLabel: 'No',
       showLabel: true,
     },
-    _internal_separator_1: {
-      _internal_constraints: [
-        {
-          type: 'show',
-          key: '_internal_showAnswers',
-          constraint: z.boolean().refine((value) => value === true),
-        },
-      ],
-      type: '_internal_separator',
-      name: '_internal_separator_1',
-    },
+
     _internal_accordion_2: {
       _internal_constraints: [
         {

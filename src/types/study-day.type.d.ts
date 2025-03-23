@@ -1,5 +1,5 @@
 export type StudyDay = {
-  id: string;
+  frontUuid: string;
   planId: string;
   dayNumber: number;
   objectives: string[];

@@ -29,7 +29,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/(pages)/guide/page.tsx",
-    "src/shared/utils/webpush.tjs"
+    "src/shared/utils/webpush.tjs",
+    "src/components/plan-revise/revise-incorrect-summary.msx"
   ],
   "exclude": ["node_modules"]
 }

@@ -62,6 +62,7 @@ export default function FormInputsComponent<T>({
 
         const isSeparator = input?.type === '_internal_separator';
         const isAccordion = input?.type === '_internal_accordion';
+        const isGroupTitle = input?.type === '_internal_group_title';
 
         let accordionInputs: InternalAccordion<T>['inputs'] = {};
 
@@ -84,7 +85,7 @@ export default function FormInputsComponent<T>({
             return (
               <Accordion
                 key={`form-item-${inputName}-${index}`}
-                className='-px-4'
+                className='-px-4 py-2'
               >
                 <Accordion.Item
                   title={input.title}
@@ -104,6 +105,16 @@ export default function FormInputsComponent<T>({
                   />
                 </Accordion.Item>
               </Accordion>
+            );
+          } else if (isGroupTitle) {
+            return (
+              <div
+                key={`form-item-${inputName}-${index}`}
+                className='flex flex-col'
+              >
+                <h6 className='mt-4'>{input.title}</h6>
+                <hr className='mb-4 mt-2 border-gray-200 dark:border-slate-900' />
+              </div>
             );
           } else {
             return (
