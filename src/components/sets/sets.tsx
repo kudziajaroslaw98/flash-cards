@@ -42,12 +42,12 @@ export default function Sets() {
   const toggleRef = useRef<HTMLButtonElement>(null);
 
   const handleNewSets = (sets: Partial<FlashcardSet>[]) => {
-    window.umami.track('add_sets', { count: sets.length });
+    window?.umami?.track('add_sets', { count: sets.length });
     addSets(sets);
   };
 
   const handleEditSets = (sets: Partial<FlashcardSet>[]) => {
-    window.umami.track('edit_sets', { count: sets.length });
+    window?.umami?.track('edit_sets', { count: sets.length });
     updateSets(sets);
   };
 
@@ -78,12 +78,12 @@ export default function Sets() {
   const handleSearchedTextChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    window.umami.track('Search sets');
+    window?.umami?.track('Search sets');
     setSearchedText(event.target.value);
   };
 
   const handleSearchCategoryChange = (category: string[]) => {
-    window.umami.track('Search sets by category');
+    window?.umami?.track('Search sets by category');
     setSearchedCategory(category);
   };
 
@@ -100,12 +100,12 @@ export default function Sets() {
   }, [selected]);
 
   const handleSetToggleChange = (set: FlashcardSet) => {
-    window.umami.track('Toggle set favourite');
+    window?.umami?.track('Toggle set favourite');
     updateSet({ ...set, isFavourite: !set.isFavourite });
   };
 
   const toggleSelected = (set: FlashcardSet) => {
-    window.umami.track('Set toggle selected');
+    window?.umami?.track('Set toggle selected');
     const isFlashCardSelected =
       selected.findIndex((item) => item.frontUuid === set.frontUuid) !== -1;
 
@@ -119,22 +119,22 @@ export default function Sets() {
   };
 
   const removeSelected = () => {
-    window.umami.track('Remove sets', { count: selected.length });
+    window?.umami?.track('Remove sets', { count: selected.length });
     removeSets(selected);
     setSelected([]);
   };
 
   const [onStart, onEnd, onMove] = useLongPress<FlashcardSet, FlashcardSet>(
     (set) => {
-      window.umami.track('Set long pressed');
+      window?.umami?.track('Set long pressed');
       toggleSelected(set);
     },
     (set, e) => {
       if (isInSelectionMode) {
-        window.umami.track('Set short pressed - toggle selected');
+        window?.umami?.track('Set short pressed - toggle selected');
         toggleSelected(set.at(0) as FlashcardSet);
       } else {
-        window.umami.track('Set short pressed - open set');
+        window?.umami?.track('Set short pressed - open set');
         const target = e.target as HTMLElement;
 
         if (target?.classList?.contains('toggle-button')) {
@@ -277,7 +277,7 @@ export default function Sets() {
             trigger={
               <Button
                 onClick={() => {
-                  window.umami.track('Add set clicked');
+                  window?.umami?.track('Add set clicked');
                 }}
                 icon={<Plus className='h-4 w-4' />}
                 size={'icon-square'}
@@ -295,7 +295,7 @@ export default function Sets() {
             trigger={
               <Button
                 onClick={() => {
-                  window.umami.track('Edit set clicked');
+                  window?.umami?.track('Edit set clicked');
                 }}
                 icon={<Pencil className='h-4 w-4' />}
                 size={'icon-square'}
@@ -313,7 +313,7 @@ export default function Sets() {
 
           <AlertDialog
             onCancel={() => {
-              window.umami.track('Cancel remove set');
+              window?.umami?.track('Cancel remove set');
             }}
             headerText='Are you absolutely sure?'
             bodyText='This action cannot be undone. This will permanently delete your set.'

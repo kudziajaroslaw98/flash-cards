@@ -54,7 +54,7 @@ export default function TextArea({
   const [value, setValue] = useState(props.value);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
-  useAutosizeTextArea(textAreaRef.current, value);
+  const { recalculateHeight } = useAutosizeTextArea(textAreaRef.current, value);
 
   useEffect(() => {
     setValue(props.value);
@@ -69,25 +69,29 @@ export default function TextArea({
   };
 
   const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-    window.umami.track('Focus input', { name: props.name });
+    window?.umami?.track('Focus input', { name: props.name });
     if (props.onFocus) {
       props.onFocus(e);
     }
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-    window.umami.track('Blur input', { name: props.name });
+    window?.umami?.track('Blur input', { name: props.name });
     if (props.onBlur) {
       props.onBlur(e);
     }
   };
 
   const generate = () => {
-    window.umami.track('Generate text clicked', { name: props.name });
+    window?.umami?.track('Generate text clicked', { name: props.name });
     if (handleGenerate && !blockGenerate && !loadingGenerate) {
       handleGenerate();
     }
   };
+
+  useEffect(() => {
+    recalculateHeight();
+  }, [textAreaRef]);
 
   return (
     <label
@@ -110,7 +114,7 @@ export default function TextArea({
           className={cn([
             touched && !valid ? '!border-red-400 ring-red-400/50' : '',
             touched && valid ? '!border-green-400 ring-green-400/50' : '',
-            'field-sizing-content relative flex w-full items-center gap-4 rounded-md border border-gray-300 bg-gray-100 p-2 px-4 dark:border-slate-800 dark:bg-slate-900',
+            'field-sizing-content relative flex w-full items-center gap-4 rounded-md border border-gray-300 bg-transparent p-2 px-4 dark:border-slate-800',
             'h-auto resize-y text-sm outline-none transition-all focus:ring',
             label
               ? 'placeholder:text-gray-400  dark:placeholder:text-slate-500'

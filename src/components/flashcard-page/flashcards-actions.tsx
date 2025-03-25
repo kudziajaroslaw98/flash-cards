@@ -35,7 +35,7 @@ export default function FlashcardsActions({
     ) ?? [];
 
   const addNewRecord = (flashcards: Partial<Flashcard>[]) => {
-    window.umami.track('Add flashcards', { count: flashcards.length });
+    window?.umami?.track('Add flashcards', { count: flashcards.length });
     addFlashcards(flashcards);
 
     updateMetadata({
@@ -52,12 +52,12 @@ export default function FlashcardsActions({
   };
 
   const editSelectedRecords = (editRecords: Partial<Flashcard>[]) => {
-    window.umami.track('Edit flashcards', { count: editRecords.length });
+    window?.umami?.track('Edit flashcards', { count: editRecords.length });
     updateFlashcards(editRecords);
   };
 
   const removeSelected = () => {
-    window.umami.track('Remove flashcards', { count: selected.length });
+    window?.umami?.track('Remove flashcards', { count: selected.length });
     removeFlashcards(selected);
     setSelected([]);
   };
@@ -97,7 +97,7 @@ export default function FlashcardsActions({
           />
           <AlertDialog
             onCancel={() => {
-              window.umami.track('Cancel remove flashcards');
+              window?.umami?.track('Cancel remove flashcards');
             }}
             headerText='Are you absolutely sure?'
             bodyText='This action cannot be undone. This will permanently delete your flashcards.'

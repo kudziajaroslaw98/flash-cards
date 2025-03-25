@@ -21,7 +21,7 @@ export function StudyPlanActions({
   const studyPlans = useLiveQuery(() => db.studyPlans.toArray()) ?? [];
 
   const removeSelected = () => {
-    window.umami.track('Remove flashcards', { count: selected.length });
+    window?.umami?.track('Remove flashcards', { count: selected.length });
     removeStudyPlans(selected);
     setSelected([]);
   };
@@ -40,7 +40,7 @@ export function StudyPlanActions({
         <>
           <AlertDialog
             onCancel={() => {
-              window.umami.track('Cancel remove flashcards');
+              window?.umami?.track('Cancel remove flashcards');
             }}
             headerText='Are you absolutely sure?'
             bodyText='This action cannot be undone. This will permanently delete your flashcards.'

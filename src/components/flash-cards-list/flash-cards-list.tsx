@@ -1,17 +1,29 @@
 'use client';
 
 import '#/shared/utils/polyfills';
-import { useCallback, useEffect, useState } from 'react';
-
-import FlashcardComponent from '#/components/flash-card/flash-card';
+import {
+  type Dispatch,
+  type SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { useAppContext } from '#/providers/app-context';
-import { cn } from '#/shared/utils/cn.util';
 import type { Flashcard } from '#/types/flash-card.type';
 
+import { useResizeObserver } from '#/hooks/use-resize-observer';
+import { useWindowResize } from '#/hooks/use-window-resize-observer';
+import { cn } from '#/shared/utils/cn.util';
 import { TreePalm } from 'lucide-react';
-import { AnimatePresence } from 'motion/react';
-import * as m from 'motion/react-m';
+import { VirtualizedFlashcardList } from './virtualized-flashcard-list';
+
+interface Column {
+  key: string;
+  name: string;
+  width: number;
+}
 
 export default function FlashcardsList({
   selected,
@@ -20,14 +32,14 @@ export default function FlashcardsList({
 }: {
   selected: Flashcard[];
   filteredFlashcards: Flashcard[];
-  setSelected: React.Dispatch<React.SetStateAction<Flashcard[]>>;
+  setSelected: Dispatch<SetStateAction<Flashcard[]>>;
 }) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const { flashcards } = useAppContext();
 
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
-  const [tileSize] = useState<'sm' | 'md' | 'lg' | 'horizontal-sm'>(
-    'horizontal-sm',
-  );
+  const [columns, setColumns] = useState<Column[]>([]);
+  const [data, setData] = useState<Flashcard[][]>([]);
 
   const isSelected = useCallback(
     (flashcard: Flashcard) => {
@@ -52,6 +64,107 @@ export default function FlashcardsList({
     [isSelected],
   );
 
+  const generateColumns = (columnsCount: number): Column[] => {
+    if (!containerRef.current || containerRef.current === null) {
+      return [];
+    } else {
+      const columns = new Array(columnsCount).fill(0).map((_, i) => {
+        const key: string = i.toString();
+        return {
+          key,
+          name: `Column-${i}`,
+          width:
+            containerRef.current!.getBoundingClientRect().width / columnsCount,
+        };
+      });
+
+      setColumns(columns);
+      return columns;
+    }
+  };
+
+  const generateData = useCallback(
+    (columns: Column[]) => {
+      return new Array(filteredFlashcards.length).fill(0).map((_, rowIndex) =>
+        columns.reduce<Array<Flashcard>>((acc, _curr, colIndex) => {
+          acc.push(filteredFlashcards[rowIndex * columns.length + colIndex]);
+
+          return acc;
+        }, []),
+      );
+    },
+    [filteredFlashcards, columns],
+  );
+
+  useWindowResize(
+    ({ width }) => {
+      let columns = [];
+      let data: Flashcard[][] = [];
+
+      if (width >= 1536) {
+        columns = generateColumns(4);
+      } else if (width >= 1280) {
+        columns = generateColumns(3);
+      } else if (width >= 600) {
+        columns = generateColumns(2);
+      } else {
+        columns = generateColumns(1);
+      }
+
+      if (columns) {
+        data = generateData(columns);
+        setData(data);
+      }
+    },
+    { debounceDelay: 200 },
+  );
+
+  useResizeObserver(
+    () => {
+      const width = typeof window !== 'undefined' ? window.innerWidth : 0;
+      let columns = [];
+      let data: Flashcard[][] = [];
+
+      if (width >= 1536) {
+        columns = generateColumns(4);
+      } else if (width >= 1280) {
+        columns = generateColumns(3);
+      } else if (width >= 600) {
+        columns = generateColumns(2);
+      } else {
+        columns = generateColumns(1);
+      }
+
+      if (columns) {
+        data = generateData(columns);
+        setData(data);
+      }
+    },
+    containerRef.current,
+    { debounceDelay: 200 },
+  );
+
+  useEffect(() => {
+    const width = typeof window !== 'undefined' ? window.innerWidth : 0;
+    let columns = [];
+    let data: Flashcard[][] = [];
+
+    if (width >= 1536) {
+      columns = generateColumns(4);
+    } else if (width >= 1280) {
+      columns = generateColumns(3);
+    } else if (width >= 600) {
+      columns = generateColumns(2);
+    } else {
+      columns = generateColumns(1);
+    }
+
+    if (columns) {
+      data = generateData(columns);
+      setData(data);
+    }
+  }, [filteredFlashcards]);
+
   useEffect(() => {
     if (selected.length > 0) {
       setIsInSelectionMode(true);
@@ -71,38 +184,16 @@ export default function FlashcardsList({
       )}
       {flashcards.length > 0 && (
         <div
-          className={cn([
-            'grid h-auto w-full justify-center gap-4 transition-all',
-            filteredFlashcards.length > 5
-              ? 'xl:justify-center'
-              : 'xl:justify-start',
-            tileSize === 'sm' && 'grid-cols-[repeat(auto-fit,9rem)]',
-            tileSize === 'md' && 'grid-cols-[repeat(auto-fit,11rem)]',
-            tileSize === 'lg' && 'grid-cols-[repeat(auto-fit,16rem)]',
-            tileSize === 'horizontal-sm' &&
-              'grid-cols-1 min-[600px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',
-          ])}
+          ref={containerRef}
+          className={cn(['grid h-full w-full gap-4 transition-all'])}
         >
-          <AnimatePresence mode='popLayout'>
-            {filteredFlashcards.map((flashcard) => (
-              <m.div
-                key={flashcard.frontUuid}
-                exit={{
-                  maxHeight: 0,
-                  height: 0,
-                }}
-                layout
-              >
-                <FlashcardComponent
-                  flashcard={flashcard}
-                  size={tileSize}
-                  isSelected={isSelected(flashcard)}
-                  onSelect={() => toggleSelected(flashcard)}
-                  isInSelectionMode={isInSelectionMode}
-                />
-              </m.div>
-            ))}
-          </AnimatePresence>
+          <VirtualizedFlashcardList
+            columns={columns}
+            data={data}
+            isInSelectionMode={isInSelectionMode}
+            isSelected={isSelected}
+            toggleSelected={toggleSelected}
+          />
         </div>
       )}
     </div>

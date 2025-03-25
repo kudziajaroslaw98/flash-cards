@@ -38,15 +38,15 @@ export function AISuggestedFlashcard({
 
   const [onStart, onEnd, onMove] = useLongPress<AISuggestedFlashcardType>(
     (flashcard) => {
-      window.umami.track('Flashcard long pressed');
+      window?.umami?.track('Flashcard long pressed');
       if (onSelect) {
         onSelect(flashcard);
       }
     },
     () => {
-      window.umami.track('Flashcard short pressed');
+      window?.umami?.track('Flashcard short pressed');
       if (isInSelectionMode) {
-        window.umami.track('Flashcard selected');
+        window?.umami?.track('Flashcard selected');
         if (onSelect) {
           onSelect(flashcard);
         }

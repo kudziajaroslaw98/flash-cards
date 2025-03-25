@@ -61,8 +61,8 @@ export default function FlashcardsFilters({
     setSearchedType(types);
   };
 
-  const handleSelectAll = () => {
-    setSelected(flashcards);
+  const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
+    setSelected(event.target.checked ? flashcards : []);
   };
 
   useEffect(() => {

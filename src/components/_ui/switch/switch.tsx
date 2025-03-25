@@ -7,6 +7,7 @@ type SwitchProps =
       value: boolean;
       variant?: 'vertical' | 'vertical-reversed';
       onClick: () => void;
+      className?: string;
     }
   | {
       showLabel: true;
@@ -15,6 +16,7 @@ type SwitchProps =
       uncheckedLabel: string;
       variant: 'vertical' | 'vertical-reversed';
       onClick: () => void;
+      className?: string;
     };
 
 export default function Switch({
@@ -40,6 +42,7 @@ export default function Switch({
       <div
         className={cn([
           'relative h-6 w-10 rounded-full bg-gray-200 peer-focus:ring peer-focus:ring-green-400/50 dark:bg-slate-950',
+          props.className,
         ])}
       >
         <div

@@ -33,20 +33,20 @@ export default function FlashcardComponent({
 
   const [onStart, onEnd, onMove] = useLongPress<Flashcard>(
     (flashcard) => {
-      window.umami.track('Flashcard long pressed');
+      window?.umami?.track('Flashcard long pressed');
       if (onSelect) {
         onSelect(flashcard);
       }
     },
     () => {
-      window.umami.track('Flashcard short pressed');
+      window?.umami?.track('Flashcard short pressed');
       if (isInSelectionMode) {
-        window.umami.track('Flashcard selected');
+        window?.umami?.track('Flashcard selected');
         if (onSelect) {
           onSelect(flashcard);
         }
       } else if (!flipBlocked && flashcard.type !== 'index') {
-        window.umami.track('Flashcard flipped');
+        window?.umami?.track('Flashcard flipped');
         setIsFlipped(!isFlipped);
       }
     },
@@ -96,7 +96,7 @@ export default function FlashcardComponent({
       top: 0,
       left: 0,
       position: reviseView ? 'relative' : 'absolute',
-      zIndex: 22,
+      zIndex: 40,
       height: '22.75rem',
       width: '100%',
     } as Variant,

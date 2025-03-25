@@ -29,7 +29,7 @@ export function ReviseBody({
     if (!revisedCard) {
       return;
     }
-    window.umami.track('Space repetition clicked', { value });
+    window?.umami?.track('Space repetition clicked', { value });
 
     if (clicked) {
       return;
@@ -61,9 +61,9 @@ export function ReviseBody({
     if (!answer || !revisedCard || !currentDay || !currentSession) return;
 
     if (key) {
-      window.umami.track('Answer clicked', { key });
+      window?.umami?.track('Answer clicked', { key });
     } else {
-      window.umami.track('Answer clicked', { key: null });
+      window?.umami?.track('Answer clicked', { key: null });
     }
 
     if (clicked) {

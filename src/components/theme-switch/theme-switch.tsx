@@ -1,6 +1,6 @@
 import { useThemeContext } from '#/providers/theme-provider.component';
-import Switch from '../_ui/switch/switch';
 import { Moon, Sun } from 'lucide-react';
+import Switch from '../_ui/switch/switch';
 
 type ThemeSwitchProps = {
   showLabel: boolean;
@@ -18,6 +18,7 @@ export default function ThemeSwitchComponent(props: ThemeSwitchProps) {
       checkedLabel='Light mode'
       uncheckedLabel='Dark mode'
       variant={props.variant ?? 'vertical'}
+      className='dark:bg-slate-900'
     >
       {isLightMode ? (
         <Sun className='h-4 w-4 fill-current' />

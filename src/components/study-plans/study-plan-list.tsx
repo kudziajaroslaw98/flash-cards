@@ -34,16 +34,16 @@ export function StudyPlanList({
 
   const [onStart, onEnd, onMove] = useLongPress<StudyPlan, StudyPlan>(
     (plan) => {
-      window.umami.track('Flashcard long pressed');
+      window?.umami?.track('Flashcard long pressed');
       toggleSelected(plan);
     },
     ([plan]) => {
-      window.umami.track('Flashcard short pressed');
+      window?.umami?.track('Flashcard short pressed');
       if (isInSelectionMode) {
-        window.umami.track('Flashcard selected');
+        window?.umami?.track('Flashcard selected');
         toggleSelected(plan);
       } else {
-        window.umami.track('Flashcard clicked');
+        window?.umami?.track('Flashcard clicked');
         router.push(`/study/plans/${plan.frontUuid}/`);
       }
     },

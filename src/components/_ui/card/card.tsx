@@ -53,7 +53,7 @@ export default function Card({
         `text-default group relative flex flex-col gap-4 rounded-md border border-gray-200 bg-gray-50 p-4 text-gray-600 shadow-card transition-all dark:border-slate-800/40  dark:bg-slate-950 dark:text-slate-300 dark:shadow-card-dark `,
         'outline-none ring-green-400/50 focus-visible:ring',
         motion &&
-          'active:scale-95 motion-safe:will-change-transform md:hover:translate-y-1 md:hover:shadow-card-hovered dark:md:hover:shadow-dark-card-hovered',
+          'active:scale-95 motion-safe:will-change-transform md:hover:translate-y-1',
         className,
       ])}
       {...props}

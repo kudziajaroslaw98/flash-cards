@@ -137,7 +137,7 @@ export default function Dropdown<T>({
 
   useOutsideAlerter(dropdownWrapperRef, () => {
     if (visible) {
-      window.umami.track('Dropdown - Click outside');
+      window?.umami?.track('Dropdown - Click outside');
       setVisible(false);
       setSearchValue('');
       hasFocus.current = false;
@@ -271,14 +271,14 @@ export default function Dropdown<T>({
   }, [searchValue]);
 
   const toggleDropdown = () => {
-    window.umami.track('Dropdown - Toggle', { name: props.name ?? label });
+    window?.umami?.track('Dropdown - Toggle', { name: props.name ?? label });
     if (disabled) return;
     setVisible((prev) => !prev);
     setSearchValue('');
   };
 
   const changePickedItem = (pickedItem: DictionaryValue<T>) => {
-    window.umami.track('Dropdown - Select item', {
+    window?.umami?.track('Dropdown - Select item', {
       name: pickedItem.label,
     });
     if (multiple) {
@@ -311,7 +311,7 @@ export default function Dropdown<T>({
   };
 
   const clearPicked = (key?: string) => {
-    window.umami.track('Dropdown - Clear picked', { key: key ?? 'btnClick' });
+    window?.umami?.track('Dropdown - Clear picked', { key: key ?? 'btnClick' });
     setSelected([]);
 
     if (multiple) {
@@ -331,7 +331,7 @@ export default function Dropdown<T>({
   };
 
   const handleToggleAddNew = (key?: string, type?: 'Cancel') => {
-    window.umami.track('Dropdown - add new clicked', {
+    window?.umami?.track('Dropdown - add new clicked', {
       key: key ?? 'btnClick',
       type: type ?? 'add',
     });
@@ -339,7 +339,7 @@ export default function Dropdown<T>({
   };
 
   const handleAddNewElement = (key?: string) => {
-    window.umami.track('Dropdown - new element added', {
+    window?.umami?.track('Dropdown - new element added', {
       key: key ?? 'btnClick',
     });
     const newItem = {

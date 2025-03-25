@@ -59,12 +59,12 @@ function TagInput({
   const [tags, setTags] = useState<string[]>(props.value || []);
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    window.umami.track('Focus input', { name: props.name });
+    window?.umami?.track('Focus input', { name: props.name });
     if (props.onFocus) props.onFocus(e);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    window.umami.track('Blur input', { name: props.name });
+    window?.umami?.track('Blur input', { name: props.name });
     if (props.onBlur) props.onBlur(e);
   };
 

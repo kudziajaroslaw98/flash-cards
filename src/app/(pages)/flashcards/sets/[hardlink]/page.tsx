@@ -88,7 +88,7 @@ export default function SetHardlinkPage() {
     ) ?? [];
 
   const handleAssignCards = (flashcards: string[]) => {
-    window.umami.track('flashcard assigned to set');
+    window?.umami?.track('flashcard assigned to set');
     setSet((prev) => ({
       ...prev,
       flashcards,
@@ -103,7 +103,7 @@ export default function SetHardlinkPage() {
   };
 
   const handleEditSet = (set: Partial<FlashcardSet>[]) => {
-    window.umami.track('Edit set', { count: set.length });
+    window?.umami?.track('Edit set', { count: set.length });
     if (set.length > 0) {
       const hardlink = set[0].name?.replace(/ /g, '-').toLowerCase();
       router.prefetch(`flashcards/sets/${hardlink}`);
@@ -116,7 +116,7 @@ export default function SetHardlinkPage() {
   };
 
   const handleRemoveSet = () => {
-    window.umami.track('Delete set');
+    window?.umami?.track('Delete set');
     if (set?.frontUuid) {
       removeSets([set]);
       router.push('/flashcards/sets');
@@ -135,7 +135,7 @@ export default function SetHardlinkPage() {
       label: 'export set CSV',
       icon: <Download className='h-6 w-6' />,
       onClick: () => {
-        window.umami.track('Export set CSV');
+        window?.umami?.track('Export set CSV');
       },
     },
     {
@@ -143,13 +143,13 @@ export default function SetHardlinkPage() {
       label: 'Import set CSV',
       icon: <Upload className='h-6 w-6' />,
       onClick: () => {
-        window.umami.track('Import set CSV');
+        window?.umami?.track('Import set CSV');
       },
     },
   ];
 
   const handleGenerateFlashcards = async () => {
-    window.umami.track('Generate flashcards');
+    window?.umami?.track('Generate flashcards');
     if (!isLoggedIn || !isPlanActive) return;
 
     submit({
@@ -160,10 +160,10 @@ export default function SetHardlinkPage() {
   };
 
   const handleNewFlashcards = (newFlashcards: Omit<Flashcard, 'order'>[]) => {
-    window.umami.track('Add flashcards');
+    window?.umami?.track('Add flashcards');
 
     if (newFlashcards.length > 0) {
-      window.umami.track('Add flashcards', { count: newFlashcards.length });
+      window?.umami?.track('Add flashcards', { count: newFlashcards.length });
       addFlashcards(
         newFlashcards.map((f) => ({ ...f, sets: [set.frontUuid] })),
       );
@@ -193,7 +193,7 @@ export default function SetHardlinkPage() {
   };
 
   const handleUnassignFlashcards = () => {
-    window.umami.track('Unassign flashcards');
+    window?.umami?.track('Unassign flashcards');
 
     unassignFlashcardsFromSet(
       selected.map((f) => f.frontUuid),
@@ -300,7 +300,7 @@ export default function SetHardlinkPage() {
                   icon={<Settings className='h-4 w-4' />}
                   size={'icon'}
                   variant={'primary-outline'}
-                  onClick={() => window.umami.track('Set options clicked')}
+                  onClick={() => window?.umami?.track('Set options clicked')}
                   alt='Set options'
                 />
               }

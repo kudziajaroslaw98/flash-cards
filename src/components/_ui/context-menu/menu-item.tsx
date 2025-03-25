@@ -20,7 +20,7 @@ export default function MenuItem(props: PropsWithChildren<MenuItemProps>) {
 
   const handleClick = () => {
     if (handleItemClick) {
-      window.umami.track('Click context menu item');
+      window?.umami?.track('Click context menu item');
       handleItemClick();
     }
   };

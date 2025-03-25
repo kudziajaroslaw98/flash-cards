@@ -42,7 +42,7 @@ export function ReminderActions({
     }, 1);
   };
   const removeSelected = () => {
-    window.umami.track('Remove reminders', { count: selected.length });
+    window?.umami?.track('Remove reminders', { count: selected.length });
     removeReminders(selected);
     setSelected([]);
   };
@@ -83,7 +83,7 @@ export function ReminderActions({
           />
           <AlertDialog
             onCancel={() => {
-              window.umami.track('Cancel remove flashcards');
+              window?.umami?.track('Cancel remove flashcards');
             }}
             headerText='Are you absolutely sure?'
             bodyText='This action cannot be undone. This will permanently delete your flashcards.'

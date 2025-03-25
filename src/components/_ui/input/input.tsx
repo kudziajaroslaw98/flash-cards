@@ -60,17 +60,17 @@ function Input({
 }: InputComponentProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    window.umami.track('Focus input', { name: props.name });
+    window?.umami?.track('Focus input', { name: props.name });
     if (props.onFocus) props.onFocus(e);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    window.umami.track('Blur input', { name: props.name });
+    window?.umami?.track('Blur input', { name: props.name });
     if (props.onBlur) props.onBlur(e);
   };
 
   const handleClick = () => {
-    window.umami.track('Click input', { name: props.name });
+    window?.umami?.track('Click input', { name: props.name });
     if (inputRef.current) {
       inputRef.current.focus();
       inputRef.current.click();
@@ -116,17 +116,22 @@ function Input({
             label
               ? 'placeholder:text-gray-400 dark:placeholder:text-slate-500'
               : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
-            'peer text-sm text-gray-800',
-            inputType === 'checkbox' ? 'w-auto' : 'w-full',
-            'bg-transparent text-inherit outline-none transition-all dark:text-slate-200',
+            'peer text-sm text-gray-800 ',
+            'text-inherit outline-none transition-all dark:text-slate-200',
+            // peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-red-600 checked:border-red-600
+            inputType === 'checkbox'
+              ? `pointer-events-none relative h-4 min-w-4 appearance-none rounded border border-gray-300 checked:border-green-500
+              checked:bg-green-500 checked:after:absolute checked:after:left-0 checked:after:top-0 checked:after:z-10
+              checked:after:flex checked:after:h-full checked:after:w-full checked:after:items-center checked:after:justify-center
+              checked:after:text-white checked:after:content-["✓"] dark:border-slate-700 dark:checked:border-green-500 dark:checked:bg-green-500`
+              : 'w-full bg-transparent ',
           ])}
           onFocus={handleFocus}
           onBlur={handleBlur}
           aria-invalid={touched && !valid ? 'true' : 'false'}
         />
-
         {inputLabel && (
-          <span className='pointer-events-none flex w-full text-nowrap text-gray-500 dark:text-gray-500'>
+          <span className='pointer-events-none flex w-full text-nowrap text-gray-500 dark:text-slate-400'>
             {inputLabel}
           </span>
         )}

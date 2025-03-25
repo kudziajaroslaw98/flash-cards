@@ -90,7 +90,7 @@ export const NewFlashcardModal = ({
   };
 
   const handleDialogClose = () => {
-    window.umami.track('Flashcard dialog - closed', { isInEditMode });
+    window?.umami?.track('Flashcard dialog - closed', { isInEditMode });
 
     setIsModalOpen(false);
     setCurrentIndex(0);
@@ -99,7 +99,7 @@ export const NewFlashcardModal = ({
   };
 
   const handleDialogSubmit = async () => {
-    window.umami.track('Flashcard dialog - submitted', { isInEditMode });
+    window?.umami?.track('Flashcard dialog - submitted', { isInEditMode });
 
     await formRef.current?.checkValidity();
 
@@ -141,7 +141,7 @@ export const NewFlashcardModal = ({
   };
 
   const handleRightButtonClick = () => {
-    window.umami.track('Flashcard dialog - right button clicked');
+    window?.umami?.track('Flashcard dialog - right button clicked');
     updateFormValue();
     if (currentIndex < flashcards.length - 1) {
       setCurrentIndex(currentIndex + 1);
@@ -154,7 +154,7 @@ export const NewFlashcardModal = ({
   };
 
   const handleLeftButtonClick = () => {
-    window.umami.track('Flashcard dialog - left button clicked');
+    window?.umami?.track('Flashcard dialog - left button clicked');
 
     if (currentIndex > 0) {
       updateFormValue();

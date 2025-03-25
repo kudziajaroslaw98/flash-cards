@@ -60,14 +60,14 @@ export function InputSwitch({
   };
 
   const handleFocus = () => {
-    window.umami.track('Focus input', { name: props.name });
+    window?.umami?.track('Focus input', { name: props.name });
     if (onFocus) {
       onFocus();
     }
   };
 
   const handleBlur = () => {
-    window.umami.track('Blur input', { name: props.name });
+    window?.umami?.track('Blur input', { name: props.name });
     if (onBlur) {
       onBlur();
     }

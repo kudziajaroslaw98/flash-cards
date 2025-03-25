@@ -1,14 +1,14 @@
+import { Trigger } from '#/components/_shared/trigger';
+import { ShortcutList } from '#/components/shortcut-list/shortcut-list';
+import useOutsideAlerter from '#/hooks/use-click-outside.hook';
+import useKeyPress from '#/hooks/use-key-press.hook';
+import DialogProvider from '#/providers/dialog.providers';
 import React, {
   createContext,
   PropsWithChildren,
   useCallback,
   useRef,
 } from 'react';
-import { ShortcutList } from '#/components/shortcut-list/shortcut-list';
-import useOutsideAlerter from '#/hooks/use-click-outside.hook';
-import DialogProvider from '#/providers/dialog.providers';
-import { Trigger } from '#/components/_shared/trigger';
-import useKeyPress from '#/hooks/use-key-press.hook';
 import { createPortal } from 'react-dom';
 
 export const DialogContext = createContext({
@@ -40,7 +40,7 @@ export const Dialog = ({
   const ref = useRef<HTMLDivElement>(null);
 
   useOutsideAlerter(ref, () => {
-    window.umami.track('Dialog - backdrop clicked');
+    window?.umami?.track('Dialog - backdrop clicked');
     if (onDialogClose && closeOnBackdropClick) {
       onDialogClose();
     }
@@ -48,7 +48,7 @@ export const Dialog = ({
 
   const handleEnter = useCallback(
     (e: KeyboardEvent) => {
-      window.umami.track('Dialog - enter clicked');
+      window?.umami?.track('Dialog - enter clicked');
 
       const target = e.target as HTMLElement;
 
@@ -61,7 +61,7 @@ export const Dialog = ({
   );
 
   const handleEscape = useCallback(() => {
-    window.umami.track('Dialog - escape clicked');
+    window?.umami?.track('Dialog - escape clicked');
 
     if (open && onDialogClose) {
       onDialogClose();

@@ -49,7 +49,7 @@ function AuthButtons({
     return redirectUrl;
   };
   const handleOAuthGoogle = async () => {
-    window.umami.track('Sign in with Google');
+    window?.umami?.track('Sign in with Google');
     setIsLoading(true);
     await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -60,7 +60,7 @@ function AuthButtons({
   };
 
   const handleOAuthGithub = async () => {
-    window.umami.track('Sign in with Github');
+    window?.umami?.track('Sign in with Github');
     setIsLoading(true);
     await supabase.auth.signInWithOAuth({
       provider: 'github',
@@ -104,7 +104,7 @@ export default function SignInComponent() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleBackButton = () => {
-    window.umami.track('Sign in back');
+    window?.umami?.track('Sign in back');
     window.history.back();
   };
 

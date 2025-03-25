@@ -63,7 +63,7 @@ export const MultiDialog = ({
   // const [direction, setDirection] = useState('right');
 
   useOutsideAlerter(ref, () => {
-    window.umami.track('Dialog - backdrop clicked');
+    window?.umami?.track('Dialog - backdrop clicked');
     if (onDialogClose && closeOnBackdropClick) {
       onDialogClose();
     }
@@ -71,7 +71,7 @@ export const MultiDialog = ({
 
   const handleEnter = useCallback(
     (e: KeyboardEvent) => {
-      window.umami.track('Dialog - enter clicked');
+      window?.umami?.track('Dialog - enter clicked');
 
       const target = e.target as HTMLElement;
 
@@ -84,7 +84,7 @@ export const MultiDialog = ({
   );
 
   const handleArrowRight = useCallback(() => {
-    window.umami.track('Dialog - arrow right clicked');
+    window?.umami?.track('Dialog - arrow right clicked');
     if (open && handleRightButtonClick) {
       direction.current = 1;
       // setDirection(1);
@@ -93,7 +93,7 @@ export const MultiDialog = ({
   }, [open, handleRightButtonClick]);
 
   const handleArrowLeft = useCallback(() => {
-    window.umami.track('Dialog - arrow left clicked');
+    window?.umami?.track('Dialog - arrow left clicked');
     direction.current = -1;
     // setDirection(-1);
     if (open && handleLeftButtonClick) {
@@ -102,7 +102,7 @@ export const MultiDialog = ({
   }, [open, handleLeftButtonClick]);
 
   const handleEscape = useCallback(() => {
-    window.umami.track('Dialog - escape clicked');
+    window?.umami?.track('Dialog - escape clicked');
 
     if (open && onDialogClose) {
       onDialogClose();

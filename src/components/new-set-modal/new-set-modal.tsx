@@ -112,7 +112,7 @@ export const NewSetModal = ({
   };
 
   const handleDialogSubmit = async () => {
-    window.umami.track('Flashcard set dialog - submitted', { isInEditMode });
+    window?.umami?.track('Flashcard set dialog - submitted', { isInEditMode });
 
     await formRef.current?.checkValidity();
 
@@ -139,7 +139,7 @@ export const NewSetModal = ({
   };
 
   const handleRightButtonClick = () => {
-    window.umami.track('Flashcard set dialog - right button clicked');
+    window?.umami?.track('Flashcard set dialog - right button clicked');
     updateFormValue();
     if (currentIndex < sets.length - 1) {
       setCurrentIndex(currentIndex + 1);
@@ -158,7 +158,7 @@ export const NewSetModal = ({
   };
 
   const handleLeftButtonClick = () => {
-    window.umami.track('Flashcard set dialog - left button clicked');
+    window?.umami?.track('Flashcard set dialog - left button clicked');
 
     if (currentIndex > 0) {
       updateFormValue();

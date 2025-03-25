@@ -94,7 +94,7 @@ export default function FlashcardReviseComponent() {
     if (!revisedCard) {
       return;
     }
-    window.umami.track('Space repetition clicked', { value });
+    window?.umami?.track('Space repetition clicked', { value });
 
     if (clicked) {
       return;
@@ -126,9 +126,9 @@ export default function FlashcardReviseComponent() {
     if (!answer || !revisedCard) return;
 
     if (key) {
-      window.umami.track('Answer clicked', { key });
+      window?.umami?.track('Answer clicked', { key });
     } else {
-      window.umami.track('Answer clicked', { key: null });
+      window?.umami?.track('Answer clicked', { key: null });
     }
 
     if (clicked) {
@@ -175,7 +175,7 @@ export default function FlashcardReviseComponent() {
   };
 
   const reshuffleFlashcards = () => {
-    window.umami.track('Reshuffle flashcards', { key: null, clicked });
+    window?.umami?.track('Reshuffle flashcards', { key: null, clicked });
     if (!clicked || !revisedCard) return;
 
     calculateRepetition(revisedCard, clickedOption as ReviseOptionsType);
@@ -184,7 +184,7 @@ export default function FlashcardReviseComponent() {
   };
 
   const reshuffleFlashcardsWithKey = (key: string) => {
-    window.umami.track('Reshuffle flashcards', { key, clicked });
+    window?.umami?.track('Reshuffle flashcards', { key, clicked });
     if (!clicked || !revisedCard) return;
 
     calculateRepetition(revisedCard, clickedOption as ReviseOptionsType);
@@ -196,13 +196,13 @@ export default function FlashcardReviseComponent() {
   };
 
   const changeRevisedSet = (value: string) => {
-    window.umami.track('Change revised set', { value });
+    window?.umami?.track('Change revised set', { value });
     setClicked(false);
     setRevisedSet(value);
   };
 
   const continueRerollClick = () => {
-    window.umami.track('Continue reshuffling');
+    window?.umami?.track('Continue reshuffling');
     setRevisedCard(undefined);
     setClickedOption(undefined);
     setClicked(false);
