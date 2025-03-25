@@ -2,7 +2,7 @@ import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { parseStreamingJSON } from '#/shared/utils/parse-streaming-json';
 import type { Flashcard } from '#/types/flash-card.type';
 import { useCompletion } from '@ai-sdk/react';
-import { ArrowRight, Dot } from 'lucide-react';
+import { ArrowRight, Dot, LoaderCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
 import { Accordion } from '../_ui/accordion/accordion';
@@ -79,14 +79,6 @@ export function ReviseIncorrectSummary({
     } else {
       setIncorrectSummaries(parsedJSON.completeObjects);
     }
-    //  simplifiedDefinition: z.string(),
-    //       commonMisconceptions: z.string(),
-    //       contextualExample: z.string().optional(),
-    //       keyTakeaway: z.string(),
-    //       relatedConcepts: z.string().optional(),
-    //       mnemonic: z.string().optional(),
-    //       visualExample: z.string().optional(),
-    // setIncorrectSummaries(summaries);
   }, [summaries, generateSummaryLoading]);
 
   useEffect(() => {
@@ -112,9 +104,11 @@ export function ReviseIncorrectSummary({
   }) => {
     return (
       <div className='flex flex-col gap-2'>
-        <span className='flex items-center gap-1 text-sm font-semibold'>
+        <span className='font-ibm-serif flex items-center gap-1 text-sm font-semibold'>
           <Dot className='size-4 text-green-500' />
-          <span className='text-gray-600 dark:text-slate-200'>{title}</span>
+          <span className='font-serif text-gray-600 dark:text-slate-200'>
+            {title}
+          </span>
         </span>
 
         <div className='prose w-full rounded-md bg-gray-100/60 p-2 px-5 text-sm text-gray-600 dark:bg-slate-900/60 dark:text-slate-300'>
@@ -127,7 +121,7 @@ export function ReviseIncorrectSummary({
   return (
     <div className='flex w-full flex-col items-center gap-8'>
       <div className='flex w-full max-w-2xl flex-col gap-2'>
-        <span className='font-semibold dark:text-slate-200'>
+        <span className='font-serif font-bold uppercase text-gray-600 dark:text-slate-200'>
           New cards summary
         </span>
 
@@ -149,83 +143,93 @@ export function ReviseIncorrectSummary({
       </div>
 
       <div className='flex w-full max-w-2xl flex-col gap-4'>
-        <span className='font-semibold dark:text-slate-200'>
+        <span className='font-serif font-bold uppercase text-gray-600 dark:text-slate-200'>
           Incorrect flashcard summaries
         </span>
 
-        <Accordion>
-          {incorrectSummaries &&
-            incorrectSummaries?.map((summary, index) => (
-              <Accordion.Item
-                key={index}
-                title={
-                  <div className='flex items-center gap-2 font-medium'>
-                    <span>
-                      {
+        {generateSummaryLoading && (
+          <div className='flex w-full flex-col items-center justify-center gap-4'>
+            <LoaderCircle className='size-6 animate-spin' />
+            <span className='flex w-full animate-pulse justify-center py-4 text-center text-lg md:text-left'>
+              Generating summaries...
+            </span>
+          </div>
+        )}
+        {incorrectSummaries.length > 0 && (
+          <Accordion>
+            {incorrectSummaries &&
+              incorrectSummaries?.map((summary, index) => (
+                <Accordion.Item
+                  key={index}
+                  title={
+                    <div className='flex items-center gap-2 font-medium'>
+                      <span>
+                        {
+                          flashcards.find(
+                            (f) => f.frontUuid === incorrectFlashcards[index],
+                          )?.query
+                        }
+                      </span>
+                    </div>
+                  }
+                >
+                  <div className='flex flex-col gap-4'>
+                    <SummarySection
+                      title='Definition:'
+                      text={
                         flashcards.find(
                           (f) => f.frontUuid === incorrectFlashcards[index],
-                        )?.query
+                        )?.definition
                       }
-                    </span>
+                    />
+
+                    <SummarySection
+                      title='Simplified Definition'
+                      text={summary.simplifiedDefinition}
+                    />
+
+                    <SummarySection
+                      title='Common Misconceptions'
+                      text={summary.commonMisconceptions}
+                    />
+
+                    <SummarySection
+                      title='Key Takeaway'
+                      text={summary.keyTakeaway}
+                    />
+
+                    {summary.contextualExample && (
+                      <SummarySection
+                        title='Contextual Example'
+                        text={summary.contextualExample}
+                      />
+                    )}
+
+                    {summary.relatedConcepts && (
+                      <SummarySection
+                        title='Related Concepts'
+                        text={summary.relatedConcepts}
+                      />
+                    )}
+
+                    {summary.mnemonic && (
+                      <SummarySection
+                        title='Mnemonic'
+                        text={summary.mnemonic}
+                      />
+                    )}
+
+                    {summary.visualExample && (
+                      <SummarySection
+                        title='Visual Example'
+                        text={summary.visualExample}
+                      />
+                    )}
                   </div>
-                }
-              >
-                <div className='flex flex-col gap-4'>
-                  <SummarySection
-                    title='Definition:'
-                    text={
-                      flashcards.find(
-                        (f) => f.frontUuid === incorrectFlashcards[index],
-                      )?.definition
-                    }
-                  />
-
-                  <SummarySection
-                    title='Simplified Definition'
-                    text={summary.simplifiedDefinition}
-                  />
-
-                  <SummarySection
-                    title='Common Misconceptions'
-                    text={summary.commonMisconceptions}
-                  />
-
-                  <SummarySection
-                    title='Key Takeaway'
-                    text={summary.keyTakeaway}
-                  />
-
-                  {summary.contextualExample && (
-                    <SummarySection
-                      title='Contextual Example'
-                      text={summary.contextualExample}
-                    />
-                  )}
-
-                  {summary.relatedConcepts && (
-                    <SummarySection
-                      title='Related Concepts'
-                      text={summary.relatedConcepts}
-                    />
-                  )}
-
-                  {summary.mnemonic && (
-                    <SummarySection
-                      title='Mnemonic'
-                      text={summary.mnemonic}
-                    />
-                  )}
-
-                  {summary.visualExample && (
-                    <SummarySection
-                      title='Visual Example'
-                      text={summary.visualExample}
-                    />
-                  )}
-                </div>
-              </Accordion.Item>
-            ))}
-        </Accordion>
+                </Accordion.Item>
+              ))}
+          </Accordion>
+        )}
       </div>
 
       <Button

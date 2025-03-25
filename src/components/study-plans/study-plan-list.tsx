@@ -6,7 +6,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { BadgeCheck, Palette } from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   useCallback,
   useEffect,
@@ -26,6 +26,7 @@ export function StudyPlanList({
   selected: StudyPlan[];
   setSelected: Dispatch<SetStateAction<StudyPlan[]>>;
 }) {
+  const router = useRouter();
   const studyPlans =
     useLiveQuery(() => db.studyPlans.toCollection().sortBy('createdAt')) ?? [];
   const studySessions = useLiveQuery(() => db.studySessions.toArray()) ?? [];
@@ -41,6 +42,9 @@ export function StudyPlanList({
       if (isInSelectionMode) {
         window.umami.track('Flashcard selected');
         toggleSelected(plan);
+      } else {
+        window.umami.track('Flashcard clicked');
+        router.push(`/study/plans/${plan.frontUuid}/`);
       }
     },
   );
@@ -102,76 +106,69 @@ export function StudyPlanList({
                   translateY: '-10%',
                 }}
               >
-                <Link href={`/study/plans/${plan.frontUuid}/`}>
-                  <Card
-                    tabIndex={0}
-                    key={plan.frontUuid}
-                    className={cn([
-                      'flex h-full cursor-pointer flex-col justify-between gap-4 sm:min-h-44 sm:gap-4',
-                      selected.includes(plan) ? 'ring ring-green-400/60' : '',
-                    ])}
-                    onMouseDown={(e) => onStart(e, plan)}
-                    onTouchStart={(e) => onStart(e, plan)}
-                    onMouseUp={(e) => onEnd(e, [plan])}
-                    onTouchEnd={(e) => onEnd(e, [plan])}
-                    onTouchMove={onMove}
-                  >
-                    {selected.includes(plan) && (
-                      <BadgeCheck className='absolute -right-4 -top-4 h-6 w-6  fill-green-500 text-gray-50 dark:text-slate-950' />
-                    )}
+                <Card
+                  tabIndex={0}
+                  key={plan.frontUuid}
+                  className={cn([
+                    'flex h-full cursor-pointer flex-col justify-between gap-4 sm:min-h-44 sm:gap-4',
+                    selected.includes(plan) ? 'ring ring-green-400/60' : '',
+                  ])}
+                  onMouseDown={(e) => onStart(e, plan)}
+                  onTouchStart={(e) => onStart(e, plan)}
+                  onMouseUp={(e) => onEnd(e, [plan])}
+                  onTouchEnd={(e) => onEnd(e, [plan])}
+                  onTouchMove={onMove}
+                >
+                  {selected.includes(plan) && (
+                    <BadgeCheck className='absolute -right-4 -top-4 h-6 w-6  fill-green-500 text-gray-50 dark:text-slate-950' />
+                  )}
 
-                    <div className='flex flex-col gap-4'>
-                      <h5 className='text-base font-bold text-gray-800 dark:text-slate-200'>
-                        {plan.name ?? 'Untitled plan'}
-                      </h5>
+                  <div className='flex flex-col gap-4'>
+                    <h5 className='text-base font-bold text-gray-800 dark:text-slate-200'>
+                      {plan.name ?? 'Untitled plan'}
+                    </h5>
 
-                      <div className='flex flex-col gap-1 text-sm text-gray-500 dark:text-slate-500'>
-                        <div className='flex w-full gap-2'>
-                          <span className='font-semibold'>Created at:</span>
+                    <div className='flex flex-col gap-1 text-sm text-gray-500 dark:text-slate-500'>
+                      <div className='flex w-full gap-2'>
+                        <span className='font-semibold'>Created at:</span>
 
-                          <span>{new Date(plan.createdAt).toDateString()}</span>
-                        </div>
+                        <span>{new Date(plan.createdAt).toDateString()}</span>
+                      </div>
 
-                        <div className='flex w-full gap-2'>
-                          <span className='font-semibold'>Plan duration:</span>
+                      <div className='flex w-full gap-2'>
+                        <span className='font-semibold'>Plan duration:</span>
 
-                          <span>{plan.durationDays} days</span>
-                        </div>
+                        <span>{plan.durationDays} days</span>
+                      </div>
 
-                        <div className='flex w-full gap-2'>
-                          <span className='font-semibold'>Current day:</span>
+                      <div className='flex w-full gap-2'>
+                        <span className='font-semibold'>Current day:</span>
 
-                          <span>
-                            {studySessions.find(
-                              (s) => s.planId === plan.frontUuid,
-                            )?.currentDay === 0
-                              ? 'Not started'
-                              : studySessions.find(
-                                  (s) => s.planId === plan.frontUuid,
-                                )?.currentDay}
-                          </span>
-                        </div>
+                        <span>
+                          {studySessions.find(
+                            (s) => s.planId === plan.frontUuid,
+                          )?.currentDay === 0
+                            ? 'Not started'
+                            : studySessions.find(
+                                (s) => s.planId === plan.frontUuid,
+                              )?.currentDay}
+                        </span>
                       </div>
                     </div>
+                  </div>
 
-                    <div className='flex w-full items-center justify-between'>
-                      <div className='flex w-full items-center gap-2'>
-                        {plan.focusTags && (
-                          <div className='flex flex-wrap gap-2'>
-                            {plan.focusTags.map((tag) => (
-                              <Badge
-                                key={tag}
-                                className='capitalize'
-                              >
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                  <div className='flex w-full items-center justify-between'>
+                    <div className='flex w-full items-center gap-2'>
+                      {plan.focusTags && (
+                        <div className='flex flex-wrap gap-2'>
+                          {plan.focusTags.map((tag) => (
+                            <Badge key={tag}>{tag}</Badge>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </Card>
-                </Link>
+                  </div>
+                </Card>
               </m.div>
             ))}
           </AnimatePresence>

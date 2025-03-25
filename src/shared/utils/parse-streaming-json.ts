@@ -2,9 +2,16 @@ export function parseStreamingJSON<T>(streamText: string): {
   completeObjects: T[];
   currentObject: Partial<T> | null;
 } {
+  // remove code block markdown
+  streamText.replaceAll('```json', '');
+  streamText.replaceAll('```', '');
+
   // Check if we have the beginning of a JSON array
   if (!streamText.trim().startsWith('[')) {
-    return { completeObjects: [], currentObject: null };
+    // remove array bracket on start
+
+    streamText = streamText.replace(/^\[/, '');
+    streamText = streamText.replace(/\]$/, '');
   }
 
   // Split the incoming text by objects

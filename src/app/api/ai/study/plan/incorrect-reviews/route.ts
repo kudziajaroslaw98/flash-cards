@@ -2,6 +2,7 @@ import { Logger } from '#/shared/helpers/logger/logger';
 import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { createClient } from '#/shared/utils/supabase/server';
+import uuid from '#/shared/utils/uuid.util';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamText } from 'ai';
 import type { NextRequest } from 'next/server';
@@ -31,6 +32,7 @@ async function validateBody(body: Record<string, unknown>) {
 const rateLimit = new RateLimit(1, 10, routePath);
 
 export async function POST(req: NextRequest) {
+  const sessionId = uuid();
   const supabase = await createClient();
   const user = (await supabase.auth.getUser()).data.user;
 
@@ -128,7 +130,7 @@ export async function POST(req: NextRequest) {
 Flashcards Data:
 ${summaries
   .map(
-    (summary) => `- 
+    (summary) => `-
   **FrontUuid**: ${summary.frontUuid}
   **Context**: ${summary.context}
   **Definition**: ${summary.definition}
@@ -136,8 +138,9 @@ ${summaries
   `,
   )
   .join('\n')}
-  
-respond with plain JSON of array of objects, one object per card text:
+
+**Output format:**
+respond with JSON of array of objects, one object per card text:
 {
   "id": "unique_ID",
   "simplifiedDefinition": "brief_easy_explanation",
@@ -151,12 +154,6 @@ respond with plain JSON of array of objects, one object per card text:
 ADDITIONAL INSTRUCTIONS:
 You can include multiple commonMisconceptions/contextualExample/keyTakeaway/relatedConcepts/visualExample by separating them with a semicolon.
 You can use markdown in this fields: commonMisconceptions/contextualExample/keyTakeaway/relatedConcepts/visualExample to highlight important points.
-
-IMPORTANT: 
-omit all \`\`\`json \`\`\`
-
-Finish generating all summaries. Add in the end: 
-'[FINISH] All summaries generated'
 `;
 
   const gemini = createGoogleGenerativeAI({
@@ -171,72 +168,24 @@ Finish generating all summaries. Add in the end:
     maxSteps: 5,
     stopSequences: ['[FINISH] All summaries generated'],
     system:
-      'You are a patient, expert tutor specializing in breaking down complex concepts into simple, memorable explanations. Your task is to help learners understand why their answer to a flashcard was incorrect, using analogies, mnemonics, and real-world examples.',
-    // experimental_output: Output.object({
-    //   schema: z.array(
-    //     z.object({
-    //       simplifiedDefinition: z.string(),
-    //       commonMisconceptions: z.string(),
-    //       contextualExample: z.string().optional(),
-    //       keyTakeaway: z.string(),
-    //       relatedConcepts: z.string().optional(),
-    //       mnemonic: z.string().optional(),
-    //       visualExample: z.string().optional(),
-    //     }),
-    //   ),
-    // }),
+      'You are a patient, expert tutor specializing in breaking down complex concepts into simple, memorable explanations. Your task is to help learners understand why their answer to a flashcard was incorrect, using analogies, mnemonics, and real-world examples. When youre ready to finish, include the phrase "[FINISH] All summaries generated" in your response.',
+    onFinish(response) {
+      Logger.info(
+        `Session ${sessionId} finished successfully ${JSON.stringify({ finishReson: response.finishReason, reasoning: response.reasoning, warnings: response.warnings, usage: response.usage })}`,
+        routePath,
+      );
+    },
+    onError: (error) => {
+      Logger.error(`Session ${sessionId}`, routePath, JSON.stringify(error));
+    },
+    onStepFinish: (response) => {
+      Logger.info(
+        `Session ${sessionId} finished successfully ${JSON.stringify({ finishReson: response.finishReason, reasoning: response.reasoning, warnings: response.warnings, usage: response.usage })}`,
+        routePath,
+      );
+    },
+    onChunk: (chunk) => {
+      console.log(chunk);
+    },
   }).toDataStreamResponse();
-
-  // return createDataStreamResponse({
-  //   execute: async (dataStream) => {
-  //     const result = streamText({
-  //       model: gemini('gemini-2.0-flash-thinking-exp-01-21'),
-  //       prompt: prompt,
-  //       temperature: 0.7,
-  //       system:
-  //         'You are a patient, expert tutor specializing in breaking down complex concepts into simple, memorable explanations. Your task is to help learners understand why their answer to a flashcard was incorrect, using analogies, mnemonics, and real-world examples.',
-  //       // experimental_output: Output.object({
-  //       //   schema: z.array(
-  //       //     z.object({
-  //       //       simplifiedDefinition: z.string(),
-  //       //       commonMisconceptions: z.string(),
-  //       //       contextualExample: z.string().optional(),
-  //       //       keyTakeaway: z.string(),
-  //       //       relatedConcepts: z.string().optional(),
-  //       //       mnemonic: z.string().optional(),
-  //       //       visualExample: z.string().optional(),
-  //       //     }),
-  //       //   ),
-  //       // }),
-  //     });
-
-  //     result.mergeIntoDataStream(dataStream);
-  //     //   for await (const chunk of partialObjectStream) {
-  //     //     dataStream.writeData(chunk);
-  //     //     Logger.info(`${chunk}`);
-  //     //   }
-  //     //   const { partialObjectStream } = streamObject({
-  //     //     model: gemini('gemini-2.0-flash-001'),
-  //     //     prompt: prompt,
-  //     //     temperature: 0.7,
-  //     //     system:
-  //     //       'You are a patient, expert tutor specializing in breaking down complex concepts into simple, memorable explanations. Your task is to help learners understand why their answer to a flashcard was incorrect, using analogies, mnemonics, and real-world examples.',
-  //     //     output: 'array',
-  //     //     schema: z.object({
-  //     //       simplifiedDefinition: z.string(),
-  //     //       commonMisconceptions: z.string(),
-  //     //       contextualExample: z.string().optional(),
-  //     //       keyTakeaway: z.string(),
-  //     //       relatedConcepts: z.string().optional(),
-  //     //       mnemonic: z.string().optional(),
-  //     //       visualExample: z.string().optional(),
-  //     //     }),
-  //     //   });
-
-  //     //   for await (const chunk of partialObjectStream) {
-  //     //     dataStream.writeData(chunk);
-  //     //     Logger.info(`${chunk}`);
-  //     //   }
-  //   },
-  // });
 }

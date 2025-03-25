@@ -41,12 +41,13 @@ export const AccordionItem = ({
   return (
     <div className='group w-full'>
       <m.button
-        className={cn([accordionLabelVariants({ variant })])}
+        className={cn([accordionLabelVariants({ variant }), 'w-full'])}
         onClick={handleClick}
       >
-        <span className='text-left text-sm font-medium text-gray-600 dark:text-slate-300'>
+        <span className='flex w-full max-w-full truncate text-left text-sm font-medium text-gray-600 dark:text-slate-300'>
           {title}
         </span>
+
         <m.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}

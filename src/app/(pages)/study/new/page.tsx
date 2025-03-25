@@ -167,85 +167,93 @@ export default function NewStudyPlanPage() {
           <h4 className='w-52 text-green-400'>Create new plan</h4>
         </div>
       </div>
-      <StepperProvider>
-        <Stepper>
-          <StepperStep
-            index={1}
-            stepLabel='General settings'
-            stepIdentification='1'
-          >
-            <StudyPlanStep1
-              state={state}
-              setState={setState}
-            />
-          </StepperStep>
+      {process.env.NODE_ENV === 'production' ? (
+        <div className='flex w-full flex-col items-center justify-center gap-8 sm:items-start md:justify-between'>
+          <div className='flex w-full flex-col items-center justify-center gap-2 sm:items-start md:justify-between'>
+            <h4 className='w-52 text-green-400'>Coming soon..</h4>
+          </div>
+        </div>
+      ) : (
+        <StepperProvider>
+          <Stepper>
+            <StepperStep
+              index={1}
+              stepLabel='General settings'
+              stepIdentification='1'
+            >
+              <StudyPlanStep1
+                state={state}
+                setState={setState}
+              />
+            </StepperStep>
 
-          <StepperStep
-            index={2}
-            stepLabel='Plan Type & Duration'
-            stepIdentification='2'
-          >
-            <StudyPlanStep2
-              state={state}
-              setState={setState}
-            />
-          </StepperStep>
+            <StepperStep
+              index={2}
+              stepLabel='Plan Type & Duration'
+              stepIdentification='2'
+            >
+              <StudyPlanStep2
+                state={state}
+                setState={setState}
+              />
+            </StepperStep>
 
-          <StepperStep
-            index={3}
-            stepLabel='Review Picked Flashcards'
-            stepIdentification='3'
-          >
-            <StudyPlanStep3
-              flashcards={flashcards}
-              setFlashcards={setFlashcards}
-              suggestions={suggestions}
-              isLoading={isLoading}
-              flashcardCount={getRecommendedFlashcardCount(
-                state.step2.duration as PlanDuration,
-                state.step2.planType as PlanType,
-              )}
-              generateSuggestions={generateSuggestions}
-            />
-          </StepperStep>
+            <StepperStep
+              index={3}
+              stepLabel='Review Picked Flashcards'
+              stepIdentification='3'
+            >
+              <StudyPlanStep3
+                flashcards={flashcards}
+                setFlashcards={setFlashcards}
+                suggestions={suggestions}
+                isLoading={isLoading}
+                flashcardCount={getRecommendedFlashcardCount(
+                  state.step2.duration as PlanDuration,
+                  state.step2.planType as PlanType,
+                )}
+                generateSuggestions={generateSuggestions}
+              />
+            </StepperStep>
 
-          <StepperStep
-            index={4}
-            stepLabel='Generate & Customize Flashcards'
-            stepIdentification='3.1'
-          >
-            <StudyPlanStep4
-              suggestions={suggestions}
-              isLoading={isLoading}
-              flashcardCount={getRecommendedFlashcardCount(
-                state.step2.duration as PlanDuration,
-                state.step2.planType as PlanType,
-              )}
-              setSuggestions={setSuggestions}
-              setFlashcards={setFlashcards}
-            />
-          </StepperStep>
+            <StepperStep
+              index={4}
+              stepLabel='Generate & Customize Flashcards'
+              stepIdentification='3.1'
+            >
+              <StudyPlanStep4
+                suggestions={suggestions}
+                isLoading={isLoading}
+                flashcardCount={getRecommendedFlashcardCount(
+                  state.step2.duration as PlanDuration,
+                  state.step2.planType as PlanType,
+                )}
+                setSuggestions={setSuggestions}
+                setFlashcards={setFlashcards}
+              />
+            </StepperStep>
 
-          <StepperStep
-            index={5}
-            stepLabel='Generate & Review Study Plan'
-            stepIdentification='4'
-          >
-            <StudyPlanStep5
-              focusTags={state.step1.focusTags}
-              flashcards={flashcards}
-              summaries={flashcards.map((flashcard) => ({
-                frontUuid: flashcard.frontUuid,
-                context: flashcard.context,
-                query: flashcard.query,
-                definition: flashcard.definition,
-              }))}
-              planType={state.step2.planType}
-              duration={state.step2.duration}
-            />
-          </StepperStep>
-        </Stepper>
-      </StepperProvider>
+            <StepperStep
+              index={5}
+              stepLabel='Generate & Review Study Plan'
+              stepIdentification='4'
+            >
+              <StudyPlanStep5
+                focusTags={state.step1.focusTags}
+                flashcards={flashcards}
+                summaries={flashcards.map((flashcard) => ({
+                  frontUuid: flashcard.frontUuid,
+                  context: flashcard.context,
+                  query: flashcard.query,
+                  definition: flashcard.definition,
+                }))}
+                planType={state.step2.planType}
+                duration={state.step2.duration}
+              />
+            </StepperStep>
+          </Stepper>
+        </StepperProvider>
+      )}
     </div>
   );
 }

@@ -7,9 +7,10 @@ import { StudyDay } from '#/types/study-day.type';
 import type { StudyPlan } from '#/types/study-plan.type';
 import type { StudySession } from '#/types/study-session.type';
 import { experimental_useObject as useObject } from '@ai-sdk/react';
-import { Check, LoaderCircle } from 'lucide-react';
+import { Check, Dot, LoaderCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import Markdown from 'react-markdown';
 import { z } from 'zod';
 import { Accordion } from '../_ui/accordion/accordion';
 import { Button } from '../_ui/button/button';
@@ -53,6 +54,7 @@ export function StudyPlanStep5({
         metrics: z.object({
           targetRetention: z.number(),
           maxStudyTime: z.number(),
+          estimatedStudyTime: z.number(),
         }),
       }),
     ),
@@ -128,6 +130,7 @@ export function StudyPlanStep5({
         incorrectCards: [],
         metrics: {
           targetRetention: day.metrics.targetRetention,
+          estimatedStudyTime: day.metrics.estimatedStudyTime,
           maxStudyTime: day.metrics.maxStudyTime,
         },
         synced: false,
@@ -141,6 +144,37 @@ export function StudyPlanStep5({
     db.studyDays.bulkAdd(studyPlanDays);
 
     router.push(`/study/plans/`);
+  };
+
+  const PlanSection = ({
+    title,
+    text,
+    children,
+  }: {
+    title?: string;
+    text?: string;
+    children?: ReactNode;
+  }) => {
+    return (
+      <div className='flex w-full flex-col gap-2'>
+        <span className='flex items-center gap-1 font-serif text-sm font-semibold uppercase'>
+          <Dot className='size-4 text-green-500' />
+          <span className='text-gray-600 dark:text-slate-200'>{title}</span>
+        </span>
+
+        {text && (
+          <div className='prose w-full rounded-md bg-gray-100/60 p-2 px-5 text-sm text-gray-600 dark:bg-slate-900/60 dark:text-slate-300'>
+            <Markdown>{text}</Markdown>
+          </div>
+        )}
+
+        {children && (
+          <div className='w-full rounded-md bg-gray-100/60 p-2 px-5 text-sm text-gray-600 dark:bg-slate-900/60 dark:text-slate-300'>
+            {children}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -190,32 +224,31 @@ export function StudyPlanStep5({
               title={`Day ${index + 1}`}
             >
               <div className='flex w-full flex-col gap-4'>
-                <div className='flex flex-col gap-2'>
-                  <h6 className=' text-gray-600'>Objectives</h6>
-
-                  <ul className='flex list-disc flex-col gap-1 pl-4 text-sm'>
+                <PlanSection title='Objectives'>
+                  <ul className='prose flex list-disc flex-col gap-1 pl-4 text-sm'>
                     {day.objectives.map((objective, index) => (
                       <li key={'objective-' + index}>{objective}</li>
                     ))}
                   </ul>
-                </div>
+                </PlanSection>
 
-                <div className='flex flex-col gap-2'>
-                  <h6 className='text-gray-600'>Metrics</h6>
-
-                  <ul className='flex list-disc flex-col gap-1 pl-4 text-sm'>
+                <PlanSection title='Metrics'>
+                  <ul className='prose flex list-disc flex-col gap-1 pl-4 text-sm'>
                     <li>Target Retention: {day.metrics.targetRetention}%</li>
 
                     <li>Max Study Time: {day.metrics.maxStudyTime} minutes</li>
+
+                    <li>
+                      Estimated study time required:{' '}
+                      {day.metrics.estimatedStudyTime} minutes
+                    </li>
                   </ul>
-                </div>
+                </PlanSection>
 
                 <div className='flex w-full flex-col gap-2'>
                   <div className='flex w-full flex-col gap-4'>
                     {day.cardsToReview.length > 0 && (
-                      <div className='flex flex-col gap-2'>
-                        <h6 className='text-gray-600'>Review Cards</h6>
-
+                      <PlanSection title='Review Cards'>
                         <div
                           className={cn([
                             'grid h-auto w-full justify-center gap-4 transition-all',
@@ -237,34 +270,34 @@ export function StudyPlanStep5({
                               />
                             ))}
                         </div>
-                      </div>
+                      </PlanSection>
                     )}
 
-                    <div className='flex flex-col gap-2'>
-                      <h6 className='text-gray-600'>New Cards</h6>
-
-                      <div
-                        className={cn([
-                          'grid h-auto w-full justify-center gap-4 transition-all',
-                          day.newCards.length < 5
-                            ? 'xl:justify-start'
-                            : 'xl:justify-center',
-                          'grid-cols-1 min-[600px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',
-                        ])}
-                      >
-                        {flashcards
-                          .filter((card) =>
-                            day.newCards.includes(card.frontUuid),
-                          )
-                          .map((card) => (
-                            <FlashcardComponent
-                              key={'new-card-' + card.frontUuid}
-                              flashcard={card}
-                              size='horizontal-sm'
-                            />
-                          ))}
-                      </div>
-                    </div>
+                    {day.newCards.length > 0 && (
+                      <PlanSection title='New Cards'>
+                        <div
+                          className={cn([
+                            'grid h-auto w-full justify-center gap-4 transition-all',
+                            day.newCards.length < 5
+                              ? 'xl:justify-start'
+                              : 'xl:justify-center',
+                            'grid-cols-1 min-[600px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',
+                          ])}
+                        >
+                          {flashcards
+                            .filter((card) =>
+                              day.newCards.includes(card.frontUuid),
+                            )
+                            .map((card) => (
+                              <FlashcardComponent
+                                key={'new-card-' + card.frontUuid}
+                                flashcard={card}
+                                size='horizontal-sm'
+                              />
+                            ))}
+                        </div>
+                      </PlanSection>
+                    )}
                   </div>
                 </div>
               </div>

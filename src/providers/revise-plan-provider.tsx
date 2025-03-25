@@ -28,10 +28,12 @@ export type RevisePlanContextType = {
   reviewFlashcards: Flashcard[];
   newFlashcards: Flashcard[];
   completedFlashcards: Flashcard[];
+  clicked: boolean;
   setPickedPlan: Dispatch<SetStateAction<StudyPlan | null>>;
   setReviseStage: Dispatch<SetStateAction<number>>;
   setCurrentDay: Dispatch<SetStateAction<StudyDay | null>>;
   setCurrentSession: Dispatch<SetStateAction<StudySession | null>>;
+  setClicked: Dispatch<SetStateAction<boolean>>;
 };
 
 export const RevisePlanContext = createContext<RevisePlanContextType>({
@@ -45,10 +47,12 @@ export const RevisePlanContext = createContext<RevisePlanContextType>({
   reviewFlashcards: [],
   newFlashcards: [],
   completedFlashcards: [],
+  clicked: false,
   setReviseStage: () => {},
   setPickedPlan: () => {},
   setCurrentDay: () => {},
   setCurrentSession: () => {},
+  setClicked: () => {},
 });
 
 export default function RevisePlanProvider(props: Readonly<PropsWithChildren>) {
@@ -58,6 +62,7 @@ export default function RevisePlanProvider(props: Readonly<PropsWithChildren>) {
   const [currentSession, setCurrentSession] = useState<StudySession | null>(
     null,
   );
+  const [clicked, setClicked] = useState(false);
 
   const studySession = useLiveQuery(
     () =>
@@ -163,10 +168,12 @@ export default function RevisePlanProvider(props: Readonly<PropsWithChildren>) {
         reviewFlashcards,
         newFlashcards,
         completedFlashcards,
+        clicked,
         setPickedPlan,
         setCurrentDay,
         setReviseStage,
         setCurrentSession,
+        setClicked,
       }}
     >
       {props.children}

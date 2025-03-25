@@ -31,6 +31,7 @@ import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { Flashcard, FlashcardType } from '#/types/flash-card.type';
 import type { Metadata } from '#/types/metadata.type';
 import type { Reminder } from '#/types/reminder.type';
+import type { StudyPlan } from '#/types/study-plan.type';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   createContext,
@@ -71,6 +72,7 @@ export type AppContextType = {
   addReminders: (reminders: Partial<Reminder>[]) => void;
   removeReminders: (reminders: Reminder[]) => void;
   updateReminders: (reminders: Partial<Reminder>[]) => void;
+  removeStudyPlans: (plans: StudyPlan[]) => void;
 };
 
 export const AppContext = createContext<AppContextType>({
@@ -98,6 +100,7 @@ export const AppContext = createContext<AppContextType>({
   addReminders: () => null,
   removeReminders: () => null,
   updateReminders: () => null,
+  removeStudyPlans: () => null,
 });
 
 export default function AppProvider(props: PropsWithChildren) {
@@ -458,6 +461,39 @@ export default function AppProvider(props: PropsWithChildren) {
   /////////////////
 
   /////////////////
+  // #region STUDY PLANS
+  /////////////////
+
+  const removeStudyPlans = async (plans: StudyPlan[]) => {
+    const plansToDelete: string[] = plans.map((item) => item.frontUuid);
+
+    // remove study sessions
+    const studySessions = await db.studySessions
+      .where('planId')
+      .anyOf(plansToDelete)
+      .toArray();
+    await db.studySessions.bulkDelete(
+      studySessions.map((item) => item.frontUuid),
+    );
+
+    // remove study days
+    const studyDays = await db.studyDays
+      .where('planId')
+      .anyOf(plansToDelete)
+      .toArray();
+    await db.studyDays.bulkDelete(studyDays.map((item) => item.frontUuid));
+
+    // remove study plans
+    await db.studyPlans.bulkDelete(plansToDelete);
+
+    // TODO: Add supabase delete
+  };
+
+  /////////////////
+  // #endregion STUDY PLANS
+  /////////////////
+
+  /////////////////
   // #region SYNCHRONIZATION
   /////////////////
 
@@ -756,6 +792,7 @@ export default function AppProvider(props: PropsWithChildren) {
         addReminders,
         removeReminders,
         updateReminders,
+        removeStudyPlans,
       }}
     >
       {props.children}

@@ -179,11 +179,8 @@ export default function FlashcardReviseComponent() {
     if (!clicked || !revisedCard) return;
 
     calculateRepetition(revisedCard, clickedOption as ReviseOptionsType);
-    setRevisedCard(undefined);
     setClickedOption(undefined);
     setClicked(false);
-
-    reroll();
   };
 
   const reshuffleFlashcardsWithKey = (key: string) => {
@@ -218,7 +215,7 @@ export default function FlashcardReviseComponent() {
       spaceRepetitionClick(spaceRepetitionOptions[index].value);
     } else {
       // TODO: Find better way to handle this type.
-      // @ts-expect-error tssd
+      // @ts-expect-error ts error
       changeClicked(revisedCard?.[`answer${index + 1}`] as string, key);
     }
   };

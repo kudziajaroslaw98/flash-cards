@@ -14,6 +14,7 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-inter)'],
         mono: ['var(--font-roboto-mono)'],
+        serif: ['var(--font-serif)']
       },
       textShadow: {
         sm: '0 1px 2px var(--tw-shadow-color)',
@@ -62,7 +63,7 @@ const config: Config = {
             transform: 'translateY(-100%)',
             display: 'flex',
           },
-          
+
           '99%': {
             opacity: '0',
             transform: 'translateY(-95%)',

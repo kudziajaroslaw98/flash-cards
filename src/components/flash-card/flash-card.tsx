@@ -16,6 +16,7 @@ interface FlashcardProps {
   onSelect?: (flashcard: Flashcard) => void;
   isInSelectionMode?: boolean;
   flipBlocked?: boolean;
+  reviseView?: boolean;
 }
 
 export default function FlashcardComponent({
@@ -25,6 +26,7 @@ export default function FlashcardComponent({
   isInSelectionMode,
   flipBlocked = false,
   size = 'md',
+  reviseView = false,
   ...props
 }: Readonly<FlashcardProps>) {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -93,7 +95,7 @@ export default function FlashcardComponent({
     hovered: {
       top: 0,
       left: 0,
-      position: 'absolute',
+      position: reviseView ? 'relative' : 'absolute',
       zIndex: 22,
       height: '22.75rem',
       width: '100%',

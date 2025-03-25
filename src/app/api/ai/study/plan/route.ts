@@ -1,9 +1,12 @@
+import { planTypeDictionary } from '#/dictionaries/plan-type.dictionary';
 import { planDurationSchema } from '#/schemas/plan-durations.schema';
 import { planTypeSchema } from '#/schemas/plan-types.schema';
 import { Logger } from '#/shared/helpers/logger/logger';
 import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { createClient } from '#/shared/utils/supabase/server';
+import uuid from '#/shared/utils/uuid.util';
+import { PlanType } from '#/types/plan-types.type';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamObject } from 'ai';
 import type { NextRequest } from 'next/server';
@@ -36,6 +39,7 @@ async function validateBody(body: Record<string, unknown>) {
 const rateLimit = new RateLimit(1, 10, routePath);
 
 export async function POST(req: NextRequest) {
+  const sessionId = uuid();
   const supabase = await createClient();
   const user = (await supabase.auth.getUser()).data.user;
 
@@ -63,18 +67,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const planTypes = {
-    overview: 'Comprehensive Overview',
-    'deep-dive': 'Deep Dive',
-    'quick-revision': 'Quick Revision',
-    'exam-prep': 'Exam Preparation',
-  } as const;
   const {
     planType,
     summaries,
     duration,
   }: {
-    planType: keyof typeof planTypes;
+    planType: PlanType;
     summaries: {
       frontUuid: string;
       query: string;
@@ -121,20 +119,32 @@ export async function POST(req: NextRequest) {
     routePath,
   );
 
-  const prompt = `Create a study plan for a "${planTypes[planType]}" plan.
+  const prompt = `
+    **Total Number of Flashcards to utilize:**
+      ${summaries.length}
+    **Objective:**
+      Create a study plan for a "${planTypeDictionary.find((plan) => plan.value === planType)?.label}" plan.
       Use all the provided summaries to generate the plan. Do not create a plan with topics that are not included in the summaries.
       Plan duration should be approximately geared towards the user's preferable learning hours per week: ${learningHours || 'Not specified'}, plan duration in days: ${duration}(days).
       Plan cannot exceed ${duration}(days) in length.
 
-      Plan should introduce the information with increasing difficulty and complexity as the user progresses through the plan. It should keep the learning structured in very logical way. 
+      Plan should introduce the information with increasing difficulty and complexity as the user progresses through the plan. It should keep the learning structured in very logical way.
       For example if the plan is about learning about a topic, the plan should start with a very basic understanding of the topic and then move to a more advanced understanding of the topic.
       For example:
-      1. What is variable and how it can be used -> 
+      1. What is variable and how it can be used ->
       2. What is a algorithm and what types of algorithms are there ->
       3. How to leverage using algorithms
 
-      Plan needs to use ALL ${summaries.length} summaries provided spread across the plan days.
+      Plan needs to use ALL (${summaries.length}) summaries provided, spread them across the plan days:
+      <FLASHCARD_SUMMARIES>
+        ${summaries.map((summary) => `- { id: ${summary.frontUuid}; topic: ${summary.context}; query: ${summary.query}; }`).join('\n')}
+      </FLASHCARD_SUMMARIES>
 
+      **Important Considerations:**
+      * The plan should be realistic and manageable within the chosen timeframe.
+      * While pacing is important, the **absolute priority** is to use all [X] flashcards.
+
+      **Desired Study Plan Output:**
       Structure the plan into daily study sessions. For each day, provide:
       - Day number
       - Short plan name based on the summaries provided. For example: "Variables and Data Types"
@@ -143,12 +153,8 @@ export async function POST(req: NextRequest) {
       - 2-3 summaries of day learning objectives.
       - Metrics for each day:
         * Estimated retention for each day (in percentage 0-100)
-        * Maximum study time for each day (in minutes)
-
-      The study plan should cover the following flashcard topics:
-      <TOPIC_SUMMARIES>
-        ${summaries.map((summary) => `- { id: ${summary.frontUuid}; topic: ${summary.context}; query: ${summary.query}; }`).join('\n')}
-      </TOPIC_SUMMARIES>
+        * Estimated study time for each day (in minutes)
+        * Estimated total study time for the plan (in minutes)
 
       Prioritize spaced repetition for reviews and balance review with introducing new material gradually. Make the plan engaging and easy to follow.
 `;
@@ -178,9 +184,23 @@ export async function POST(req: NextRequest) {
       newCards: z.array(z.string()).describe('Array of flashcards frontUuids'),
       metrics: z.object({
         targetRetention: z.number(),
-        maxStudyTime: z.number(),
+        maxStudyTime: z
+          .number()
+          .describe('Max time allowed to study for this day'),
+        estimatedStudyTime: z
+          .number()
+          .describe('Estimated time required to complete this study day'),
       }),
     }),
+    onFinish(response) {
+      Logger.info(
+        `Session ${sessionId} finished successfully ${JSON.stringify({ error: response.error, warnings: response.warnings, usage: response.usage })}`,
+        routePath,
+      );
+    },
+    onError: (error) => {
+      Logger.error(`Session ${sessionId}`, routePath, JSON.stringify(error));
+    },
   });
 
   return stream.toTextStreamResponse();

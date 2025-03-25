@@ -8,6 +8,7 @@ export type StudyDay = {
   correctCards: string[];
   incorrectCards: string[];
   metrics: {
+    estimatedStudyTime: number; // minutes
     targetRetention: number;
     maxStudyTime: number; // minutes
   };

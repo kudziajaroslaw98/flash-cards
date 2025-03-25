@@ -23,7 +23,6 @@ export function PlanRevise() {
   const [dropdownConfig, setDropdownConfig] = useState<
     { value: StudyPlan; label: string }[]
   >([]);
-  const [clicked, setClicked] = useState(false);
 
   const router = useRouter();
 
@@ -137,10 +136,7 @@ export function PlanRevise() {
                     }
                   >
                     <Case caseValue={true}>
-                      <ReviseStages
-                        clicked={clicked}
-                        setClicked={setClicked}
-                      />
+                      <ReviseStages />
                     </Case>
 
                     <Case caseValue={false}>

@@ -1,4 +1,5 @@
 import { db } from '#/db/dexie.db';
+import { useAppContext } from '#/providers/app-context';
 import { APP_ROUTES } from '#/shared/defaults/app.routes';
 import type { StudyPlan } from '#/types/study-plan.type';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -16,11 +17,12 @@ export function StudyPlanActions({
   selected: StudyPlan[];
   setSelected: Dispatch<SetStateAction<StudyPlan[]>>;
 }) {
+  const { removeStudyPlans } = useAppContext();
   const studyPlans = useLiveQuery(() => db.studyPlans.toArray()) ?? [];
 
   const removeSelected = () => {
     window.umami.track('Remove flashcards', { count: selected.length });
-    // removePlans(selected);
+    removeStudyPlans(selected);
     setSelected([]);
   };
 

@@ -45,3 +45,8 @@ next-env.d.ts
 # TODO: delete it when figured out how to pull from db.
 # Supabase tmp .
 /supabase
+
+# editor configs
+.idea
+.vscode
+.zed

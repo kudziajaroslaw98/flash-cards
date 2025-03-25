@@ -4,7 +4,9 @@ import { db } from '#/db/dexie.db';
 import { cn } from '#/shared/utils/cn.util';
 import { format } from 'date-fns';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Dot } from 'lucide-react';
+import { ReactNode } from 'react';
+import Markdown from 'react-markdown';
 import { Accordion } from '../_ui/accordion/accordion';
 import Badge from '../_ui/badge/badge';
 import LinkComponent from '../_ui/link/link';
@@ -32,6 +34,37 @@ export function StudyPlan({ planId }: { planId: string }) {
   );
 
   const flashcards = useLiveQuery(() => db.flashcards.toArray(), []) ?? [];
+
+  const PlanSection = ({
+    title,
+    text,
+    children,
+  }: {
+    title?: string;
+    text?: string;
+    children?: ReactNode;
+  }) => {
+    return (
+      <div className='flex w-full flex-col gap-2'>
+        <span className='flex items-center gap-1 font-serif text-sm font-semibold uppercase'>
+          <Dot className='size-4 text-green-500' />
+          <span className='text-gray-600 dark:text-slate-200'>{title}</span>
+        </span>
+
+        {text && (
+          <div className='prose w-full rounded-md bg-gray-100/60 p-2 px-5 text-sm text-gray-600 dark:bg-slate-900/60 dark:text-slate-300'>
+            <Markdown>{text}</Markdown>
+          </div>
+        )}
+
+        {children && (
+          <div className='w-full rounded-md bg-gray-100/60 p-2 px-5 text-sm text-gray-600 dark:bg-slate-900/60 dark:text-slate-300'>
+            {children}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className='flex w-full flex-col gap-8'>
@@ -95,38 +128,33 @@ export function StudyPlan({ planId }: { planId: string }) {
                 title={`Day ${index + 1}`}
               >
                 <div className='flex w-full flex-col gap-4'>
-                  <div className='flex flex-col gap-2'>
-                    <h6 className=' tracking-tight text-gray-600'>
-                      Objectives
-                    </h6>
-
-                    <ul className='flex list-disc flex-col gap-1 pl-4 text-sm'>
+                  <PlanSection title='Objectives'>
+                    <ul className='prose flex list-disc flex-col gap-1 pl-4 text-sm'>
                       {day.objectives.map((objective, index) => (
                         <li key={'objective-' + index}>{objective}</li>
                       ))}
                     </ul>
-                  </div>
+                  </PlanSection>
 
-                  <div className='flex flex-col gap-2'>
-                    <h6 className='tracking-tight text-gray-600'>Metrics</h6>
-
-                    <ul className='flex list-disc flex-col gap-1 pl-4 text-sm'>
+                  <PlanSection title='Metrics'>
+                    <ul className='prose flex list-disc flex-col gap-1 pl-4 text-sm'>
                       <li>Target Retention: {day.metrics.targetRetention}%</li>
 
                       <li>
                         Max Study Time: {day.metrics.maxStudyTime} minutes
                       </li>
+
+                      <li>
+                        Estimated study time required:{' '}
+                        {day.metrics.estimatedStudyTime} minutes
+                      </li>
                     </ul>
-                  </div>
+                  </PlanSection>
 
                   <div className='flex w-full flex-col gap-2'>
                     <div className='flex w-full flex-col gap-4'>
                       {day.cardsToReview.length > 0 && (
-                        <div className='flex flex-col gap-2'>
-                          <h6 className='tracking-tight text-gray-600'>
-                            Review Cards
-                          </h6>
-
+                        <PlanSection title='Review Cards'>
                           <div
                             className={cn([
                               'grid h-auto w-full justify-center gap-4 transition-all',
@@ -148,36 +176,34 @@ export function StudyPlan({ planId }: { planId: string }) {
                                 />
                               ))}
                           </div>
-                        </div>
+                        </PlanSection>
                       )}
 
-                      <div className='flex flex-col gap-2'>
-                        <h6 className='tracking-tight text-gray-600'>
-                          New Cards
-                        </h6>
-
-                        <div
-                          className={cn([
-                            'grid h-auto w-full justify-center gap-4 transition-all',
-                            day.newCards.length < 5
-                              ? 'xl:justify-start'
-                              : 'xl:justify-center',
-                            'grid-cols-1 min-[600px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',
-                          ])}
-                        >
-                          {flashcards
-                            .filter((card) =>
-                              day.newCards.includes(card.frontUuid),
-                            )
-                            .map((card) => (
-                              <FlashcardComponent
-                                key={'new-card-' + card.frontUuid}
-                                flashcard={card}
-                                size='horizontal-sm'
-                              />
-                            ))}
-                        </div>
-                      </div>
+                      {day.newCards.length > 0 && (
+                        <PlanSection title='New Cards'>
+                          <div
+                            className={cn([
+                              'grid h-auto w-full justify-center gap-4 transition-all',
+                              day.newCards.length < 5
+                                ? 'xl:justify-start'
+                                : 'xl:justify-center',
+                              'grid-cols-1 min-[600px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',
+                            ])}
+                          >
+                            {flashcards
+                              .filter((card) =>
+                                day.newCards.includes(card.frontUuid),
+                              )
+                              .map((card) => (
+                                <FlashcardComponent
+                                  key={'new-card-' + card.frontUuid}
+                                  flashcard={card}
+                                  size='horizontal-sm'
+                                />
+                              ))}
+                          </div>
+                        </PlanSection>
+                      )}
                     </div>
                   </div>
                 </div>

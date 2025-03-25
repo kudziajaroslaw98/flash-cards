@@ -11,31 +11,34 @@ type ReviewItem = {
 
 export function ReviseItem({ clicked, revisedCard }: ReviewItem) {
   return (
-    <div className='grid w-full items-center justify-center'>
-      <div
-        className={cn([
-          'flex w-full items-center justify-end gap-2 opacity-0 transition md:translate-x-20',
-          clicked && revisedCard?.type !== 'index' && 'opacity-100',
-        ])}
-      >
-        <CornerLeftDown className='size-5 text-green-400' />
+    <div className='grid w-full'>
+      <div className='flex w-full flex-col items-center justify-center'>
+        <div
+          className={cn([
+            'flex w-full max-w-96  items-center justify-end gap-2 opacity-0 transition md:translate-x-20',
+            clicked && revisedCard?.type !== 'index' && 'opacity-100',
+          ])}
+        >
+          <CornerLeftDown className='size-5 text-green-400' />
 
-        <span className='w-32 text-xs italic text-gray-600 dark:text-slate-500'>
-          Click on the card to flip it
-        </span>
-      </div>
+          <span className='w-32 text-xs italic text-gray-600 dark:text-slate-500'>
+            Click on the card to flip it
+          </span>
+        </div>
 
-      <div className='max-w-96'>
-        {revisedCard ? (
-          <FlashcardComponent
-            key={revisedCard.frontUuid}
-            flashcard={revisedCard}
-            flipBlocked={!clicked}
-            size='horizontal-sm'
-          />
-        ) : (
-          <Card className='h-96 w-80' />
-        )}
+        <div className='w-full max-w-96'>
+          {revisedCard ? (
+            <FlashcardComponent
+              key={revisedCard.frontUuid}
+              flashcard={revisedCard}
+              flipBlocked={!clicked}
+              size='horizontal-sm'
+              reviseView
+            />
+          ) : (
+            <Card className='h-96 w-80' />
+          )}
+        </div>
       </div>
     </div>
   );

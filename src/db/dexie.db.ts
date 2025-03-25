@@ -47,11 +47,11 @@ export class AppDB extends Dexie {
           'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
         reminders:
           '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
-        studyPlans: '&id, synced, *focusTags, *days',
+        studyPlans: '&frontUuid, synced, *focusTags, *days',
         studySessions:
-          '&id, synced, *completedCards, currentDay, startDate, planId',
+          '&frontUuid, synced, *completedCards, currentDay, startDate, planId',
         studyDays:
-          '&id, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
+          '&frontUuid, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
       })
       .upgrade((transaction) => {
         transaction
@@ -87,11 +87,11 @@ export class AppDB extends Dexie {
           'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
         reminders:
           '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
-        studyPlans: '&id, synced, *focusTags, *days',
+        studyPlans: '&frontUuid, synced, *focusTags, *days',
         studySessions:
-          '&id, synced, *completedCards, currentDay, startDate, planId',
+          '&frontUuid, synced, *completedCards, currentDay, startDate, planId',
         studyDays:
-          '&id, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
+          '&frontUuid, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
       })
       .upgrade((transaction) => {
         transaction
@@ -127,11 +127,11 @@ export class AppDB extends Dexie {
         'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
       reminders:
         '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
-      studyPlans: '&id, synced, *focusTags, *days',
+      studyPlans: '&frontUuid, synced, *focusTags, *days',
       studySessions:
-        '&id, synced, *completedCards, currentDay, startDate, planId',
+        '&frontUuid, synced, *completedCards, currentDay, startDate, planId',
       studyDays:
-        '&id, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
+        '&frontUuid, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
     });
 
     this.version(4).stores({
@@ -145,11 +145,11 @@ export class AppDB extends Dexie {
         'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
       reminders:
         '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
-      studyPlans: '&id, synced, *focusTags, *days',
+      studyPlans: '&frontUuid, synced, *focusTags, *days',
       studySessions:
-        '&id, synced, *completedCards, currentDay, startDate, planId',
+        '&frontUuid, synced, *completedCards, currentDay, startDate, planId',
       studyDays:
-        '&id, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
+        '&frontUuid, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
     });
 
     this.version(5)
@@ -164,11 +164,11 @@ export class AppDB extends Dexie {
           'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
         reminders:
           '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
-        studyPlans: '&id, synced, *focusTags, *days',
+        studyPlans: '&frontUuid, synced, *focusTags, *days',
         studySessions:
-          '&id, synced, *completedCards, currentDay, startDate, planId',
+          '&frontUuid, synced, *completedCards, currentDay, startDate, planId',
         studyDays:
-          '&id, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
+          '&frontUuid, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
       })
       .upgrade((transaction) => {
         transaction
@@ -229,11 +229,11 @@ export class AppDB extends Dexie {
           'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
         reminders:
           '&frontUuid, setFrontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
-        studyPlans: '&id, synced, *focusTags, *days',
+        studyPlans: '&frontUuid, synced, *focusTags, *days',
         studySessions:
-          '&id, synced, *completedCards, currentDay, startDate, planId',
+          '&frontUuid, synced, *completedCards, currentDay, startDate, planId',
         studyDays:
-          '&id, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
+          '&frontUuid, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
       })
       .upgrade((transaction) => {
         transaction
@@ -263,11 +263,11 @@ export class AppDB extends Dexie {
           'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
         reminders:
           '&frontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
-        studyPlans: '&id, synced, *focusTags, *days',
+        studyPlans: '&frontUuid, synced, *focusTags, *days',
         studySessions:
-          '&id, synced, *completedCards, currentDay, startDate, planId',
+          '&frontUuid, synced, *completedCards, currentDay, startDate, planId',
         studyDays:
-          '&id, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
+          '&frontUuid, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
       })
       .upgrade((transaction) => {
         transaction
@@ -285,6 +285,23 @@ export class AppDB extends Dexie {
             remindersMerge(defaultReminder, reminder),
           );
       });
+    this.version(8).stores({
+      flashcards:
+        '&frontUuid, tags, createdAt, updatedAt, *sets, spacedRepetition.dueDate, spacedRepetition.easeFactor, [setUuids+spacedRepetition.dueDate], synced',
+      sets: '&frontUuid, createdAt, isFavourite, updatedAt, *flashcards, synced',
+      metadata: 'key, synced',
+      dailyStats: 'frontUuid, updatedAt, date, synced',
+      focusSessions: 'frontUuid, timestamp, start, end, synced',
+      reviewLogs:
+        'frontUuid, timestamp, sessionUuid, cardFrontUuid, *tags, synced',
+      reminders:
+        '&frontUuid, start, repeat, enabled, synced, createdAt, updatedAt',
+      studyPlans: '&frontUuid, synced, *focusTags, *days',
+      studySessions:
+        '&frontUuid, synced, *completedCards, currentDay, startDate, planId',
+      studyDays:
+        '&frontUuid, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
+    });
 
     // Setup hooks
     this.setupHooks();

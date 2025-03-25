@@ -98,26 +98,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // const studyScopes = {
-  //   default: 'Focus on Core Concepts',
-  //   comprehensive: 'Comprehensive Coverage',
-  //   specific: 'Specific Area within Tags',
-  // } as const;
-  // const planTypes = {
-  //   overview: 'Comprehensive Overview',
-  //   'deep-dive': 'Deep Dive',
-  //   'quick-revision': 'Quick Revision',
-  //   'exam-prep': 'Exam Preparation',
-  // } as const;
-  // const knowledgeLevels = {
-  //   unfamiliar: 'Unfamiliar knows (1-15%) of the material',
-  //   beginner: 'Beginner knows (16-30%) of the material',
-  //   developing: 'Developing knows (31-55%) of the material',
-  //   proficient: 'Proficient knows (56-75%) of the material',
-  //   advanced: 'Advanced knows (76-90%) of the material',
-  //   expert: 'Expert knows (91-100%) of the material',
-  // } as const;
-
   const {
     focusTags,
     studyScope,
@@ -222,7 +202,7 @@ export async function POST(req: NextRequest) {
     flashcardCount: number,
     summaries: { id: string; topic: string; query: string; context: string }[],
   ) => `
-  Generate ${flashcardCount} unique flashcards covering [${focusTags.join(',')}] for a "${pickedPlanType}" study plan, knowledge level "${pickedKnowledgeLevel}" and study scope: "${pickedStudyScope}". 
+  Generate ${flashcardCount} unique flashcards covering [${focusTags.join(',')}] for a "${pickedPlanType}" study plan, knowledge level "${pickedKnowledgeLevel}" and study scope: "${pickedStudyScope}".
 
   **User Preferences**:
     • Question formats: ${preferredFormat ?? 'Balanced mix of all formats (application | compare-contrast | problem-solving | definition | cause-effect | process | analysis | evaluation | recall)'}
@@ -232,7 +212,7 @@ export async function POST(req: NextRequest) {
     • Length: ${cardLength ?? 'Balanced length'}
     • Mnemonics: ${mnemonicPreference ?? 'No specific mnemonic techniques'}
     ${userPrompt ? `• Additional instructions: ${userPrompt}` : ''}
-    
+
 
 **EXCLUDED TOPICS** (DO NOT generate cards related to these):
 ${blacklist && blacklist.length > 0 ? blacklist.join(', ') : 'None specified'}
@@ -265,7 +245,7 @@ ${summaries
    • Deep-Dive: Complex relationships and detailed mechanisms
    • Quick-Revision: Essential definitions and high-yield distinctions
    • Exam-Prep: Application scenarios and analysis questions
-   
+
    JSON OUTPUT per card:
 {
   "id": "unique_ID",
@@ -298,6 +278,7 @@ Only include optional fields when they add significant value.
     temperature: 0.8,
     maxSteps: 5,
     experimental_continueSteps: true,
+    stopSequences: ['[FINISH] All FC generated'],
     system: `You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards. Your primary responsibilities are:
 
 1. UNIQUENESS: Generate flashcards that explore DISTINCT concepts, avoiding semantic overlap or reformulation of existing content.
@@ -310,7 +291,8 @@ Only include optional fields when they add significant value.
 
 5. ANSWER QUALITY: Create clearly correct answers and plausible but definitively incorrect distractors that don't hint at the correct response.
 
-Your expertise spans disciplines from technical fields to languages, sciences to humanities. For each flashcard set, you analyze existing content to identify knowledge gaps, then strategically fill those gaps with carefully crafted new cards that expand the user's understanding in meaningful ways.`,
+Your expertise spans disciplines from technical fields to languages, sciences to humanities. For each flashcard set, you analyze existing content to identify knowledge gaps, then strategically fill those gaps with carefully crafted new cards that expand the user's understanding in meaningful ways.
+When you're ready to finish, include the phrase "[FINISH] All FC generated" in your response.`,
     onFinish(response) {
       Logger.info(
         `Session ${sessionId} finished successfully ${JSON.stringify({ steps: response?.steps, finishReason: response?.finishReason, usage: response.usage })}`,
