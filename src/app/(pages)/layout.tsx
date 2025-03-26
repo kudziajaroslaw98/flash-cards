@@ -8,7 +8,7 @@ export default function PagesLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className='flex h-auto min-h-full w-full flex-col  bg-gray-50 pt-20 dark:bg-slate-950 md:pt-0'>
+    <div className='flex h-auto min-h-full w-full flex-col bg-gray-50 pt-20 dark:bg-slate-950 md:pt-0'>
       <ToastsComponent />
 
       <div className='mx-auto flex h-auto min-h-full w-full max-w-[100rem] gap-8 p-4 xl:gap-8'>

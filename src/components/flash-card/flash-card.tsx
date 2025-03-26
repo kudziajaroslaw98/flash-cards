@@ -3,10 +3,11 @@
 import useLongPress from '#/hooks/use-long-press.hook';
 import { cn } from '#/shared/utils/cn.util';
 import type { Flashcard } from '#/types/flash-card.type';
-import { BadgeCheck } from 'lucide-react';
+import { BadgeCheck, Dot } from 'lucide-react';
 import type { Variant } from 'motion/react';
 import * as m from 'motion/react-m';
 import { useEffect, useState } from 'react';
+import Markdown from 'react-markdown';
 import Card from '../_ui/card/card';
 
 interface FlashcardProps {
@@ -77,13 +78,14 @@ export default function FlashcardComponent({
         <span className='font-semibold text-gray-600 dark:text-slate-200'>
           {title}
         </span>
-        <ul className='flex list-inside !list-disc flex-col gap-1 '>
+        <ul>
           {data.split(';').map((chunk) => (
             <li
-              className='list-item decoration-gray-600'
+              className='flex'
               key={chunk.trim()}
             >
-              {chunk.trim()}
+              <Dot className='size-5 min-w-5 text-green-400' />
+              <Markdown>{chunk.trim()}</Markdown>
             </li>
           ))}
         </ul>
@@ -211,6 +213,15 @@ export default function FlashcardComponent({
               </div>
 
               <div className='flex flex-col gap-4'>
+                {flashcard?.query && (
+                  <div className='flex snap-start scroll-pt-8 flex-col gap-1'>
+                    <span className='font-semibold text-gray-600 dark:text-slate-200'>
+                      Question:
+                    </span>
+                    <span>{flashcard?.query}</span>
+                  </div>
+                )}
+
                 <div className='flex snap-start scroll-pt-8 flex-col gap-1'>
                   <span className='font-semibold text-gray-600 dark:text-slate-200'>
                     Definition:
@@ -219,10 +230,12 @@ export default function FlashcardComponent({
                 </div>
 
                 {flashcard?.answer1 && (
-                  <FlashcardSection
-                    title='Answer:'
-                    data={flashcard.answer1}
-                  />
+                  <div className='flex snap-start scroll-pt-8 flex-col gap-1'>
+                    <span className='font-semibold text-gray-600 dark:text-slate-200'>
+                      Answer:
+                    </span>
+                    <span>{flashcard?.answer1}</span>
+                  </div>
                 )}
 
                 {flashcard?.examples && (

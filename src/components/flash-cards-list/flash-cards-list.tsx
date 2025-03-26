@@ -83,27 +83,6 @@ export default function FlashcardsList({
     },
   );
 
-  // useResizeObserver(() => {
-  //   const width = typeof window !== 'undefined' ? window.innerWidth : 0;
-  //   let columns = [];
-  //   let data: Flashcard[][] = [];
-
-  //   if (width >= 1536) {
-  //     columns = generateColumns(4);
-  //   } else if (width >= 1280) {
-  //     columns = generateColumns(3);
-  //   } else if (width >= 600) {
-  //     columns = generateColumns(2);
-  //   } else {
-  //     columns = generateColumns(1);
-  //   }
-
-  //   if (columns) {
-  //     data = generateData(columns);
-  //     setData(data);
-  //   }
-  // }, containerRef);
-
   const generateColumns = (
     columnsCount: number,
     containerWidth: number | null,
@@ -133,29 +112,6 @@ export default function FlashcardsList({
       ),
     [filteredFlashcards, columns],
   );
-
-  // useWindowResize(
-  //   ({ width }) => {
-  //     let columns = [];
-  //     let data: Flashcard[][] = [];
-
-  //     if (width >= 1536) {
-  //       columns = generateColumns(4);
-  //     } else if (width >= 1280) {
-  //       columns = generateColumns(3);
-  //     } else if (width >= 600) {
-  //       columns = generateColumns(2);
-  //     } else {
-  //       columns = generateColumns(1);
-  //     }
-
-  //     if (columns) {
-  //       data = generateData(columns);
-  //       setData(data);
-  //     }
-  //   },
-  //   { debounceDelay: 200 },
-  // );
 
   useEffect(() => {
     const width = typeof window !== 'undefined' ? window.innerWidth : 0;

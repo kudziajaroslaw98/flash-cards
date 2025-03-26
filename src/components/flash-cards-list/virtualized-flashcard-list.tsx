@@ -1,7 +1,8 @@
+import { cn } from '#/shared/utils/cn.util';
 import { Flashcard } from '#/types/flash-card.type';
-import { useVirtualizer, useWindowVirtualizer } from '@tanstack/react-virtual';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import * as m from 'motion/react-m';
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import FlashcardComponent from '../flash-card/flash-card';
 
 interface Column {
@@ -24,13 +25,16 @@ export function VirtualizedFlashcardList({
   isInSelectionMode: boolean;
 }) {
   const parentRef = useRef<HTMLDivElement | null>(null);
-  const getColumnWidth = (index: number) => columns[index].width;
+  const getColumnWidth = useCallback(
+    (index: number) => columns[index].width,
+    [columns],
+  );
 
-  const rowVirtualizer = useWindowVirtualizer({
+  const rowVirtualizer = useVirtualizer({
     count: data.length,
     estimateSize: () => 192,
-    overscan: 2,
-    scrollMargin: 24,
+    getScrollElement: () => parentRef.current,
+    overscan: 5,
   });
 
   const columnVirtualizer = useVirtualizer({
@@ -38,11 +42,19 @@ export function VirtualizedFlashcardList({
     count: columns.length,
     getScrollElement: () => parentRef.current,
     estimateSize: getColumnWidth,
-    overscan: 2,
     scrollMargin: 16,
+    overscan: 5,
   });
 
-  console.log('virtual');
+  const calculateTransformX = useCallback(
+    (index: number) => {
+      if (index === 0) return 4;
+      if (index === columns.length - 1)
+        return index * getColumnWidth(index) + 4;
+      return index * getColumnWidth(index) + 4;
+    },
+    [columns],
+  );
 
   return (
     <div
@@ -56,20 +68,19 @@ export function VirtualizedFlashcardList({
         height: '750px',
       }}
     >
-      {rowVirtualizer.getVirtualItems().map((virtualRow) => (
-        <div key={`virtual-list-row-${virtualRow.key}`}>
-          {columnVirtualizer.getVirtualItems().map(
-            (virtualColumn) =>
-              data[virtualRow.index][virtualColumn.index] && (
+      {rowVirtualizer.getVirtualItems().map((virtualRow) =>
+        columnVirtualizer.getVirtualItems().map(
+          (virtualColumn) =>
+            data[virtualRow.index][virtualColumn.index] && (
+              <div key={virtualColumn.key}>
                 <m.div
-                  key={virtualColumn.key}
                   style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     width: `${getColumnWidth(virtualColumn.index) - 16}px`,
                     height: `${virtualRow.size}px`,
-                    transform: `translateX(${virtualColumn.start}px) translateY(${virtualRow.start}px)`,
+                    transform: `translateX(${calculateTransformX(virtualColumn.index)}px) translateY(${virtualRow.start + 16}px)`,
                     zIndex: 20,
                   }}
                   whileHover={{ zIndex: 21 }}
@@ -88,10 +99,18 @@ export function VirtualizedFlashcardList({
                     isInSelectionMode={isInSelectionMode}
                   />
                 </m.div>
-              ),
-          )}
-        </div>
-      ))}
+                {virtualRow.index === data.length - 1 && (
+                  <div
+                    className={cn(['h-96 w-1 md:h-48'])}
+                    style={{
+                      transform: `translateX(${calculateTransformX(virtualColumn.index)}px) translateY(${virtualRow.start + 16 + 32}px)`,
+                    }}
+                  ></div>
+                )}
+              </div>
+            ),
+        ),
+      )}
     </div>
   );
 }

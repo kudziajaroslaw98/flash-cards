@@ -108,33 +108,6 @@ export default function Dropdown<T>({
   const popoverRef = useRef<HTMLDivElement>(null);
   const hasFocus = useRef(false);
 
-  // TODO: How to animate this?
-  // const dropdownPopupStyles = useMemo(() => {
-  //   if (dropdownLabelRef.current === null) return {};
-  //   else {
-  //     return {
-  //       position: 'fixed',
-  //       top:
-  //         contextPosition === 'bottom'
-  //           ? (((dropdownLabelRef.current.getBoundingClientRect()
-  //               .top as number) +
-  //               dropdownLabelRef.current.getBoundingClientRect()
-  //                 .height) as number) + 8
-  //           : 'unset',
-  //       bottom:
-  //         contextPosition === 'top'
-  //           ? (dropdownLabelRef.current.getBoundingClientRect()
-  //               .bottom as number) -
-  //             (dropdownLabelRef.current.getBoundingClientRect().top as number) +
-  //             dropdownLabelRef.current.getBoundingClientRect().height +
-  //             8
-  //           : 'unset',
-  //       left: dropdownLabelRef.current.getBoundingClientRect().left,
-  //       width: dropdownLabelRef.current.getBoundingClientRect().width,
-  //     } as const;
-  //   }
-  // }, [dropdownLabelRef.current]);
-
   useOutsideAlerter(dropdownWrapperRef, () => {
     if (visible) {
       window?.umami?.track('Dropdown - Click outside');
@@ -156,6 +129,7 @@ export default function Dropdown<T>({
       return;
 
     if (contextPosition === 'bottom') {
+      const minOffset = 48;
       const buttonRect = dropdownLabelRef.current.getBoundingClientRect();
       const top =
         (((dropdownLabelRef.current.getBoundingClientRect().y as number) +
@@ -170,7 +144,8 @@ export default function Dropdown<T>({
         window.innerHeight -
         popoverRef.current.getBoundingClientRect().bottom -
         16 +
-        popoverRef.current.getBoundingClientRect().height;
+        popoverRef.current.getBoundingClientRect().height -
+        minOffset;
 
       if (popoverRef.current.getBoundingClientRect().height > availableSpace) {
         popoverRef.current.style.height = `${availableSpace}px`;
@@ -179,6 +154,7 @@ export default function Dropdown<T>({
     }
 
     if (contextPosition === 'top') {
+      const minOffset = 48;
       const buttonRect = dropdownLabelRef.current.getBoundingClientRect();
       const top =
         (dropdownLabelRef.current.getBoundingClientRect().y as number) -
@@ -193,7 +169,8 @@ export default function Dropdown<T>({
         window.innerHeight -
         popoverRef.current.getBoundingClientRect().top -
         16 +
-        popoverRef.current.getBoundingClientRect().height;
+        popoverRef.current.getBoundingClientRect().height -
+        minOffset;
 
       if (popoverRef.current.getBoundingClientRect().height > availableSpace) {
         popoverRef.current.style.height = `${availableSpace}px`;
