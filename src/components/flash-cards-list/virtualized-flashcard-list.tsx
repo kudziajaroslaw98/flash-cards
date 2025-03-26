@@ -30,6 +30,7 @@ export function VirtualizedFlashcardList({
     count: data.length,
     estimateSize: () => 192,
     overscan: 2,
+    scrollMargin: 24,
   });
 
   const columnVirtualizer = useVirtualizer({
@@ -38,7 +39,10 @@ export function VirtualizedFlashcardList({
     getScrollElement: () => parentRef.current,
     estimateSize: getColumnWidth,
     overscan: 2,
+    scrollMargin: 16,
   });
+
+  console.log('virtual');
 
   return (
     <div
@@ -46,11 +50,7 @@ export function VirtualizedFlashcardList({
       style={{
         display: 'flex',
         overflowY: 'auto',
-        overflowX: 'hidden',
-        paddingLeft: '-16px',
-        paddingRight: '-16px',
-        marginLeft: '16px',
-        marginRight: '16px',
+        overflowX: 'visible',
         width: '100%',
         position: 'relative',
         height: '750px',

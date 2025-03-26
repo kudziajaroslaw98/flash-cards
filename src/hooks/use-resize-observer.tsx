@@ -1,81 +1,151 @@
-import { useCallback, useEffect, useState } from 'react';
+// import { useCallback, useEffect, useRef, useState } from 'react';
 
-/**
- * Custom hook to track window resize events safely
- * @param callback Function to call when window is resized
- * @param options Configuration options for resize tracking
- */
-export const useResizeObserver = (
-  callback: (dimensions: { width: number; height: number }) => void,
-  element: HTMLElement | null,
-  options: {
-    debounceDelay?: number;
-    throttle?: boolean;
-  } = {},
-) => {
-  const { debounceDelay = 200, throttle = false } = options;
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-  // Safe initial state with default dimensions
-  const [dimensions, setDimensions] = useState({
-    width: element !== null ? element.getBoundingClientRect().width : 0,
-    height: element !== null ? element.getBoundingClientRect().height : 0,
-  });
+// /**
+//  * Custom hook to track window resize events safely
+//  * @param callback Function to call when window is resized
+//  * @param options Configuration options for resize tracking
+//  */
+// export const useResizeObserver = (
+//   callback: (width: number) => void,
+//   options: {
+//     debounceDelay?: number;
+//     throttle?: boolean;
+//   } = {},
+// ) => {
+//   const { debounceDelay = 200 } = options;
 
-  // Memoized resize handler
+//   // Ref to store the observed element
+//   const elementRef = useRef<HTMLDivElement | null>(null);
+
+//   // Ref to store the ResizeObserver
+//   const observerRef = useRef<ResizeObserver | null>(null);
+
+//   // State to track current width
+//   const [width, setWidth] = useState(0);
+
+//   // Memoized resize handler with debounce
+//   const handleResize = useCallback(() => {
+//     if (elementRef.current) {
+//       const newWidth = elementRef.current.offsetWidth;
+
+//       // Only trigger callback if width actually changes
+//       if (newWidth !== width) {
+//         setWidth(newWidth);
+//         callback(newWidth);
+//       }
+//     }
+//   }, [callback, width]);
+
+//   // Debounce wrapper
+//   const debouncedResize = useCallback(() => {
+//     // eslint-disable-next-line no-undef
+//     let timeoutId: NodeJS.Timeout;
+//     return () => {
+//       if (timeoutId) clearTimeout(timeoutId);
+//       timeoutId = setTimeout(handleResize, debounceDelay);
+//     };
+//   }, [handleResize, debounceDelay])();
+
+//   useEffect(() => {
+//     // Ensure ResizeObserver is supported
+//     if (typeof ResizeObserver === 'undefined') {
+//       console.warn('ResizeObserver is not supported in this browser');
+//       return;
+//     }
+
+//     // Create ResizeObserver
+//     observerRef.current = new ResizeObserver(debouncedResize);
+
+//     return () => {
+//       // Disconnect observer on cleanup
+//       if (observerRef.current) {
+//         observerRef.current.disconnect();
+//       }
+//     };
+//   }, [debouncedResize]);
+
+//   // Ref callback to attach observer
+//   const ref = useCallback((element: HTMLDivElement | null) => {
+//     // Disconnect previous observer if exists
+//     if (observerRef.current && elementRef.current) {
+//       observerRef.current.unobserve(elementRef.current);
+//     }
+
+//     // Update element ref
+//     elementRef.current = element;
+
+//     // Observe new element
+//     if (element && observerRef.current) {
+//       observerRef.current.observe(element);
+//     }
+//   }, []);
+
+//   return { ref, elementRef, width };
+// };
+
+function useResizeObserver(
+  callback: (size: { width: number; height: number }) => void,
+  ref: React.RefObject<HTMLDivElement | null>,
+) {
+  const observer = useRef<ResizeObserver | null>(null);
+  const onResizeCallback = useCallback(callback, [callback]); // Memoize onResize callback
+  const [oldWidth, setOldWidth] = useState(0);
+
   const handleResize = useCallback(() => {
-    console.log('resize');
-    // Only run on client-side
-    if (element === null) {
-      return;
-    }
+    if (ref.current) {
+      const newWidth = ref.current.getBoundingClientRect().width;
 
-    const newDimensions = {
-      width: element.getBoundingClientRect().width,
-      height: element.getBoundingClientRect().height,
-    };
-
-    // Only update if dimensions changed
-    if (
-      newDimensions.width !== dimensions.width ||
-      newDimensions.height !== dimensions.height
-    ) {
-      setDimensions(newDimensions);
-      callback(newDimensions);
+      // Only trigger callback if width actually changes
+      if (newWidth !== oldWidth) {
+        setOldWidth(newWidth);
+        callback({
+          width: newWidth,
+          height: ref.current.getBoundingClientRect().height,
+        });
+      }
     }
-  }, [callback, dimensions]);
+  }, [callback, oldWidth]);
+  
+  const debouncedResize = useCallback(() => {
+      // eslint-disable-next-line no-undef
+      let timeoutId: NodeJS.Timeout;
+      return () => {
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(handleResize, 200);
+      };
+    }, [handleResize])();
 
   useEffect(() => {
-    // Ensure we're on the client-side
-    if (element === null) return;
+    if (ref?.current === undefined || ref.current === null) {
+      return; // Do nothing if ref is not yet attached to an element
+    }
 
-    // Choose between debounce and throttle
-    // eslint-disable-next-line no-undef
-    let timeoutId: NodeJS.Timeout;
-    let rafId: number;
+    observer.current = new ResizeObserver((entries) => {
+      if (!Array.isArray(entries) || !entries.length) {
+        return;
+      }
 
-    const resizeHandler = throttle
-      ? () => {
-          if (rafId) cancelAnimationFrame(rafId);
-          rafId = requestAnimationFrame(handleResize);
-        }
-      : () => {
-          if (timeoutId) clearTimeout(timeoutId);
-          timeoutId = setTimeout(handleResize, debounceDelay);
-        };
+      const entry = entries[0]; // We are observing a single element, so take the first entry
+      const { width, height } = entry.contentRect;
 
-    // Add resize listener
-    element.addEventListener('resize', resizeHandler);
+      if (onResizeCallback && width !== oldWidth) {
+        setOldWidth(width);
+        onResizeCallback({ width, height });
+      }
+    });
 
-    // Trigger initial callback
-    handleResize();
+    observer.current.observe(ref.current);
 
-    // Cleanup
     return () => {
-      element.removeEventListener('resize', resizeHandler);
-      if (timeoutId) clearTimeout(timeoutId);
-      if (rafId) cancelAnimationFrame(rafId);
+      if (observer.current) {
+        observer.current.disconnect(); // Cleanup observer on unmount or ref change
+      }
     };
-  }, [handleResize, debounceDelay, throttle]);
+  }, [ref, onResizeCallback]); // Re-run effect if ref or onResize callback changes
 
-  return { dimensions, handleResize };
-};
+  return null; // This hook doesn't need to return anything visible
+}
+
+export default useResizeObserver;

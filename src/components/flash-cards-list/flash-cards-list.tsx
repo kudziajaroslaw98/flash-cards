@@ -6,16 +6,15 @@ import {
   type SetStateAction,
   useCallback,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 
 import { useAppContext } from '#/providers/app-context';
 import type { Flashcard } from '#/types/flash-card.type';
 
-import { useResizeObserver } from '#/hooks/use-resize-observer';
-import { useWindowResize } from '#/hooks/use-window-resize-observer';
+import useContainerAndWindowResizeObserver from '#/hooks/use-container-and-window-resize-observer';
 import { cn } from '#/shared/utils/cn.util';
+import { splitArrayIntoChunks } from '#/shared/utils/split-array-into-chunks';
 import { TreePalm } from 'lucide-react';
 import { VirtualizedFlashcardList } from './virtualized-flashcard-list';
 
@@ -34,9 +33,7 @@ export default function FlashcardsList({
   filteredFlashcards: Flashcard[];
   setSelected: Dispatch<SetStateAction<Flashcard[]>>;
 }) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const { flashcards } = useAppContext();
-
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
   const [columns, setColumns] = useState<Column[]>([]);
   const [data, setData] = useState<Flashcard[][]>([]);
@@ -64,8 +61,54 @@ export default function FlashcardsList({
     [isSelected],
   );
 
-  const generateColumns = (columnsCount: number): Column[] => {
-    if (!containerRef.current || containerRef.current === null) {
+  const containerRef = useContainerAndWindowResizeObserver(
+    ({ windowWidth, containerWidth }) => {
+      let columns = [];
+      let data: Flashcard[][] = [];
+
+      if (windowWidth >= 1536) {
+        columns = generateColumns(4, containerWidth);
+      } else if (windowWidth >= 1280) {
+        columns = generateColumns(3, containerWidth);
+      } else if (windowWidth >= 600) {
+        columns = generateColumns(2, containerWidth);
+      } else {
+        columns = generateColumns(1, containerWidth);
+      }
+
+      if (columns) {
+        data = generateData(columns);
+        setData(data);
+      }
+    },
+  );
+
+  // useResizeObserver(() => {
+  //   const width = typeof window !== 'undefined' ? window.innerWidth : 0;
+  //   let columns = [];
+  //   let data: Flashcard[][] = [];
+
+  //   if (width >= 1536) {
+  //     columns = generateColumns(4);
+  //   } else if (width >= 1280) {
+  //     columns = generateColumns(3);
+  //   } else if (width >= 600) {
+  //     columns = generateColumns(2);
+  //   } else {
+  //     columns = generateColumns(1);
+  //   }
+
+  //   if (columns) {
+  //     data = generateData(columns);
+  //     setData(data);
+  //   }
+  // }, containerRef);
+
+  const generateColumns = (
+    columnsCount: number,
+    containerWidth: number | null,
+  ): Column[] => {
+    if (containerWidth === null) {
       return [];
     } else {
       const columns = new Array(columnsCount).fill(0).map((_, i) => {
@@ -73,8 +116,7 @@ export default function FlashcardsList({
         return {
           key,
           name: `Column-${i}`,
-          width:
-            containerRef.current!.getBoundingClientRect().width / columnsCount,
+          width: containerWidth / columnsCount,
         };
       });
 
@@ -84,79 +126,52 @@ export default function FlashcardsList({
   };
 
   const generateData = useCallback(
-    (columns: Column[]) => {
-      return new Array(filteredFlashcards.length).fill(0).map((_, rowIndex) =>
-        columns.reduce<Array<Flashcard>>((acc, _curr, colIndex) => {
-          acc.push(filteredFlashcards[rowIndex * columns.length + colIndex]);
-
-          return acc;
-        }, []),
-      );
-    },
+    (columns: Column[]) =>
+      splitArrayIntoChunks<Flashcard>(
+        filteredFlashcards.slice(),
+        columns.length,
+      ),
     [filteredFlashcards, columns],
   );
 
-  useWindowResize(
-    ({ width }) => {
-      let columns = [];
-      let data: Flashcard[][] = [];
+  // useWindowResize(
+  //   ({ width }) => {
+  //     let columns = [];
+  //     let data: Flashcard[][] = [];
 
-      if (width >= 1536) {
-        columns = generateColumns(4);
-      } else if (width >= 1280) {
-        columns = generateColumns(3);
-      } else if (width >= 600) {
-        columns = generateColumns(2);
-      } else {
-        columns = generateColumns(1);
-      }
+  //     if (width >= 1536) {
+  //       columns = generateColumns(4);
+  //     } else if (width >= 1280) {
+  //       columns = generateColumns(3);
+  //     } else if (width >= 600) {
+  //       columns = generateColumns(2);
+  //     } else {
+  //       columns = generateColumns(1);
+  //     }
 
-      if (columns) {
-        data = generateData(columns);
-        setData(data);
-      }
-    },
-    { debounceDelay: 200 },
-  );
-
-  useResizeObserver(
-    () => {
-      const width = typeof window !== 'undefined' ? window.innerWidth : 0;
-      let columns = [];
-      let data: Flashcard[][] = [];
-
-      if (width >= 1536) {
-        columns = generateColumns(4);
-      } else if (width >= 1280) {
-        columns = generateColumns(3);
-      } else if (width >= 600) {
-        columns = generateColumns(2);
-      } else {
-        columns = generateColumns(1);
-      }
-
-      if (columns) {
-        data = generateData(columns);
-        setData(data);
-      }
-    },
-    containerRef.current,
-    { debounceDelay: 200 },
-  );
+  //     if (columns) {
+  //       data = generateData(columns);
+  //       setData(data);
+  //     }
+  //   },
+  //   { debounceDelay: 200 },
+  // );
 
   useEffect(() => {
     const width = typeof window !== 'undefined' ? window.innerWidth : 0;
+    const containerWidth =
+      containerRef.current?.getBoundingClientRect().width ?? null;
     let columns = [];
     let data: Flashcard[][] = [];
 
     if (width >= 1536) {
-      columns = generateColumns(4);
+      columns = generateColumns(4, containerWidth);
     } else if (width >= 1280) {
-      columns = generateColumns(3);
+      columns = generateColumns(3, containerWidth);
     } else if (width >= 600) {
-      columns = generateColumns(2);
+      columns = generateColumns(2, containerWidth);
     } else {
-      columns = generateColumns(1);
+      columns = generateColumns(1, containerWidth);
     }
 
     if (columns) {
@@ -174,7 +189,10 @@ export default function FlashcardsList({
   }, [selected]);
 
   return (
-    <div className='relative flex h-full w-full flex-col'>
+    <div
+      ref={containerRef}
+      className='relative flex h-full w-full flex-col'
+    >
       {flashcards.length === 0 && (
         <div className='flex flex-col items-center justify-center py-10'>
           <TreePalm className='mb-8 size-12 text-green-500' />
@@ -183,17 +201,16 @@ export default function FlashcardsList({
         </div>
       )}
       {flashcards.length > 0 && (
-        <div
-          ref={containerRef}
-          className={cn(['grid h-full w-full gap-4 transition-all'])}
-        >
-          <VirtualizedFlashcardList
-            columns={columns}
-            data={data}
-            isInSelectionMode={isInSelectionMode}
-            isSelected={isSelected}
-            toggleSelected={toggleSelected}
-          />
+        <div className='h-full w-full'>
+          <div className={cn(['grid h-full w-full gap-4 transition-all'])}>
+            <VirtualizedFlashcardList
+              columns={columns}
+              data={data}
+              isInSelectionMode={isInSelectionMode}
+              isSelected={isSelected}
+              toggleSelected={toggleSelected}
+            />
+          </div>
         </div>
       )}
     </div>
