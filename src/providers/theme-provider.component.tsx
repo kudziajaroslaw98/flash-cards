@@ -1,5 +1,6 @@
 'use client';
 
+import useLocalStorage from '#/hooks/use-local-storage.hook';
 import {
   createContext,
   PropsWithChildren,
@@ -8,7 +9,6 @@ import {
   useEffect,
   useState,
 } from 'react';
-import useLocalStorage from '#/hooks/use-local-storage.hook';
 
 export type ThemeContextType = {
   isLightMode: boolean;
@@ -40,7 +40,7 @@ export default function ThemeProvider(props: Readonly<PropsWithChildren>) {
       document.querySelector('html')?.classList?.remove('dark');
     }
 
-    window.umami.track('Theme changed', { theme: newTheme });
+    window?.umami?.track('Theme changed', { theme: newTheme });
   };
 
   const isLightMode = useCallback((): boolean => {

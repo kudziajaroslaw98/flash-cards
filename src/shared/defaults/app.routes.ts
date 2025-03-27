@@ -11,6 +11,12 @@ export const APP_ROUTES = {
     profile: '/account/profile',
     settings: '/account/settings',
   },
+  study: {
+    plans: '/study/plans',
+    newPlan: '/study/new',
+    revise: '/study/revise',
+  },
+  feedback: '/feedback',
   pricing: '/pricing',
   signIn: '/sign-in',
   signUp: '/sign-up',

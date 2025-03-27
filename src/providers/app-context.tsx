@@ -4,8 +4,6 @@ import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
 import { defaultMetadata } from '#/shared/defaults/default-metadata';
 import { defaultReminder } from '#/shared/defaults/default-reminder';
 import { defaultSet } from '#/shared/defaults/default-set';
-import { FLASHCARDS_DB_DEFAULT } from '#/shared/defaults/flashcards-local-storage-init';
-import { SETS_DB_DEFAULT } from '#/shared/defaults/sets-local-storage-init';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { metadataMerge } from '#/shared/helpers/metadata-merge';
 import { remindersMerge } from '#/shared/helpers/reminders-merge';
@@ -33,6 +31,7 @@ import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { Flashcard, FlashcardType } from '#/types/flash-card.type';
 import type { Metadata } from '#/types/metadata.type';
 import type { Reminder } from '#/types/reminder.type';
+import type { StudyPlan } from '#/types/study-plan.type';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   createContext,
@@ -61,6 +60,10 @@ export type AppContextType = {
   updateFlashcards: (flashcards: Partial<Flashcard>[]) => void;
   updateFlashcard: (flashcard: Partial<Flashcard>) => void;
   assignFlashcardsToSet: (flashcardUuids: string[], setUuid: string) => void;
+  unassignFlashcardsFromSet: (
+    flashcardUuids: string[],
+    setUuid: string,
+  ) => void;
   addSets: (set: Partial<FlashcardSet>[]) => void;
   removeSets: (set: FlashcardSet[]) => void;
   updateSet: (set: Partial<FlashcardSet>) => void;
@@ -69,6 +72,7 @@ export type AppContextType = {
   addReminders: (reminders: Partial<Reminder>[]) => void;
   removeReminders: (reminders: Reminder[]) => void;
   updateReminders: (reminders: Partial<Reminder>[]) => void;
+  removeStudyPlans: (plans: StudyPlan[]) => void;
 };
 
 export const AppContext = createContext<AppContextType>({
@@ -87,6 +91,7 @@ export const AppContext = createContext<AppContextType>({
   updateFlashcards: () => null,
   updateFlashcard: () => null,
   assignFlashcardsToSet: () => null,
+  unassignFlashcardsFromSet: () => null,
   addSets: () => null,
   removeSets: () => null,
   updateSet: () => null,
@@ -95,6 +100,7 @@ export const AppContext = createContext<AppContextType>({
   addReminders: () => null,
   removeReminders: () => null,
   updateReminders: () => null,
+  removeStudyPlans: () => null,
 });
 
 export default function AppProvider(props: PropsWithChildren) {
@@ -115,7 +121,7 @@ export default function AppProvider(props: PropsWithChildren) {
 
   const [avatarSeed, setAvatarSeed] = useState<string>('');
   const flashcardsArray =
-    useLiveQuery(() => db.flashcards.toCollection().sortBy('order')) ?? [];
+    useLiveQuery(() => db.flashcards.toCollection().sortBy('createdAt')) ?? [];
   const setsArray = useLiveQuery(() => db.sets.toArray()) ?? [];
   const remindersArray =
     useLiveQuery(() => db.reminders.toCollection().sortBy('createdAt')) ?? [];
@@ -181,7 +187,7 @@ export default function AppProvider(props: PropsWithChildren) {
   const addFlashcards = async (flashcards: Partial<Flashcard>[]) => {
     const mappedFlashcards: Flashcard[] = flashcards.map((flashcard, index) => {
       const flashcardUuid = flashcard.frontUuid ?? uuid();
-      return flashcardsMerge(defaultFlashcard, {
+      return flashcardsMerge(defaultFlashcard(), {
         ...flashcard,
         frontUuid: flashcardUuid,
         order: flashcardsArray.length + index,
@@ -233,7 +239,7 @@ export default function AppProvider(props: PropsWithChildren) {
 
   const updateFlashcards = async (flashcards: Partial<Flashcard>[]) => {
     const mappedFlashcards: Flashcard[] = flashcards.map((flashcard) =>
-      flashcardsMerge(defaultFlashcard, flashcard),
+      flashcardsMerge(defaultFlashcard(), flashcard),
     );
 
     db.flashcards.bulkPut(mappedFlashcards);
@@ -250,7 +256,7 @@ export default function AppProvider(props: PropsWithChildren) {
 
   const updateFlashcard = async (flashcard: Partial<Flashcard>) => {
     const updatedFlashcard: Flashcard = flashcardsMerge(
-      defaultFlashcard,
+      defaultFlashcard(),
       flashcard,
     );
 
@@ -285,6 +291,32 @@ export default function AppProvider(props: PropsWithChildren) {
       flashcards.map((flashcard) => ({
         ...flashcard,
         sets: [...(flashcard?.sets ?? []), setUuid],
+      })) as Flashcard[],
+    );
+  };
+
+  const unassignFlashcardsFromSet = async (
+    flashcardUuids: string[],
+    setUuid: string,
+  ) => {
+    const set = await db.sets.get(setUuid);
+    const flashcards = await db.flashcards.bulkGet(flashcardUuids);
+
+    if (!set) {
+      console.warn('Set not found');
+      return;
+    }
+
+    await db.sets.update(setUuid, {
+      flashcards: set.flashcards.filter(
+        (flashcard) => !flashcardUuids.includes(flashcard),
+      ),
+    });
+
+    await db.flashcards.bulkPut(
+      flashcards.map((flashcard) => ({
+        ...flashcard,
+        sets: [...(flashcard?.sets ?? [])].filter((set) => set !== setUuid),
       })) as Flashcard[],
     );
   };
@@ -426,6 +458,39 @@ export default function AppProvider(props: PropsWithChildren) {
 
   /////////////////
   // #endregion REMINDERS MANAGEMENT
+  /////////////////
+
+  /////////////////
+  // #region STUDY PLANS
+  /////////////////
+
+  const removeStudyPlans = async (plans: StudyPlan[]) => {
+    const plansToDelete: string[] = plans.map((item) => item.frontUuid);
+
+    // remove study sessions
+    const studySessions = await db.studySessions
+      .where('planId')
+      .anyOf(plansToDelete)
+      .toArray();
+    await db.studySessions.bulkDelete(
+      studySessions.map((item) => item.frontUuid),
+    );
+
+    // remove study days
+    const studyDays = await db.studyDays
+      .where('planId')
+      .anyOf(plansToDelete)
+      .toArray();
+    await db.studyDays.bulkDelete(studyDays.map((item) => item.frontUuid));
+
+    // remove study plans
+    await db.studyPlans.bulkDelete(plansToDelete);
+
+    // TODO: Add supabase delete
+  };
+
+  /////////////////
+  // #endregion STUDY PLANS
   /////////////////
 
   /////////////////
@@ -635,13 +700,6 @@ export default function AppProvider(props: PropsWithChildren) {
       localStorage.removeItem('migrations');
       localStorage.removeItem('backup_pre_dexie');
 
-      // 2. Validate localStorage data
-      const flashcards = FLASHCARDS_DB_DEFAULT;
-      const sets = SETS_DB_DEFAULT;
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const metadata = defaultMetadata as any;
-
       // 3. Use explicit Dexie transaction
       await db.transaction(
         'rw',
@@ -655,11 +713,6 @@ export default function AppProvider(props: PropsWithChildren) {
             db.sets.clear(),
             db.metadata.clear(),
           ]);
-
-          // 4. Batch insert with validation
-          await db.flashcards.bulkPut(flashcards);
-          await db.sets.bulkPut(sets);
-          await db.metadata.put({ ...metadata, key: 'current' }, 'current');
 
           // 5. Mark migration complete
           localStorage.setItem('dexie_migrated', 'true');
@@ -698,6 +751,16 @@ export default function AppProvider(props: PropsWithChildren) {
     };
   }, [isLoggedIn]);
 
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const umamiBlocked = window.localStorage.getItem('umami.disabled');
+
+      if (!umamiBlocked) {
+        window.localStorage.setItem('umami.disabled', '1');
+      }
+    }
+  }, []);
+
   /////////////////
   // #endregion MUTATIONS
   /////////////////
@@ -720,6 +783,7 @@ export default function AppProvider(props: PropsWithChildren) {
         updateFlashcards: updateFlashcards,
         updateFlashcard: updateFlashcard,
         assignFlashcardsToSet: assignFlashcardsToSet,
+        unassignFlashcardsFromSet: unassignFlashcardsFromSet,
         addSets,
         removeSets,
         updateSets,
@@ -728,6 +792,7 @@ export default function AppProvider(props: PropsWithChildren) {
         addReminders,
         removeReminders,
         updateReminders,
+        removeStudyPlans,
       }}
     >
       {props.children}

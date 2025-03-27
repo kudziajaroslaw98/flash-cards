@@ -7,4 +7,7 @@ export const API_ROUTES = {
   ANSWER_GENERATE: '/api/ai/flashcard/answer/generate',
   SET_DESCRIPTION: '/api/ai/set/description/generate',
   SET_FLASHCARDS: '/api/ai/set/flashcards/generate',
+  GENERATE_SUGGESTED_FLASHCARDS: '/api/ai/study/plan/flashcards',
+  GENERATE_PLAN: '/api/ai/study/plan',
+  GENERATE_INCORRECT_REVIEW_SUMMARY: '/api/ai/study/plan/incorrect-reviews',
 } as const;

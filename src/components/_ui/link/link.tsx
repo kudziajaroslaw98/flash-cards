@@ -32,7 +32,7 @@ export default function LinkComponent({
   const isPathActive = pathName.includes(href);
 
   const handleClick = () => {
-    window.umami.track('Click link', { href });
+    window?.umami?.track('Click link', { href });
     if (onClick) onClick();
   };
 

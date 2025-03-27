@@ -73,7 +73,7 @@ export function ReminderModal({
   };
 
   const handleDialogClose = () => {
-    window.umami.track('Reminder dialog - closed', { isInEditMode });
+    window?.umami?.track('Reminder dialog - closed', { isInEditMode });
 
     setIsModalOpen(false);
     setCurrentIndex(0);
@@ -82,7 +82,7 @@ export function ReminderModal({
   };
 
   const handleDialogSubmit = async () => {
-    window.umami.track('Reminder dialog - submitted', { isInEditMode });
+    window?.umami?.track('Reminder dialog - submitted', { isInEditMode });
 
     await formRef.current?.checkValidity();
 
@@ -120,7 +120,7 @@ export function ReminderModal({
   };
 
   const handleRightButtonClick = () => {
-    window.umami.track('Reminder dialog - right button clicked');
+    window?.umami?.track('Reminder dialog - right button clicked');
     updateFormValue();
     if (currentIndex < values.length - 1) {
       setCurrentIndex(currentIndex + 1);
@@ -133,7 +133,7 @@ export function ReminderModal({
   };
 
   const handleLeftButtonClick = () => {
-    window.umami.track('Reminder dialog - left button clicked');
+    window?.umami?.track('Reminder dialog - left button clicked');
 
     if (currentIndex > 0) {
       updateFormValue();

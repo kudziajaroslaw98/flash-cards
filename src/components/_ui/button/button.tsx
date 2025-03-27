@@ -4,17 +4,18 @@ import { LoaderCircle } from 'lucide-react';
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
 
 const buttonVariants = cva(
-  `group outline has-[:focus]:ring has-[:focus]:ring-green-400/50 inline-flex w-full max-w-80 items-center text-sm justify-center gap-2 rounded-md border transition active:scale-95 disabled:!border-gray-300 dark:disabled:!border-gray-800 disabled:!bg-transparent disabled:!text-gray-400 dark:disabled:!bg-transparent disabled:opacity-50 disabled:cursor-not-allowed ring-0 outline-0 focus:ring ring-green-400/50`,
+  `group outline has-[:focus]:ring has-[:focus]:ring-green-400/50 disabled:!bg-gray-50 inline-flex w-full max-w-80 items-center text-sm justify-center gap-2
+   rounded-md border transition active:scale-95 disabled:!border-gray-300 dark:disabled:!bg-slate-950 dark:disabled:!border-gray-800
+   disabled:!text-gray-400 disabled:cursor-not-allowed ring-0 outline-0 focus:ring ring-green-400/50`,
   {
     variants: {
       variant: {
-        disabled: '',
         'disabled-outline':
           'border-gray-300 dark:border-slate-800 bg-transparent text-gray-500 dark:bg-transparent',
         'disabled-text':
           'hover:bg-gray-200/50 dark:hover:bg-slate-800/50 border-transparent dark:border-transparent',
         'disabled-fill':
-          'text-gray-500 bg-gray-200/50 hover:bg-gray-200/25 dark:bg-slate-800/50 dark:hover:bg-slate-800/25 border-transparent dark:border-transparent',
+          'text-gray-500 bg-gray-100 hover:bg-gray-50 dark:bg-slate-800/50 dark:hover:bg-slate-800/25 border-transparent dark:border-transparent',
         primary:
           'border-transparent text-gray-50 bg-green-400 border-green-500 hover:bg-green-500 active:focus:bg-green-600',
         'primary-outline':
@@ -49,6 +50,7 @@ const buttonVariants = cva(
         xlg: 'h-10 px-14 md:w-auto',
         icon: 'h-10 min-w-10 md:w-10',
         'icon-square': 'h-10 w-10',
+        'icon-square-sm': 'h-9 w-9',
         'icon-sm': 'size-7',
         'icon-xs': 'size-5',
         full: 'w-full h-10 !max-w-auto',
@@ -61,6 +63,7 @@ const buttonVariants = cva(
     defaultVariants: {
       variant: 'primary',
       size: 'default',
+      iconPosition: 'right',
     },
   },
 );
@@ -80,6 +83,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     { className, variant, disabled, loading, size, iconPosition, ...props },
     ref,
   ) => {
+    const showIcon = loading || (!loading && props.icon);
     return (
       <button
         disabled={disabled || loading}
@@ -90,14 +94,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         tabIndex={disabled ? -1 : 0}
         {...props}
       >
-        {loading ||
-          (!loading && props.icon && (
-            <span className='pointer-events-none'>
-              {loading && <LoaderCircle className={'h-4 w-4 animate-spin'} />}
+        {showIcon && (
+          <span className='pointer-events-none'>
+            {loading && <LoaderCircle className={'h-4 w-4 animate-spin'} />}
 
-              {!loading && props.icon}
-            </span>
-          ))}
+            {!loading && props.icon}
+          </span>
+        )}
 
         {props?.label && props.label}
       </button>

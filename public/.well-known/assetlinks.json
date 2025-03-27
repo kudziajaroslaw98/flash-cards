@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.finalphase.flashcards.twa",
+        "sha256_cert_fingerprints": ["06:95:4E:42:9B:2B:03:EC:74:5C:1D:45:12:C3:FB:BB:C0:0D:95:ED:4B:62:BC:C5:34:C6:60:F4:39:18:B7:8F"]
+      }
+    }]

@@ -1,6 +1,6 @@
 import { RateLimit } from '#/shared/utils/api-limiter';
 import { createClient } from '#/shared/utils/supabase/server';
-import { createOpenAI } from '@ai-sdk/openai';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamText } from 'ai';
 
 export const maxDuration = 30;
@@ -41,12 +41,12 @@ export async function POST(req: Request) {
 
   const { prompt }: { prompt: string } = await req.json();
 
-  const openai = createOpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+  const gemini = createGoogleGenerativeAI({
+    apiKey: process.env.GOOGLE_AI_API_KEY,
   });
 
   const result = streamText({
-    model: openai('gpt-3.5-turbo-1106'),
+    model: gemini('gemini-2.0-flash-001'),
     system:
       'You are expert in english vocabulary, you are generating descriptiops for texts. You always give unique and fitting descriptions. Do not use words from prompt to not give hints. ',
     prompt: prompt,

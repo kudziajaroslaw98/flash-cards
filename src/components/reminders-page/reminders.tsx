@@ -10,7 +10,7 @@ import { ReminderFilters } from './reminder-filters';
 import { RemindersList } from './reminders-list';
 
 export function Reminders() {
-  const { notificationPermission, pushSubcribed, permissionRequest } =
+  const { notificationPermission, pushSubscribed, permissionRequest } =
     useClientPermissions();
   const [selected, setSelected] = useState<Reminder[]>([]);
   const [filtered, setFiltered] = useState<Reminder[]>([]);
@@ -31,7 +31,7 @@ export function Reminders() {
         )}
       </div>
 
-      {notificationPermission === 'granted' && pushSubcribed ? (
+      {notificationPermission === 'granted' && pushSubscribed ? (
         <>
           <RemindersList
             selected={selected}

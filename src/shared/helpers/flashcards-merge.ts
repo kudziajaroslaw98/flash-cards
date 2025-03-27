@@ -25,7 +25,7 @@ export const flashcardsMerge = (
         flashcard?.spacedRepetition?.lastReviewAt ?? new Date().toUTCString(),
       dueDate:
         flashcard?.spacedRepetition?.dueDate ??
-        new Date(Date.now()).toUTCString(),
+        new Date(Date.now() + 1000 * 60 * 10).toUTCString(),
       reviews:
         flashcard?.spacedRepetition?.reviews ??
         defaultFlashcard.spacedRepetition.reviews,
@@ -51,5 +51,9 @@ export const flashcardsMerge = (
     synonyms: flashcard?.synonyms ?? defaultFlashcard.synonyms,
     relatedFacts: flashcard?.relatedFacts ?? defaultFlashcard.relatedFacts,
     tags: flashcard?.tags ?? defaultFlashcard.tags,
+    answer1: flashcard?.answer1 ?? defaultFlashcard.answer1,
+    answer2: flashcard?.answer2 ?? defaultFlashcard.answer2,
+    answer3: flashcard?.answer3 ?? defaultFlashcard.answer3,
+    answer4: flashcard?.answer4 ?? defaultFlashcard.answer4,
   } as Flashcard;
 };

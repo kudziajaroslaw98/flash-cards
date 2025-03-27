@@ -34,7 +34,7 @@ export const AssignFlashcardsModal = ({
         flashcards?.map((flashcard) => {
           if (flashcard.type === 'index' || flashcard.type === 'single') {
             return {
-              label: flashcard.context,
+              label: flashcard.query ?? flashcard.context,
               value: flashcard.frontUuid,
             };
           }
@@ -87,7 +87,7 @@ export const AssignFlashcardsModal = ({
             className='flex flex-col items-center justify-center pb-8 pt-4'
           >
             <FormComponent<Pick<FlashcardSet, 'flashcards'>>
-              className='w-full max-w-80'
+              className='w-full max-w-96'
               scheme={getFormScheme}
               emitFormValue={setFormValue}
               initialValues={initialValue}

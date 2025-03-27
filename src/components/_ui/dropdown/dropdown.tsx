@@ -9,12 +9,13 @@ import { Eraser, Plus, Search } from 'lucide-react';
 import * as m from 'motion/react-m';
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '../button/button';
+import { FieldLabel } from '../field-label/field-label';
 import Input from '../input/input';
 import DropdownItem from './dropdown-item';
 import DropdownLabel from './dropdown-label';
 
 const DropdownVariants = cva(
-  `absolute flex-col overflow-visible rounded-md border dark:border-slate-900/95 dark:bg-slate-950 flex w-full min-w-fit bg-gray-50/95 backdrop-blur-lg`,
+  `absolute flex-col overflow-visible rounded-md border dark:border-slate-900/95 dark:bg-slate-950 flex bg-gray-50/95 backdrop-blur-lg`,
   {
     variants: {
       contextPosition: {
@@ -31,7 +32,7 @@ const DropdownVariants = cva(
 );
 
 interface BaseDropdownProps<T> extends VariantProps<typeof DropdownVariants> {
-  type?: 'dropdown';
+  type: 'dropdown';
   config: DictionaryValue<T>[];
   value?: T | T[];
   clearAll?: boolean;
@@ -48,12 +49,13 @@ interface BaseDropdownProps<T> extends VariantProps<typeof DropdownVariants> {
   onFocus?: () => void;
   onAddNew?: (value: string) => void;
   disabled?: boolean;
+  contextClassName?: string;
   name?: string;
 }
 
 export type DropdownProps<T> =
   | (BaseDropdownProps<T> & {
-      multiple?: false;
+      multiple: false;
       label?: string;
       multipleLabel?: string;
       onChange: (_value: DictionaryValue<T>['value']) => void;
@@ -66,7 +68,7 @@ export type DropdownProps<T> =
     });
 
 export default function Dropdown<T>({
-  multiple,
+  multiple = false,
   multipleLabel,
   controlLabel,
   label,
@@ -74,8 +76,9 @@ export default function Dropdown<T>({
   config,
   valid,
   required,
-  contextPosition,
+  contextPosition = 'bottom',
   labelClassName,
+  contextClassName,
   onChange,
   onBlur,
   onFocus,
@@ -105,36 +108,9 @@ export default function Dropdown<T>({
   const popoverRef = useRef<HTMLDivElement>(null);
   const hasFocus = useRef(false);
 
-  // TODO: How to animate this?
-  // const dropdownPopupStyles = useMemo(() => {
-  //   if (dropdownLabelRef.current === null) return {};
-  //   else {
-  //     return {
-  //       position: 'fixed',
-  //       top:
-  //         contextPosition === 'bottom'
-  //           ? (((dropdownLabelRef.current.getBoundingClientRect()
-  //               .top as number) +
-  //               dropdownLabelRef.current.getBoundingClientRect()
-  //                 .height) as number) + 8
-  //           : 'unset',
-  //       bottom:
-  //         contextPosition === 'top'
-  //           ? (dropdownLabelRef.current.getBoundingClientRect()
-  //               .bottom as number) -
-  //             (dropdownLabelRef.current.getBoundingClientRect().top as number) +
-  //             dropdownLabelRef.current.getBoundingClientRect().height +
-  //             8
-  //           : 'unset',
-  //       left: dropdownLabelRef.current.getBoundingClientRect().left,
-  //       width: dropdownLabelRef.current.getBoundingClientRect().width,
-  //     } as const;
-  //   }
-  // }, [dropdownLabelRef.current]);
-
   useOutsideAlerter(dropdownWrapperRef, () => {
     if (visible) {
-      window.umami.track('Dropdown - Click outside');
+      window?.umami?.track('Dropdown - Click outside');
       setVisible(false);
       setSearchValue('');
       hasFocus.current = false;
@@ -152,15 +128,56 @@ export default function Dropdown<T>({
     )
       return;
 
-    const buttonRect = dropdownLabelRef.current.getBoundingClientRect();
-    const top =
-      (((dropdownLabelRef.current.getBoundingClientRect().y as number) +
-        dropdownLabelRef.current.getBoundingClientRect().height) as number) + 8;
+    if (contextPosition === 'bottom') {
+      const minOffset = 48;
+      const buttonRect = dropdownLabelRef.current.getBoundingClientRect();
+      const top =
+        (((dropdownLabelRef.current.getBoundingClientRect().y as number) +
+          dropdownLabelRef.current.getBoundingClientRect().height) as number) +
+        8;
 
-    popoverRef.current.style.top = `${top}px`;
-    popoverRef.current.style.left = `${buttonRect.left + window.scrollX}px`;
-    popoverRef.current.style.width = `${dropdownLabelRef.current.getBoundingClientRect().width}px`;
-  }, []);
+      popoverRef.current.style.top = `${top}px`;
+      popoverRef.current.style.left = `${buttonRect.left + window.scrollX}px`;
+      popoverRef.current.style.width = `${dropdownLabelRef.current.getBoundingClientRect().width}px`;
+
+      const availableSpace =
+        window.innerHeight -
+        popoverRef.current.getBoundingClientRect().bottom -
+        16 +
+        popoverRef.current.getBoundingClientRect().height -
+        minOffset;
+
+      if (popoverRef.current.getBoundingClientRect().height > availableSpace) {
+        popoverRef.current.style.height = `${availableSpace}px`;
+        popoverRef.current.style.maxHeight = `${availableSpace}px`;
+      }
+    }
+
+    if (contextPosition === 'top') {
+      const minOffset = 48;
+      const buttonRect = dropdownLabelRef.current.getBoundingClientRect();
+      const top =
+        (dropdownLabelRef.current.getBoundingClientRect().y as number) -
+        (popoverRef.current.getBoundingClientRect().height as number) -
+        8;
+
+      popoverRef.current.style.top = `${top}px`;
+      popoverRef.current.style.left = `${buttonRect.left + window.scrollX}px`;
+      popoverRef.current.style.width = `${dropdownLabelRef.current.getBoundingClientRect().width}px`;
+
+      const availableSpace =
+        window.innerHeight -
+        popoverRef.current.getBoundingClientRect().top -
+        16 +
+        popoverRef.current.getBoundingClientRect().height -
+        minOffset;
+
+      if (popoverRef.current.getBoundingClientRect().height > availableSpace) {
+        popoverRef.current.style.height = `${availableSpace}px`;
+        popoverRef.current.style.maxHeight = `${availableSpace}px`;
+      }
+    }
+  }, [contextPosition]);
 
   useEffect(() => {
     if (visible) {
@@ -231,14 +248,14 @@ export default function Dropdown<T>({
   }, [searchValue]);
 
   const toggleDropdown = () => {
-    window.umami.track('Dropdown - Toggle', { name: props.name ?? label });
+    window?.umami?.track('Dropdown - Toggle', { name: props.name ?? label });
     if (disabled) return;
     setVisible((prev) => !prev);
     setSearchValue('');
   };
 
   const changePickedItem = (pickedItem: DictionaryValue<T>) => {
-    window.umami.track('Dropdown - Select item', {
+    window?.umami?.track('Dropdown - Select item', {
       name: pickedItem.label,
     });
     if (multiple) {
@@ -248,7 +265,9 @@ export default function Dropdown<T>({
 
       if (index === -1) {
         setSelected((prev) => [...prev, pickedItem]);
-        onChange([...selected, pickedItem].map((item) => item.value));
+        onChange(
+          [...selected, pickedItem].map((item) => item.value) as T & T[],
+        );
       } else {
         setSelected((prev) =>
           prev.filter((item) => item.value !== pickedItem.value),
@@ -256,7 +275,7 @@ export default function Dropdown<T>({
         onChange(
           selected
             .filter((item) => item.value !== pickedItem.value)
-            .map((item) => item.value),
+            .map((item) => item.value) as T & T[],
         );
       }
     } else {
@@ -264,16 +283,16 @@ export default function Dropdown<T>({
       setSelected([pickedItem]);
       setSearchValue('');
 
-      onChange(pickedItem.value);
+      onChange(pickedItem.value as T & T[]);
     }
   };
 
   const clearPicked = (key?: string) => {
-    window.umami.track('Dropdown - Clear picked', { key: key ?? 'btnClick' });
+    window?.umami?.track('Dropdown - Clear picked', { key: key ?? 'btnClick' });
     setSelected([]);
 
     if (multiple) {
-      onChange([]);
+      onChange([] as T & T[]);
     }
   };
 
@@ -289,7 +308,7 @@ export default function Dropdown<T>({
   };
 
   const handleToggleAddNew = (key?: string, type?: 'Cancel') => {
-    window.umami.track('Dropdown - add new clicked', {
+    window?.umami?.track('Dropdown - add new clicked', {
       key: key ?? 'btnClick',
       type: type ?? 'add',
     });
@@ -297,7 +316,7 @@ export default function Dropdown<T>({
   };
 
   const handleAddNewElement = (key?: string) => {
-    window.umami.track('Dropdown - new element added', {
+    window?.umami?.track('Dropdown - new element added', {
       key: key ?? 'btnClick',
     });
     const newItem = {
@@ -315,9 +334,9 @@ export default function Dropdown<T>({
 
     if (multiple) {
       setSelected((prev) => [...prev, newItem]);
-      onChange([...selected, newItem].map((item) => item.value));
+      onChange([...selected, newItem].map((item) => item.value) as T & T[]);
     } else {
-      onChange(newItem.value);
+      onChange(newItem.value as T & T[]);
       setSelected([newItem]);
     }
   };
@@ -338,21 +357,19 @@ export default function Dropdown<T>({
       onFocus={handleClickOnDropdown}
     >
       {controlLabel && (
-        <span
-          className={cn([
-            touched && !valid ? '!text-red-400' : '',
-            touched && valid ? '!text-green-400' : '',
-            'w-auto pb-2  pl-2 text-sm text-gray-400',
-          ])}
-        >
-          {`${controlLabel}${required ? ' *' : ' (optional)'}`}
-        </span>
+        <FieldLabel
+          touched={touched}
+          valid={valid ?? true}
+          required={required ?? false}
+          label={controlLabel}
+        />
       )}
+
       <div className='w-full'>
         <div
           ref={dropdownLabelRef}
           className={cn([
-            'border-gray-300 text-gray-500 dark:border-slate-800 dark:text-slate-400',
+            'border-gray-300 text-gray-600 dark:border-slate-800 dark:text-slate-400',
             'group relative flex h-10 w-full cursor-pointer items-center justify-center rounded-md border text-sm outline-none group-has-[:focus]:ring',
             hasFocus.current ? 'ring' : '',
             'transition',
@@ -400,7 +417,8 @@ export default function Dropdown<T>({
             data-open={visible}
             className={cn([
               DropdownVariants({ contextPosition }),
-              'fixed border  border-gray-300 dark:border-slate-900',
+              'fixed border border-gray-300 shadow-xl dark:border-slate-900 dark:shadow-black',
+              contextClassName,
             ])}
             ref={popoverRef}
             initial={{ opacity: 0, y: -10 }}
@@ -408,9 +426,9 @@ export default function Dropdown<T>({
             exit={{ opacity: 0, y: -10 }}
           >
             {props.searchable && (
-              <div className='min-w-fit rounded-t-md border-b bg-gray-50 p-2 dark:border-slate-800/40 dark:bg-slate-950 '>
+              <div className='min-w-fit rounded-t-md border-b p-2 dark:border-slate-800/40'>
                 <Input
-                  type='text'
+                  inputType='text'
                   value={searchValue}
                   valid={true}
                   placeholder={`Search in ${multipleLabel ?? label}...`}
@@ -425,7 +443,7 @@ export default function Dropdown<T>({
             <div
               tabIndex={-1}
               className={cn([
-                'max-h-52 overflow-y-auto p-2',
+                'flex h-full flex-col gap-1 overflow-y-auto p-2',
                 (props.searchable || props.clearAll) &&
                   items?.length > 0 &&
                   'py-3',
@@ -454,7 +472,7 @@ export default function Dropdown<T>({
             </div>
             {props.addNew && !isInAddNewMode && (
               <div
-                className='flex h-11 w-full cursor-pointer items-center justify-center border-t bg-gray-50  px-4 py-2 text-gray-500 outline-none transition hover:text-green-400 focus:ring focus:ring-green-400/50  dark:border-slate-800/40 dark:bg-slate-950'
+                className='flex h-11 w-full cursor-pointer items-center justify-center rounded-b-md border-t bg-gray-50 px-4 py-2 text-gray-500 outline-none transition hover:text-green-400 focus:ring focus:ring-green-400/50  dark:border-slate-800/40 dark:bg-slate-950'
                 onClick={() => handleToggleAddNew()}
                 onKeyDown={(event) =>
                   event.key === 'Enter' && handleToggleAddNew('Enter')
@@ -468,7 +486,7 @@ export default function Dropdown<T>({
               <div>
                 <div className='min-w-fit  bg-gray-50 p-1 py-2 outline-none focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-950'>
                   <Input
-                    type='text'
+                    inputType='text'
                     value={newItemValue}
                     valid={true}
                     placeholder='New element...'

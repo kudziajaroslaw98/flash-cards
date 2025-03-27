@@ -3,7 +3,7 @@ import { cn } from '#/shared/utils/cn.util';
 import * as m from 'motion/react-m';
 import { Children } from 'react';
 import Tooltip from '../_ui/tooltip/tooltip';
-import { useStepper } from './stepper';
+import { useStepper } from './stepper-context';
 
 export const StepperProgress = () => {
   const { currentStep, isCompleted, steps } = useStepper();
@@ -73,7 +73,7 @@ export const StepperProgress = () => {
                   </span>
                 }
                 position='bottom'
-                className='w-32'
+                className='w-fit max-w-32'
               >
                 <m.div
                   className={cn([
@@ -89,12 +89,25 @@ export const StepperProgress = () => {
                   animate={{ scale: 1, opacity: 1 }}
                 >
                   {/* @ts-expect-error prop required by component, always available */}
-                  {Children.only(step)?.props?.stepIdentificator}
+                  {Children.only(step)?.props?.stepIdentification}
                 </m.div>
               </Tooltip>
             </div>
           );
         })}
+      </div>
+
+      <div className='flex w-full justify-center gap-1 pt-4 text-xs'>
+        <span className='font-semibold'>
+          Step {currentStep} of {steps.length}:
+        </span>
+        <span>
+          {steps.map((step, index) => {
+            /* @ts-expect-error prop required by component, always available */
+            const stepLabel = Children.only(step)?.props?.stepLabel;
+            return index === currentStep - 1 ? stepLabel : null;
+          })}
+        </span>
       </div>
     </div>
   );

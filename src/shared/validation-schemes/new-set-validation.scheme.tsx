@@ -13,7 +13,8 @@ export const newSetFormScheme = (
 ): FormScheme<Pick<FlashcardSet, 'name' | 'description' | 'category'>> => ({
   inputs: {
     name: {
-      type: 'text',
+      type: 'input',
+      inputType: 'text',
       name: 'name',
       label: 'Set name',
       placeholder: 'Wild Animals',

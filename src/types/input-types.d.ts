@@ -4,11 +4,44 @@ import type { InputSwitchProps } from '#/components/_ui/input-switch/input-switc
 import type { InputComponentProps } from '#/components/_ui/input/input';
 import type { TagInputComponentProps } from '#/components/_ui/tag-input/tag-input';
 import type { TextAreaProps } from '#/components/_ui/text-area/text-area';
+import type { ExtendedSchemeKeys } from './extended-scheme-keys';
+import type { ExtendedInputType } from './form-scheme.type';
 
-export type InputDefinitions =
-  | Omit<InputComponentProps, 'value' | 'error' | 'valid'>
+export type InternalSeparator = {
+  type: '_internal_separator';
+  name: string;
+};
+
+export type InternalAccordion<T> = {
+  type: '_internal_accordion';
+  name: string;
+  title: string;
+  inputs: Partial<
+    Record<ExtendedSchemeKeys<T>, ExtendedInputType<InputDefinitions<T>, T>>
+  >;
+};
+
+export type InternalGroupTitle = {
+  type: '_internal_group_title';
+  title: string | React.ReactNode;
+};
+
+export type VanillaInputType = Omit<
+  InputComponentProps,
+  'value' | 'error' | 'valid'
+> & {
+  type: 'input';
+};
+
+export type InternalInputTypes<T> = InternalSeparator | InternalAccordion<T>;
+
+export type InputDefinitions<T> =
+  | VanillaInputType
   | Omit<InputSwitchProps, 'value' | 'error' | 'valid'>
-  | TextAreaProps
-  | DropdownProps<unknown>
-  | DateTimePickerProps
-  | Omit<TagInputComponentProps, 'value' | 'error' | 'valid'>;
+  | Omit<TagInputComponentProps, 'value' | 'error' | 'valid'>
+  | Omit<TextAreaProps, 'value' | 'error' | 'valid'>
+  | Omit<DropdownProps<unknown>, 'onChange'>
+  | Omit<DateTimePickerProps, 'value' | 'error' | 'valid'>
+  | InternalSeparator
+  | InternalAccordion<T>
+  | InternalGroupTitle;

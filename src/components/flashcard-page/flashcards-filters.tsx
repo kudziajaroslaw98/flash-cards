@@ -9,8 +9,10 @@ import Input from '../_ui/input/input';
 
 export default function FlashcardsFilters({
   setFilteredFlashcards,
+  setSelected,
 }: {
   setFilteredFlashcards: (flashcards: Flashcard[]) => void;
+  setSelected: (flashcards: Flashcard[]) => void;
 }) {
   const [searchedText, setSearchedText] = useState('');
   const [searchedSets, setSearchedSets] = useState<Array<string>>([]);
@@ -19,7 +21,7 @@ export default function FlashcardsFilters({
   const { flashcards, setsDictionary, flashcardTypeDictionaries } =
     useAppContext();
 
-  const handleFilterWithMultipleCryteria = useCallback(() => {
+  const handleFilterWithMultipleCriteria = useCallback(() => {
     const tmpFlashcards = flashcards
       .filter(
         (flashcard) =>
@@ -59,15 +61,30 @@ export default function FlashcardsFilters({
     setSearchedType(types);
   };
 
+  const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
+    setSelected(event.target.checked ? flashcards : []);
+  };
+
   useEffect(() => {
-    handleFilterWithMultipleCryteria();
+    handleFilterWithMultipleCriteria();
   }, [searchedText, searchedSets, searchedType, flashcards]);
 
   return (
     <div className='flex w-full flex-col flex-wrap items-center justify-center gap-2 text-sm sm:flex-row sm:justify-end'>
       <span className='flex w-full justify-center sm:w-auto'>
         <Input
-          type='text'
+          inputType='checkbox'
+          valid={true}
+          for='selectAll'
+          inputLabel='Select All'
+          onChange={handleSelectAll}
+          className='!w-full !max-w-80 sm:!w-56'
+        />
+      </span>
+
+      <span className='flex w-full justify-center sm:w-auto'>
+        <Input
+          inputType='text'
           value={searchedText}
           valid={true}
           placeholder='Search in flashcards...'
@@ -80,6 +97,7 @@ export default function FlashcardsFilters({
 
       <span className='flex w-full flex-col items-center justify-center gap-2 sm:w-auto sm:flex-row'>
         <Dropdown
+          type='dropdown'
           config={setsDictionary}
           onChange={handleSetsChange}
           multipleLabel='Sets'
@@ -92,6 +110,7 @@ export default function FlashcardsFilters({
         />
 
         <Dropdown
+          type='dropdown'
           config={flashcardTypeDictionaries}
           onChange={handleTypesChange}
           multipleLabel='Types'

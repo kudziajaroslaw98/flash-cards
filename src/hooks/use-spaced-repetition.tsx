@@ -4,6 +4,7 @@ import {
   calculateReversedWeight,
   calculateWeight,
 } from '#/shared/utils/calculate-weight';
+import { getRandomArrayItems } from '#/shared/utils/get-random-array-items';
 import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util';
 import type { Flashcard } from '#/types/flash-card.type';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -23,6 +24,7 @@ export default function useSpacedRepetition({
   numberOfItems = 4,
 }: UseSpacedRepetitionProps) {
   const todayItemsRef = useRef<number | null>(null);
+  const workerRef = useRef<Worker | null>(null);
   const [randomItems, setRandomItems] = useState<Flashcard[] | null>(null);
   const [continueReroll, setContinueReroll] = useState(false);
   const todayItems = useMemo(
@@ -60,28 +62,31 @@ export default function useSpacedRepetition({
   }) {
     const MAX_RETRIES = 10;
 
+    const itemsCopy = [...items];
     const randomItems: Flashcard[] = [];
     const max = items[items.length - 1]?.spacedRepetition?.culmulativeWeight;
 
     let retries = 0;
 
     while (randomItems.length < numberOfItems && retries < MAX_RETRIES) {
-      if (items.length <= numberOfItems) {
-        return items;
+      if (itemsCopy.length <= numberOfItems) {
+        return itemsCopy;
       }
 
       const randomNumber = getRandomRangedNumber(0, max);
       const foundIndex = binarySearch(
-        items,
+        itemsCopy,
         'spacedRepetition.culmulativeWeight',
         randomNumber,
       );
 
       if (foundIndex >= 0) {
-        const item = items[foundIndex];
+        const item = itemsCopy[foundIndex];
 
         if (!randomItems.includes(item) && item) {
           randomItems.push(item);
+          itemsCopy.splice(foundIndex, 1);
+          retries = 0;
         } else {
           retries++;
           continue;
@@ -100,13 +105,6 @@ export default function useSpacedRepetition({
 
   function findRandomItem(array: Flashcard[], numberOfItems: number) {
     return getRandomArrayItems(array, numberOfItems);
-  }
-
-  function getRandomArrayItems(
-    array: Flashcard[],
-    itemsCount: number,
-  ): Flashcard[] {
-    return array.sort(() => Math.random() - 0.5).slice(0, itemsCount);
   }
 
   function spaceRepetitionAlgorithm({
@@ -146,17 +144,15 @@ export default function useSpacedRepetition({
       .toCollection()
       .sortBy('spacedRepetition.dueDate');
 
-    const worker = new Worker(
-      new URL('../workers/space-repetition-worker.ts', import.meta.url),
-    );
+    if (items.length === 0 || !workerRef.current) return;
 
-    worker.postMessage({ action: 'calculate-culmilative', items });
-
-    worker.onmessage = function (event) {
-      db.flashcards.bulkUpdate(event.data.mappedItems);
+    workerRef.current!.postMessage({
+      action: 'calculate-culmilative',
+      items: items,
+    });
+    workerRef.current!.onmessage = async function (event) {
+      await db.flashcards.bulkPut(event.data.mappedItems);
     };
-
-    worker.terminate();
   };
 
   const calculateRepetition = async (
@@ -231,6 +227,30 @@ export default function useSpacedRepetition({
     recalculateCulmulatives();
   };
 
+  const reroll = () => {
+    if (todayItems.length === 0) {
+      if (!continueReroll) {
+        return [];
+      } else {
+        const randomItems = findRandomItem(array, numberOfItems);
+
+        setRandomItems(randomItems);
+
+        return randomItems;
+      }
+    }
+
+    const randomItems = findRandomWeightedItem({
+      items: todayItems.length > 0 ? todayItems : array,
+      numberOfItems,
+    });
+
+    setRandomItems(randomItems);
+    console.log(randomItems);
+
+    return randomItems;
+  };
+
   useEffect(() => {
     if (todayItems.length > 0 && todayItemsRef.current === null) {
       todayItemsRef.current = todayItems.length;
@@ -252,34 +272,26 @@ export default function useSpacedRepetition({
     }
   }, [array, numberOfItems, todayItems, continueReroll]);
 
-  const reroll = () => {
-    if (todayItems.length === 0) {
-      if (!continueReroll) {
-        return [];
-      } else {
-        const randomItems = findRandomItem(array, numberOfItems);
-
-        setRandomItems(randomItems);
-
-        return randomItems;
-      }
-    }
-
-    const randomItems = findRandomWeightedItem({
-      items: todayItems.length > 0 ? todayItems : array,
-      numberOfItems,
-    });
-
-    setRandomItems(randomItems);
-
-    return randomItems;
-  };
-
   useEffect(() => {
     if (continueReroll) {
       reroll();
     }
   }, [continueReroll]);
+
+  useEffect(() => {
+    if (array.length > 0) {
+      recalculateCulmulatives();
+    }
+  }, []);
+
+  useEffect(() => {
+    const worker = new Worker(
+      new URL('../workers/space-repetition-worker.ts', import.meta.url),
+    );
+
+    workerRef.current = worker;
+    return () => worker.terminate();
+  }, []);
 
   return {
     randomItems,

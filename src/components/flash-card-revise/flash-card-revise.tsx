@@ -54,7 +54,6 @@ export default function FlashcardReviseComponent() {
   const defaultSet = { value: 'default', label: 'All flashcards' };
   const [revisedCard, setRevisedCard] = useState<Flashcard>();
   const [revisedSet, setRevisedSet] = useState<string>(defaultSet.value);
-  const [clickedCard, setClickedCard] = useState<Flashcard>();
   const [clickedOption, setClickedOption] = useState<string>();
   const [clicked, setClicked] = useState(false);
   const cardsReviewed = useRef(0);
@@ -95,7 +94,7 @@ export default function FlashcardReviseComponent() {
     if (!revisedCard) {
       return;
     }
-    window.umami.track('Space repetition clicked', { value });
+    window?.umami?.track('Space repetition clicked', { value });
 
     if (clicked) {
       return;
@@ -123,24 +122,39 @@ export default function FlashcardReviseComponent() {
     setClicked(true);
   };
 
-  const changeClicked = (flashCard: Flashcard | undefined, key?: string) => {
-    if (!flashCard || !revisedCard) return;
+  const changeClicked = (answer: string, key?: string) => {
+    if (!answer || !revisedCard) return;
 
     if (key) {
-      window.umami.track('Answer clicked', { key });
+      window?.umami?.track('Answer clicked', { key });
     } else {
-      window.umami.track('Answer clicked', { key: null });
+      window?.umami?.track('Answer clicked', { key: null });
     }
 
     if (clicked) {
       return;
     }
 
-    const correct = revisedCard?.frontUuid === flashCard.frontUuid;
+    const correct = revisedCard?.answer1 === answer;
     const clonedStats = { ...metadata };
 
     cardsReviewed.current += 1;
     clonedStats.answers += 1;
+
+    const reviewLog: ReviewLog = {
+      frontUuid: uuid(),
+      timestamp: new Date().toISOString(),
+      sessionUuid: focusSession.current.frontUuid,
+      cardFrontUuid: revisedCard.frontUuid,
+      recalled: false,
+      timeSpent: Math.floor((Date.now() - cardTime.current.getTime()) / 1000),
+      tags: revisedCard.tags,
+      synced: false,
+    };
+
+    if (correct) {
+      reviewLog.recalled = true;
+    }
 
     if (revisedCard.type === 'single' && correct) {
       clonedStats.correctAnswers += 1;
@@ -155,30 +169,25 @@ export default function FlashcardReviseComponent() {
       (clonedStats.correctAnswers / clonedStats.answers).toFixed(2),
     );
 
+    db.reviewLogs.add(reviewLog);
     updateMetadata({ ...clonedStats });
-    setClickedCard(flashCard);
     setClicked(true);
   };
 
   const reshuffleFlashcards = () => {
-    window.umami.track('Reshuffle flashcards', { key: null, clicked });
+    window?.umami?.track('Reshuffle flashcards', { key: null, clicked });
     if (!clicked || !revisedCard) return;
 
     calculateRepetition(revisedCard, clickedOption as ReviseOptionsType);
-    setClickedCard(undefined);
-    setRevisedCard(undefined);
     setClickedOption(undefined);
     setClicked(false);
-
-    reroll();
   };
 
   const reshuffleFlashcardsWithKey = (key: string) => {
-    window.umami.track('Reshuffle flashcards', { key, clicked });
+    window?.umami?.track('Reshuffle flashcards', { key, clicked });
     if (!clicked || !revisedCard) return;
 
     calculateRepetition(revisedCard, clickedOption as ReviseOptionsType);
-    setClickedCard(undefined);
     setRevisedCard(undefined);
     setClickedOption(undefined);
     setClicked(false);
@@ -187,14 +196,13 @@ export default function FlashcardReviseComponent() {
   };
 
   const changeRevisedSet = (value: string) => {
-    window.umami.track('Change revised set', { value });
+    window?.umami?.track('Change revised set', { value });
     setClicked(false);
     setRevisedSet(value);
   };
 
   const continueRerollClick = () => {
-    window.umami.track('Continue reshuffling');
-    setClickedCard(undefined);
+    window?.umami?.track('Continue reshuffling');
     setRevisedCard(undefined);
     setClickedOption(undefined);
     setClicked(false);
@@ -206,7 +214,9 @@ export default function FlashcardReviseComponent() {
     if (revisedCard?.type === 'index' || revisedCard?.type === 'question') {
       spaceRepetitionClick(spaceRepetitionOptions[index].value);
     } else {
-      changeClicked(randomItems?.[index], key);
+      // TODO: Find better way to handle this type.
+      // @ts-expect-error ts error
+      changeClicked(revisedCard?.[`answer${index + 1}`] as string, key);
     }
   };
 
@@ -277,7 +287,7 @@ export default function FlashcardReviseComponent() {
 
   return flashcards.length > 0 ? (
     <div className='flex h-full w-full flex-col justify-stretch'>
-      <div className='flex h-full w-full flex-col items-center gap-8 pb-44'>
+      <div className='flex h-full w-full flex-col items-center gap-8 pb-12'>
         {(availableTodayItems === 0 && continueReroll) ||
         availableTodayItems > 0 ? (
           <>
@@ -321,9 +331,7 @@ export default function FlashcardReviseComponent() {
 
             <ReviseOptions
               clicked={clicked}
-              clickedCard={clickedCard}
               clickedOption={clickedOption}
-              randomItems={randomItems}
               revisedCard={revisedCard}
               spaceRepetitionClick={spaceRepetitionClick}
               changeClicked={changeClicked}
@@ -342,7 +350,7 @@ export default function FlashcardReviseComponent() {
       </div>
 
       <FloatingButtons>
-        <div className='flex w-full flex-col items-center justify-center gap-4'>
+        <div className='flex w-full flex-col items-center justify-center gap-2 py-2'>
           <Button
             label={'Reshuffle'}
             icon={<RefreshCw className='h-4 w-4' />}
@@ -355,6 +363,8 @@ export default function FlashcardReviseComponent() {
           />
 
           <Dropdown
+            type='dropdown'
+            multiple={false}
             config={[defaultSet, ...setsDictionary]}
             onChange={changeRevisedSet}
             value={defaultSet.value}

@@ -60,7 +60,7 @@ export function Dashboard() {
               <div className='text-4xl font-bold text-green-400'>
                 {Math.round(focusRatio.ratio * 100)}%
               </div>
-              <span className='flex flex-col text-sm text-gray-600'>
+              <span className='flex flex-col text-sm text-gray-600 dark:text-slate-200'>
                 <span className='flex gap-2'>
                   <span className='font-semibold'>Active:</span>
                   <span>{`${formatDurationFull(focusRatio.totalActive)}`}</span>

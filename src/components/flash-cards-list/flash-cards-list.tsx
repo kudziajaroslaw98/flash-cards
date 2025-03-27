@@ -1,17 +1,28 @@
 'use client';
 
 import '#/shared/utils/polyfills';
-import { useCallback, useEffect, useState } from 'react';
-
-import FlashcardComponent from '#/components/flash-card/flash-card';
+import {
+  type Dispatch,
+  type SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 
 import { useAppContext } from '#/providers/app-context';
-import { cn } from '#/shared/utils/cn.util';
 import type { Flashcard } from '#/types/flash-card.type';
 
+import useContainerAndWindowResizeObserver from '#/hooks/use-container-and-window-resize-observer';
+import { cn } from '#/shared/utils/cn.util';
+import { splitArrayIntoChunks } from '#/shared/utils/split-array-into-chunks';
 import { TreePalm } from 'lucide-react';
-import { AnimatePresence } from 'motion/react';
-import * as m from 'motion/react-m';
+import { VirtualizedFlashcardList } from './virtualized-flashcard-list';
+
+interface Column {
+  key: string;
+  name: string;
+  width: number;
+}
 
 export default function FlashcardsList({
   selected,
@@ -20,12 +31,12 @@ export default function FlashcardsList({
 }: {
   selected: Flashcard[];
   filteredFlashcards: Flashcard[];
-  setSelected: React.Dispatch<React.SetStateAction<Flashcard[]>>;
+  setSelected: Dispatch<SetStateAction<Flashcard[]>>;
 }) {
   const { flashcards } = useAppContext();
-
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
-  const [tileSize] = useState<'sm' | 'md' | 'lg'>('sm');
+  const [columns, setColumns] = useState<Column[]>([]);
+  const [data, setData] = useState<Flashcard[][]>([]);
 
   const isSelected = useCallback(
     (flashcard: Flashcard) => {
@@ -50,6 +61,81 @@ export default function FlashcardsList({
     [isSelected],
   );
 
+  const containerRef = useContainerAndWindowResizeObserver(
+    ({ windowWidth, containerWidth }) => {
+      let columns = [];
+      let data: Flashcard[][] = [];
+
+      if (windowWidth >= 1536) {
+        columns = generateColumns(4, containerWidth);
+      } else if (windowWidth >= 1280) {
+        columns = generateColumns(3, containerWidth);
+      } else if (windowWidth >= 600) {
+        columns = generateColumns(2, containerWidth);
+      } else {
+        columns = generateColumns(1, containerWidth);
+      }
+
+      if (columns) {
+        data = generateData(columns);
+        setData(data);
+      }
+    },
+  );
+
+  const generateColumns = (
+    columnsCount: number,
+    containerWidth: number | null,
+  ): Column[] => {
+    if (containerWidth === null) {
+      return [];
+    } else {
+      const columns = new Array(columnsCount).fill(0).map((_, i) => {
+        const key: string = i.toString();
+        return {
+          key,
+          name: `Column-${i}`,
+          width: containerWidth / columnsCount,
+        };
+      });
+
+      setColumns(columns);
+      return columns;
+    }
+  };
+
+  const generateData = useCallback(
+    (columns: Column[]) =>
+      splitArrayIntoChunks<Flashcard>(
+        filteredFlashcards.slice(),
+        columns.length,
+      ),
+    [filteredFlashcards, columns],
+  );
+
+  useEffect(() => {
+    const width = typeof window !== 'undefined' ? window.innerWidth : 0;
+    const containerWidth =
+      containerRef.current?.getBoundingClientRect().width ?? null;
+    let columns = [];
+    let data: Flashcard[][] = [];
+
+    if (width >= 1536) {
+      columns = generateColumns(4, containerWidth);
+    } else if (width >= 1280) {
+      columns = generateColumns(3, containerWidth);
+    } else if (width >= 600) {
+      columns = generateColumns(2, containerWidth);
+    } else {
+      columns = generateColumns(1, containerWidth);
+    }
+
+    if (columns) {
+      data = generateData(columns);
+      setData(data);
+    }
+  }, [filteredFlashcards]);
+
   useEffect(() => {
     if (selected.length > 0) {
       setIsInSelectionMode(true);
@@ -59,7 +145,10 @@ export default function FlashcardsList({
   }, [selected]);
 
   return (
-    <div className='relative flex h-full w-full flex-col'>
+    <div
+      ref={containerRef}
+      className='relative flex h-full w-full flex-col'
+    >
       {flashcards.length === 0 && (
         <div className='flex flex-col items-center justify-center py-10'>
           <TreePalm className='mb-8 size-12 text-green-500' />
@@ -68,37 +157,16 @@ export default function FlashcardsList({
         </div>
       )}
       {flashcards.length > 0 && (
-        <div
-          className={cn([
-            'grid h-auto w-full justify-center gap-4 transition-all',
-            filteredFlashcards.length > 5
-              ? 'xl:justify-between'
-              : 'xl:justify-start',
-            tileSize === 'sm' && 'grid-cols-[repeat(auto-fit,11rem)]',
-            tileSize === 'md' && 'grid-cols-[repeat(auto-fit,11rem)]',
-            tileSize === 'lg' && 'grid-cols-[repeat(auto-fit,16rem)]',
-          ])}
-        >
-          <AnimatePresence mode='popLayout'>
-            {filteredFlashcards.map((flashcard) => (
-              <m.div
-                key={flashcard.frontUuid}
-                exit={{
-                  maxHeight: 0,
-                  height: 0,
-                }}
-                layout
-              >
-                <FlashcardComponent
-                  flashcard={flashcard}
-                  size={tileSize}
-                  isSelected={isSelected(flashcard)}
-                  onSelect={() => toggleSelected(flashcard)}
-                  isInSelectionMode={isInSelectionMode}
-                />
-              </m.div>
-            ))}
-          </AnimatePresence>
+        <div className='h-full w-full'>
+          <div className={cn(['grid h-full w-full gap-4 transition-all'])}>
+            <VirtualizedFlashcardList
+              columns={columns}
+              data={data}
+              isInSelectionMode={isInSelectionMode}
+              isSelected={isSelected}
+              toggleSelected={toggleSelected}
+            />
+          </div>
         </div>
       )}
     </div>

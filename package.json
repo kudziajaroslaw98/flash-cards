@@ -15,7 +15,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.1.5",
+    "@ai-sdk/google": "^1.2.3",
     "@dicebear/collection": "^9.2.2",
     "@dicebear/core": "^9.2.2",
     "@ducanh2912/next-pwa": "^10.2.9",
@@ -29,9 +29,10 @@
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.48.1",
     "@tailwindcss/typography": "^0.5.16",
+    "@tanstack/react-virtual": "^3.13.5",
     "@types/d3": "^7.4.3",
     "@types/mdx": "^2.0.13",
-    "ai": "^4.1.11",
+    "ai": "^4.2.6",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -40,12 +41,12 @@
     "dexie": "^4.0.11",
     "dexie-react-hooks": "^1.1.7",
     "lucide-react": "^0.465.0",
-    "motion": "^12.4.0",
-    "next": "15.1.4",
-    "next-mdx-remote": "^5.0.0",
+    "motion": "^12.5.0",
+    "next": "^15.2.3",
     "postcss": "^8.5.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
+    "react-markdown": "^10.1.0",
     "react-rewards": "^2.1.0",
     "sharp": "^0.33.5",
     "stripe": "^17.6.0",
@@ -71,7 +72,7 @@
     "prettier-plugin-organize-attributes": "^1.0.0",
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-tailwindcss": "^0.5.14",
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.2"
   },
   "overrides": {
     "@types/react": "19.0.6",

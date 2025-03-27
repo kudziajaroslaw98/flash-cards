@@ -11,7 +11,7 @@ export function useClientPermissions() {
   >('default');
   const [isPushSubscribed, setIsPushSubscribed] = useState(false);
 
-  const handlePermisionRequest = async () => {
+  const handlePermissionRequest = async () => {
     Notification.requestPermission().then((permission) => {
       setNotificationPermission(permission);
       db.metadata.update('current', {
@@ -81,7 +81,7 @@ export function useClientPermissions() {
 
   useEffect(() => {
     if (user) {
-      handlePermisionRequest();
+      handlePermissionRequest();
     }
   }, [user]);
 
@@ -99,8 +99,8 @@ export function useClientPermissions() {
 
   return {
     notificationPermission,
-    pushSubcribed: isPushSubscribed,
+    pushSubscribed: isPushSubscribed,
     permissionChange: handleNotificationPermissionChange,
-    permissionRequest: handlePermisionRequest,
+    permissionRequest: handlePermissionRequest,
   };
 }

@@ -11,7 +11,6 @@ import { FloatingButtons } from '#/components/floating-buttons/floating-buttons'
 import { NewFlashcardModal } from '#/components/new-flash-card-modal/new-flash-card-modal';
 import { NewSetModal } from '#/components/new-set-modal/new-set-modal';
 import { db } from '#/db/dexie.db';
-import useFetch from '#/hooks/use-fetch.hook';
 import { useAppContext } from '#/providers/app-context';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
@@ -19,9 +18,9 @@ import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { cn } from '#/shared/utils/cn.util';
 import uuid from '#/shared/utils/uuid.util';
-import type { ApiResponse } from '#/types/api-response.type';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { Flashcard } from '#/types/flash-card.type';
+import { experimental_useObject as useObject } from '@ai-sdk/react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   ArrowLeft,
@@ -40,16 +39,18 @@ import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { z } from 'zod';
 
 export default function SetHardlinkPage() {
   const setHardLink = useParams()?.hardlink as string;
   const router = useRouter();
-  const { fetch, isLoading } = useFetch();
+  // const { fetch, isLoading } = useFetch();
   const { isLoggedIn, isPlanActive } = useSessionContext();
   const {
     flashcards,
-    addFlashcards: addFlashcards,
-    assignFlashcardsToSet: assignFlashcardsToSet,
+    addFlashcards,
+    assignFlashcardsToSet,
+    unassignFlashcardsFromSet,
     sets,
     categories,
     updateSets,
@@ -62,6 +63,23 @@ export default function SetHardlinkPage() {
     sets.filter((set) => set?.hardlink === setHardLink)[0],
   );
   const [selected, setSelected] = useState<Flashcard[]>([]);
+  const [generated, setGenerated] = useState<Flashcard[]>([]);
+  const { submit, isLoading, object } = useObject({
+    api: API_ROUTES.SET_FLASHCARDS,
+    schema: z.array(
+      z.object({
+        id: z.string(),
+        query: z.string(),
+        topic: z.string(),
+        definition: z.string(),
+        tags: z.array(z.string()),
+        examples: z.string(),
+        keyPoints: z.string(),
+        synonyms: z.string(),
+        relatedFacts: z.string(),
+      }),
+    ),
+  });
 
   const setFlashcards =
     useLiveQuery(
@@ -70,22 +88,22 @@ export default function SetHardlinkPage() {
     ) ?? [];
 
   const handleAssignCards = (flashcards: string[]) => {
-    window.umami.track('flashcard assigned to set');
+    window?.umami?.track('flashcard assigned to set');
     setSet((prev) => ({
       ...prev,
-      flashcards: [...flashcards],
+      flashcards,
     }));
     updateSets([
       {
         ...set,
-        flashcards: flashcards,
+        flashcards,
       },
     ]);
     assignFlashcardsToSet(flashcards, set.frontUuid);
   };
 
   const handleEditSet = (set: Partial<FlashcardSet>[]) => {
-    window.umami.track('Edit set', { count: set.length });
+    window?.umami?.track('Edit set', { count: set.length });
     if (set.length > 0) {
       const hardlink = set[0].name?.replace(/ /g, '-').toLowerCase();
       router.prefetch(`flashcards/sets/${hardlink}`);
@@ -98,7 +116,7 @@ export default function SetHardlinkPage() {
   };
 
   const handleRemoveSet = () => {
-    window.umami.track('Delete set');
+    window?.umami?.track('Delete set');
     if (set?.frontUuid) {
       removeSets([set]);
       router.push('/flashcards/sets');
@@ -117,7 +135,7 @@ export default function SetHardlinkPage() {
       label: 'export set CSV',
       icon: <Download className='h-6 w-6' />,
       onClick: () => {
-        window.umami.track('Export set CSV');
+        window?.umami?.track('Export set CSV');
       },
     },
     {
@@ -125,68 +143,27 @@ export default function SetHardlinkPage() {
       label: 'Import set CSV',
       icon: <Upload className='h-6 w-6' />,
       onClick: () => {
-        window.umami.track('Import set CSV');
+        window?.umami?.track('Import set CSV');
       },
     },
   ];
 
   const handleGenerateFlashcards = async () => {
-    window.umami.track('Generate flashcards');
+    window?.umami?.track('Generate flashcards');
     if (!isLoggedIn || !isPlanActive) return;
 
-    const response:
-      | ApiResponse<unknown>
-      | Record<'word' | 'definition', string>[] = await fetch(
-      API_ROUTES.SET_FLASHCARDS,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          flashcards: setFlashcards.map((flashcard) => flashcard.context) ?? [],
-          setName: set?.name ?? '',
-        }),
-      },
-    );
-
-    if ('success' in response && !response?.success) {
-      console.warn(response?.error);
-      return;
-    }
-
-    const flashcardsResponse: Record<'word' | 'definition', string>[] =
-      response as Record<'word' | 'definition', string>[];
-
-    const mappedFlashcards: Flashcard[] = flashcardsResponse.map(
-      (flashcard, index) =>
-        flashcardsMerge(defaultFlashcard, {
-          type: 'single',
-          query: 'What is the definition of word below?',
-          context: flashcard.word,
-          definition: flashcard.definition,
-          frontUuid: uuid(),
-          order: flashcards.length + index,
-          sets: [set.frontUuid],
-        }),
-    );
-
-    if (flashcardsResponse.length > 0) {
-      addFlashcards(mappedFlashcards);
-      updateSets([
-        {
-          ...set,
-          flashcards: [
-            ...set.flashcards,
-            ...mappedFlashcards.map((f) => f.frontUuid),
-          ],
-        },
-      ]);
-    }
+    submit({
+      flashcards: setFlashcards.map((flashcard) => flashcard.frontUuid) ?? [],
+      setName: set?.name ?? '',
+      setDescription: set?.description ?? '',
+    });
   };
 
   const handleNewFlashcards = (newFlashcards: Omit<Flashcard, 'order'>[]) => {
-    window.umami.track('Add flashcards');
+    window?.umami?.track('Add flashcards');
 
     if (newFlashcards.length > 0) {
-      window.umami.track('Add flashcards', { count: newFlashcards.length });
+      window?.umami?.track('Add flashcards', { count: newFlashcards.length });
       addFlashcards(
         newFlashcards.map((f) => ({ ...f, sets: [set.frontUuid] })),
       );
@@ -216,11 +193,12 @@ export default function SetHardlinkPage() {
   };
 
   const handleUnassignFlashcards = () => {
-    window.umami.track('Unassign flashcards');
-    const filteredFlashcards = setFlashcards.filter(
-      (f) => !selected.includes(f),
+    window?.umami?.track('Unassign flashcards');
+
+    unassignFlashcardsFromSet(
+      selected.map((f) => f.frontUuid),
+      set.frontUuid,
     );
-    handleAssignCards(filteredFlashcards.map((f) => f.frontUuid));
     setSelected([]);
   };
 
@@ -251,6 +229,49 @@ export default function SetHardlinkPage() {
     setSet(sets.filter((set) => set?.hardlink === setHardLink)[0]);
   }, [sets, setHardLink]);
 
+  useEffect(() => {
+    if (!object) return;
+    console.log(object);
+    setGenerated(
+      object
+        ?.filter((flashcard) => flashcard)
+        ?.map((flashcard, index) =>
+          flashcardsMerge(defaultFlashcard(), {
+            ...flashcard,
+            frontUuid: uuid(),
+            order: setFlashcards.length + index,
+            context: flashcard?.topic,
+            type: 'single',
+            tags: [...(flashcard?.tags as string[])],
+          }),
+        ) as Flashcard[],
+    );
+
+    if (object && !isLoading) {
+      const mappedFlashcards: Flashcard[] = generated.map((flashcard) =>
+        flashcardsMerge(defaultFlashcard(), {
+          ...flashcard,
+          type: 'single',
+          sets: [set.frontUuid],
+        }),
+      );
+
+      if (generated.length > 0) {
+        addFlashcards(mappedFlashcards);
+        updateSets([
+          {
+            ...set,
+            flashcards: [
+              ...set.flashcards,
+              ...mappedFlashcards.map((f) => f.frontUuid),
+            ],
+          },
+        ]);
+        setGenerated([]);
+      }
+    }
+  }, [object, isLoading]);
+
   return (
     <div className='flex h-full w-full grow flex-col items-center gap-8 md:pb-24'>
       <div className='flex w-full flex-col justify-start gap-4'>
@@ -279,7 +300,7 @@ export default function SetHardlinkPage() {
                   icon={<Settings className='h-4 w-4' />}
                   size={'icon'}
                   variant={'primary-outline'}
-                  onClick={() => window.umami.track('Set options clicked')}
+                  onClick={() => window?.umami?.track('Set options clicked')}
                   alt='Set options'
                 />
               }
@@ -308,7 +329,7 @@ export default function SetHardlinkPage() {
         </span>
       </div>
 
-      {setFlashcards.length === 0 && (
+      {setFlashcards.length === 0 && generated.length === 0 && (
         <div className='flex w-full flex-col items-center justify-center py-10 text-center'>
           <Cookie className='mb-8 size-12 text-green-500' />
           <span>
@@ -326,7 +347,7 @@ export default function SetHardlinkPage() {
         <div
           className={cn([
             'grid w-full justify-center gap-4 md:justify-start',
-            'grid-cols-[repeat(auto-fit,11rem)]',
+            'grid-cols-1 min-[600px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',
           ])}
         >
           <AnimatePresence mode='popLayout'>
@@ -337,7 +358,18 @@ export default function SetHardlinkPage() {
                   isSelected={isSelected(flashcard)}
                   onSelect={toggleSelected}
                   isInSelectionMode={selected.length > 0}
-                  size={'sm'}
+                  size={'horizontal-sm'}
+                />
+              </div>
+            ))}
+            {generated.map((flashcard, index) => (
+              <div key={`flashcard-${index}`}>
+                <FlashcardComponent
+                  flashcard={flashcard}
+                  isSelected={isSelected(flashcard)}
+                  onSelect={toggleSelected}
+                  isInSelectionMode={selected.length > 0}
+                  size={'horizontal-sm'}
                 />
               </div>
             ))}

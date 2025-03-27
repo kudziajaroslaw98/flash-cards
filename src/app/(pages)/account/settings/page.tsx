@@ -17,8 +17,9 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 export default function SettingsPage() {
-  const { user, deleteUser, pickedPlan, isPlanActive } = useSessionContext();
-  const { notificationPermission, pushSubcribed, permissionRequest } =
+  const { user, updateUser, deleteUser, pickedPlan, isPlanActive } =
+    useSessionContext();
+  const { notificationPermission, pushSubscribed, permissionRequest } =
     useClientPermissions();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
@@ -27,96 +28,22 @@ export default function SettingsPage() {
     db.table('metadata').toCollection().first(),
   );
 
-  // useEffect(() => {
-  //   const handleNotificationPermission = async () => {
-  //     const registration = await navigator.serviceWorker.ready;
-  //     const pushManager = registration.pushManager;
-  //     const subscription = await pushManager.getSubscription();
-
-  //     if (subscription) {
-  //       setPermission('granted');
-  //       db.metadata.update('current', {
-  //         notificationPermission: 'granted',
-  //       });
-  //     } else {
-  //       setPermission('denied');
-  //       db.metadata.update('current', {
-  //         notificationPermission: 'denied',
-  //       });
-  //     }
-  //   };
-  //   handleNotificationPermission();
-  // }, []);
-
   const handleDeleteUser = () => {
     setIsDeleting(true);
     deleteUser();
   };
 
-  // const handleNotificationChange = async () => {
-  //   if (permission === 'granted') {
-  //     const registration = await navigator.serviceWorker.ready;
-  //     const pushManager = registration.pushManager;
-  //     pushManager.getSubscription().then(async (subscription) => {
-  //       if (subscription) {
-  //         const response = await fetch('/api/notification/unsubscribe', {
-  //           method: 'POST',
-  //           body: JSON.stringify({ subscription }), // Send user ID
-  //           headers: { 'Content-Type': 'application/json' },
-  //         }).then((res) => res.json());
-
-  //         if (response.success) {
-  //           subscription.unsubscribe();
-  //           // TODO: add toast
-  //         }
-  //       }
-  //     });
-  //     setPermission('denied');
-  //     db.metadata.update('current', { notificationPermission: 'denied' });
-  //     return;
-  //   } else if (permission === 'denied') {
-  //     setPermission('default');
-  //     db.metadata.update('current', { notificationPermission: 'default' });
-  //     return;
-  //   }
-
-  //   await Notification.requestPermission().then(async (result) => {
-  //     if (result === 'granted') {
-  //       setPermission('granted');
-  //       db.metadata.update('current', { notificationPermission: 'granted' });
-  //       const subscribeToNotifications = async () => {
-  //         if (
-  //           !('serviceWorker' in navigator) ||
-  //           !('PushManager' in window) ||
-  //           !VAPID_PUBLIC_KEY ||
-  //           !user
-  //         ) {
-  //           return;
-  //         }
-
-  //         const registration = await navigator.serviceWorker.ready;
-  //         const subscription = await registration.pushManager.subscribe({
-  //           userVisibleOnly: true,
-  //           applicationServerKey: VAPID_PUBLIC_KEY,
-  //         });
-
-  //         const response = await fetch('/api/notification/subscribe', {
-  //           method: 'POST',
-  //           body: JSON.stringify({ subscription }), // Send user ID
-  //           headers: { 'Content-Type': 'application/json' },
-  //         }).then((res) => res.json());
-
-  //         if (response.success) {
-  //           // TODO: todo: add toast
-  //         }
-  //       };
-
-  //       subscribeToNotifications();
-  //     } else if (result === 'denied') {
-  //       db.metadata.update('current', { notificationPermission: 'denied' });
-  //     }
-  //   });
-  // };
+  const handlePlanUpgrade = () => {
+    if (process.env.NODE_ENV === 'development') {
+      updateUser({
+        data: {
+          ...user?.user_metadata,
+          stripe_subscribed_plan: 'standard',
+          stripe_subscription_status: 'active',
+        },
+      });
+    }
+  };
 
   const handleNotificationClick = () => {
     if (notificationPermission !== 'granted') {
@@ -200,6 +127,16 @@ export default function SettingsPage() {
               alt='Change plan'
             ></Button>
           </Link>
+
+          {process.env.NODE_ENV === 'development' && (
+            <Button
+              label='(Dev) Upgrade Plan'
+              size='full'
+              className='max-w-full'
+              alt='Change plan'
+              onClick={handlePlanUpgrade}
+            ></Button>
+          )}
         </section>
       </div>
 
@@ -249,7 +186,7 @@ export default function SettingsPage() {
               <Switch
                 showLabel={false}
                 onClick={handleNotificationClick}
-                value={notificationPermission === 'granted' && pushSubcribed}
+                value={notificationPermission === 'granted' && pushSubscribed}
               />
             </Tooltip>
           </div>
@@ -295,7 +232,7 @@ export default function SettingsPage() {
                 <span className='text-sm text-gray-700 dark:text-slate-200'>
                   Clearing local data will{' '}
                   <span className='font-bold text-red-500'>remove all</span>{' '}
-                  your local data.
+                  <b>your local data.</b>
                 </span>
               </p>
 
@@ -323,7 +260,7 @@ export default function SettingsPage() {
                 <span className='text-sm text-gray-700 dark:text-slate-200'>
                   Deleting your account will permanently{' '}
                   <span className='font-bold text-red-500'>remove all</span>{' '}
-                  your data.
+                  <b>your local + cloud data</b>.
                 </span>
               </p>
 

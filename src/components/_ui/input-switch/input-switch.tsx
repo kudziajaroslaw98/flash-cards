@@ -1,25 +1,26 @@
 import { cn } from '#/shared/utils/cn.util';
 import { useEffect, useState, type InputHTMLAttributes } from 'react';
+import { FieldLabel } from '../field-label/field-label';
 
 export interface InputSwitchProps
   extends Pick<
     InputHTMLAttributes<HTMLInputElement>,
     'className' | 'required' | 'name' | 'onKeyDown' | 'tabIndex'
   > {
-  for: string;
-  valid: boolean;
+  for?: string;
+  valid?: boolean;
   label?: string;
   required?: boolean;
   touched?: boolean;
   error?: string | null;
   className?: string;
-  type?: 'switch';
+  type: 'switch';
   icon?: React.ReactNode;
   showLabel: true;
   value: boolean;
   checkedLabel: string;
   uncheckedLabel: string;
-  variant: 'vertical' | 'vertical-reversed';
+  variant?: 'vertical' | 'vertical-reversed';
   onChange?: (value: boolean) => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -59,14 +60,14 @@ export function InputSwitch({
   };
 
   const handleFocus = () => {
-    window.umami.track('Focus input', { name: props.name });
+    window?.umami?.track('Focus input', { name: props.name });
     if (onFocus) {
       onFocus();
     }
   };
 
   const handleBlur = () => {
-    window.umami.track('Blur input', { name: props.name });
+    window?.umami?.track('Blur input', { name: props.name });
     if (onBlur) {
       onBlur();
     }
@@ -79,15 +80,12 @@ export function InputSwitch({
       aria-labelledby={type}
     >
       {label && (
-        <span
-          className={cn([
-            touched && !valid ? '!text-red-400' : '',
-            touched && valid ? '!text-green-400' : '',
-            'w-auto pb-2 pl-2 text-sm text-gray-400',
-          ])}
-        >
-          {`${label}${required ? ' *' : ' (optional)'}`}
-        </span>
+        <FieldLabel
+          touched={touched}
+          valid={valid ?? true}
+          required={required ?? false}
+          label={label}
+        />
       )}
 
       <span

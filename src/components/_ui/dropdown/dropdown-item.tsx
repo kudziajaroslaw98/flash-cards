@@ -1,3 +1,4 @@
+import { cn } from '#/shared/utils/cn.util';
 import { DictionaryValue } from '#/types//dictionary-value.type';
 
 export default function DropdownItem<T>({
@@ -17,7 +18,7 @@ export default function DropdownItem<T>({
     switch (event.key) {
       case ' ':
       case 'Enter':
-        window.umami.track('Select dropdown item', { key: event.key });
+        window?.umami?.track('Select dropdown item', { key: event.key });
         changePickedItem(item);
         break;
       default:
@@ -27,7 +28,12 @@ export default function DropdownItem<T>({
 
   return (
     <div
-      className={`${isSelected && 'text-green-400'} flex h-auto w-full cursor-pointer items-center gap-4 rounded-md px-4 py-2 text-gray-500 !outline-none transition hover:bg-gray-200 hover:text-gray-700 focus:bg-gray-100 focus:ring  focus:ring-green-400/50 dark:border-slate-700 dark:hover:bg-slate-900 dark:hover:text-gray-300 dark:focus:bg-slate-900`}
+      className={cn([
+        'flex h-auto w-full cursor-pointer items-center gap-4 rounded-md border border-gray-200 px-4 py-2 text-gray-500 !outline-none transition dark:border-slate-900',
+        'hover:bg-gray-200 hover:text-gray-700 dark:hover:bg-slate-900 dark:hover:text-gray-300',
+        'focus:bg-gray-100 focus:ring  focus:ring-green-400/50  dark:focus:bg-slate-900',
+        isSelected && 'text-green-400',
+      ])}
       onClick={() => changePickedItem(item)}
       onKeyDown={handleKeyDown}
       tabIndex={0}

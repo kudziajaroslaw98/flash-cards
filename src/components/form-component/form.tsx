@@ -1,5 +1,6 @@
 'use client';
 
+import { isInternalInput } from '#/shared/guards/is-internal-input';
 import { cn } from '#/shared/utils/cn.util';
 import { isDifferent } from '#/shared/utils/is-different.util';
 import {
@@ -8,6 +9,8 @@ import {
   type InputType,
   type InputValidation,
 } from '#/types//form-scheme.type';
+import type { ExtendedSchemeKeys } from '#/types/extended-scheme-keys';
+import type { InternalAccordion } from '#/types/input-types';
 import {
   useEffect,
   useImperativeHandle,
@@ -26,7 +29,6 @@ import {
 import FormInputsComponent from './form-inputs';
 
 export type FormProps<T> = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ref?: Ref<FormMethods<T>>;
   scheme: FormScheme<T>;
   initialValues?: T;
@@ -101,64 +103,79 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
   // #region FORM CONSTRUCT
   //////////////
 
-  useEffect(() => {
-    if (
-      initialValuesRef.current === null ||
-      isDifferent(initialValuesRef.current, props.initialValues)
-    ) {
-      let initialInputs: string[] = [];
-      let initialValids: Record<string, boolean> = {};
-      let initialErrors: Record<string, string | null> = {};
-      let tmpValues: Record<string, string | unknown[]> = {};
-      let initialVisibility: Record<string, boolean> = {};
-      let initialValidations: Record<string, InputValidation<T>[]> = {};
+  const initFromInputs = ({
+    inputs,
+    initInputs,
+    Valids,
+    Errors,
+    Visibility,
+    Validations,
+    initTmpValues,
+  }: {
+    inputs: [ExtendedSchemeKeys<T>, ExtendedInputType<InputType<T>, T>][];
+    initInputs: string[];
+    Valids: Record<string, boolean>;
+    Errors: Record<string, string | null>;
+    Visibility: Record<string, boolean>;
+    Validations: Partial<Record<string, InputValidation<T>[]>>;
+    initTmpValues: Partial<Record<ExtendedSchemeKeys<T>, string | unknown[]>>;
+  }) => {
+    let initialInputs: string[] = initInputs;
+    let initialValids: Record<string, boolean> = Valids;
+    let initialErrors: Record<string, string | null> = Errors;
+    let tmpValues: Partial<Record<ExtendedSchemeKeys<T>, string | unknown[]>> =
+      initTmpValues;
+    let initialVisibility: Record<string, boolean> = Visibility;
+    let initialValidations: Partial<
+      Record<ExtendedSchemeKeys<T>, InputValidation<T>[]>
+    > = Validations;
 
-      const inputs = Object.entries(props.scheme.inputs) as [
-        string,
-        ExtendedInputType<InputType, T>,
-      ][];
+    inputs.forEach(([inputName, input]) => {
+      initialVisibility = { ...initialVisibility, [inputName]: true };
+      initialValidations = { ...initialValidations, [inputName]: [] };
 
-      inputs.forEach(([inputName, input]) => {
-        initialVisibility = { ...initialVisibility, [inputName]: true };
-        initialValidations = { ...initialValidations, [inputName]: [] };
+      if (input?._internal_constraints) {
+        const showConstraints = input._internal_constraints.filter(
+          ({ type }) => type === 'show',
+        );
+        const validationConstraints = input._internal_constraints.filter(
+          ({ type }) => type === 'validation',
+        );
 
-        if (input?._internal_constraints) {
-          const showConstraints = input._internal_constraints.filter(
-            ({ type }) => type === 'show',
-          );
-          const validationConstraints = input._internal_constraints.filter(
-            ({ type }) => type === 'validation',
-          );
+        initialValidations = {
+          ...initialValidations,
+          [inputName]: validationConstraints,
+        };
 
-          initialValidations = {
-            ...initialValidations,
-            [inputName]: validationConstraints,
-          };
-
-          if (showConstraints.length > 0) {
-            const isInvalid = showConstraints.some(
-              ({ key, constraint }) =>
-                !constraint.safeParse(
-                  props.initialValues?.[key] ?? formValues?.[key as string],
-                ).success,
-            );
-
-            if (isInvalid) {
-              initialVisibility = { ...initialVisibility, [inputName]: false };
+        if (showConstraints.length > 0) {
+          const isInvalid = showConstraints.some(({ key, constraint }) => {
+            if (isInternalInput<T>(key)) {
+              return !constraint.safeParse(
+                formValues?.[key as string] ?? input._internal_default_value,
+              ).success;
+            } else {
+              return !constraint.safeParse(
+                props.initialValues?.[key] ?? formValues?.[key as string],
+              ).success;
             }
+          });
+
+          if (isInvalid) {
+            initialVisibility = { ...initialVisibility, [inputName]: false };
           }
         }
+      }
 
-        initialInputs = [...initialInputs, inputName];
-        initialValids = { ...initialValids, [inputName]: true };
-        initialErrors = { ...initialErrors, [inputName]: null };
+      initialInputs = [...initialInputs, inputName as string];
+      initialValids = { ...initialValids, [inputName]: true };
+      initialErrors = { ...initialErrors, [inputName]: null };
 
-        let inputDefaultInitialValue;
+      let inputDefaultInitialValue;
 
-        if (input?._internal_default_value) {
+      if (!isInternalInput<T>(inputName)) {
+        if (input?._internal_default_value !== undefined) {
           inputDefaultInitialValue = input._internal_default_value;
         } else {
-          // @ts-expect-error Generic type generate error here
           switch (typeof props.initialValues?.[inputName]) {
             case 'string':
               inputDefaultInitialValue = '';
@@ -170,7 +187,6 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
               inputDefaultInitialValue = false;
               break;
             default:
-              // @ts-expect-error Generic type generate error here
               if (Array.isArray(props.initialValues?.[inputName])) {
                 inputDefaultInitialValue = [];
               } else {
@@ -181,13 +197,188 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
 
         tmpValues = {
           ...tmpValues,
-          // @ts-expect-error Generic type generate error here
-          [inputName]: props.initialValues?.[inputName]
-            ? // @ts-expect-error  Generic type generate error here
-              props.initialValues?.[inputName]
+          [inputName]: (props.initialValues?.[inputName] as string)
+            ? props.initialValues?.[inputName]
             : inputDefaultInitialValue,
         };
+      } else {
+        inputDefaultInitialValue =
+          formValues?.[inputName] ?? input._internal_default_value ?? null;
+
+        tmpValues = {
+          ...tmpValues,
+          [inputName]: inputDefaultInitialValue,
+        };
+      }
+    });
+
+    console.log({
+      initialInputs,
+      initialValids,
+      initialErrors,
+      initialVisibility,
+      initialValidations,
+      tmpValues,
+    });
+
+    return {
+      initialInputs,
+      initialValids,
+      initialErrors,
+      initialVisibility,
+      initialValidations,
+      tmpValues,
+    };
+  };
+
+  const getAllInputs = () => {
+    const inputs = Object.entries(props.scheme.inputs) as [
+      ExtendedSchemeKeys<T>,
+      ExtendedInputType<InputType<T>, T>,
+    ][];
+    const allInputs = inputs;
+
+    inputs
+      .filter(([inputName]) => inputName.startsWith('_internal_accordion'))
+      .map(([_inputName, input]) =>
+        allInputs.push(
+          ...(Object.entries((input as InternalAccordion<T>).inputs) as [
+            ExtendedSchemeKeys<T>,
+            ExtendedInputType<InputType<T>, T>,
+          ][]),
+        ),
+      );
+
+    console.log('🚀 ~ :240 ~ getAllInputs ~ allInputs:', allInputs);
+    return allInputs;
+  };
+
+  useEffect(() => {
+    if (
+      initialValuesRef.current === null ||
+      isDifferent(initialValuesRef.current, props.initialValues)
+    ) {
+      let initialInputs: string[] = [];
+      let initialValids: Record<string, boolean> = {};
+      let initialErrors: Record<string, string | null> = {};
+      let tmpValues: Partial<
+        Record<ExtendedSchemeKeys<T>, string | unknown[]>
+      > = {};
+      let initialVisibility: Record<string, boolean> = {};
+      let initialValidations: Partial<
+        Record<ExtendedSchemeKeys<T>, InputValidation<T>[]>
+      > = {};
+
+      const inputs = getAllInputs();
+
+      const result = initFromInputs({
+        inputs,
+        initInputs: initialInputs,
+        Valids: initialValids,
+        Errors: initialErrors,
+        Visibility: initialVisibility,
+        Validations: initialValidations,
+        initTmpValues: tmpValues,
       });
+
+      initialInputs = { ...initialInputs, ...result.initialInputs };
+      initialValids = { ...initialValids, ...result.initialValids };
+      initialErrors = { ...initialErrors, ...result.initialErrors };
+      initialVisibility = { ...initialVisibility, ...result.initialVisibility };
+      initialValidations = {
+        ...initialValidations,
+        ...result.initialValidations,
+      };
+      console.log(
+        '🚀 ~ :305 ~ useEffect ~ initialVisibility:',
+        initialVisibility,
+      );
+      tmpValues = { ...tmpValues, ...result.tmpValues };
+      // inputs.forEach(([inputName, input]) => {
+      //   initialVisibility = { ...initialVisibility, [inputName]: true };
+      //   initialValidations = { ...initialValidations, [inputName]: [] };
+
+      //   if (input?._internal_constraints) {
+      //     const showConstraints = input._internal_constraints.filter(
+      //       ({ type }) => type === 'show',
+      //     );
+      //     const validationConstraints = input._internal_constraints.filter(
+      //       ({ type }) => type === 'validation',
+      //     );
+
+      //     initialValidations = {
+      //       ...initialValidations,
+      //       [inputName]: validationConstraints,
+      //     };
+
+      //     if (showConstraints.length > 0) {
+      //       const isInvalid = showConstraints.some(({ key, constraint }) => {
+      //         if (isInternalInput<T>(key)) {
+      //           return !constraint.safeParse(
+      //             formValues?.[key as string] ?? input._internal_default_value,
+      //           ).success;
+      //         } else {
+      //           return !constraint.safeParse(
+      //             props.initialValues?.[key] ?? formValues?.[key as string],
+      //           ).success;
+      //         }
+      //       });
+
+      //       if (isInvalid) {
+      //         initialVisibility = { ...initialVisibility, [inputName]: false };
+      //       }
+      //     }
+      //   }
+
+      //   initialInputs = [...initialInputs, inputName as string];
+      //   initialValids = { ...initialValids, [inputName]: true };
+      //   initialErrors = { ...initialErrors, [inputName]: null };
+
+      //   let inputDefaultInitialValue;
+
+      //   if (!isInternalInput<T>(inputName)) {
+      //     if (input?._internal_default_value !== undefined) {
+      //       inputDefaultInitialValue = input._internal_default_value;
+      //     } else {
+      //       switch (typeof props.initialValues?.[inputName]) {
+      //         case 'string':
+      //           inputDefaultInitialValue = '';
+      //           break;
+      //         case 'number':
+      //           inputDefaultInitialValue = 0;
+      //           break;
+      //         case 'boolean':
+      //           inputDefaultInitialValue = false;
+      //           break;
+      //         default:
+      //           if (Array.isArray(props.initialValues?.[inputName])) {
+      //             inputDefaultInitialValue = [];
+      //           } else {
+      //             inputDefaultInitialValue = '';
+      //           }
+      //       }
+      //     }
+
+      //     tmpValues = {
+      //       ...tmpValues,
+      //       [inputName]: (props.initialValues?.[inputName] as string)
+      //         ? props.initialValues?.[inputName]
+      //         : inputDefaultInitialValue,
+      //     };
+      //   } else if (
+      //     isInternalInput<T>(inputName) &&
+      //     input.type === '_internal_accordion'
+      //   ) {
+      //   } else {
+      //     inputDefaultInitialValue =
+      //       formValues?.[inputName] ?? input._internal_default_value ?? null;
+
+      //     tmpValues = {
+      //       ...tmpValues,
+      //       [inputName]: inputDefaultInitialValue,
+      //     };
+      //   }
+      // });
 
       const initialValues: Record<keyof T, string | unknown[]> = {
         ...props.initialValues,
@@ -200,7 +391,9 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
       setFormValues(initialValues);
       setDefaultValids(initialValids);
       setInputsVisibility(initialVisibility);
-      setInputValidations(initialValidations);
+      setInputValidations(
+        initialValidations as Record<string, InputValidation<T>[]>,
+      );
       initialValuesRef.current = props.initialValues ?? null;
     }
   }, [props.initialValues, props.scheme.inputs]);
@@ -208,10 +401,7 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
   useEffect(() => {
     let initialVisibility: Record<string, boolean> = {};
     let initialValidations: Record<string, InputValidation<T>[]> = {};
-    const inputs = Object.entries(props.scheme.inputs) as [
-      string,
-      ExtendedInputType<InputType, T>,
-    ][];
+    const inputs = getAllInputs();
 
     inputs.forEach(([inputName, input]) => {
       initialVisibility = { ...initialVisibility, [inputName]: true };
@@ -415,16 +605,25 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
   // #region HANDLERS
   //////////////
 
+  const handleEmitValues = (formInternalValues: Record<string, unknown>) => {
+    if (props.emitFormValue) {
+      const correctValues = Object.entries(formInternalValues).filter(
+        ([key, _value]) => !key.startsWith('_internal_'),
+      );
+      props.emitFormValue(Object.fromEntries(correctValues) as T);
+    }
+  };
+
   const handleOnInput = (
     event: FormEvent<HTMLInputElement> | FormEvent<HTMLTextAreaElement>,
     inputName: string,
   ) => {
     if (props.emitFormValue) {
-      props.emitFormValue({
+      handleEmitValues({
         ...formValues,
         [inputName]: (event.target as HTMLInputElement | HTMLTextAreaElement)
           ?.value,
-      } as T);
+      });
     }
 
     setFormValues((prev) => ({
@@ -436,10 +635,10 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
 
   const handleOnChange = (value: unknown | unknown[], inputName: string) => {
     if (props.emitFormValue) {
-      props.emitFormValue({
+      handleEmitValues({
         ...formValues,
         [inputName]: value,
-      } as T);
+      });
     }
 
     setFormValues((prev) => ({

@@ -1,6 +1,6 @@
 import '#/shared/utils/polyfills';
 import type { Metadata } from 'next';
-import { Inter, Roboto_Mono } from 'next/font/google';
+import { Courier_Prime, Inter, Roboto_Mono } from 'next/font/google';
 
 import ClientSideProviders from '#/providers/client-side-providers.component';
 import Script from 'next/script';
@@ -10,6 +10,13 @@ const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter',
+});
+
+const courierPrime = Courier_Prime({
+  display: 'swap',
+  variable: '--font-serif',
+  subsets: ['latin'],
+  weight: ['400', '700'],
 });
 
 const roboto_mono = Roboto_Mono({
@@ -109,13 +116,13 @@ export default function RootLayout({
   return (
     <html
       lang='en'
-      className={`${inter.variable} ${roboto_mono.variable} dark flex font-sans`}
+      className={`${inter.variable} ${roboto_mono.variable} ${courierPrime.variable} dark flex font-sans`}
       suppressHydrationWarning
     >
       <head>
         <Script
           defer
-          src={`/xs.js`}
+          src={`/analytics.js`}
           data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID!}
           strategy='lazyOnload'
         />

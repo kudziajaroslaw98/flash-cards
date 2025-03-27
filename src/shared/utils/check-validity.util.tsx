@@ -18,7 +18,11 @@ export default function checkValidity(
     response = { valid: true };
   } else {
     error = output.error.errors[0].message;
-    response = { valid: false, error };
+    response = {
+      valid: false,
+      error,
+      details: output.error?.issues[0]?.message,
+    };
   }
 
   if (setter) {

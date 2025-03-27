@@ -33,7 +33,7 @@ export function ReminderFilters({
     <div className='flex w-full flex-col flex-wrap items-center justify-center gap-2 text-sm sm:flex-row sm:justify-end'>
       <span className='flex w-full justify-center sm:w-auto'>
         <Input
-          type='text'
+          inputType='text'
           value={searchedText}
           valid={true}
           placeholder='Search in reminders...'

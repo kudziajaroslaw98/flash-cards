@@ -22,7 +22,10 @@ export default function FlashcardPage() {
           </span>
         </div>
 
-        <FlashcardsFilters setFilteredFlashcards={setFilteredFlashcards} />
+        <FlashcardsFilters
+          setFilteredFlashcards={setFilteredFlashcards}
+          setSelected={setSelected}
+        />
       </div>
 
       <FlashcardsList
