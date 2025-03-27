@@ -2,14 +2,6 @@
 User-agent: *
 Disallow: /api
 
-# Block all crawlers for /api
-User-agent: *
-Disallow: /_next
-
-# Block all crawlers for /api
-User-agent: *
-Disallow: /favicon.ico
-
 # Block all crawlers for /settings
 User-agent: *
 Disallow: /settings
@@ -17,5 +9,13 @@ Disallow: /settings
 # Allow all crawlers
 User-agent: *
 Allow: /
+
+# Allow all crawlers
+User-agent: *
+Allow: /guide/
+
+# Allow all crawlers
+User-agent: *
+Allow: /sign-in/
 
 Sitemap: https://flashcards.finalphase.app/sitemap.xml
