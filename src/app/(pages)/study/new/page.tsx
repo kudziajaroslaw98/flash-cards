@@ -10,6 +10,7 @@ import { StudyPlanStep3 } from '#/components/study-plan-steps/study-plan-step-3'
 import { StudyPlanStep4 } from '#/components/study-plan-steps/study-plan-step-4';
 import { StudyPlanStep5 } from '#/components/study-plan-steps/study-plan-step-5';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
+import { Logger } from '#/shared/helpers/logger/logger';
 import { extractObjectsFromString } from '#/shared/utils/extract-objects-from-string';
 import type { CardLength } from '#/types/card-length.type';
 import type { ContentEmphasis } from '#/types/content-emphasis.type';
@@ -103,7 +104,7 @@ export default function NewStudyPlanPage() {
     duration: PlanDuration,
     planType: PlanType,
   ) => {
-    return recommendedFlashcardsCount[planType ?? 'overview'][duration ?? '1'];
+    return recommendedFlashcardsCount[planType ?? 'overview'][duration ?? '3'];
   };
 
   const { complete, completion } = useCompletion({
@@ -139,6 +140,7 @@ export default function NewStudyPlanPage() {
   };
 
   useEffect(() => {
+    Logger.info(completion);
     const objects =
       extractObjectsFromString<AISuggestedFlashcardType>(completion);
     const suggestionsLength = suggestions.length;

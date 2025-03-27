@@ -2,6 +2,7 @@ import useLongPress from '#/hooks/use-long-press.hook';
 import { cn } from '#/shared/utils/cn.util';
 import type { Flashcard } from '#/types/flash-card.type';
 import { BadgeCheck } from 'lucide-react';
+import { Variant } from 'motion/react';
 import * as m from 'motion/react-m';
 import { useEffect, useState } from 'react';
 import Card from '../_ui/card/card';
@@ -62,6 +63,35 @@ export function AISuggestedFlashcard({
     }
   }, [isInSelectionMode]);
 
+  const cardVariants = {
+    hovered: {
+      top: 0,
+      left: 0,
+      position: 'absolute',
+      zIndex: 40,
+      height: '22.75rem',
+      width: '100%',
+    } as Variant,
+    unhovered: {
+      translateY: '0%',
+      opacity: 100,
+      height: '11rem',
+      width: '100%',
+      transitionEnd: {
+        position: 'relative',
+        zIndex: 21,
+      },
+    } as Variant,
+    initial: { translateY: '10%', opacity: 0, zIndex: -20 },
+    exit: {
+      translateY: '-5%',
+      opacity: 0,
+      zIndex: -20,
+      maxHeight: 0,
+      height: 0,
+    },
+  };
+
   return (
     <m.div
       onMouseDown={(e) => onStart(e, flashcard)}
@@ -69,30 +99,21 @@ export function AISuggestedFlashcard({
       onTouchStart={(e) => onStart(e, flashcard)}
       onTouchEnd={onEnd}
       onTouchMove={onMove}
+      className={cn(['relative flex'])}
     >
       <m.div
-        animate={{
-          translateY: '0%',
-          opacity: 100,
-          zIndex: 21,
-        }}
-        initial={{ translateY: '10%', opacity: 0, zIndex: -20 }}
-        exit={{
-          translateY: '-5%',
-          opacity: 0,
-          zIndex: -20,
-        }}
-        className='flex justify-center'
+        variants={cardVariants}
+        animate={'unhovered'}
+        initial={false}
+        exit={'exit'}
+        whileHover={isFlipped ? 'hovered' : ''}
         key={`${flashcard.id}:${isFlipped ? 'flipped' : 'unflipped'}`}
       >
         <Card
           tabIndex={0}
           className={cn([
-            'group relative z-10 cursor-pointer flex-col items-center p-4 py-0 outline-none focus-visible:ring  focus-visible:ring-green-400/50',
+            'z-10 h-full cursor-pointer flex-col items-center px-2 py-2 outline-none focus-visible:ring  focus-visible:ring-green-400/50',
             isSelected ? 'ring ring-green-400/60' : '',
-            // '!h-56 !w-44',?
-            // '!h-44 !w-36',
-            'h-44 w-80',
           ])}
           {...props}
         >

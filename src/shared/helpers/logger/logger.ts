@@ -3,23 +3,35 @@ export class Logger {
     console.warn(
       `[${new Date().toUTCString()}] [WARN] [${path ?? 'NO PATH'}] => ${log}`,
     );
+    console.log('----------------------');
+    console.log('----------------------');
+    console.log('----------------------');
   }
 
   public static info(log: string, path?: string) {
     console.log(
       `[${new Date().toUTCString()}] [INFO] [${path ?? 'NO PATH'}] => ${log}`,
     );
+    console.log('----------------------');
+    console.log('----------------------');
+    console.log('----------------------');
   }
 
   public static debug(log: string, path?: string) {
     console.debug(
       `[${new Date().toUTCString()}] [DEBUG] [${path ?? 'NO PATH'}] => ${log}`,
     );
+    console.log('----------------------');
+    console.log('----------------------');
+    console.log('----------------------');
   }
 
   public static error(log: string, path?: string, errorLog?: string) {
     console.error(
       `[${new Date().toUTCString()}] [ERROR] [${path ?? 'NO PATH'}] => ${log}${errorLog && `:: ERROR => ${errorLog}`}`,
     );
+    console.log('----------------------');
+    console.log('----------------------');
+    console.log('----------------------');
   }
 }

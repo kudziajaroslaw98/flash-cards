@@ -198,20 +198,53 @@ export async function POST(req: NextRequest) {
     (level) => level.value === knowledgeLevel,
   );
 
+  const gemini = createGoogleGenerativeAI({
+    apiKey: process.env.GOOGLE_AI_API_KEY,
+  });
+
+  // const {response} = await generateText({
+  //   model: gemini('gemini-2.0-flash-thinking-exp-01-21'),
+  //   prompt: `
+  //   **Subject-Style Mapping for Adaptive Flashcard Selection:**
+
+  //   * **Technical/STEM:** Styles: How/Why Questions, Process Flashcards, Diagram Labeling, Formula/Equation, Application Scenarios, Definition (Concise).  Focus: Mechanisms, Problem-Solving, Formulas.
+  //   * **Language Learning:** Styles: Example Sentences, Scenario Dialogues, Fill-in-Blank, Meaning in Context (Idioms), Synonym/Antonym, Grammar Rules. Focus: Usage, Vocabulary, Conversation.
+  //   * **Humanities/Social Sciences:** Styles: Who/What/When/Where Questions, Concept Definitions, Timeline Flashcards, Cause-Effect, Compare-Contrast, Argument/Counter-Argument. Focus: Facts, Concepts, Theories, Arguments.
+  //   * **Arts & Music:** Styles: Image-Based (Art), Audio-Based (Music), Identify Artist/Artwork, Identify Instrument/Sound, Technique/Process, Definition (Art/Music Terms). Focus: Recognition, Techniques, Concepts.
+  //   * **Law & Business:** Styles: Case Studies (Scenario-Based), Definition (Legal/Business Terms), Principle/Rule, Ethical Dilemma (Scenario), Process Flashcards, Compare Concepts/Strategies. Focus: Application, Terminology, Principles.
+  //   * **Medical/Healthcare:** Styles: Diagram Labeling (Anatomy), Process/Mechanism, Medical Terminology, Clinical Scenarios, Drug Mechanism, Disease Pathology, Definition (Medical). Focus: Structures, Processes, Terms, Scenarios.
+
+  //   **Response**:
+  //   Respond in JSON format. Array of a`,
+  //   temperature: 0.8,
+  //   system: `You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards. Your primary responsibilities are:
+  // })
+
   const prompt = (
     flashcardCount: number,
     summaries: { id: string; topic: string; query: string; context: string }[],
   ) => `
+  **Subject-Style Mapping for Adaptive Flashcard Selection:**
+
+  * **Technical/STEM:** Styles: How/Why Questions, Process Flashcards, Diagram Labeling, Formula/Equation, Application Scenarios, Definition (Concise).  Focus: Mechanisms, Problem-Solving, Formulas.
+  * **Language Learning:** Styles: Example Sentences, Scenario Dialogues, Fill-in-Blank, Meaning in Context (Idioms), Synonym/Antonym, Grammar Rules. Focus: Usage, Vocabulary, Conversation.
+  * **Humanities/Social Sciences:** Styles: Who/What/When/Where Questions, Concept Definitions, Timeline Flashcards, Cause-Effect, Compare-Contrast, Argument/Counter-Argument. Focus: Facts, Concepts, Theories, Arguments.
+  * **Arts & Music:** Styles: Image-Based (Art), Audio-Based (Music), Identify Artist/Artwork, Identify Instrument/Sound, Technique/Process, Definition (Art/Music Terms). Focus: Recognition, Techniques, Concepts.
+  * **Law & Business:** Styles: Case Studies (Scenario-Based), Definition (Legal/Business Terms), Principle/Rule, Ethical Dilemma (Scenario), Process Flashcards, Compare Concepts/Strategies. Focus: Application, Terminology, Principles.
+  * **Medical/Healthcare:** Styles: Diagram Labeling (Anatomy), Process/Mechanism, Medical Terminology, Clinical Scenarios, Drug Mechanism, Disease Pathology, Definition (Medical). Focus: Structures, Processes, Terms, Scenarios.
+
+  {{allowed styles and formats}}
+
   Generate ${flashcardCount} unique flashcards covering [${focusTags.join(',')}] for a "${pickedPlanType}" study plan, knowledge level "${pickedKnowledgeLevel}" and study scope: "${pickedStudyScope}".
 
   **User Preferences**:
-    • Question formats: ${preferredFormat ?? 'Balanced mix of all formats (application | compare-contrast | problem-solving | definition | cause-effect | process | analysis | evaluation | recall)'}
     • Emphasize: ${contentEmphasis ?? 'Balanced coverage across subtopics'}
     • Learning style: ${learningStyle ?? 'Balanced for all learning styles (visual | auditory | reading-writing | kinesthetic | logical | social | solitary)'}
     • Difficulty: ${difficultyDistribution ?? 'Balanced difficulty (33% easy, 34% medium, 33% hard)'}
     • Length: ${cardLength ?? 'Balanced length'}
     • Mnemonics: ${mnemonicPreference ?? 'No specific mnemonic techniques'}
     ${userPrompt ? `• Additional instructions: ${userPrompt}` : ''}
+    • Flashcard format and preference: Use allowed styles and formats
 
 
 **EXCLUDED TOPICS** (DO NOT generate cards related to these):
@@ -267,10 +300,6 @@ You can include multiple examples/keyPoints/synonyms/relatedFacts by separating 
 
 Only include optional fields when they add significant value.
 `;
-
-  const gemini = createGoogleGenerativeAI({
-    apiKey: process.env.GOOGLE_AI_API_KEY,
-  });
 
   return streamText({
     model: gemini('gemini-2.0-flash-thinking-exp-01-21'),

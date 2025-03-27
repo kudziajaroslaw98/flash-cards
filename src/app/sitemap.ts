@@ -6,43 +6,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: 'https://flashcards.finalphase.app/',
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 1,
+      priority: 0.5,
     },
     {
-      url: 'https://flashcards.finalphase.app/flashcards/learn',
+      url: 'https://flashcards.finalphase.app/sign-in/',
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.6,
+      priority: 0.5,
     },
     {
-      url: 'https://flashcards.finalphase.app/flashcards/sets',
+      url: 'https://flashcards.finalphase.app/guide/',
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.6,
-    },
-    {
-      url: 'https://flashcards.finalphase.app/dashboard',
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
-    {
-      url: 'https://flashcards.finalphase.app/guide',
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
-    {
-      url: 'https://flashcards.finalphase.app/sign-in',
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
-    {
-      url: 'https://flashcards.finalphase.app/flashcards/revise',
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
+      priority: 0.5,
     },
   ];
 }

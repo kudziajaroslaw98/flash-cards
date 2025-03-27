@@ -75,7 +75,7 @@ export default function FlashcardComponent({
           snap && 'snap-start snap-always',
         ])}
       >
-        <span className='font-semibold text-gray-600 dark:text-slate-200'>
+        <span className='font-serif uppercase text-gray-600 dark:text-slate-200'>
           {title}
         </span>
         <ul>
@@ -122,6 +122,159 @@ export default function FlashcardComponent({
     },
   };
 
+  const FrontSide = () => (
+    <span className={cn(['flex h-full w-full flex-col'])}>
+      <>
+        {isSelected && (
+          <BadgeCheck className='absolute -right-4 -top-4 h-6 w-6 fill-green-500 text-gray-50 dark:text-slate-950' />
+        )}
+
+        {flashcard.type === 'index' && (
+          <>
+            <h5
+              className={cn([
+                'z-20 flex h-auto w-full flex-col items-center justify-start hyphens-auto text-center font-serif text-green-400',
+                size === 'sm' && 'text-lg leading-[120%]',
+                size === 'horizontal-sm' && 'text-xs leading-[90%]',
+                size === 'md' && 'text-2xl',
+                size === 'lg' && 'text-3xl',
+              ])}
+            >
+              {flashcard.context}
+            </h5>
+          </>
+        )}
+
+        {flashcard.type === 'question' && (
+          <>
+            <h5
+              className={cn([
+                'z-20 flex h-full w-full flex-col items-center justify-center text-center',
+                size === 'sm' && 'text-[0.6875rem] leading-[120%]',
+                size === 'horizontal-sm' && 'text-[0.6875rem] leading-[120%]',
+                size === 'md' && 'text-xs',
+                size === 'lg' && 'text-sm',
+              ])}
+            >
+              {flashcard.query}
+            </h5>
+          </>
+        )}
+
+        {flashcard.type === 'single' && (
+          <>
+            {flashcard.query && (
+              <h5
+                className={cn([
+                  'z-20 flex h-auto w-full flex-col items-center justify-start hyphens-auto text-center font-serif text-green-400',
+                  size === 'sm' && 'text-lg leading-[120%]',
+                  size === 'horizontal-sm' && 'text-xs leading-[90%]',
+                  size === 'md' && 'text-2xl',
+                  size === 'lg' && 'text-3xl',
+                ])}
+              >
+                {flashcard.context}
+              </h5>
+            )}
+
+            {flashcard.query && (
+              <h5
+                className={cn([
+                  'z-20 flex h-full w-full flex-col items-center justify-center text-center',
+                  size === 'sm' && 'text-[0.6875rem] leading-[120%]',
+                  size === 'horizontal-sm' && 'text-[0.6875rem] leading-[120%]',
+                  size === 'md' && 'text-xs',
+                  size === 'lg' && 'text-sm',
+                ])}
+              >
+                {flashcard.query}
+              </h5>
+            )}
+          </>
+        )}
+      </>
+    </span>
+  );
+
+  const BackSide = () => (
+    <div
+      className={cn([
+        'scrollbar-hidden relative z-20 flex h-full w-full snap-y snap-mandatory scroll-pt-8 flex-col overflow-y-auto scroll-smooth hyphens-auto py-6 text-gray-500 dark:text-slate-400',
+        size === 'sm' && 'text-[.7rem]',
+        size === 'horizontal-sm' && 'text-[.7rem]',
+        size === 'md' && 'text-xs',
+        size === 'lg' && 'text-sm',
+      ])}
+    >
+      <div className='sticky top-0 w-full'>
+        <div className='relative flex w-full'>
+          <div className='absolute -top-7 left-0 z-[22] flex h-8 w-full bg-transparent bg-[radial-gradient(transparent_1px,rgba(249_250_251)_1px)] from-transparent via-black via-50% to-black to-100% bg-[size:4px_4px] backdrop-blur-sm mask-image-gradient-to-t dark:bg-[radial-gradient(transparent_1px,rgba(2_6_23)_1px)]' />
+        </div>
+      </div>
+
+      <div className='flex flex-col gap-4'>
+        {flashcard?.query && (
+          <div className='flex snap-start scroll-pt-8 flex-col gap-1'>
+            <span className='font-serif uppercase text-gray-600 dark:text-slate-200'>
+              Question:
+            </span>
+            <span>{flashcard?.query}</span>
+          </div>
+        )}
+
+        <div className='flex snap-start scroll-pt-8 flex-col gap-1'>
+          <span className='font-serif uppercase text-gray-600 dark:text-slate-200'>
+            Definition:
+          </span>
+          <span>{flashcard?.definition}</span>
+        </div>
+
+        {flashcard?.answer1 && (
+          <div className='flex snap-start scroll-pt-8 flex-col gap-1'>
+            <span className='font-serif uppercase text-gray-600 dark:text-slate-200'>
+              Answer:
+            </span>
+            <span>{flashcard?.answer1}</span>
+          </div>
+        )}
+
+        {flashcard?.examples && (
+          <FlashcardSection
+            title='Examples:'
+            data={flashcard.examples}
+          />
+        )}
+
+        {flashcard?.synonyms && (
+          <FlashcardSection
+            title='Synonyms:'
+            data={flashcard.synonyms}
+          />
+        )}
+
+        {flashcard?.keyPoints && (
+          <FlashcardSection
+            title='Key Points:'
+            data={flashcard.keyPoints}
+          />
+        )}
+
+        {flashcard?.relatedFacts && (
+          <FlashcardSection
+            title='Related Facts:'
+            data={flashcard.relatedFacts}
+          />
+        )}
+      </div>
+
+      <div className='sticky bottom-0 w-full'>
+        <div className='relative flex w-full'>
+          <div className='absolute -bottom-7 left-0 z-[22] flex h-8 w-full bg-transparent bg-[radial-gradient(transparent_1px,rgba(249_250_251)_1px)] from-transparent via-black via-50% to-black to-100% bg-[size:4px_4px] backdrop-blur-sm mask-image-gradient-to-b dark:bg-[radial-gradient(transparent_1px,rgba(2_6_23)_1px)]' />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <m.div
       onMouseDown={(e) => onStart(e, flashcard)}
@@ -142,138 +295,13 @@ export default function FlashcardComponent({
         <Card
           tabIndex={0}
           className={cn([
-            'z-10 h-full cursor-pointer flex-col items-center p-4 py-0 outline-none focus-visible:ring  focus-visible:ring-green-400/50',
+            'z-10 h-full cursor-pointer flex-col items-center px-2 py-2 outline-none focus-visible:ring  focus-visible:ring-green-400/50',
             isSelected ? 'ring ring-green-400/60' : '',
           ])}
           {...props}
         >
-          {(!isFlipped || isInSelectionMode) && (
-            <span
-              className={cn([
-                'flex h-full w-full flex-col',
-                (flashcard.type === 'index' || flashcard.type === 'question') &&
-                  'items-center justify-center',
-              ])}
-            >
-              <>
-                {isSelected && (
-                  <BadgeCheck className='absolute -right-4 -top-4 h-6 w-6 fill-green-500 text-gray-50 dark:text-slate-950' />
-                )}
-
-                {flashcard.type !== 'index' && (
-                  <h5
-                    className={cn([
-                      'z-20 flex h-20 w-full flex-col items-center justify-center text-center',
-                      size === 'sm' && 'text-[0.6875rem] leading-[120%]',
-                      size === 'horizontal-sm' &&
-                        'text-[0.6875rem] leading-[120%]',
-                      size === 'md' && 'text-xs',
-                      size === 'lg' && 'text-sm',
-                      flashcard.type === 'question' &&
-                        'h-full flex-col justify-center',
-                    ])}
-                  >
-                    {flashcard.query}
-                  </h5>
-                )}
-
-                {flashcard.type !== 'question' && (
-                  <h2
-                    className={cn([
-                      'z-20 flex h-full w-full flex-col items-center hyphens-auto py-2 text-center text-green-400 ',
-                      size === 'sm' && 'text-lg leading-[120%]',
-                      size === 'horizontal-sm' && 'text-lg leading-[120%]',
-                      size === 'md' && 'text-2xl',
-                      size === 'lg' && 'text-3xl',
-                      flashcard.type === 'index' && 'justify-center',
-                      flashcard.type === 'single' && 'pt-8',
-                    ])}
-                  >
-                    {flashcard.context}
-                  </h2>
-                )}
-              </>
-            </span>
-          )}
-
-          {isFlipped && !isInSelectionMode && (
-            <div
-              className={cn([
-                'scrollbar-hidden relative z-20 flex h-full w-full snap-y snap-mandatory scroll-pt-8 flex-col overflow-y-auto scroll-smooth hyphens-auto py-6 text-gray-500 dark:text-slate-400',
-                size === 'sm' && 'text-[.7rem]',
-                size === 'horizontal-sm' && 'text-[.7rem]',
-                size === 'md' && 'text-xs',
-                size === 'lg' && 'text-sm',
-              ])}
-            >
-              <div className='sticky top-0 w-full'>
-                <div className='relative flex w-full'>
-                  <div className='absolute -top-7 left-0 z-[22] flex h-8 w-full bg-transparent bg-[radial-gradient(transparent_1px,rgba(249_250_251)_1px)] from-transparent via-black via-50% to-black to-100% bg-[size:4px_4px] backdrop-blur-sm mask-image-gradient-to-t dark:bg-[radial-gradient(transparent_1px,rgba(2_6_23)_1px)]' />
-                </div>
-              </div>
-
-              <div className='flex flex-col gap-4'>
-                {flashcard?.query && (
-                  <div className='flex snap-start scroll-pt-8 flex-col gap-1'>
-                    <span className='font-semibold text-gray-600 dark:text-slate-200'>
-                      Question:
-                    </span>
-                    <span>{flashcard?.query}</span>
-                  </div>
-                )}
-
-                <div className='flex snap-start scroll-pt-8 flex-col gap-1'>
-                  <span className='font-semibold text-gray-600 dark:text-slate-200'>
-                    Definition:
-                  </span>
-                  <span>{flashcard?.definition}</span>
-                </div>
-
-                {flashcard?.answer1 && (
-                  <div className='flex snap-start scroll-pt-8 flex-col gap-1'>
-                    <span className='font-semibold text-gray-600 dark:text-slate-200'>
-                      Answer:
-                    </span>
-                    <span>{flashcard?.answer1}</span>
-                  </div>
-                )}
-
-                {flashcard?.examples && (
-                  <FlashcardSection
-                    title='Examples:'
-                    data={flashcard.examples}
-                  />
-                )}
-
-                {flashcard?.synonyms && (
-                  <FlashcardSection
-                    title='Synonyms:'
-                    data={flashcard.synonyms}
-                  />
-                )}
-
-                {flashcard?.keyPoints && (
-                  <FlashcardSection
-                    title='Key Points:'
-                    data={flashcard.keyPoints}
-                  />
-                )}
-
-                {flashcard?.relatedFacts && (
-                  <FlashcardSection
-                    title='Related Facts:'
-                    data={flashcard.relatedFacts}
-                  />
-                )}
-              </div>
-
-              <div className='sticky bottom-0 w-full'>
-                <div className='relative flex w-full'>
-                  <div className='absolute -bottom-7 left-0 z-[22] flex h-8 w-full bg-transparent bg-[radial-gradient(transparent_1px,rgba(249_250_251)_1px)] from-transparent via-black via-50% to-black to-100% bg-[size:4px_4px] backdrop-blur-sm mask-image-gradient-to-b dark:bg-[radial-gradient(transparent_1px,rgba(2_6_23)_1px)]' />
-                </div>
-              </div>
-            </div>
-          )}
+          {(!isFlipped || isInSelectionMode) && <FrontSide />}
+          {isFlipped && !isInSelectionMode && <BackSide />}
         </Card>
       </m.div>
     </m.div>

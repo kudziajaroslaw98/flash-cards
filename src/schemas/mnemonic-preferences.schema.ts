@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 export const mnemonicPreferencesSchema = z.enum(
   [
-    'none',
     'acronyms',
     'associations',
     'chunking',

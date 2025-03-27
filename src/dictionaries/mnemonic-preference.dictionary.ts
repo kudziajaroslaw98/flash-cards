@@ -1,5 +1,4 @@
 export const mnemonicPreferenceDictionary = [
-  { value: 'none', label: 'No specific mnemonic techniques' },
   { value: 'acronyms', label: 'Include helpful acronyms' },
   {
     value: 'associations',

@@ -102,6 +102,13 @@ export function StudyPlanStep1({
                     { value: 'Fundamentals', label: 'Fundamentals' },
                     { value: 'Anatomy', label: 'Anatomy' },
                     { value: 'Human', label: 'Human' },
+                    { value: 'English', label: 'English' },
+                    { value: 'Vocabulary', label: 'Vocabulary' },
+                    {
+                      value: 'Daily Conversations',
+                      label: 'Daily Conversations',
+                    },
+                    { value: 'Idioms', label: 'Idioms' },
                   ],
                   multiple: true,
                   multipleLabel: 'Tags',
@@ -165,7 +172,7 @@ export function StudyPlanStep1({
                       label: 'Choose preferred format...',
                       controlLabel: 'Preferred Format',
                       config: preferredFormatDictionary,
-                      _internal_default_value: 'balanced',
+                      _internal_default_value: null,
                       _internal_constraints: [
                         {
                           type: 'validation',
@@ -180,7 +187,7 @@ export function StudyPlanStep1({
                       label: 'Choose content emphasis...',
                       controlLabel: 'Content Emphasis',
                       config: contentEmphasisDictionary,
-                      _internal_default_value: 'balanced',
+                      _internal_default_value: null,
                       _internal_constraints: [
                         {
                           type: 'validation',
@@ -217,7 +224,7 @@ export function StudyPlanStep1({
                       label: 'Choose learning style...',
                       controlLabel: 'Learning Style',
                       config: learningStyleDictionary,
-                      _internal_default_value: 'balanced',
+                      _internal_default_value: null,
                       _internal_constraints: [
                         {
                           type: 'validation',
@@ -248,7 +255,7 @@ export function StudyPlanStep1({
                       label: 'Choose mnemonic preference...',
                       controlLabel: 'Mnemonic Preference',
                       config: mnemonicPreferenceDictionary,
-                      _internal_default_value: 'none',
+                      _internal_default_value: null,
                       _internal_constraints: [
                         {
                           type: 'validation',
