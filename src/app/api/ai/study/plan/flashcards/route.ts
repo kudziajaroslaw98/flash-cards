@@ -230,98 +230,99 @@ export async function POST(req: NextRequest) {
     flashcardCount: number,
     summaries: { id: string; topic: string; query: string; context: string }[],
   ) => `
-  **Subject-Style Mapping for Adaptive Flashcard Selection:**
+  # ROLE: You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards tailored to user specifications.
 
-  * **Technical/STEM:** Styles: How/Why Questions, Process Flashcards, Diagram Labeling, Formula/Equation, Application Scenarios, Definition (Concise).  Focus: Mechanisms, Problem-Solving, Formulas.
-  * **Language Learning:** Styles: Example Sentences, Scenario Dialogues, Fill-in-Blank, Meaning in Context (Idioms), Synonym/Antonym, Grammar Rules. Focus: Usage, Vocabulary, Conversation.
-  * **Humanities/Social Sciences:** Styles: Who/What/When/Where Questions, Concept Definitions, Timeline Flashcards, Cause-Effect, Compare-Contrast, Argument/Counter-Argument. Focus: Facts, Concepts, Theories, Arguments.
-  * **Arts & Music:** Styles: Image-Based (Art), Audio-Based (Music), Identify Artist/Artwork, Identify Instrument/Sound, Technique/Process, Definition (Art/Music Terms). Focus: Recognition, Techniques, Concepts.
-  * **Law & Business:** Styles: Case Studies (Scenario-Based), Definition (Legal/Business Terms), Principle/Rule, Ethical Dilemma (Scenario), Process Flashcards, Compare Concepts/Strategies. Focus: Application, Terminology, Principles.
-  * **Medical/Healthcare:** Styles: Diagram Labeling (Anatomy), Process/Mechanism, Medical Terminology, Clinical Scenarios, Drug Mechanism, Disease Pathology, Definition (Medical). Focus: Structures, Processes, Terms, Scenarios.
+  # GOAL: Generate ${flashcardCount} unique flashcards based on the provided inputs, strictly adhering to the specified knowledge level and content focus.
 
-  Generate ${flashcardCount} unique flashcards.
+  # INPUTS:
+  *   **Knowledge Level:** ${pickedKnowledgeLevel} (This is the PRIMARY determinant of difficulty for ALL cards)
+  *   **Focus Tags:** [${focusTags.join(', ')}] (These define the specific topics/concepts to cover)
+  *   **Coverage Focus:** ${pickedCoverageFocus} (Defines breadth/depth across Focus Tags: 'core' = essentials only; 'broad' = wider variety; 'deep' = intense focus on specifics)
+  *   **Subject Area & Topic:** (Infer the general Subject Area [e.g., Technical/STEM, Language Learning] and specific Topic Name from the Focus Tags. Use this context for applying style and knowledge level guidance.)
+  *   **Excluded Topics (Blacklist):** ${blacklist && blacklist.length > 0 ? `[${blacklist.join(', ')}]` : 'None specified'} (Strictly AVOID generating cards primarily about these concepts.)
+  *   **Existing Cards (Avoid Duplication):**
+      ${summaries && summaries.length > 0 ? summaries.map((summary) => `• ID: ${summary.id}, Topic: ${summary.topic}, Question: ${summary.query}, Context: ${summary.context}`).join('\n') : '  None provided.'}
+  *   **Optional User Preferences:**
+      *   Learning style preference: ${learningStyle ?? 'Balanced'}
+      *   Card length preference: ${cardLength ?? 'Balanced'}
+      *   Mnemonic preference: ${mnemonicPreference ?? 'None'}
+      *   Additional instructions: ${userPrompt ?? 'None'}
+      *(Note: These preferences are secondary. Knowledge Level and Coverage Focus constraints MUST take precedence.)*
 
-  **User Preferences**:
-    • Learning style: ${learningStyle ?? 'Balanced for all learning styles (visual | auditory | reading-writing | kinesthetic | logical | social | solitary)'}
-    • Length: ${cardLength ?? 'Balanced length'}
-    • Mnemonics: ${mnemonicPreference ?? 'No specific mnemonic techniques'}
-    ${userPrompt ? `• Additional instructions: ${userPrompt}` : ''}
-    • Flashcard format and preference: Use allowed styles and formats
-    • Knowledge Level: ${pickedKnowledgeLevel}
-    • Plan Type: ${pickedCoverageFocus}
-    • Focus on Tags: [${focusTags.join(',')}]
+      # CORE INSTRUCTIONS & GUIDANCE:
 
-  **Knowledge Level Guidance (Interpreted for the specific Subject Area):**
+      **1. Subject-Specific Style Guidance (Base Styles):**
+          *   **Technical/STEM:** How/Why Questions, Process, Application Scenarios, Comparisons, Consequences, Components. Focus: Mechanisms, Problem-Solving.
+          *   **Language Learning:** Example Sentences, Dialogues, Fill-in-Blank, Meaning in Context, Synonym/Antonym, Grammar Rules. Focus: Usage, Vocabulary, Conversation.
+          *   **Humanities/Social Sciences:** Who/What/When/Where, Concept Definitions, Timelines, Cause-Effect, Compare-Contrast, Arguments. Focus: Facts, Concepts, Theories, Arguments.
+          *   **Arts & Music:** Image/Audio-Based ID, Technique/Process, Definitions, Artist/Style Recognition. Focus: Recognition, Techniques, Concepts.
+          *   **Law & Business:** Case Studies, Definitions, Principles/Rules, Ethical Scenarios, Process, Comparisons. Focus: Application, Terminology, Principles.
+          *   **Medical/Healthcare:** Diagrams, Process/Mechanism, Terminology, Clinical Scenarios, Drug/Disease Info, Definitions. Focus: Structures, Processes, Terms, Scenarios.
+          *(Select appropriate styles from this list based on the inferred Subject Area and the specific Focus Tags.)*
 
-    *   **unfamiliar:** Assume zero prior knowledge *within the topic*. Focus on the absolute most basic elements:
-      -   *Examples:* Core definitions (STEM/Law/Business), basic vocabulary/alphabet (Language), key figures/events (Humanities), identifying major styles/instruments (Arts), fundamental structures (Medical). Simple recognition or recall. Use appropriate styles (e.g., Definition, Who/What/When).
-    *   **beginner:** Assume familiarity with only the most basic elements. Focus on understanding foundational concepts, simple rules/processes, and common examples.
-      -   *Examples:* Simple syntax/conjugation (Language), core functions/components (STEM), basic timelines/definitions (Humanities), recognizing characteristics of a style (Arts), simple legal/business principles (Law/Business), basic anatomical parts/functions (Medical). Use appropriate styles (e.g., Example Sentence, List Parts, Define Concept).
-    *   **developing:** Assume understanding of basics. Focus on connecting concepts, understanding common usage/variations, simple application, and basic analysis.
-      -   *Examples:* Using different tenses/simple dialogues (Language), explaining how components interact (STEM), identifying cause/effect (Humanities), analyzing basic composition (Arts), applying a simple rule to a scenario (Law/Business), describing a basic physiological process (Medical). Use appropriate styles (e.g., Fill-in-Blank, How/Why, Compare-Contrast, Simple Scenario).
-    *   **proficient:** Assume solid grasp of fundamentals and common applications. Focus on applying knowledge in varied contexts, understanding nuances, identifying patterns/best practices, and intermediate analysis/troubleshooting.
-      -   *Examples:* Constructing complex sentences/handling common conversational topics (Language), applying concepts to solve standard problems (STEM), analyzing primary sources/comparing interpretations (Humanities), identifying artist techniques/influences (Arts), analyzing a standard case study (Law/Business), interpreting common clinical signs (Medical). Use appropriate styles (e.g., Scenario Dialogue, Application Scenario, Cause-Effect Analysis, Case Study).
-    *   **advanced:** Assume deep understanding and practical experience. Focus on complex scenarios, subtle distinctions, evaluating trade-offs, synthesizing information, and addressing non-standard situations.
-      -   *Examples:* Nuanced vocabulary/idioms/cultural context (Language), optimizing solutions/debugging complex issues (STEM), evaluating historical arguments/synthesizing theories (Humanities), critiquing complex works/understanding art theory (Arts), navigating complex legal/business strategies (Law/Business), differential diagnosis/complex patient management (Medical). Use appropriate styles (e.g., Meaning in Context (Idioms), Complex Scenarios, Argument/Counter-Argument, Technique Analysis, Ethical Dilemma).
-    *   **expert:** Assume mastery and ability to teach. Focus on cutting-edge knowledge, deep theoretical underpinnings, predicting trends, critical evaluation across contexts, and explaining complexity simply.
-      -   *Examples:* Linguistic theory/translation nuances (Language), designing novel systems/research-level problems (STEM), contributing original analysis/historiography (Humanities), curating/art criticism/theory (Arts), shaping strategy/policy (Law/Business), understanding rare conditions/research frontiers (Medical). Use appropriate styles (e.g., Explaining complex grammar, Designing a system, Critical Evaluation, Advanced Theory).
+      **2. Knowledge Level Application (CRITICAL - Determines Complexity):**
+          *(Apply ONE level consistently to ALL generated cards based on the 'Knowledge Level' input. Interpret these general guidelines within the context of the inferred Subject Area and Focus Tags.)*
 
-  **Constraint Checklist for [Knowledge Level Value] & [Subject Area]:**
+          *   **unfamiliar:** Assume zero prior knowledge within the Focus Tags. Focus on the absolute most basic elements: Core definitions (STEM/Law), basic vocabulary (Language), key figures/events (Humanities), major styles/instruments (Arts), fundamental structures (Medical). Simple recognition or recall. Use basic styles (Definition, Who/What).
+          *   **beginner:** Assume familiarity with only the most basic elements. Focus on understanding foundational concepts, simple rules/processes, and common examples: Simple syntax/conjugation (Language), core functions/components (STEM), basic timelines/concepts (Humanities), characteristics of a style (Arts), simple principles (Law/Business), basic anatomy/functions (Medical). Use foundational styles (Example Sentence, List Parts, Define Concept).
+          *   **developing:** Assume understanding of basics. Focus on connecting concepts, understanding common usage/variations, simple application, and basic analysis: Using different tenses/dialogues (Language), explaining component interaction (STEM), identifying cause/effect (Humanities), analyzing basic composition (Arts), applying simple rules (Law/Business), describing basic processes (Medical). Use connecting styles (Fill-in-Blank, How/Why, Compare-Contrast, Simple Scenario).
+          *   **proficient:** Assume solid grasp of fundamentals and common applications. Focus on applying knowledge in varied contexts, understanding nuances, identifying patterns/best practices, and intermediate analysis/troubleshooting: Complex sentences/conversations (Language), solving standard problems (STEM), analyzing sources/interpretations (Humanities), artist techniques/influences (Arts), standard case studies (Law/Business), interpreting common clinical signs (Medical). Use application styles (Scenario Dialogue, Application Scenario, Cause-Effect Analysis, Case Study).
+          *   **advanced:** Assume deep understanding and practical experience. Focus on complex scenarios, subtle distinctions, evaluating trade-offs, synthesizing information, and addressing non-standard situations: Nuanced vocabulary/idioms/context (Language), optimizing/debugging complex issues (STEM), evaluating arguments/theories (Humanities), critiquing complex works/theory (Arts), complex legal/business strategy (Law/Business), differential diagnosis/complex management (Medical). Use analytical styles (Meaning in Context (Idioms), Complex Scenarios, Argument/Counter-Argument, Technique Analysis, Ethical Dilemma).
+          *   **expert:** (Apply with EXTREME rigor for technical fields) Assume mastery and ability to teach the concepts within the Focus Tags.
+              *   **Focus Areas:** MUST GO BEYOND standard definitions and undergraduate material. Target complex system design trade-offs (e.g., scalability patterns, distributed systems consistency models, CAP theorem nuances), advanced algorithms/data structures (e.g., probabilistic, advanced graph theory), performance optimization internals (e.g., kernel tuning, JIT behavior, query optimization), deep language internals (e.g., memory models, GC strategies, type theory), complex concurrency/parallelism (e.g., lock-free structures, race condition diagnosis), cutting-edge fields (e.g., specific ML architectures, quantum algorithm impacts, formal verification), theoretical limits/proofs, or comparing/contrasting advanced architectural patterns in specific production scenarios.
+              *   **Question Types:** MUST REQUIRE significant analysis, synthesis, evaluation, design trade-off justification, or complex troubleshooting/diagnosis. Ask "why" advanced techniques are used, evaluate *implications* or *limitations*, propose architectural solutions, critique designs based on NFRs, or explain nuanced concepts/edge cases as if teaching a proficient learner. Use expert terminology *correctly and meaningfully*.
+              *   **ABSOLUTELY DO NOT (Especially for STEM/CS):**
+                  *   Ask for simple definitions or basic "what is" / "what is the purpose of" for foundational concepts like core data structures (stack, queue, etc. - unless asking about *advanced implementations* or *complex trade-offs*), core OOP principles (unless comparing *implementation strategies* or *design pattern implications*), fundamental algorithms, common protocols (HTTP, SQL), basic concepts (recursion, APIs, version control, OS roles, Big O notation - unless asking about *complex analysis*, *edge cases*, or *comparing notations*).
+                  *   Simply rephrase a basic question with formal wording. The *underlying concept* and *required cognitive task* must be genuinely advanced.
+              *   **Examples (Reflecting desired complexity for CS/STEM):**
+                  *   "Critically evaluate trade-offs between strong consistency and high availability in distributed databases, referencing CAP theorem and consensus algorithms like Paxos/Raft."
+                  *   "Design a system architecture for a real-time notification service handling 1M concurrent users, justifying choices for load balancing, queuing, and storage considering latency/fault tolerance."
+                  *   "Explain challenges and solutions for avoiding false sharing in multi-threaded applications on modern multi-core architectures."
+                  *   "Compare use cases and performance characteristics of B-trees vs. Log-Structured Merge-Trees (LSM-trees) for disk-based database indexing."
+                  *   "How would you diagnose intermittent, high-latency requests in a complex microservices architecture?"
 
-    *   **Content Relevance:** Ensure flashcards are strictly relevant to "[Topic Name]" and appropriate for the "[Subject Area]".
-    *   **Level Appropriateness:**
-      -   **[For Proficient/Advanced/Expert]:** AVOID overly basic concepts, definitions, or tasks typically covered in introductory materials for "[Topic Name]" within "[Subject Area]".
-      -   **[For all levels]:** Ensure the cognitive task required (recall, apply, analyze, evaluate, etc.) matches the specified knowledge level description.
-    *   **Style Appropriateness:** Select flashcard styles (e.g., definition, scenario, fill-in-the-blank) that are suitable for both the "[Subject Area]" (referencing the examples above) and the complexity required by the "[Knowledge Level Value]".
-    *   **Accuracy & Clarity:** Ensure information is accurate and presented clearly. Keep fronts (prompts) and backs (answers) concise but sufficiently detailed for the level.
+      **3. Content Selection (Applying Focus & Coverage):**
+          *   **Prioritize Focus Tags:** Generate content *primarily* related to the concepts specified in the ''Focus Tags''.
+          *   **Apply Coverage Focus:**
+              *   If ''core'': Focus strictly on the most essential information within the ''Focus Tags'' at the target ''Knowledge Level''.
+              *   If ''broad'': Aim for variety across the different ''Focus Tags'' (if multiple) or cover a wider range of concepts within a single tag/topic, all at the target ''Knowledge Level''.
+              *   If ''deep'': Prioritize depth within fewer areas defined by the ''Focus Tags''. Explore nuances, specific mechanisms, or complex examples related to the tags, at the target ''Knowledge Level''.
 
+      **4. Constraint Checklist & Quality Control:**
+          *   **Knowledge Level Consistency:** ALL cards MUST strictly match the single ''Knowledge Level'' specified. NO mixing of difficulties.
+          *   **Focus Tag Relevance:** Content MUST be directly relevant to the provided ''Focus Tags''.
+          *   **Coverage Focus Alignment:** The *selection* and *depth* of topics MUST reflect the specified ''Coverage Focus''.
+          *   **Blacklist Adherence:** Verify NO card's primary subject is from the ''Excluded Topics (Blacklist)''.
+          *   **Uniqueness:** Avoid semantic overlap or simple reformulations of ''Existing Cards'' or other generated cards in this batch.
+          *   **Style Appropriateness:** Chosen flashcard style MUST fit the Subject Area, Focus Tag content, and the complexity required by the Knowledge Level.
+          *   **Accuracy & Clarity: Information must be accurate. Questions (''query''), concise answers (''answer''), and explanations (''definition'') must be clear and sufficiently detailed for the level.
+          *  **Answer & Explanation Quality:**
+              *   The ''answer'' MUST be the direct, concise, and correct response to the ''query''.
+              *   The ''definition'' MUST clearly elaborate on *why* the ''answer'' is correct, provide necessary context, or break down the concept further, appropriate to the ''Knowledge Level''.
+              *   Avoid including keywords from the ''query'' directly in the ''answer'' or ''definition'' where possible if it would make the answer too obvious (no trivial hints).
 
-**EXCLUDED TOPICS** (DO NOT generate cards related to these):
-${blacklist && blacklist.length > 0 ? blacklist.join(', ') : 'None specified'}
-
-  **Existing Cards** (DO NOT DUPLICATE):
-${summaries
-  .map(
-    (summary) =>
-      `• ID: ${summary.id}, Topic: ${summary.topic}, Question: ${summary.query}, Context: ${summary.context}`,
-  )
-  .join('\n')}
-
-  **Critical Requirements**:
-1. ANSWER QUALITY:
-   • NO terms from questions in answers - avoid hinting solutions
-   • NO terms from answers in questions - avoid hinting answers
-   • Only answer1 is correct. Answer2, answer3, answer4 are still required in the response but need to be incorrect.
-   • Wrong answers: plausible but clearly incorrect to experts
-   • Match complexity precisely to knowledge level ${knowledgeLevel} - especially for expert level
-   • For vocabulary: semantically related but distinct distractors
-
-  **Clarifications**:
-    • Include multiple examples, key points, synonyms, and related facts where relevant.
-    • Only include optional fields when they add significant value.
-    • Ensure each flashcard is unique and explores distinct concepts.
-    • The Focus Tags specify the primary areas of content. Use them to determine the specific [Topic Name] and [Subject Area] context for constraints.
-
-   JSON OUTPUT per card:
-{
-  "id": "unique_ID",
-  "query": "clear_and_concise_question", // The front of the flashcard
-  "definition": "answer_explanation", // The back of the flashcard
-  "context": "main_subject_or_topic",
-  "tags": ["relevant_tags"],
-  "answer1": "correct_answer", // The back of the flashcard
-  "answer2": "wrong_answer",
-  "answer3": "wrong_answer",
-  "answer4": "wrong_answer",
-  "examples": "optional_usage_example(s)",
-  "keyPoints": "optional_key_takeaway(s)",
-  "synonyms": "optional_alternative_terms",
-  "relatedFacts": "optional_related_concepts_or_facts"
-}
-
-You can include multiple examples/keyPoints/synonyms/relatedFacts by separating them with a semicolon.
-
-Only include optional fields when they add significant value.
+      # OUTPUT FORMAT:
+      Generate the response as a JSON array, where each object represents a single flashcard conforming to this structure:
+[
+  {
+    "id": "unique_string_ID_for_this_card",
+    "query": "The clear and concise question or prompt forming the front of the flashcard.",, // The front of the flashcard
+    "definition": "The detailed explanation elaborating on WHY the 'answer' is correct, providing context, or further defining the concept.", // The back of the flashcard
+    "context": "The main subject or topic inferred from the Focus Tags (e.g., 'Computer Science', 'English Grammar').",
+    "tags": ["list", "of", "relevant", "tags", "derived", "from", "FocusTags", "and", "specific", "card", "content"],
+    "answer1": "The correct, comprehensive answer or explanation forming the back of the flashcard.", // The back of the flashcard
+    "answer2": "wrong_answer",
+    "answer3": "wrong_answer",
+    "answer4": "wrong_answer",
+    "examples": "Optional: Usage example(s) separated by semicolon if multiple.",
+    "keyPoints": "Optional: Key takeaway(s) or note(s) separated by semicolon if multiple.",
+    "synonyms": "Optional: Alternative term(s) separated by semicolon if multiple.",
+    "relatedFacts": "Optional: Related concept(s) or fact(s) separated by semicolon if multiple."
+  }
+]
+Only include optional fields (examples, keyPoints, synonyms, relatedFacts) when they add significant pedagogical value relevant to the card's content and knowledge level.
+Both answer and explanation fields are required.
+Ensure the JSON is valid.
 `;
 
   return streamText({
@@ -331,15 +332,26 @@ Only include optional fields when they add significant value.
     maxSteps: 5,
     experimental_continueSteps: true,
     stopSequences: ['[FINISH] All FC generated'],
-    system: `You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards. Your primary responsibilities are:
-1. UNIQUENESS: Generate flashcards that explore DISTINCT concepts, avoiding semantic overlap or reformulation of existing content.
-2. PEDAGOGICAL VARIETY: Craft questions across multiple cognitive domains (from basic recall to complex evaluation).
-3. KNOWLEDGE CALIBRATION: Precisely match content difficulty to the specified knowledge level.
-4. ANSWER QUALITY: Create clearly correct answers and plausible but definitively incorrect distractors that don't hint at the correct response.
-When you're ready to finish, include the phrase "[FINISH] All FC generated" in your response.`,
+    system: `You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards based on detailed user specifications. Your primary responsibilities, guided by the main prompt, are:
+
+    1.  **UNIQUENESS & RELEVANCE:** Generate flashcards exploring DISTINCT concepts relevant to the specified ''Focus Tags'', strictly avoiding semantic overlap or reformulation of ''Existing Cards'' or other generated content in the current batch.
+    2.  **PEDAGOGICAL APPROPRIATENESS:** Employ varied question styles and cognitive tasks (e.g., application, analysis, evaluation) that are *strictly appropriate for the single Knowledge Level specified in the main prompt*. Do NOT mix difficulty levels across cards in one request.
+    3.  **KNOWLEDGE CALIBRATION (Primary Directive):** Precisely match the complexity, depth, and scope of ALL generated content (''query'', ''answer'', ''definition'', optional fields) to the *single* ''Knowledge Level'' provided in the main prompt. Adhere meticulously to the detailed guidance for that specific level.
+    4.  **ANSWER & EXPLANATION QUALITY:** Create a clearly correct, concise ''answer'' and a detailed, accurate ''definition'' that effectively clarifies *why* the answer is correct, provides necessary context, and aligns with the required ''Knowledge Level'', following the JSON structure defined in the main prompt.
+    5.  **CONSTRAINT ADHERENCE:** Strictly follow all constraints specified in the main prompt, including ''Coverage Focus'', ''Excluded Topics (Blacklist)'', ''Subject-Specific Styles'', and the required ''OUTPUT FORMAT''. *The main prompt's detailed instructions always take precedence.*
+
+    When you have generated the requested number of high-quality, compliant flashcards, include the phrase "[FINISH] All FC generated" in your response.`,
     onFinish(response) {
       Logger.info(
-        `Session ${sessionId} finished successfully ${JSON.stringify({ steps: response?.steps, finishReason: response?.finishReason, usage: response.usage })}`,
+        `Session ${sessionId} finished successfully ${JSON.stringify({ finishReason: response?.finishReason, usage: response.usage })}`,
+        routePath,
+      );
+      Logger.info(
+        `Session ${sessionId} finished successfully [REQUEST]${JSON.stringify({ steps: response?.steps.map((step) => step.request) })}`,
+        routePath,
+      );
+      Logger.info(
+        `Session ${sessionId} finished successfully [REQUEST]${JSON.stringify({ steps: response?.steps.map((step) => step.response) })}`,
         routePath,
       );
     },
