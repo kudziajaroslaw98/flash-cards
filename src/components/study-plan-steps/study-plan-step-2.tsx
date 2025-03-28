@@ -1,10 +1,10 @@
 import type { PlanSetupState } from '#/app/(pages)/study/new/page';
+import { coverageFocusDictionary } from '#/dictionaries/coverage-focus.dictionary';
 import { durationDictionary } from '#/dictionaries/duration.dictionary';
-import { planTypeDictionary } from '#/dictionaries/plan-type.dictionary';
+import { coverageFocusSchema } from '#/schemas/coverage-focus.schema';
 import { planDurationSchema } from '#/schemas/plan-durations.schema';
-import { planTypeSchema } from '#/schemas/plan-types.schema';
+import type { CoverageFocus } from '#/types/coverage-focus.type';
 import type { PlanDuration } from '#/types/plan-durations.type';
-import type { PlanType } from '#/types/plan-types.type';
 import { ArrowRight } from 'lucide-react';
 import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { z } from 'zod';
@@ -24,7 +24,7 @@ export function StudyPlanStep2({
   const { goToNext } = useStepper();
   const formRef = useRef<
     FormMethods<{
-      planType: PlanType;
+      coverageFocus: CoverageFocus;
       duration: PlanDuration;
       userPrompt: string;
       blacklist: string[];
@@ -62,25 +62,26 @@ export function StudyPlanStep2({
       <div className='flex w-full flex-col items-center justify-center py-12'>
         <div className='flex w-96 flex-col items-center justify-center gap-8'>
           <FormComponent<{
-            planType: PlanType;
+            coverageFocus?: CoverageFocus;
             duration: PlanDuration;
             blacklist: string[];
             userPrompt: string;
           }>
             scheme={{
               inputs: {
-                planType: {
+                coverageFocus: {
                   type: 'dropdown',
                   multiple: false,
-                  config: planTypeDictionary,
-                  label: 'Study Plan Type',
-                  controlLabel: 'Plan Type',
+                  config: coverageFocusDictionary,
+                  label: 'Coverage Focus',
+                  controlLabel: 'Coverage Focus',
                   required: true,
+                  _internal_default_value: 'core',
                   _internal_constraints: [
                     {
                       type: 'validation',
-                      key: 'planType',
-                      constraint: planTypeSchema,
+                      key: 'coverageFocus',
+                      constraint: coverageFocusSchema,
                     },
                   ],
                 },

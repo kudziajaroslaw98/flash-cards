@@ -1,12 +1,9 @@
-import { planTypeDictionary } from '#/dictionaries/plan-type.dictionary';
 import { planDurationSchema } from '#/schemas/plan-durations.schema';
-import { planTypeSchema } from '#/schemas/plan-types.schema';
 import { Logger } from '#/shared/helpers/logger/logger';
 import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { createClient } from '#/shared/utils/supabase/server';
 import uuid from '#/shared/utils/uuid.util';
-import { PlanType } from '#/types/plan-types.type';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamObject } from 'ai';
 import type { NextRequest } from 'next/server';
@@ -16,7 +13,6 @@ const routePath = 'ai/study/plan/flashcards';
 
 async function validateBody(body: Record<string, unknown>) {
   const validationScheme = z.object({
-    planType: planTypeSchema,
     duration: planDurationSchema,
     summaries: z.array(
       z.object({
@@ -68,11 +64,9 @@ export async function POST(req: NextRequest) {
   }
 
   const {
-    planType,
     summaries,
     duration,
   }: {
-    planType: PlanType;
     summaries: {
       frontUuid: string;
       query: string;
@@ -84,7 +78,6 @@ export async function POST(req: NextRequest) {
 
   try {
     const error = await validateBody({
-      planType,
       summaries,
       duration,
     });
@@ -111,7 +104,6 @@ export async function POST(req: NextRequest) {
 
   Logger.info(
     `User [ ${user.id} ] is generating study plan: ${JSON.stringify({
-      planType,
       duration,
       summaries: summaries.length,
       learningHours,
@@ -123,7 +115,7 @@ export async function POST(req: NextRequest) {
     **Total Number of Flashcards to utilize:**
       ${summaries.length}
     **Objective:**
-      Create a study plan for a "${planTypeDictionary.find((plan) => plan.value === planType)?.label}" plan.
+      Create a study plan.
       Use all the provided summaries to generate the plan. Do not create a plan with topics that are not included in the summaries.
       Plan duration should be approximately geared towards the user's preferable learning hours per week: ${learningHours || 'Not specified'}, plan duration in days: ${duration}(days).
       Plan cannot exceed ${duration}(days) in length.

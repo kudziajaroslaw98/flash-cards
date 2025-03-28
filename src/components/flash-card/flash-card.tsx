@@ -101,6 +101,7 @@ export default function FlashcardComponent({
       zIndex: 40,
       height: '22.75rem',
       width: '100%',
+      '::last': { position: 'relative' },
     } as Variant,
     unhovered: {
       translateY: '0%',
@@ -133,9 +134,9 @@ export default function FlashcardComponent({
           <>
             <h5
               className={cn([
-                'z-20 flex h-auto w-full flex-col items-center justify-start hyphens-auto text-center font-serif text-green-400',
+                'z-20 flex h-full w-full flex-col items-center justify-center hyphens-auto text-center text-green-400',
                 size === 'sm' && 'text-lg leading-[120%]',
-                size === 'horizontal-sm' && 'text-xs leading-[90%]',
+                size === 'horizontal-sm' && 'text-sm leading-[120%]',
                 size === 'md' && 'text-2xl',
                 size === 'lg' && 'text-3xl',
               ])}
@@ -282,7 +283,7 @@ export default function FlashcardComponent({
       onTouchStart={(e) => onStart(e, flashcard)}
       onTouchEnd={onEnd}
       onTouchMove={onMove}
-      className={cn(['relative flex'])}
+      className={cn(['relative flex h-44 w-full'])}
     >
       <m.div
         variants={cardVariants}

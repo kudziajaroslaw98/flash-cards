@@ -8,14 +8,12 @@ import { knowledgeLevelDictionary } from '#/dictionaries/knowledge-level.diction
 import { learningStyleDictionary } from '#/dictionaries/learning-style.dictionary';
 import { mnemonicPreferenceDictionary } from '#/dictionaries/mnemonic-preference.dictionary';
 import { preferredFormatDictionary } from '#/dictionaries/preferred-format.dictionary';
-import { studyScopeDictionary } from '#/dictionaries/study-scope.dictionary';
 import { cardLengthSchema } from '#/schemas/card-length.schema';
 import { contentEmphasisSchema } from '#/schemas/content-emphasis.schema';
 import { difficultyDistributionSchema } from '#/schemas/difficulty-distribution.schema';
 import { knowledgeLevelSchema } from '#/schemas/knowledge-level.schema';
 import { learningStyleAdaptationSchema } from '#/schemas/learning-style-adaptation.schema';
 import { mnemonicPreferencesSchema } from '#/schemas/mnemonic-preferences.schema';
-import { planStudyScopeSchema } from '#/schemas/plan-study-scope.schema';
 import { preferredQuestionFormatsSchema } from '#/schemas/preferred-question-formats.schema';
 import type { CardLength } from '#/types/card-length.type';
 import type { ContentEmphasis } from '#/types/content-emphasis.type';
@@ -23,7 +21,6 @@ import type { DifficultyDistribution } from '#/types/difficulty-distribution.typ
 import type { KnowledgeLevel } from '#/types/knowledge-level.type';
 import type { LearningStyleAdaptation } from '#/types/learning-style.type';
 import type { MnemonicPreferences } from '#/types/mnemonic-preference.type';
-import type { PlanStudyScope } from '#/types/plan-study-scope.type';
 import type { PreferredQuestionFormats } from '#/types/preferred-question-formats.type';
 import { ArrowRight } from 'lucide-react';
 import { useRef, type Dispatch, type SetStateAction } from 'react';
@@ -43,7 +40,6 @@ export function StudyPlanStep1({
   const formRef = useRef<
     FormMethods<{
       focusTags: string[];
-      studyScope: PlanStudyScope;
       knowledgeLevel: KnowledgeLevel;
       preferredFormat?: PreferredQuestionFormats;
       contentEmphasis?: ContentEmphasis;
@@ -109,6 +105,7 @@ export function StudyPlanStep1({
                       label: 'Daily Conversations',
                     },
                     { value: 'Idioms', label: 'Idioms' },
+                    { value: 'Grammar', label: 'Grammar' },
                   ],
                   multiple: true,
                   multipleLabel: 'Tags',
@@ -139,21 +136,6 @@ export function StudyPlanStep1({
                       type: 'validation',
                       key: 'knowledgeLevel',
                       constraint: knowledgeLevelSchema,
-                    },
-                  ],
-                },
-                studyScope: {
-                  type: 'dropdown',
-                  multiple: false,
-                  label: 'Choose study scope...',
-                  controlLabel: 'Study Scope',
-                  config: studyScopeDictionary,
-                  _internal_default_value: 'default',
-                  _internal_constraints: [
-                    {
-                      type: 'validation',
-                      key: 'studyScope',
-                      constraint: planStudyScopeSchema,
                     },
                   ],
                 },

@@ -1,15 +1,13 @@
+import { coverageFocusDictionary } from '#/dictionaries/coverage-focus.dictionary';
 import { knowledgeLevelDictionary } from '#/dictionaries/knowledge-level.dictionary';
-import { planTypeDictionary } from '#/dictionaries/plan-type.dictionary';
-import { studyScopeDictionary } from '#/dictionaries/study-scope.dictionary';
 import { cardLengthSchema } from '#/schemas/card-length.schema';
 import { contentEmphasisSchema } from '#/schemas/content-emphasis.schema';
+import { coverageFocusSchema } from '#/schemas/coverage-focus.schema';
 import { difficultyDistributionSchema } from '#/schemas/difficulty-distribution.schema';
 import { knowledgeLevelSchema } from '#/schemas/knowledge-level.schema';
 import { learningStyleAdaptationSchema } from '#/schemas/learning-style-adaptation.schema';
 import { mnemonicPreferencesSchema } from '#/schemas/mnemonic-preferences.schema';
 import { planDurationSchema } from '#/schemas/plan-durations.schema';
-import { planStudyScopeSchema } from '#/schemas/plan-study-scope.schema';
-import { planTypeSchema } from '#/schemas/plan-types.schema';
 import { preferredQuestionFormatsSchema } from '#/schemas/preferred-question-formats.schema';
 import { Logger } from '#/shared/helpers/logger/logger';
 import { RateLimit } from '#/shared/utils/api-limiter';
@@ -18,12 +16,11 @@ import { createClient } from '#/shared/utils/supabase/server';
 import uuid from '#/shared/utils/uuid.util';
 import type { CardLength } from '#/types/card-length.type';
 import type { ContentEmphasis } from '#/types/content-emphasis.type';
+import type { CoverageFocus } from '#/types/coverage-focus.type';
 import type { DifficultyDistribution } from '#/types/difficulty-distribution.type';
 import type { KnowledgeLevel } from '#/types/knowledge-level.type';
 import type { LearningStyleAdaptation } from '#/types/learning-style.type';
 import type { MnemonicPreferences } from '#/types/mnemonic-preference.type';
-import type { PlanStudyScope } from '#/types/plan-study-scope.type';
-import type { PlanType } from '#/types/plan-types.type';
 import type { PreferredQuestionFormats } from '#/types/preferred-question-formats.type';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamText } from 'ai';
@@ -38,9 +35,8 @@ async function validateBody(body: Record<string, unknown>) {
       .array(z.string().min(1, 'tag is required').max(255, 'tag is too long'))
       .min(1, 'Tags are required')
       .max(5, 'Max 5 tags'),
-    studyScope: planStudyScopeSchema,
     knowledgeLevel: knowledgeLevelSchema,
-    planType: planTypeSchema,
+    coverageFocus: coverageFocusSchema,
     duration: planDurationSchema,
     flashcardsNeeded: z
       .number()
@@ -100,9 +96,8 @@ export async function POST(req: NextRequest) {
 
   const {
     focusTags,
-    studyScope,
     knowledgeLevel,
-    planType,
+    coverageFocus,
     duration,
     flashcardsNeeded,
     preferredFormat,
@@ -115,9 +110,8 @@ export async function POST(req: NextRequest) {
     blacklist,
   }: {
     focusTags: string[];
-    studyScope: PlanStudyScope;
     knowledgeLevel: KnowledgeLevel;
-    planType: PlanType;
+    coverageFocus: CoverageFocus;
     duration: string;
     flashcardsNeeded: number;
     preferredFormat?: PreferredQuestionFormats;
@@ -133,8 +127,7 @@ export async function POST(req: NextRequest) {
   try {
     const error = await validateBody({
       focusTags,
-      studyScope,
-      planType,
+      coverageFocus,
       knowledgeLevel,
       duration,
       flashcardsNeeded,
@@ -170,8 +163,7 @@ export async function POST(req: NextRequest) {
     `User [ ${user.id} ] is generating plan flashcards suggestions. Data: ${JSON.stringify(
       {
         focusTags,
-        studyScope,
-        planType,
+        coverageFocus,
         knowledgeLevel,
         duration,
         flashcardsNeeded,
@@ -188,11 +180,8 @@ export async function POST(req: NextRequest) {
     routePath,
   );
 
-  const pickedPlanType = planTypeDictionary.find(
-    (plan) => plan.value === planType,
-  );
-  const pickedStudyScope = studyScopeDictionary.find(
-    (scope) => scope.value === studyScope,
+  const pickedCoverageFocus = coverageFocusDictionary.find(
+    (plan) => plan.value === coverageFocus,
   );
   const pickedKnowledgeLevel = knowledgeLevelDictionary.find(
     (level) => level.value === knowledgeLevel,
@@ -220,6 +209,23 @@ export async function POST(req: NextRequest) {
   //   system: `You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards. Your primary responsibilities are:
   // })
 
+  const getTemperature = (knowledgeLevel: KnowledgeLevel) => {
+    switch (knowledgeLevel) {
+      case 'unfamiliar':
+        return 1.0;
+      case 'beginner':
+        return 1.0;
+      case 'developing':
+        return 0.9;
+      case 'proficient':
+        return 0.8;
+      case 'advanced':
+        return 0.6;
+      case 'expert':
+        return 0.5;
+    }
+  };
+
   const prompt = (
     flashcardCount: number,
     summaries: { id: string; topic: string; query: string; context: string }[],
@@ -233,18 +239,41 @@ export async function POST(req: NextRequest) {
   * **Law & Business:** Styles: Case Studies (Scenario-Based), Definition (Legal/Business Terms), Principle/Rule, Ethical Dilemma (Scenario), Process Flashcards, Compare Concepts/Strategies. Focus: Application, Terminology, Principles.
   * **Medical/Healthcare:** Styles: Diagram Labeling (Anatomy), Process/Mechanism, Medical Terminology, Clinical Scenarios, Drug Mechanism, Disease Pathology, Definition (Medical). Focus: Structures, Processes, Terms, Scenarios.
 
-  {{allowed styles and formats}}
-
-  Generate ${flashcardCount} unique flashcards covering [${focusTags.join(',')}] for a "${pickedPlanType}" study plan, knowledge level "${pickedKnowledgeLevel}" and study scope: "${pickedStudyScope}".
+  Generate ${flashcardCount} unique flashcards.
 
   **User Preferences**:
-    • Emphasize: ${contentEmphasis ?? 'Balanced coverage across subtopics'}
     • Learning style: ${learningStyle ?? 'Balanced for all learning styles (visual | auditory | reading-writing | kinesthetic | logical | social | solitary)'}
-    • Difficulty: ${difficultyDistribution ?? 'Balanced difficulty (33% easy, 34% medium, 33% hard)'}
     • Length: ${cardLength ?? 'Balanced length'}
     • Mnemonics: ${mnemonicPreference ?? 'No specific mnemonic techniques'}
     ${userPrompt ? `• Additional instructions: ${userPrompt}` : ''}
     • Flashcard format and preference: Use allowed styles and formats
+    • Knowledge Level: ${pickedKnowledgeLevel}
+    • Plan Type: ${pickedCoverageFocus}
+    • Focus on Tags: [${focusTags.join(',')}]
+
+  **Knowledge Level Guidance (Interpreted for the specific Subject Area):**
+
+    *   **unfamiliar:** Assume zero prior knowledge *within the topic*. Focus on the absolute most basic elements:
+      -   *Examples:* Core definitions (STEM/Law/Business), basic vocabulary/alphabet (Language), key figures/events (Humanities), identifying major styles/instruments (Arts), fundamental structures (Medical). Simple recognition or recall. Use appropriate styles (e.g., Definition, Who/What/When).
+    *   **beginner:** Assume familiarity with only the most basic elements. Focus on understanding foundational concepts, simple rules/processes, and common examples.
+      -   *Examples:* Simple syntax/conjugation (Language), core functions/components (STEM), basic timelines/definitions (Humanities), recognizing characteristics of a style (Arts), simple legal/business principles (Law/Business), basic anatomical parts/functions (Medical). Use appropriate styles (e.g., Example Sentence, List Parts, Define Concept).
+    *   **developing:** Assume understanding of basics. Focus on connecting concepts, understanding common usage/variations, simple application, and basic analysis.
+      -   *Examples:* Using different tenses/simple dialogues (Language), explaining how components interact (STEM), identifying cause/effect (Humanities), analyzing basic composition (Arts), applying a simple rule to a scenario (Law/Business), describing a basic physiological process (Medical). Use appropriate styles (e.g., Fill-in-Blank, How/Why, Compare-Contrast, Simple Scenario).
+    *   **proficient:** Assume solid grasp of fundamentals and common applications. Focus on applying knowledge in varied contexts, understanding nuances, identifying patterns/best practices, and intermediate analysis/troubleshooting.
+      -   *Examples:* Constructing complex sentences/handling common conversational topics (Language), applying concepts to solve standard problems (STEM), analyzing primary sources/comparing interpretations (Humanities), identifying artist techniques/influences (Arts), analyzing a standard case study (Law/Business), interpreting common clinical signs (Medical). Use appropriate styles (e.g., Scenario Dialogue, Application Scenario, Cause-Effect Analysis, Case Study).
+    *   **advanced:** Assume deep understanding and practical experience. Focus on complex scenarios, subtle distinctions, evaluating trade-offs, synthesizing information, and addressing non-standard situations.
+      -   *Examples:* Nuanced vocabulary/idioms/cultural context (Language), optimizing solutions/debugging complex issues (STEM), evaluating historical arguments/synthesizing theories (Humanities), critiquing complex works/understanding art theory (Arts), navigating complex legal/business strategies (Law/Business), differential diagnosis/complex patient management (Medical). Use appropriate styles (e.g., Meaning in Context (Idioms), Complex Scenarios, Argument/Counter-Argument, Technique Analysis, Ethical Dilemma).
+    *   **expert:** Assume mastery and ability to teach. Focus on cutting-edge knowledge, deep theoretical underpinnings, predicting trends, critical evaluation across contexts, and explaining complexity simply.
+      -   *Examples:* Linguistic theory/translation nuances (Language), designing novel systems/research-level problems (STEM), contributing original analysis/historiography (Humanities), curating/art criticism/theory (Arts), shaping strategy/policy (Law/Business), understanding rare conditions/research frontiers (Medical). Use appropriate styles (e.g., Explaining complex grammar, Designing a system, Critical Evaluation, Advanced Theory).
+
+  **Constraint Checklist for [Knowledge Level Value] & [Subject Area]:**
+
+    *   **Content Relevance:** Ensure flashcards are strictly relevant to "[Topic Name]" and appropriate for the "[Subject Area]".
+    *   **Level Appropriateness:**
+      -   **[For Proficient/Advanced/Expert]:** AVOID overly basic concepts, definitions, or tasks typically covered in introductory materials for "[Topic Name]" within "[Subject Area]".
+      -   **[For all levels]:** Ensure the cognitive task required (recall, apply, analyze, evaluate, etc.) matches the specified knowledge level description.
+    *   **Style Appropriateness:** Select flashcard styles (e.g., definition, scenario, fill-in-the-blank) that are suitable for both the "[Subject Area]" (referencing the examples above) and the complexity required by the "[Knowledge Level Value]".
+    *   **Accuracy & Clarity:** Ensure information is accurate and presented clearly. Keep fronts (prompts) and backs (answers) concise but sufficiently detailed for the level.
 
 
 **EXCLUDED TOPICS** (DO NOT generate cards related to these):
@@ -259,41 +288,35 @@ ${summaries
   .join('\n')}
 
   **Critical Requirements**:
-1. ADAPTIVE QUESTION FORMATS - Select based on subject matter:
-   • TECHNICAL: How/why mechanisms, comparisons, applications, consequences, components
-   • VOCABULARY: Contextual meaning, word relationships, usage, distinctions, register
-   • PROCEDURAL: Sequential steps, preparations, tools, outcomes, troubleshooting
-   • FACTUAL: Temporal/spatial knowledge, attributes, classifications, measurements
-
-2. ANSWER QUALITY:
-   • NO terms from questions in answers - avoid hint words
-   • Application doesn't have implemented multiple answers so only answer one is correct.
+1. ANSWER QUALITY:
+   • NO terms from questions in answers - avoid hinting solutions
+   • NO terms from answers in questions - avoid hinting answers
+   • Only answer1 is correct. Answer2, answer3, answer4 are still required in the response but need to be incorrect.
    • Wrong answers: plausible but clearly incorrect to experts
    • Match complexity precisely to knowledge level ${knowledgeLevel} - especially for expert level
    • For vocabulary: semantically related but distinct distractors
 
-3. PLAN-SPECIFIC APPROACH:
-   For "${planType}":
-   • Overview: Broad concept coverage across cognitive levels
-   • Deep-Dive: Complex relationships and detailed mechanisms
-   • Quick-Revision: Essential definitions and high-yield distinctions
-   • Exam-Prep: Application scenarios and analysis questions
+  **Clarifications**:
+    • Include multiple examples, key points, synonyms, and related facts where relevant.
+    • Only include optional fields when they add significant value.
+    • Ensure each flashcard is unique and explores distinct concepts.
+    • The Focus Tags specify the primary areas of content. Use them to determine the specific [Topic Name] and [Subject Area] context for constraints.
 
    JSON OUTPUT per card:
 {
   "id": "unique_ID",
-  "query": "clear_and_concise_question",
-  "definition": "answer_explanation",
-  "context": "main_subject",
+  "query": "clear_and_concise_question", // The front of the flashcard
+  "definition": "answer_explanation", // The back of the flashcard
+  "context": "main_subject_or_topic",
   "tags": ["relevant_tags"],
-  "answer1": "correct_answer",
+  "answer1": "correct_answer", // The back of the flashcard
   "answer2": "wrong_answer",
   "answer3": "wrong_answer",
   "answer4": "wrong_answer",
-  "examples": "optional_usage",
-  "keyPoints": "optional_notes",
-  "synonyms": "optional_terms",
-  "relatedFacts": "optional_connections"
+  "examples": "optional_usage_example(s)",
+  "keyPoints": "optional_key_takeaway(s)",
+  "synonyms": "optional_alternative_terms",
+  "relatedFacts": "optional_related_concepts_or_facts"
 }
 
 You can include multiple examples/keyPoints/synonyms/relatedFacts by separating them with a semicolon.
@@ -304,23 +327,15 @@ Only include optional fields when they add significant value.
   return streamText({
     model: gemini('gemini-2.0-flash-thinking-exp-01-21'),
     prompt: prompt(flashcardsNeeded, []).replaceAll('\n', ' ').trim(),
-    temperature: 0.8,
+    temperature: getTemperature(knowledgeLevel),
     maxSteps: 5,
     experimental_continueSteps: true,
     stopSequences: ['[FINISH] All FC generated'],
     system: `You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards. Your primary responsibilities are:
-
 1. UNIQUENESS: Generate flashcards that explore DISTINCT concepts, avoiding semantic overlap or reformulation of existing content.
-
-2. PEDAGOGICAL VARIETY: Craft questions across multiple cognitive domains (from basic recall to complex evaluation) and diverse formats (definitions, applications, comparisons, problem-solving).
-
-3. KNOWLEDGE CALIBRATION: Precisely match content difficulty to the specified knowledge level - from foundational concepts for beginners to cutting-edge applications for experts.
-
-4. SUBJECT ADAPTABILITY: Tailor your approach based on subject matter (technical concepts, vocabulary, procedures, factual content) and study purpose (comprehensive overview, deep dive, revision, exam prep).
-
-5. ANSWER QUALITY: Create clearly correct answers and plausible but definitively incorrect distractors that don't hint at the correct response.
-
-Your expertise spans disciplines from technical fields to languages, sciences to humanities. For each flashcard set, you analyze existing content to identify knowledge gaps, then strategically fill those gaps with carefully crafted new cards that expand the user's understanding in meaningful ways.
+2. PEDAGOGICAL VARIETY: Craft questions across multiple cognitive domains (from basic recall to complex evaluation).
+3. KNOWLEDGE CALIBRATION: Precisely match content difficulty to the specified knowledge level.
+4. ANSWER QUALITY: Create clearly correct answers and plausible but definitively incorrect distractors that don't hint at the correct response.
 When you're ready to finish, include the phrase "[FINISH] All FC generated" in your response.`,
     onFinish(response) {
       Logger.info(

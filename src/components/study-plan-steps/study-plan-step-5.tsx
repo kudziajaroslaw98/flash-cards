@@ -21,7 +21,6 @@ export function StudyPlanStep5({
   focusTags,
   flashcards,
   summaries,
-  planType,
   duration,
 }: {
   focusTags: string[];
@@ -32,7 +31,6 @@ export function StudyPlanStep5({
     query: string;
     definition: string;
   }>[];
-  planType: string;
   duration: string;
 }) {
   const [planDays, setPlanDays] = useState<(StudyDay & { name: string })[]>([]);
@@ -61,11 +59,10 @@ export function StudyPlanStep5({
   });
 
   useEffect(() => {
-    if (summaries && planType && duration && initialLoadReg.current === false) {
+    if (summaries && duration && initialLoadReg.current === false) {
       initialLoadReg.current = true;
       submit({
         summaries,
-        planType,
         duration,
       });
     }

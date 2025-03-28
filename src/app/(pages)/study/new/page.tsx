@@ -14,14 +14,13 @@ import { Logger } from '#/shared/helpers/logger/logger';
 import { extractObjectsFromString } from '#/shared/utils/extract-objects-from-string';
 import type { CardLength } from '#/types/card-length.type';
 import type { ContentEmphasis } from '#/types/content-emphasis.type';
+import type { CoverageFocus } from '#/types/coverage-focus.type';
 import type { DifficultyDistribution } from '#/types/difficulty-distribution.type';
 import type { Flashcard } from '#/types/flash-card.type';
 import type { KnowledgeLevel } from '#/types/knowledge-level.type';
 import type { LearningStyleAdaptation } from '#/types/learning-style.type';
 import type { MnemonicPreferences } from '#/types/mnemonic-preference.type';
 import type { PlanDuration } from '#/types/plan-durations.type';
-import type { PlanStudyScope } from '#/types/plan-study-scope.type';
-import type { PlanType } from '#/types/plan-types.type';
 import type { PreferredQuestionFormats } from '#/types/preferred-question-formats.type';
 import { useCompletion } from '@ai-sdk/react';
 import { useEffect, useState } from 'react';
@@ -29,7 +28,6 @@ import { useEffect, useState } from 'react';
 export interface PlanSetupState {
   step1: {
     focusTags: string[];
-    studyScope: PlanStudyScope;
     knowledgeLevel: KnowledgeLevel;
     preferredFormat?: PreferredQuestionFormats;
     contentEmphasis?: ContentEmphasis;
@@ -40,7 +38,7 @@ export interface PlanSetupState {
   };
   step2: {
     duration: PlanDuration;
-    planType: PlanType;
+    coverageFocus: CoverageFocus;
     blacklist: string[];
     userPrompt: string;
   };
@@ -51,47 +49,39 @@ export default function NewStudyPlanPage() {
   const [state, setState] = useState<PlanSetupState>({
     step1: {
       focusTags: [],
-      studyScope: 'default',
       knowledgeLevel: 'beginner',
     },
     step2: {
+      coverageFocus: 'core',
       duration: '3',
-      planType: 'overview',
       blacklist: [],
       userPrompt: '',
     },
   });
   const recommendedFlashcardsCount: Record<
-    PlanType,
+    CoverageFocus,
     Record<PlanDuration, [number, number]>
   > = {
-    overview: {
+    deep: {
       '3': [30, 45],
       '5': [50, 75],
       '7': [70, 100],
       '14': [140, 200],
       '30': [300, 450],
     },
-    'deep-dive': {
+    broad: {
       '3': [25, 35],
       '5': [40, 60],
       '7': [60, 80],
       '14': [120, 160],
       '30': [250, 350],
     },
-    'quick-review': {
+    core: {
       '3': [15, 25],
       '5': [25, 40],
       '7': [40, 60],
       '14': [80, 120],
       '30': [150, 250],
-    },
-    'exam-prep': {
-      '3': [40, 50],
-      '5': [60, 80],
-      '7': [80, 120],
-      '14': [160, 240],
-      '30': [350, 500],
     },
   } as const;
 
@@ -102,23 +92,22 @@ export default function NewStudyPlanPage() {
 
   const getRecommendedFlashcardCount = (
     duration: PlanDuration,
-    planType: PlanType,
+    coverageFocus: CoverageFocus,
   ) => {
-    return recommendedFlashcardsCount[planType ?? 'overview'][duration ?? '3'];
+    return recommendedFlashcardsCount[coverageFocus ?? 'core'][duration ?? '3'];
   };
 
   const { complete, completion } = useCompletion({
     api: API_ROUTES.GENERATE_SUGGESTED_FLASHCARDS,
     body: {
       focusTags: state.step1.focusTags,
-      studyScope: state.step1.studyScope,
       knowledgeLevel: state.step1.knowledgeLevel,
-      planType: state.step2.planType,
+      coverageFocus: state.step2.coverageFocus,
       duration: state.step2.duration,
       flashcardsNeeded:
         getRecommendedFlashcardCount(
           state.step2.duration as PlanDuration,
-          state.step2.planType as PlanType,
+          state.step2.coverageFocus as CoverageFocus,
         )?.[1] ?? 0,
       preferredFormat: state.step1.preferredFormat,
       contentEmphasis: state.step1.contentEmphasis,
@@ -212,7 +201,7 @@ export default function NewStudyPlanPage() {
                 isLoading={isLoading}
                 flashcardCount={getRecommendedFlashcardCount(
                   state.step2.duration as PlanDuration,
-                  state.step2.planType as PlanType,
+                  state.step2.coverageFocus as CoverageFocus,
                 )}
                 generateSuggestions={generateSuggestions}
               />
@@ -228,7 +217,7 @@ export default function NewStudyPlanPage() {
                 isLoading={isLoading}
                 flashcardCount={getRecommendedFlashcardCount(
                   state.step2.duration as PlanDuration,
-                  state.step2.planType as PlanType,
+                  state.step2.coverageFocus as CoverageFocus,
                 )}
                 setSuggestions={setSuggestions}
                 setFlashcards={setFlashcards}
@@ -249,7 +238,7 @@ export default function NewStudyPlanPage() {
                   query: flashcard.query,
                   definition: flashcard.definition,
                 }))}
-                planType={state.step2.planType}
+                coverageFocus={state.step2.coverageFocus}
                 duration={state.step2.duration}
               />
             </StepperStep>
