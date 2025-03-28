@@ -124,26 +124,56 @@ export function AISuggestedFlashcard({
                   <BadgeCheck className='absolute -right-4 -top-4 h-6 w-6 fill-green-500 text-gray-50 dark:text-slate-950' />
                 )}
 
-                {flashcard.type !== 'index' && (
-                  <h5
-                    className={cn([
-                      'absolute left-0 top-0 z-20 flex h-16 w-full flex-col items-center justify-start hyphens-auto px-2 pt-4 text-center',
-                      'text-[0.6875rem] leading-[120%]',
-                    ])}
-                  >
-                    {flashcard.query}
-                  </h5>
+                {flashcard.type === 'index' && (
+                  <>
+                    <h5
+                      className={cn([
+                        'z-20 flex h-full w-full flex-col items-center justify-center hyphens-auto text-center text-green-400',
+                        'text-sm leading-[120%]',
+                      ])}
+                    >
+                      {flashcard.context}
+                    </h5>
+                  </>
                 )}
 
-                {flashcard.type !== 'question' && (
-                  <h2
-                    className={cn([
-                      'z-20 flex h-full w-full flex-col items-center justify-center hyphens-auto py-2 text-center text-green-400 ',
-                      'text-lg leading-[120%]',
-                    ])}
-                  >
-                    {flashcard.context}
-                  </h2>
+                {flashcard.type === 'question' && (
+                  <>
+                    <h5
+                      className={cn([
+                        'z-20 flex h-full w-full flex-col items-center justify-center text-center',
+                        'text-[0.6875rem] leading-[120%]',
+                      ])}
+                    >
+                      {flashcard.query}
+                    </h5>
+                  </>
+                )}
+
+                {flashcard.type === 'single' && (
+                  <>
+                    {flashcard.query && (
+                      <h5
+                        className={cn([
+                          'z-20 flex h-auto w-full flex-col items-center justify-start hyphens-auto text-center font-serif text-green-400',
+                          'text-xs leading-[90%]',
+                        ])}
+                      >
+                        {flashcard.context}
+                      </h5>
+                    )}
+
+                    {flashcard.query && (
+                      <h5
+                        className={cn([
+                          'z-20 flex h-full w-full flex-col items-center justify-center text-center',
+                          'text-[0.6875rem] leading-[120%]',
+                        ])}
+                      >
+                        {flashcard.query}
+                      </h5>
+                    )}
+                  </>
                 )}
               </>
             </span>

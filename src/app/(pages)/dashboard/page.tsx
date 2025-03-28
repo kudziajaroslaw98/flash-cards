@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     ],
   },
   robots: {
-    index: true,
+    index: false,
     follow: false,
   },
   applicationName: 'Flashcards - Learning Words Made Easy',

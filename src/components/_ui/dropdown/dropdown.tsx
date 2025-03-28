@@ -49,6 +49,7 @@ interface BaseDropdownProps<T> extends VariantProps<typeof DropdownVariants> {
   onFocus?: () => void;
   onAddNew?: (value: string) => void;
   disabled?: boolean;
+  loading?: boolean;
   contextClassName?: string;
   name?: string;
 }
@@ -86,6 +87,7 @@ export default function Dropdown<T>({
   error = null,
   touched = false,
   disabled = false,
+  loading = false,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   type = 'dropdown',
   ...props
@@ -106,6 +108,7 @@ export default function Dropdown<T>({
   const configRef = useRef<DictionaryValue<T>[] | null>(null);
   const valueRef = useRef<T | T[] | null | undefined>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
+  const popoverItemsEndRef = useRef<HTMLDivElement>(null);
   const hasFocus = useRef(false);
 
   useOutsideAlerter(dropdownWrapperRef, () => {
@@ -249,7 +252,7 @@ export default function Dropdown<T>({
 
   const toggleDropdown = () => {
     window?.umami?.track('Dropdown - Toggle', { name: props.name ?? label });
-    if (disabled) return;
+    if (disabled || loading) return;
     setVisible((prev) => !prev);
     setSearchValue('');
   };
@@ -339,6 +342,10 @@ export default function Dropdown<T>({
       onChange(newItem.value as T & T[]);
       setSelected([newItem]);
     }
+
+    setTimeout(() => {
+        popoverItemsEndRef.current?.scrollIntoView({behavior: 'smooth' });
+    }, 10);
   };
 
   const handleNewElementChange = (event: FormEvent<HTMLInputElement>) => {
@@ -403,12 +410,14 @@ export default function Dropdown<T>({
               selectedCount={selected.length}
               label={selected[0]?.label ?? label}
               multipleLabel={multipleLabel}
+              loading={loading}
             />
           ) : (
             <DropdownLabel
               onClick={() => {}}
               visible={visible}
               label={selected[0]?.label ?? label}
+              loading={loading}
             />
           )}
         </div>
@@ -469,7 +478,12 @@ export default function Dropdown<T>({
                     selectable={!!multiple}
                   />
                 ))}
+              <div
+                ref={popoverItemsEndRef}
+                className='flex size-[0.5px]'
+              ></div>
             </div>
+
             {props.addNew && !isInAddNewMode && (
               <div
                 className='flex h-11 w-full cursor-pointer items-center justify-center rounded-b-md border-t bg-gray-50 px-4 py-2 text-gray-500 outline-none transition hover:text-green-400 focus:ring focus:ring-green-400/50  dark:border-slate-800/40 dark:bg-slate-950'
@@ -482,6 +496,7 @@ export default function Dropdown<T>({
                 <Plus className='mr-2 h-4 w-4' /> Add new
               </div>
             )}
+
             {props.addNew && isInAddNewMode && (
               <div>
                 <div className='min-w-fit  bg-gray-50 p-1 py-2 outline-none focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-950'>

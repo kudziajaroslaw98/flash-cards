@@ -2,28 +2,29 @@
 
 import type { PlanSetupState } from '#/app/(pages)/study/new/page';
 import { cardLengthDictionary } from '#/dictionaries/card-length.dictionary';
-import { contentEmphasisDictionary } from '#/dictionaries/content-emphasis.dictionary';
-import { difficultyDistributionDictionary } from '#/dictionaries/difficulty-distribution.dictionary';
 import { knowledgeLevelDictionary } from '#/dictionaries/knowledge-level.dictionary';
 import { learningStyleDictionary } from '#/dictionaries/learning-style.dictionary';
 import { mnemonicPreferenceDictionary } from '#/dictionaries/mnemonic-preference.dictionary';
-import { preferredFormatDictionary } from '#/dictionaries/preferred-format.dictionary';
 import { cardLengthSchema } from '#/schemas/card-length.schema';
-import { contentEmphasisSchema } from '#/schemas/content-emphasis.schema';
-import { difficultyDistributionSchema } from '#/schemas/difficulty-distribution.schema';
 import { knowledgeLevelSchema } from '#/schemas/knowledge-level.schema';
 import { learningStyleAdaptationSchema } from '#/schemas/learning-style-adaptation.schema';
 import { mnemonicPreferencesSchema } from '#/schemas/mnemonic-preferences.schema';
-import { preferredQuestionFormatsSchema } from '#/schemas/preferred-question-formats.schema';
+import { API_ROUTES } from '#/shared/defaults/api-routes';
+import { extractObjectsFromString } from '#/shared/utils/extract-objects-from-string';
 import type { CardLength } from '#/types/card-length.type';
-import type { ContentEmphasis } from '#/types/content-emphasis.type';
-import type { DifficultyDistribution } from '#/types/difficulty-distribution.type';
+import { DictionaryValue } from '#/types/dictionary-value.type';
 import type { KnowledgeLevel } from '#/types/knowledge-level.type';
 import type { LearningStyleAdaptation } from '#/types/learning-style.type';
 import type { MnemonicPreferences } from '#/types/mnemonic-preference.type';
-import type { PreferredQuestionFormats } from '#/types/preferred-question-formats.type';
+import { useCompletion } from 'ai/react';
 import { ArrowRight } from 'lucide-react';
-import { useRef, type Dispatch, type SetStateAction } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import { z } from 'zod';
 import { Button } from '../_ui/button/button';
 import FormComponent, { type FormMethods } from '../form-component/form';
@@ -36,19 +37,26 @@ export function StudyPlanStep1({
   state: PlanSetupState;
   setState: Dispatch<SetStateAction<PlanSetupState>>;
 }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState<DictionaryValue<string>[]>([]);
   const { goToNext } = useStepper();
   const formRef = useRef<
     FormMethods<{
       focusTags: string[];
       knowledgeLevel: KnowledgeLevel;
-      preferredFormat?: PreferredQuestionFormats;
-      contentEmphasis?: ContentEmphasis;
+      suggestedFocusAreas: string[];
       learningStyle?: LearningStyleAdaptation;
-      difficultyDistribution?: DifficultyDistribution;
       cardLength?: CardLength;
       mnemonicPreference?: MnemonicPreferences;
     }>
   >(null);
+
+  const { complete, completion } = useCompletion({
+    api: API_ROUTES.GENERATE_BRAINSTORM_TAG_IDEAS,
+    onFinish: () => {
+      setIsLoading(false);
+    },
+  });
 
   const handleOnClick = async () => {
     await formRef.current?.checkValidity();
@@ -60,7 +68,41 @@ export function StudyPlanStep1({
 
   const handleFormValueChange = (value: Partial<PlanSetupState['step1']>) => {
     setState((prev) => ({ ...prev, step1: value }) as PlanSetupState);
+    generateBrainstormIdeas(value);
   };
+
+  const generateBrainstormIdeas = (value: Partial<PlanSetupState['step1']>) => {
+    if (
+      value.focusTags &&
+      value.focusTags.length > 0 &&
+      value.knowledgeLevel &&
+      value.knowledgeLevel !== null &&
+      suggestions.length === 0 &&
+      !isLoading
+    ) {
+      setIsLoading(true);
+      complete('prompt', {
+        body: {
+          focusTags: value.focusTags,
+          knowledgeLevel: value.knowledgeLevel,
+        },
+      });
+    }
+  };
+
+  useEffect(() => {
+    const objects =
+      extractObjectsFromString<DictionaryValue<string>>(completion);
+    const suggestionsLength = suggestions.length;
+
+    if (objects === null || suggestionsLength === objects?.length) {
+      return;
+    }
+
+    setSuggestions(objects);
+
+    console.log('🚀 ~ :119 ~ useEffect ~ objects:', objects);
+  }, [completion]);
 
   return (
     <div className='flex w-full flex-col items-start'>
@@ -83,6 +125,21 @@ export function StudyPlanStep1({
           <FormComponent<PlanSetupState['step1']>
             scheme={{
               inputs: {
+                knowledgeLevel: {
+                  type: 'dropdown',
+                  multiple: false,
+                  required: true,
+                  label: 'Choose level...',
+                  controlLabel: 'Select your knowledge level:',
+                  config: knowledgeLevelDictionary,
+                  _internal_constraints: [
+                    {
+                      type: 'validation',
+                      key: 'knowledgeLevel',
+                      constraint: knowledgeLevelSchema,
+                    },
+                  ],
+                },
                 focusTags: {
                   type: 'dropdown',
                   config: [
@@ -120,20 +177,31 @@ export function StudyPlanStep1({
                       key: 'focusTags',
                       constraint: z
                         .array(z.string().min(1))
-                        .min(1, 'Tags are required'),
+                        .min(1, 'Tags are required')
+                        .max(10, 'Max 10 tags'),
                     },
                   ],
                 },
-                knowledgeLevel: {
+                suggestedFocusAreas: {
                   type: 'dropdown',
-                  multiple: false,
-                  required: true,
-                  label: 'Choose level...',
-                  controlLabel: 'Select your knowledge level:',
-                  config: knowledgeLevelDictionary,
+                  config: suggestions,
+                  loading: isLoading,
+                  multiple: true,
+                  multipleLabel: 'Tags',
+                  label: 'Choose tags...',
+                  controlLabel: `Suggested tags for '${state.step1.knowledgeLevel}' level:`,
+                  _internal_default_value: [],
                   _internal_constraints: [
                     {
                       type: 'validation',
+                      key: 'suggestedFocusAreas',
+                      constraint: z
+                        .array(z.string().min(1))
+                        .max(20, 'Max 20 tags')
+                        .nullish(),
+                    },
+                    {
+                      type: 'show',
                       key: 'knowledgeLevel',
                       constraint: knowledgeLevelSchema,
                     },
@@ -145,39 +213,9 @@ export function StudyPlanStep1({
                 },
                 _internal_accordion_1: {
                   type: '_internal_accordion',
-                  title: 'Content Preferences',
-                  name: 'contentSection',
+                  title: 'Learning Style',
+                  name: 'learningStyleSection',
                   inputs: {
-                    preferredFormat: {
-                      type: 'dropdown',
-                      multiple: false,
-                      label: 'Choose preferred format...',
-                      controlLabel: 'Preferred Format',
-                      config: preferredFormatDictionary,
-                      _internal_default_value: null,
-                      _internal_constraints: [
-                        {
-                          type: 'validation',
-                          key: 'preferredFormat',
-                          constraint: preferredQuestionFormatsSchema.nullish(),
-                        },
-                      ],
-                    },
-                    contentEmphasis: {
-                      type: 'dropdown',
-                      multiple: false,
-                      label: 'Choose content emphasis...',
-                      controlLabel: 'Content Emphasis',
-                      config: contentEmphasisDictionary,
-                      _internal_default_value: null,
-                      _internal_constraints: [
-                        {
-                          type: 'validation',
-                          key: 'contentEmphasis',
-                          constraint: contentEmphasisSchema.nullish(),
-                        },
-                      ],
-                    },
                     cardLength: {
                       type: 'dropdown',
                       label: 'Choose card length...',
@@ -193,13 +231,6 @@ export function StudyPlanStep1({
                         },
                       ],
                     },
-                  },
-                },
-                _internal_accordion_2: {
-                  type: '_internal_accordion',
-                  title: 'Learning Style',
-                  name: 'learningStyleSection',
-                  inputs: {
                     learningStyle: {
                       type: 'dropdown',
                       multiple: false,
@@ -215,22 +246,6 @@ export function StudyPlanStep1({
                         },
                       ],
                     },
-                    difficultyDistribution: {
-                      type: 'dropdown',
-                      label: 'Choose difficulty distribution...',
-                      multiple: false,
-                      controlLabel: 'Difficulty Distribution',
-                      config: difficultyDistributionDictionary,
-                      _internal_default_value: 'balanced',
-                      _internal_constraints: [
-                        {
-                          type: 'validation',
-                          key: 'difficultyDistribution',
-                          constraint: difficultyDistributionSchema.nullish(),
-                        },
-                      ],
-                    },
-
                     mnemonicPreference: {
                       type: 'dropdown',
                       multiple: false,

@@ -13,26 +13,21 @@ import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { Logger } from '#/shared/helpers/logger/logger';
 import { extractObjectsFromString } from '#/shared/utils/extract-objects-from-string';
 import type { CardLength } from '#/types/card-length.type';
-import type { ContentEmphasis } from '#/types/content-emphasis.type';
 import type { CoverageFocus } from '#/types/coverage-focus.type';
-import type { DifficultyDistribution } from '#/types/difficulty-distribution.type';
 import type { Flashcard } from '#/types/flash-card.type';
 import type { KnowledgeLevel } from '#/types/knowledge-level.type';
 import type { LearningStyleAdaptation } from '#/types/learning-style.type';
 import type { MnemonicPreferences } from '#/types/mnemonic-preference.type';
 import type { PlanDuration } from '#/types/plan-durations.type';
-import type { PreferredQuestionFormats } from '#/types/preferred-question-formats.type';
 import { useCompletion } from '@ai-sdk/react';
 import { useEffect, useState } from 'react';
 
 export interface PlanSetupState {
   step1: {
     focusTags: string[];
-    knowledgeLevel: KnowledgeLevel;
-    preferredFormat?: PreferredQuestionFormats;
-    contentEmphasis?: ContentEmphasis;
+    knowledgeLevel: KnowledgeLevel | null;
+    suggestedFocusAreas: string[];
     learningStyle?: LearningStyleAdaptation;
-    difficultyDistribution?: DifficultyDistribution;
     cardLength?: CardLength;
     mnemonicPreference?: MnemonicPreferences;
   };
@@ -49,7 +44,8 @@ export default function NewStudyPlanPage() {
   const [state, setState] = useState<PlanSetupState>({
     step1: {
       focusTags: [],
-      knowledgeLevel: 'beginner',
+      suggestedFocusAreas: [],
+      knowledgeLevel: null,
     },
     step2: {
       coverageFocus: 'core',
@@ -100,7 +96,7 @@ export default function NewStudyPlanPage() {
   const { complete, completion } = useCompletion({
     api: API_ROUTES.GENERATE_SUGGESTED_FLASHCARDS,
     body: {
-      focusTags: state.step1.focusTags,
+      focusTags: [...state.step1.focusTags, ...state.step1.suggestedFocusAreas],
       knowledgeLevel: state.step1.knowledgeLevel,
       coverageFocus: state.step2.coverageFocus,
       duration: state.step2.duration,
@@ -109,10 +105,7 @@ export default function NewStudyPlanPage() {
           state.step2.duration as PlanDuration,
           state.step2.coverageFocus as CoverageFocus,
         )?.[1] ?? 0,
-      preferredFormat: state.step1.preferredFormat,
-      contentEmphasis: state.step1.contentEmphasis,
       learningStyle: state.step1.learningStyle,
-      difficultyDistribution: state.step1.difficultyDistribution,
       cardLength: state.step1.cardLength,
       mnemonicPreference: state.step1.mnemonicPreference,
       userPrompt: state.step2.userPrompt,
@@ -230,7 +223,7 @@ export default function NewStudyPlanPage() {
               stepIdentification='4'
             >
               <StudyPlanStep5
-                focusTags={state.step1.focusTags}
+                focusTags={[...state.step1.focusTags, ...state.step1.suggestedFocusAreas]}
                 flashcards={flashcards}
                 summaries={flashcards.map((flashcard) => ({
                   frontUuid: flashcard.frontUuid,
@@ -238,7 +231,6 @@ export default function NewStudyPlanPage() {
                   query: flashcard.query,
                   definition: flashcard.definition,
                 }))}
-                coverageFocus={state.step2.coverageFocus}
                 duration={state.step2.duration}
               />
             </StepperStep>

@@ -1,14 +1,11 @@
 import { coverageFocusDictionary } from '#/dictionaries/coverage-focus.dictionary';
 import { knowledgeLevelDictionary } from '#/dictionaries/knowledge-level.dictionary';
 import { cardLengthSchema } from '#/schemas/card-length.schema';
-import { contentEmphasisSchema } from '#/schemas/content-emphasis.schema';
 import { coverageFocusSchema } from '#/schemas/coverage-focus.schema';
-import { difficultyDistributionSchema } from '#/schemas/difficulty-distribution.schema';
 import { knowledgeLevelSchema } from '#/schemas/knowledge-level.schema';
 import { learningStyleAdaptationSchema } from '#/schemas/learning-style-adaptation.schema';
 import { mnemonicPreferencesSchema } from '#/schemas/mnemonic-preferences.schema';
 import { planDurationSchema } from '#/schemas/plan-durations.schema';
-import { preferredQuestionFormatsSchema } from '#/schemas/preferred-question-formats.schema';
 import { Logger } from '#/shared/helpers/logger/logger';
 import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
@@ -34,7 +31,7 @@ async function validateBody(body: Record<string, unknown>) {
     focusTags: z
       .array(z.string().min(1, 'tag is required').max(255, 'tag is too long'))
       .min(1, 'Tags are required')
-      .max(5, 'Max 5 tags'),
+      .max(30, 'Max 30 tags'),
     knowledgeLevel: knowledgeLevelSchema,
     coverageFocus: coverageFocusSchema,
     duration: planDurationSchema,
@@ -42,10 +39,7 @@ async function validateBody(body: Record<string, unknown>) {
       .number()
       .min(1, 'Flashcards Needed is required')
       .max(500, 'Max 500 flashcards'),
-    preferredFormat: preferredQuestionFormatsSchema.nullish(),
-    contentEmphasis: contentEmphasisSchema.nullish(),
     learningStyle: learningStyleAdaptationSchema.nullish(),
-    difficultyDistribution: difficultyDistributionSchema.nullish(),
     cardLength: cardLengthSchema.nullish(),
     mnemonicPreference: mnemonicPreferencesSchema.nullish(),
     blacklist: z.array(z.string()).max(10, 'Too many tags').nullish(),
@@ -100,10 +94,7 @@ export async function POST(req: NextRequest) {
     coverageFocus,
     duration,
     flashcardsNeeded,
-    preferredFormat,
-    contentEmphasis,
     learningStyle,
-    difficultyDistribution,
     cardLength,
     mnemonicPreference,
     userPrompt,
@@ -124,6 +115,21 @@ export async function POST(req: NextRequest) {
     blacklist?: string[];
   } = await req.json();
 
+  console.log('-----------');
+  console.log({
+    focusTags,
+    knowledgeLevel,
+    coverageFocus,
+    duration,
+    flashcardsNeeded,
+    learningStyle,
+    cardLength,
+    mnemonicPreference,
+    userPrompt,
+    blacklist,
+  });
+  console.log('-----------');
+
   try {
     const error = await validateBody({
       focusTags,
@@ -131,10 +137,7 @@ export async function POST(req: NextRequest) {
       knowledgeLevel,
       duration,
       flashcardsNeeded,
-      preferredFormat,
-      contentEmphasis,
       learningStyle,
-      difficultyDistribution,
       cardLength,
       mnemonicPreference,
       userPrompt,
@@ -167,10 +170,7 @@ export async function POST(req: NextRequest) {
         knowledgeLevel,
         duration,
         flashcardsNeeded,
-        preferredFormat,
-        contentEmphasis,
         learningStyle,
-        difficultyDistribution,
         cardLength,
         mnemonicPreference,
         userPrompt,
@@ -230,6 +230,7 @@ export async function POST(req: NextRequest) {
     flashcardCount: number,
     summaries: { id: string; topic: string; query: string; context: string }[],
   ) => `
+  **IMPORTANT: All generated cards MUST strictly conform to the SINGLE specified Knowledge Level: ${pickedKnowledgeLevel}. Do NOT generate simpler content.**
   # ROLE: You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards tailored to user specifications.
 
   # GOAL: Generate ${flashcardCount} unique flashcards based on the provided inputs, strictly adhering to the specified knowledge level and content focus.
@@ -261,32 +262,22 @@ export async function POST(req: NextRequest) {
           *(Select appropriate styles from this list based on the inferred Subject Area and the specific Focus Tags.)*
 
       **2. Knowledge Level Application (CRITICAL - Determines Complexity):**
-          *(Apply ONE level consistently to ALL generated cards based on the 'Knowledge Level' input. Interpret these general guidelines within the context of the inferred Subject Area and Focus Tags.)*
+          *(Apply ONE level consistently to ALL generated cards based on the 'Knowledge Level' input: ${pickedKnowledgeLevel})*
 
-          *   **unfamiliar:** Assume zero prior knowledge within the Focus Tags. Focus on the absolute most basic elements: Core definitions (STEM/Law), basic vocabulary (Language), key figures/events (Humanities), major styles/instruments (Arts), fundamental structures (Medical). Simple recognition or recall. Use basic styles (Definition, Who/What).
-          *   **beginner:** Assume familiarity with only the most basic elements. Focus on understanding foundational concepts, simple rules/processes, and common examples: Simple syntax/conjugation (Language), core functions/components (STEM), basic timelines/concepts (Humanities), characteristics of a style (Arts), simple principles (Law/Business), basic anatomy/functions (Medical). Use foundational styles (Example Sentence, List Parts, Define Concept).
-          *   **developing:** Assume understanding of basics. Focus on connecting concepts, understanding common usage/variations, simple application, and basic analysis: Using different tenses/dialogues (Language), explaining component interaction (STEM), identifying cause/effect (Humanities), analyzing basic composition (Arts), applying simple rules (Law/Business), describing basic processes (Medical). Use connecting styles (Fill-in-Blank, How/Why, Compare-Contrast, Simple Scenario).
-          *   **proficient:** Assume solid grasp of fundamentals and common applications. Focus on applying knowledge in varied contexts, understanding nuances, identifying patterns/best practices, and intermediate analysis/troubleshooting: Complex sentences/conversations (Language), solving standard problems (STEM), analyzing sources/interpretations (Humanities), artist techniques/influences (Arts), standard case studies (Law/Business), interpreting common clinical signs (Medical). Use application styles (Scenario Dialogue, Application Scenario, Cause-Effect Analysis, Case Study).
-          *   **advanced:** Assume deep understanding and practical experience. Focus on complex scenarios, subtle distinctions, evaluating trade-offs, synthesizing information, and addressing non-standard situations: Nuanced vocabulary/idioms/context (Language), optimizing/debugging complex issues (STEM), evaluating arguments/theories (Humanities), critiquing complex works/theory (Arts), complex legal/business strategy (Law/Business), differential diagnosis/complex management (Medical). Use analytical styles (Meaning in Context (Idioms), Complex Scenarios, Argument/Counter-Argument, Technique Analysis, Ethical Dilemma).
-          *   **expert:** (Apply with EXTREME rigor for technical fields) Assume mastery and ability to teach the concepts within the Focus Tags.
-              *   **Focus Areas:** MUST GO BEYOND standard definitions and undergraduate material. Target complex system design trade-offs (e.g., scalability patterns, distributed systems consistency models, CAP theorem nuances), advanced algorithms/data structures (e.g., probabilistic, advanced graph theory), performance optimization internals (e.g., kernel tuning, JIT behavior, query optimization), deep language internals (e.g., memory models, GC strategies, type theory), complex concurrency/parallelism (e.g., lock-free structures, race condition diagnosis), cutting-edge fields (e.g., specific ML architectures, quantum algorithm impacts, formal verification), theoretical limits/proofs, or comparing/contrasting advanced architectural patterns in specific production scenarios.
-              *   **Question Types:** MUST REQUIRE significant analysis, synthesis, evaluation, design trade-off justification, or complex troubleshooting/diagnosis. Ask "why" advanced techniques are used, evaluate *implications* or *limitations*, propose architectural solutions, critique designs based on NFRs, or explain nuanced concepts/edge cases as if teaching a proficient learner. Use expert terminology *correctly and meaningfully*.
-              *   **ABSOLUTELY DO NOT (Especially for STEM/CS):**
-                  *   Ask for simple definitions or basic "what is" / "what is the purpose of" for foundational concepts like core data structures (stack, queue, etc. - unless asking about *advanced implementations* or *complex trade-offs*), core OOP principles (unless comparing *implementation strategies* or *design pattern implications*), fundamental algorithms, common protocols (HTTP, SQL), basic concepts (recursion, APIs, version control, OS roles, Big O notation - unless asking about *complex analysis*, *edge cases*, or *comparing notations*).
-                  *   Simply rephrase a basic question with formal wording. The *underlying concept* and *required cognitive task* must be genuinely advanced.
-              *   **Examples (Reflecting desired complexity for CS/STEM):**
-                  *   "Critically evaluate trade-offs between strong consistency and high availability in distributed databases, referencing CAP theorem and consensus algorithms like Paxos/Raft."
-                  *   "Design a system architecture for a real-time notification service handling 1M concurrent users, justifying choices for load balancing, queuing, and storage considering latency/fault tolerance."
-                  *   "Explain challenges and solutions for avoiding false sharing in multi-threaded applications on modern multi-core architectures."
-                  *   "Compare use cases and performance characteristics of B-trees vs. Log-Structured Merge-Trees (LSM-trees) for disk-based database indexing."
-                  *   "How would you diagnose intermittent, high-latency requests in a complex microservices architecture?"
+          *   **unfamiliar:** Focus ONLY on the absolute most basic definitions and identifications. Assume ZERO prior knowledge.
+          *   **beginner:** Focus on understanding foundational concepts, simple rules, and core definitions. Assume familiarity ONLY with absolute basics.
+          *   **developing:** Focus on connecting basic concepts, simple application, and explaining 'how' things work. Assume basic definitions are known. DO NOT ask for basic definitions.
+          *   **proficient:** Focus on APPLYING concepts in context, understanding NUANCES, comparing simple approaches, and basic analysis. Assume fundamentals are well understood. DO NOT ask for basic definitions or simple 'what is' questions. Questions MUST require application or analysis.
+          *   **advanced:** Focus on complex scenarios, evaluating trade-offs, synthesis, and subtle distinctions. Assume strong practical understanding. DO NOT ask basic/intermediate 'what is' or 'how does it work' questions. Questions MUST require evaluation or synthesis.
+          *   **expert:** Focus on deep analysis, design trade-offs, critique, advanced theory, and teaching complex topics. Assume mastery. DO NOT ask questions covered in standard textbooks/undergrad courses. Questions MUST require high-level evaluation, design, or critical analysis. (Refer back to the detailed expert guidance section if needed for specific examples/constraints, especially for STEM).
+            -   **(Optional: Keep the detailed expert section separate or integrate a shorter version here, but ensure the negative constraints are prominent).**
 
       **3. Content Selection (Applying Focus & Coverage):**
           *   **Prioritize Focus Tags:** Generate content *primarily* related to the concepts specified in the ''Focus Tags''.
           *   **Apply Coverage Focus:**
-              *   If ''core'': Focus strictly on the most essential information within the ''Focus Tags'' at the target ''Knowledge Level''.
-              *   If ''broad'': Aim for variety across the different ''Focus Tags'' (if multiple) or cover a wider range of concepts within a single tag/topic, all at the target ''Knowledge Level''.
-              *   If ''deep'': Prioritize depth within fewer areas defined by the ''Focus Tags''. Explore nuances, specific mechanisms, or complex examples related to the tags, at the target ''Knowledge Level''.
+              -   If ''core'': Focus strictly on the most essential information within the ''Focus Tags'' at the target ''Knowledge Level''.
+              -   If ''broad'': Aim for variety across the different ''Focus Tags'' (if multiple) or cover a wider range of concepts within a single tag/topic, all at the target ''Knowledge Level''.
+              -   If ''deep'': Prioritize depth within fewer areas defined by the ''Focus Tags''. Explore nuances, specific mechanisms, or complex examples related to the tags, at the target ''Knowledge Level''.
 
       **4. Constraint Checklist & Quality Control:**
           *   **Knowledge Level Consistency:** ALL cards MUST strictly match the single ''Knowledge Level'' specified. NO mixing of difficulties.
@@ -297,9 +288,9 @@ export async function POST(req: NextRequest) {
           *   **Style Appropriateness:** Chosen flashcard style MUST fit the Subject Area, Focus Tag content, and the complexity required by the Knowledge Level.
           *   **Accuracy & Clarity: Information must be accurate. Questions (''query''), concise answers (''answer''), and explanations (''definition'') must be clear and sufficiently detailed for the level.
           *  **Answer & Explanation Quality:**
-              *   The ''answer'' MUST be the direct, concise, and correct response to the ''query''.
-              *   The ''definition'' MUST clearly elaborate on *why* the ''answer'' is correct, provide necessary context, or break down the concept further, appropriate to the ''Knowledge Level''.
-              *   Avoid including keywords from the ''query'' directly in the ''answer'' or ''definition'' where possible if it would make the answer too obvious (no trivial hints).
+              -   The ''answer'' MUST be the direct, concise, and correct response to the ''query''.
+              -   The ''definition'' MUST clearly elaborate on *why* the ''answer'' is correct, provide necessary context, or break down the concept further, appropriate to the ''Knowledge Level''.
+              -   Avoid including keywords from the ''query'' directly in the ''answer'' or ''definition'' where possible if it would make the answer too obvious (no trivial hints).
 
       # OUTPUT FORMAT:
       Generate the response as a JSON array, where each object represents a single flashcard conforming to this structure:
@@ -343,20 +334,20 @@ Ensure the JSON is valid.
     When you have generated the requested number of high-quality, compliant flashcards, include the phrase "[FINISH] All FC generated" in your response.`,
     onFinish(response) {
       Logger.info(
-        `Session ${sessionId} finished successfully ${JSON.stringify({ finishReason: response?.finishReason, usage: response.usage })}`,
+        `Generating flashcards session ${sessionId} finished successfully [RESPONSE DETAILS] ${JSON.stringify({ finishReason: response?.finishReason, usage: response.usage })}`,
         routePath,
       );
       Logger.info(
-        `Session ${sessionId} finished successfully [REQUEST]${JSON.stringify({ steps: response?.steps.map((step) => step.request) })}`,
-        routePath,
-      );
-      Logger.info(
-        `Session ${sessionId} finished successfully [REQUEST]${JSON.stringify({ steps: response?.steps.map((step) => step.response) })}`,
+        `Generating flashcards session ${sessionId} finished successfully [RESPONSE] ${JSON.stringify({ steps: response?.steps.map((step) => step.response) })}`,
         routePath,
       );
     },
     onError: (error) => {
-      Logger.error(`Session ${sessionId}`, routePath, JSON.stringify(error));
+      Logger.error(
+        `Generating flashcards session ${sessionId}`,
+        routePath,
+        JSON.stringify(error),
+      );
     },
   }).toDataStreamResponse();
 }
