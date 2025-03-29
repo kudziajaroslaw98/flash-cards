@@ -1,8 +1,9 @@
 import { cn } from '#/shared/utils/cn.util';
 import { Flashcard } from '#/types/flash-card.type';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
-import { useCallback, useRef } from 'react';
+import { Fragment, useCallback, useRef } from 'react';
 import FlashcardComponent from '../flash-card/flash-card';
 
 interface Column {
@@ -34,7 +35,8 @@ export function VirtualizedFlashcardList({
     count: data.length,
     estimateSize: () => 192,
     getScrollElement: () => parentRef.current,
-    overscan: 5,
+    useAnimationFrameWithResizeObserver: true,
+    indexAttribute: 'data-row-index',
   });
 
   const columnVirtualizer = useVirtualizer({
@@ -43,7 +45,7 @@ export function VirtualizedFlashcardList({
     getScrollElement: () => parentRef.current,
     estimateSize: getColumnWidth,
     scrollMargin: 16,
-    overscan: 5,
+    indexAttribute: 'data-column-index',
   });
 
   const calculateTransformX = useCallback(
@@ -62,55 +64,63 @@ export function VirtualizedFlashcardList({
       style={{
         display: 'flex',
         overflowY: 'auto',
-        overflowX: 'visible',
+        overflowX: 'hidden',
         width: '100%',
         position: 'relative',
         height: '750px',
       }}
     >
-      {rowVirtualizer.getVirtualItems().map((virtualRow) =>
-        columnVirtualizer.getVirtualItems().map(
-          (virtualColumn) =>
-            data[virtualRow.index][virtualColumn.index] && (
-              <div key={virtualColumn.key}>
-                <m.div
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: `${getColumnWidth(virtualColumn.index) - 16}px`,
-                    height: `${virtualRow.size}px`,
-                    transform: `translateX(${calculateTransformX(virtualColumn.index)}px) translateY(${virtualRow.start + 16}px)`,
-                    zIndex: 20,
-                  }}
-                  whileHover={{ zIndex: 21 }}
+      {rowVirtualizer.getVirtualItems().map((virtualRow) => (
+        <Fragment key={virtualRow.key}>
+          {columnVirtualizer.getVirtualItems().map(
+            (virtualColumn) =>
+              data[virtualRow.index][virtualColumn.index] && (
+                <div
+                  key={`${virtualRow.key}-${virtualColumn.key}`}
+                  data-column-index={virtualColumn.index}
+                  data-row-index={virtualRow.index}
                 >
-                  <FlashcardComponent
-                    flashcard={data[virtualRow.index][virtualColumn.index]}
-                    size={'horizontal-sm'}
-                    isSelected={isSelected(
-                      data[virtualRow.index][virtualColumn.index],
-                    )}
-                    onSelect={() =>
-                      toggleSelected(
-                        data[virtualRow.index][virtualColumn.index],
-                      )
-                    }
-                    isInSelectionMode={isInSelectionMode}
-                  />
-                </m.div>
-                {virtualRow.index === data.length - 1 && (
-                  <div
-                    className={cn(['h-96 w-1 md:h-48'])}
-                    style={{
-                      transform: `translateX(${calculateTransformX(virtualColumn.index)}px) translateY(${virtualRow.start + 16 + 32}px)`,
-                    }}
-                  ></div>
-                )}
-              </div>
-            ),
-        ),
-      )}
+                  <AnimatePresence mode='popLayout'>
+                    <m.div
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: `${getColumnWidth(virtualColumn.index) - 16}px`,
+                        height: `${virtualRow.size}px`,
+                        transform: `translateX(${calculateTransformX(virtualColumn.index)}px) translateY(${virtualRow.start + 16}px)`,
+                        zIndex: 20,
+                      }}
+                      whileHover={{ zIndex: 21 }}
+                    >
+                      <FlashcardComponent
+                        flashcard={data[virtualRow.index][virtualColumn.index]}
+                        size={'horizontal-sm'}
+                        isSelected={isSelected(
+                          data[virtualRow.index][virtualColumn.index],
+                        )}
+                        onSelect={() =>
+                          toggleSelected(
+                            data[virtualRow.index][virtualColumn.index],
+                          )
+                        }
+                        isInSelectionMode={isInSelectionMode}
+                      />
+                    </m.div>
+                  </AnimatePresence>
+                  {virtualRow.index === data.length - 1 && (
+                    <div
+                      className={cn(['h-96 w-1 md:h-48'])}
+                      style={{
+                        transform: `translateX(${calculateTransformX(virtualColumn.index)}px) translateY(${virtualRow.start + 16 + 32}px)`,
+                      }}
+                    ></div>
+                  )}
+                </div>
+              ),
+          )}
+        </Fragment>
+      ))}
     </div>
   );
 }

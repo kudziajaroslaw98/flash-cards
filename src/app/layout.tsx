@@ -1,6 +1,6 @@
 import '#/shared/utils/polyfills';
 import type { Metadata } from 'next';
-import { Courier_Prime, Inter, Roboto_Mono } from 'next/font/google';
+import { Domine, Inter, Roboto_Mono } from 'next/font/google';
 
 import ClientSideProviders from '#/providers/client-side-providers.component';
 import Script from 'next/script';
@@ -12,11 +12,18 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
-const courierPrime = Courier_Prime({
+// const courierPrime = Courier_Prime({
+//   display: 'swap',
+//   variable: '--font-serif',
+//   subsets: ['latin'],
+//   weight: ['400', '700'],
+// });
+
+const serif_font = Domine({
   display: 'swap',
   variable: '--font-serif',
   subsets: ['latin'],
-  weight: ['400', '700'],
+  weight: ['400'],
 });
 
 const roboto_mono = Roboto_Mono({
@@ -116,7 +123,7 @@ export default function RootLayout({
   return (
     <html
       lang='en'
-      className={`${inter.variable} ${roboto_mono.variable} ${courierPrime.variable} dark flex font-sans`}
+      className={`${inter.variable} ${roboto_mono.variable} ${serif_font.variable} dark flex font-sans`}
       suppressHydrationWarning
     >
       <head>
