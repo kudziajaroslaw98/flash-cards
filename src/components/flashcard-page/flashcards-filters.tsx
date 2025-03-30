@@ -2,15 +2,19 @@
 
 import { useAppContext } from '#/providers/app-context';
 import type { Flashcard, FlashcardType } from '#/types/flash-card.type';
-import { Search } from 'lucide-react';
+import { Cog, Search } from 'lucide-react';
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react';
+import { Button } from '../_ui/button/button';
 import Dropdown from '../_ui/dropdown/dropdown';
 import Input from '../_ui/input/input';
+import { Popover } from '../popover/popover';
 
 export default function FlashcardsFilters({
+  selected,
   setFilteredFlashcards,
   setSelected,
 }: {
+  selected: Flashcard[];
   setFilteredFlashcards: (flashcards: Flashcard[]) => void;
   setSelected: (flashcards: Flashcard[]) => void;
 }) {
@@ -70,56 +74,75 @@ export default function FlashcardsFilters({
   }, [searchedText, searchedSets, searchedType, flashcards]);
 
   return (
-    <div className='flex w-full flex-col flex-wrap items-center justify-center gap-2 text-sm sm:flex-row sm:justify-end'>
-      <span className='flex w-full justify-center sm:w-auto'>
-        <Input
-          inputType='checkbox'
-          valid={true}
-          for='selectAll'
-          inputLabel='Select All'
-          onChange={handleSelectAll}
-          className='!w-full !max-w-80 sm:!w-56'
-        />
-      </span>
+    <div className='flex gap-4'>
+      <Popover
+        trigger={
+          <Button
+            alt='filters button'
+            icon={<Cog className='size-4' />}
+            iconPosition='right'
+            size={'icon-square-sm'}
+            variant={'primary-outline'}
+          />
+        }
+        position='bottom'
+        popoverClassName='z-[40] p-4 flex flex-col gap-4'
+      >
+        <div className='flex w-full flex-col gap-2'>
+          <span className='font-serif text-sm font-medium'>Actions</span>
 
-      <span className='flex w-full justify-center sm:w-auto'>
-        <Input
-          inputType='text'
-          value={searchedText}
-          valid={true}
-          placeholder='Search in flashcards...'
-          for='search'
-          icon={<Search className='h-4 w-4' />}
-          className='!w-full !max-w-80 sm:!w-56'
-          onChange={handleSearchedTextChange}
-        />
-      </span>
+          <Input
+            inputType='checkbox'
+            valid={true}
+            for='selectAll'
+            inputLabel='Select All'
+            onChange={handleSelectAll}
+            className='!w-full !max-w-80'
+            checked={selected.length === flashcards.length}
+          />
+        </div>
 
-      <span className='flex w-full flex-col items-center justify-center gap-2 sm:w-auto sm:flex-row'>
-        <Dropdown
-          type='dropdown'
-          config={setsDictionary}
-          onChange={handleSetsChange}
-          multipleLabel='Sets'
-          label='Sets'
-          labelClassName='!w-full !max-w-80 sm:!w-56'
-          searchable
-          clearAll
-          multiple
-          disabled={setsDictionary.length === 0}
-        />
+        <div className='flex w-full flex-col gap-2'>
+          <span className='font-serif text-sm font-medium'>Filters</span>
 
-        <Dropdown
-          type='dropdown'
-          config={flashcardTypeDictionaries}
-          onChange={handleTypesChange}
-          multipleLabel='Types'
-          label='All Types'
-          labelClassName='!w-full !max-w-80 sm:!w-56'
-          multiple
-          clearAll
-        />
-      </span>
+          <Input
+            inputType='text'
+            value={searchedText}
+            valid={true}
+            placeholder='Search in flashcards...'
+            for='search'
+            icon={<Search className='h-4 w-4' />}
+            className='!w-full !max-w-80'
+            onChange={handleSearchedTextChange}
+          />
+
+          <Dropdown
+            type='dropdown'
+            config={setsDictionary}
+            onChange={handleSetsChange}
+            multipleLabel='Sets'
+            label='Sets'
+            labelClassName='!w-full !max-w-80'
+            searchable
+            clearAll
+            multiple
+            disabled={setsDictionary.length === 0}
+            nestedPopover={true}
+          />
+
+          <Dropdown
+            type='dropdown'
+            config={flashcardTypeDictionaries}
+            onChange={handleTypesChange}
+            multipleLabel='Types'
+            label='All Types'
+            labelClassName='!w-full !max-w-80'
+            multiple
+            clearAll
+            nestedPopover={true}
+          />
+        </div>
+      </Popover>
     </div>
   );
 }

@@ -15,6 +15,7 @@ import { cn } from '#/shared/utils/cn.util';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
 import {
   BadgeCheck,
+  Cog,
   Pencil,
   Plus,
   Search,
@@ -26,6 +27,7 @@ import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { Popover } from '../popover/popover';
 
 export default function Sets() {
   const router = useRouter();
@@ -147,53 +149,63 @@ export default function Sets() {
   );
 
   return (
-    <div className='flex w-full flex-col gap-6'>
-      <div className='flex w-full flex-col items-center justify-center gap-8 sm:items-start md:justify-between'>
-        <div className='flex w-full flex-col items-center justify-center gap-2 sm:items-start md:justify-between'>
+    <div className='flex w-full flex-col gap-2'>
+      <div className='flex w-full items-center justify-start gap-4 sm:items-start md:justify-between'>
+        <div className='flex w-full flex-col items-start justify-center sm:items-start md:justify-between'>
           <h4 className='text-green-400'>Your Sets</h4>
           <span className='flex flex-wrap items-center gap-4 text-center text-sm text-gray-500 dark:text-slate-400'>
             <span>{sets.length} sets created</span>
           </span>
         </div>
 
-        <div className='flex w-full flex-col flex-wrap items-center justify-center gap-2 text-sm sm:flex-row sm:justify-end'>
-          <span className='flex w-full justify-center sm:w-auto'>
-            <Input
-              inputType='text'
-              value={searchedText}
-              valid={true}
-              placeholder='Search in decks...'
-              for='search'
-              icon={<Search className='h-4 w-4' />}
-              className='!w-full !max-w-80 sm:!w-56'
-              onChange={handleSearchedTextChange}
+        <Popover
+          trigger={
+            <Button
+              alt='filters button'
+              icon={<Cog className='size-4' />}
+              iconPosition='right'
+              size={'icon-square-sm'}
+              variant={'primary-outline'}
             />
-          </span>
+          }
+          position='bottom'
+          popoverClassName='min-w-80 z-[40] p-4 flex flex-col gap-2'
+        >
+          <Input
+            inputType='text'
+            value={searchedText}
+            valid={true}
+            placeholder='Search in decks...'
+            for='search'
+            icon={<Search className='h-4 w-4' />}
+            className='!w-full !max-w-80 sm:!w-56'
+            onChange={handleSearchedTextChange}
+          />
 
-          <span className='flex w-full flex-col items-center justify-center gap-2 sm:w-auto sm:flex-row'>
-            <Dropdown
-              type='dropdown'
-              config={categories}
-              onChange={handleSearchCategoryChange}
-              multiple
-              multipleLabel='Categories'
-              label='Category'
-              clearAll
-              searchable
-              labelClassName='!w-full !max-w-80 sm:!w-56'
-            />
+          <Dropdown
+            type='dropdown'
+            config={categories}
+            onChange={handleSearchCategoryChange}
+            multiple
+            multipleLabel='Categories'
+            label='Category'
+            clearAll
+            searchable
+            labelClassName='!w-full !max-w-80 sm:!w-56'
+          />
 
-            <ToggleButton
-              animated={false}
-              toggled={isFavourite}
-              toggle={() => toggleFavourite(!isFavourite)}
-              activeIcon={<Star className='h-4 w-4 fill-current' />}
-              inactiveIcon={<Star className='h-4 w-4' />}
-              size={'icon'}
-              alt='Toggle favourite'
-            />
-          </span>
-        </div>
+          <ToggleButton
+            animated={false}
+            toggled={isFavourite}
+            toggle={() => toggleFavourite(!isFavourite)}
+            activeIcon={<Star className='h-4 w-4 fill-current' />}
+            inactiveIcon={<Star className='h-4 w-4' />}
+            size={'icon'}
+            alt='Toggle favourite'
+            label='Show only favourite'
+            toggledLabel='Show all'
+          />
+        </Popover>
       </div>
 
       <div className='flex w-full flex-col items-center justify-center gap-4'>

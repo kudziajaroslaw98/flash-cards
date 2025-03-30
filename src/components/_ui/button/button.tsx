@@ -69,7 +69,10 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
+  extends Pick<
+      ButtonHTMLAttributes<HTMLButtonElement>,
+      'disabled' | 'name' | 'className' | 'onClick' | 'onKeyDown'
+    >,
     VariantProps<typeof buttonVariants> {
   label?: string;
   icon?: React.ReactNode;

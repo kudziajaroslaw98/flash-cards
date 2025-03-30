@@ -43,6 +43,7 @@ export interface InputComponentProps
   touched?: boolean;
   icon?: React.ReactNode;
   value?: string;
+  checked?: boolean;
 }
 
 function Input({
