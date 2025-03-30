@@ -15,7 +15,7 @@ export const FloatingButtons = ({
     <m.div
       layout
       className={cn([
-        'fixed  bottom-0 left-0 flex w-full flex-row flex-wrap justify-center gap-4 p-4 md:gap-2 lg:px-16',
+        'sticky bottom-0 left-0 flex w-full flex-row flex-wrap justify-center gap-4 p-4 md:gap-2 lg:px-16',
         'z-30 bg-transparent',
         className,
       ])}

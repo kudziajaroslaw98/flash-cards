@@ -71,7 +71,7 @@ const buttonVariants = cva(
 export interface ButtonProps
   extends Pick<
       ButtonHTMLAttributes<HTMLButtonElement>,
-      'disabled' | 'name' | 'className' | 'onClick' | 'onKeyDown'
+      'disabled' | 'name' | 'className' | 'onClick' | 'onKeyDown' | 'type'
     >,
     VariantProps<typeof buttonVariants> {
   label?: string;
