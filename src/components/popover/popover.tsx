@@ -11,6 +11,18 @@ import {
   useState,
 } from 'react';
 
+interface PositionConfig {
+  minOffset: number;
+  minGap: number;
+  minHeight: number;
+  popoverMargin: number;
+}
+
+interface WindowDimensions {
+  width: number;
+  height: number;
+}
+
 export function Popover({
   trigger,
   position,
@@ -41,109 +53,120 @@ export function Popover({
   const updatePopoverPosition = useCallback(() => {
     if (!popoverRef.current || !triggerRef.current || !isOpen) return;
 
-    const minOffset = 48;
-    const minGap = 16;
-    const minHeight = 320;
+    const config = {
+      minOffset: 48,
+      minGap: 16,
+      minHeight: 320,
+      popoverMargin: 8,
+    };
+
     const buttonRect = triggerRef.current.getBoundingClientRect();
     const popoverRect = popoverRef.current.getBoundingClientRect();
-    const windowWidth = window.innerWidth;
+    const windowDimensions: WindowDimensions = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    };
 
-    // First set the vertical position
-    if (position === 'bottom') {
-      // Check available vertical space for bottom position
-      popoverRef.current.style.top = `${buttonRect.bottom + 8}px`;
-      const availableSpaceY =
-        window.innerHeight -
-        popoverRef.current.getBoundingClientRect().bottom -
-        minGap +
-        popoverRef.current.getBoundingClientRect().height -
-        minOffset;
+    // Reset any previously set dimensions
+    popoverRef.current.style.width = `${nested ? buttonRect.width : Math.max(buttonRect.width, config.minHeight)}px`;
 
-      console.log(popoverRef.current.getBoundingClientRect());
-      console.log(buttonRect.toJSON());
+    // Position based on selected placement strategy
+    switch (position) {
+      case 'bottom':
+        positionBottom(buttonRect, popoverRect, windowDimensions, config);
+        break;
+      case 'bottom-right':
+        positionBottomRight(buttonRect, popoverRect, windowDimensions, config);
+        break;
+      case 'top':
+        positionTop(buttonRect, popoverRect, windowDimensions, config);
+        break;
+    }
 
-      if (
-        buttonRect.bottom + popoverRef.current.getBoundingClientRect().height >
-        window.innerHeight
-      ) {
-        popoverRef.current.style.bottom = `16px`;
+    function positionBottom(
+      buttonRect: DOMRect,
+      popoverRect: DOMRect,
+      windowDimensions: WindowDimensions,
+      config: PositionConfig,
+    ): void {
+      // Vertical positioning
+      popoverRef.current!.style.top = `${buttonRect.bottom + config.popoverMargin}px`;
+
+      // Check if popover extends beyond bottom of viewport
+      if (buttonRect.bottom + popoverRect.height > windowDimensions.height) {
+        popoverRef.current!.style.bottom = `${config.minGap}px`;
       } else {
-        if (
-          popoverRef.current.getBoundingClientRect().height > availableSpaceY
-        ) {
-          popoverRef.current.style.height = `${availableSpaceY > minHeight ? availableSpaceY : minHeight}px`;
-          popoverRef.current.style.maxHeight = `${availableSpaceY > minHeight ? availableSpaceY : minHeight}px`;
+        // Adjust height if not enough space
+        const availableSpaceY =
+          windowDimensions.height -
+          (buttonRect.bottom + config.popoverMargin) -
+          config.minGap;
+
+        if (popoverRect.height > availableSpaceY) {
+          const adjustedHeight = Math.max(availableSpaceY, config.minHeight);
+          popoverRef.current!.style.height = `${adjustedHeight}px`;
+          popoverRef.current!.style.maxHeight = `${adjustedHeight}px`;
         }
       }
 
-      const left = buttonRect.left;
-      const overflow = window.innerWidth - buttonRect.right;
-      const availableSpaceX = left;
-      popoverRef.current.style.left = `${availableSpaceX}px`;
-    } else if (position === 'bottom-right') {
-      const top = buttonRect.bottom + 8;
-      popoverRef.current.style.top = `${top}px`;
-
-      // Check available vertical space for bottom position
-      const availableSpaceY =
-        window.innerHeight -
-        popoverRef.current.getBoundingClientRect().bottom -
-        minGap +
-        popoverRef.current.getBoundingClientRect().height -
-        minOffset;
-
-      if (popoverRef.current.getBoundingClientRect().height > availableSpaceY) {
-        popoverRef.current.style.height = `${availableSpaceY}px`;
-        popoverRef.current.style.maxHeight = `${availableSpaceY}px`;
-      }
-
-      const overflow =
-        window.innerWidth -
-        (window.innerWidth - buttonRect.right + buttonRect.right);
-
-      const availableSpaceX = window.innerWidth - buttonRect.right;
-
-      console.log(overflow, availableSpaceX);
-      popoverRef.current.style.right = `${availableSpaceX - overflow}px`;
-
-      if (breakpoint === 'mobile') {
-        popoverRef.current.style.right = `${availableSpaceX - overflow}px`;
-      } else {
-        popoverRef.current.style.right = `${availableSpaceX - overflow}px`;
-      }
-    } else if (position === 'top') {
-      console.log(popoverRef.current.getBoundingClientRect());
-      console.log(buttonRect.toJSON());
-      const bottom =
-        buttonRect.top - popoverRef.current.getBoundingClientRect().height - 8;
-
-      console.log(buttonRect.toJSON());
-
-      popoverRef.current.style.top = `${bottom}px`;
-      // Check available vertical space for top position
-      const availableSpaceY =
-        window.innerHeight -
-        popoverRef.current.getBoundingClientRect().top -
-        minGap +
-        popoverRef.current.getBoundingClientRect().height -
-        minOffset;
-
-      if (popoverRef.current.getBoundingClientRect().height > availableSpaceY) {
-        popoverRef.current.style.height = `${availableSpaceY}px`;
-        popoverRef.current.style.maxHeight = `${availableSpaceY}px`;
-      }
-
-      const left = buttonRect.left;
-      const overflow =
-        window.innerWidth -
-        (left +
-          popoverRef.current.getBoundingClientRect().width +
-          (nested ? 32 : 16));
-      const availableSpaceX = left;
-      popoverRef.current.style.left = `${availableSpaceX}px`;
+      // Horizontal positioning
+      popoverRef.current!.style.left = `${buttonRect.left}px`;
     }
 
-    popoverRef.current.style.width = `${nested ? buttonRect.width : buttonRect.width > minHeight ? buttonRect.width : minHeight}px`;
+    function positionBottomRight(
+      buttonRect: DOMRect,
+      popoverRect: DOMRect,
+      windowDimensions: WindowDimensions,
+      config: PositionConfig,
+    ): void {
+      // Vertical positioning
+      popoverRef.current!.style.top = `${buttonRect.bottom + config.popoverMargin}px`;
+
+      // Adjust height if not enough space
+      const availableSpaceY =
+        windowDimensions.height -
+        (buttonRect.bottom + config.popoverMargin) -
+        config.minGap;
+
+      if (popoverRect.height > availableSpaceY) {
+        popoverRef.current!.style.height = `${availableSpaceY}px`;
+        popoverRef.current!.style.maxHeight = `${availableSpaceY}px`;
+      }
+
+      // Horizontal positioning - align to right
+      const rightOffset = windowDimensions.width - buttonRect.right;
+      popoverRef.current!.style.right = `${rightOffset}px`;
+
+      // Remove any left positioning that might have been set
+      popoverRef.current!.style.left = '';
+    }
+
+    function positionTop(
+      buttonRect: DOMRect,
+      popoverRect: DOMRect,
+      windowDimensions: WindowDimensions,
+      config: PositionConfig,
+    ): void {
+      // Vertical positioning
+      const topPosition =
+        buttonRect.top - popoverRect.height - config.popoverMargin;
+      popoverRef.current!.style.top = `${topPosition}px`;
+
+      // Adjust height if not enough space
+      const availableSpaceY =
+        buttonRect.top - config.popoverMargin - config.minGap;
+
+      if (popoverRect.height > availableSpaceY) {
+        popoverRef.current!.style.height = `${availableSpaceY}px`;
+        popoverRef.current!.style.maxHeight = `${availableSpaceY}px`;
+      }
+
+      // Horizontal positioning
+      popoverRef.current!.style.left = `${buttonRect.left}px`;
+
+      // Remove any right positioning that might have been set
+      popoverRef.current!.style.right = '';
+    }
   }, [position, nested, isOpen]);
 
   useEffect(() => {

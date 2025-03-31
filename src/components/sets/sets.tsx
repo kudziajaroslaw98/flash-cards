@@ -201,7 +201,7 @@ export default function Sets() {
             toggle={() => toggleFavourite(!isFavourite)}
             activeIcon={<Star className='h-4 w-4 fill-current' />}
             inactiveIcon={<Star className='h-4 w-4' />}
-            size={'icon'}
+            size={'full'}
             alt='Toggle favourite'
             label='Show only favourite'
             toggledLabel='Show all'
