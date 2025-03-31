@@ -85,8 +85,8 @@ export default function FlashcardsFilters({
             variant={'primary-outline'}
           />
         }
-        position='bottom'
-        popoverClassName='z-[40] p-4 flex flex-col gap-4'
+        position='bottom-right'
+        popoverClassName='z-[40] p-4 flex flex-col gap-4 w-80'
       >
         <div className='flex w-full flex-col gap-2'>
           <span className='font-serif text-sm font-medium'>Actions</span>
@@ -97,7 +97,7 @@ export default function FlashcardsFilters({
             for='selectAll'
             inputLabel='Select All'
             onChange={handleSelectAll}
-            className='!w-full !max-w-80'
+            className='w-full'
             checked={selected.length === flashcards.length}
           />
         </div>
@@ -112,7 +112,7 @@ export default function FlashcardsFilters({
             placeholder='Search in flashcards...'
             for='search'
             icon={<Search className='h-4 w-4' />}
-            className='!w-full !max-w-80'
+            className='w-full'
             onChange={handleSearchedTextChange}
           />
 
@@ -120,14 +120,16 @@ export default function FlashcardsFilters({
             type='dropdown'
             config={setsDictionary}
             onChange={handleSetsChange}
+            value={searchedSets}
             multipleLabel='Sets'
             label='Sets'
-            labelClassName='!w-full !max-w-80'
+            labelClassName='w-full'
             searchable
             clearAll
             multiple
             disabled={setsDictionary.length === 0}
             nestedPopover={true}
+            contextPosition='bottom'
           />
 
           <Dropdown
@@ -136,10 +138,12 @@ export default function FlashcardsFilters({
             onChange={handleTypesChange}
             multipleLabel='Types'
             label='All Types'
-            labelClassName='!w-full !max-w-80'
+            labelClassName='w-full'
+            value={searchedType}
             multiple
             clearAll
             nestedPopover={true}
+            contextPosition='bottom'
           />
         </div>
       </Popover>

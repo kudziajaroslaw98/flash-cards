@@ -168,8 +168,8 @@ export default function Sets() {
               variant={'primary-outline'}
             />
           }
-          position='bottom'
-          popoverClassName='min-w-80 z-[40] p-4 flex flex-col gap-2'
+          position='bottom-right'
+          popoverClassName='w-80 z-[40] p-4 flex flex-col gap-2'
         >
           <Input
             inputType='text'
@@ -178,7 +178,6 @@ export default function Sets() {
             placeholder='Search in decks...'
             for='search'
             icon={<Search className='h-4 w-4' />}
-            className='!w-full !max-w-80 sm:!w-56'
             onChange={handleSearchedTextChange}
           />
 
@@ -188,10 +187,12 @@ export default function Sets() {
             onChange={handleSearchCategoryChange}
             multiple
             multipleLabel='Categories'
+            labelClassName='w-full'
             label='Category'
+            contextPosition='bottom'
             clearAll
             searchable
-            labelClassName='!w-full !max-w-80 sm:!w-56'
+            nestedPopover
           />
 
           <ToggleButton

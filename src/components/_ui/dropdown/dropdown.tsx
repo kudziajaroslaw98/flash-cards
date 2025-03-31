@@ -35,6 +35,7 @@ interface BaseDropdownProps<T> {
   contextClassName?: string;
   name?: string;
   nestedPopover?: boolean;
+  contextPosition?: 'top' | 'bottom' | 'bottom-right';
 }
 
 export type DropdownProps<T> =
@@ -61,6 +62,7 @@ export default function Dropdown<T>({
   valid,
   required,
   labelClassName,
+  contextClassName,
   onChange,
   onBlur,
   onFocus,
@@ -70,6 +72,7 @@ export default function Dropdown<T>({
   disabled = false,
   loading = false,
   nestedPopover = false,
+  contextPosition = 'bottom',
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   type = 'dropdown',
   ...props
@@ -89,7 +92,6 @@ export default function Dropdown<T>({
   const dropdownLabelRef = useRef<HTMLDivElement>(null);
   const configRef = useRef<DictionaryValue<T>[] | null>(null);
   const valueRef = useRef<T | T[] | null | undefined>(null);
-  const popoverRef = useRef<HTMLDivElement>(null);
   const popoverItemsEndRef = useRef<HTMLDivElement>(null);
   const hasFocus = useRef(false);
 
@@ -104,83 +106,6 @@ export default function Dropdown<T>({
       }
     }
   });
-
-  // const updatePopoverPosition = useCallback(() => {
-  //   if (
-  //     !dropdownWrapperRef.current ||
-  //     !popoverRef.current ||
-  //     !dropdownLabelRef.current
-  //   )
-  //     return;
-
-  //   if (contextPosition === 'bottom') {
-  //     const minOffset = 48;
-  //     const buttonRect = dropdownLabelRef.current.getBoundingClientRect();
-  //     const top =
-  //       (((dropdownLabelRef.current.getBoundingClientRect().y as number) +
-  //         dropdownLabelRef.current.getBoundingClientRect().height) as number) +
-  //       8;
-
-  //     console.log(dropdownLabelRef.current.getBoundingClientRect().y);
-  //     console.log(dropdownLabelRef.current.getBoundingClientRect().height);
-
-  //     popoverRef.current.style.top = `${top}px`;
-  //     popoverRef.current.style.left = `${buttonRect.left + window.scrollX}px`;
-  //     popoverRef.current.style.width = `${dropdownLabelRef.current.getBoundingClientRect().width}px`;
-
-  //     const availableSpace =
-  //       window.innerHeight -
-  //       popoverRef.current.getBoundingClientRect().bottom -
-  //       16 +
-  //       popoverRef.current.getBoundingClientRect().height -
-  //       minOffset;
-
-  //     if (popoverRef.current.getBoundingClientRect().height > availableSpace) {
-  //       popoverRef.current.style.height = `${availableSpace}px`;
-  //       popoverRef.current.style.maxHeight = `${availableSpace}px`;
-  //     }
-  //   }
-
-  //   if (contextPosition === 'top') {
-  //     const minOffset = 48;
-  //     const buttonRect = dropdownLabelRef.current.getBoundingClientRect();
-  //     const top =
-  //       (dropdownLabelRef.current.getBoundingClientRect().y as number) -
-  //       (popoverRef.current.getBoundingClientRect().height as number) -
-  //       8;
-
-  //     popoverRef.current.style.top = `${top}px`;
-  //     popoverRef.current.style.left = `${buttonRect.left + window.scrollX}px`;
-  //     popoverRef.current.style.width = `${dropdownLabelRef.current.getBoundingClientRect().width}px`;
-
-  //     const availableSpace =
-  //       window.innerHeight -
-  //       popoverRef.current.getBoundingClientRect().top -
-  //       16 +
-  //       popoverRef.current.getBoundingClientRect().height -
-  //       minOffset;
-
-  //     if (popoverRef.current.getBoundingClientRect().height > availableSpace) {
-  //       popoverRef.current.style.height = `${availableSpace}px`;
-  //       popoverRef.current.style.maxHeight = `${availableSpace}px`;
-  //     }
-  //   }
-  // }, [contextPosition]);
-
-  // useEffect(() => {
-  //   if (visible) {
-  //     updatePopoverPosition();
-  //     window.addEventListener('scroll', updatePopoverPosition, {
-  //       passive: true,
-  //     });
-  //     window.addEventListener('resize', updatePopoverPosition);
-  //   }
-
-  //   return () => {
-  //     window.removeEventListener('scroll', updatePopoverPosition);
-  //     window.removeEventListener('resize', updatePopoverPosition);
-  //   };
-  // }, [visible, updatePopoverPosition]);
 
   useEffect(() => {
     if (
@@ -357,7 +282,7 @@ export default function Dropdown<T>({
         />
       )}
 
-      <div className='w-80'>
+      <div className='w-full'>
         <Popover
           trigger={
             <div
@@ -409,12 +334,12 @@ export default function Dropdown<T>({
               )}
             </div>
           }
-          position='bottom'
+          position={contextPosition}
           nested={nestedPopover}
         >
-          <div className='flex h-full w-80 flex-col'>
+          <div className='flex h-full w-full flex-col'>
             {props.searchable && (
-              <div className='min-w-fit rounded-t-md border-b p-2 dark:border-slate-800/40'>
+              <div className='w-full min-w-fit rounded-t-md border-b p-2 dark:border-slate-800/40'>
                 <Input
                   inputType='text'
                   value={searchValue}
@@ -431,7 +356,7 @@ export default function Dropdown<T>({
             <div
               tabIndex={-1}
               className={cn([
-                'flex grow flex-col gap-1 overflow-y-auto p-2',
+                'flex w-full grow flex-col gap-1 overflow-y-auto p-2',
                 (props.searchable || props.clearAll) &&
                   items?.length > 0 &&
                   'py-3',
@@ -478,7 +403,7 @@ export default function Dropdown<T>({
 
             {props.addNew && isInAddNewMode && (
               <div>
-                <div className='min-w-fit  bg-gray-50 p-1 py-2 outline-none focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-950'>
+                <div className='w-full min-w-fit bg-gray-50 p-1 py-2 outline-none focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-950'>
                   <Input
                     inputType='text'
                     value={newItemValue}

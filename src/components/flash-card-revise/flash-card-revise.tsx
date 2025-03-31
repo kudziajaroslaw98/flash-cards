@@ -368,7 +368,7 @@ export default function FlashcardReviseComponent() {
             config={[defaultSet, ...setsDictionary]}
             onChange={changeRevisedSet}
             value={defaultSet.value}
-            contextPosition={'top'}
+            contextPosition='top'
             labelClassName='max-w-xs bg-gray-50 dark:bg-slate-950'
           />
         </div>
