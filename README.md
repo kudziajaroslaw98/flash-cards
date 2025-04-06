@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://flashcards.finalphase.app/flashcards/learn"><img src="public/images/readme-flashcards-logo.png" alt="Logo" height=100></a>
+  <a href="https://finalphase.app/flashcards/learn"><img src="public/images/readme-flashcards-logo.png" alt="Logo" height=100></a>
   <p align="center"><b>An interactive and customizable flashcards application to help you study efficiently without noise.</b></p>
 </p>
 
@@ -81,7 +81,7 @@ Next create `.env.local` and paste content of file `.env.template` and fill out 
 
 Experience the Flashcards App in action with our live version. This is a fully functional version of the app hosted online, allowing you to explore its features and interface without needing to install anything on your local machine.
 
-### [Live Version →](https://flashcards.finalphase.app/dashboard)
+### [Live Version →](https://finalphase.app/dashboard)
 
 ### Note
 

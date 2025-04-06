@@ -196,6 +196,24 @@ export default function SignInComponent() {
           ></Button>
         </Link>
 
+        <p className='mt-4 px-4 text-center text-xs text-slate-500 dark:text-slate-400'>
+          By continuing via a provider or as a guest, you agree to our{' '}
+          <Link
+            href='/terms-of-service'
+            className='underline underline-offset-4 hover:text-green-500'
+          >
+            Terms of Service
+          </Link>{' '}
+          and{' '}
+          <Link
+            href='/privacy-policy'
+            className='underline underline-offset-4 hover:text-green-500'
+          >
+            Privacy Policy
+          </Link>
+          .
+        </p>
+
         {process.env.NODE_ENV === 'development' && (
           <>
             <Button

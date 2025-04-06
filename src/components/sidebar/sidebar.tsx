@@ -186,17 +186,17 @@ export default function SidebarComponent() {
           className={`flex items-center font-thin tracking-wider outline-none focus:ring focus:ring-green-400/50 ${expanded && 'gap-4'}`}
         >
           <Image
-            width={24}
-            height={24}
-            src={'/images/flash-cards-logo.svg'}
-            alt={'Flashcards Logo'}
+            width={32}
+            height={32}
+            src={'/images/finalphase-logo.svg'}
+            alt={'Finalphase Logo'}
             loading='eager'
           />
 
           <span
-            className={`overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text pr-1 text-xl font-black uppercase tracking-tighter text-transparent transition-all ${expanded ? 'max-w-full' : 'hidden max-w-0'}`}
+            className={`overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text pr-1 font-fredoka text-xl font-black tracking-tight text-transparent transition-all ${expanded ? 'max-w-full' : 'hidden max-w-0'}`}
           >
-            FlashCards
+            Final Phase
           </span>
         </Link>
 

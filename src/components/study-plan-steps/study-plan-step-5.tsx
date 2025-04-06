@@ -154,9 +154,11 @@ export function StudyPlanStep5({
   }) => {
     return (
       <div className='flex w-full flex-col gap-2'>
-        <span className='flex items-center gap-1 font-serif text-sm font-semibold uppercase'>
+        <span className='flex items-center gap-1 text-sm font-semibold uppercase'>
           <Dot className='size-4 text-green-500' />
-          <span className='text-gray-600 dark:text-slate-200'>{title}</span>
+          <span className='font-fredoka text-gray-600 dark:text-slate-200'>
+            {title}
+          </span>
         </span>
 
         {text && (

@@ -32,12 +32,12 @@ export const metadata: Metadata = {
       'Learn what flashcards are, how they work, and how to use our app effectively. Discover tips for studying with flashcards to boost memory and learn vocabulary faster.',
     images: [
       {
-        url: 'https://flashcards.finalphase.app/og/og_image.png',
+        url: 'https://finalphase.app/og/og_image.png',
         width: 800,
         height: 600,
       },
     ],
-    url: 'https://flashcards.finalphase.app/',
+    url: 'https://finalphase.app/',
     siteName: 'Learn with Flashcards - Interactive Learning',
     locale: 'en-US',
     type: 'website',
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
       'Learn what flashcards are, how they work, and how to use our app effectively. Discover tips for studying with flashcards to boost memory and learn vocabulary faster.',
     images: [
       {
-        url: 'https://flashcards.finalphase.app/og/og_image.png',
+        url: 'https://finalphase.app/og/og_image.png',
         width: 800,
         height: 600,
       },
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
   },
   applicationName: 'Flashcards - Learning Words Made Easy',
   alternates: {
-    canonical: 'https://flashcards.finalphase.app/guide/',
+    canonical: 'https://finalphase.app/guide/',
   },
   manifest: '/manifest.json',
 };

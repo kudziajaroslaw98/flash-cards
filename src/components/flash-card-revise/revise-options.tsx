@@ -50,7 +50,7 @@ export function ReviseOptions({
       revisedCard?.answer3 ?? null,
       revisedCard?.answer4 ?? null,
     ]
-      .filter((answer) => answer !== null)
+      .filter((answer) => answer !== null && answer !== '')
       .sort(() => Math.random() - 0.5) as string[];
     setAnswers(answers);
     setAnswersAvailable(answers.some((answer) => answer !== null));
@@ -117,11 +117,14 @@ export function ReviseOptions({
                 clicked &&
                   answer === revisedCard.answer1 &&
                   clickedAnswer === answer &&
-                  'border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
+                  'scale-110 border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
                 clicked &&
                   answer !== revisedCard.answer1 &&
                   clickedAnswer === answer &&
-                  'border-red-400/50 bg-red-400/20 hover:!bg-red-100 dark:!border-red-400/40 dark:bg-red-400/20 dark:hover:!bg-red-400/20',
+                  'scale-110 border-red-400/50 bg-red-400/20 hover:!bg-red-100 dark:!border-red-400/40 dark:bg-red-400/20 dark:hover:!bg-red-400/20',
+                clicked &&
+                  clickedAnswer !== answer &&
+                  'scale-95 opacity-25 blur-[2px]',
               ])}
               key={`answer-${index + 1}`}
               onClick={() => {

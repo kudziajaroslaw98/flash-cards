@@ -13,6 +13,9 @@ export const isDifferent = (a: unknown, b: unknown): boolean => {
     const objectA = a as Record<string, unknown>;
     const objectB = b as Record<string, unknown>;
 
+    if (JSON.stringify(objectA) === '{}' && JSON.stringify(objectB) === '{}')
+      return false;
+
     const aKeys = Object.keys(a);
     const bKeys = Object.keys(b);
 

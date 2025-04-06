@@ -3,15 +3,18 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
+import { isPremiumUser } from '#/shared/guards/is-premium-user';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import uuid from '#/shared/utils/uuid.util';
 import { newFlashcardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';
 import type { Flashcard } from '#/types/flash-card.type';
-import { useCompletion } from 'ai/react';
+import { useCompletion } from '@ai-sdk/react';
 import { Button } from '../_ui/button/button';
 import Modal from '../_ui/modal/modal';
 import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
 import FormComponent, { type FormMethods } from '../form-component/form';
+
+import { extractObjectsFromString } from '#/shared/utils/extract-objects-from-string';
 
 interface NewFlashcardModalProps {
   handleNewFlashcard: (
@@ -35,12 +38,23 @@ export const NewFlashcardModal = ({
   const [flashcards, setFlashcards] =
     useState<Omit<Flashcard, 'order'>[]>(selectedFlashcards);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loadingGenerate, setLoadingGenerate] = useState(false);
   const { isLoggedIn, isPlanActive } = useSessionContext();
   const submitRef = useRef<HTMLButtonElement>(null);
   const formRef = useRef<FormMethods<Omit<Flashcard, 'order'>>>(null);
-  const { completion, complete } = useCompletion({
+  const {
+    completion,
+    complete,
+    isLoading: loadingGenerate,
+  } = useCompletion({
     api: API_ROUTES.ANSWER_GENERATE,
+  });
+
+  const {
+    completion: generatedAnswers,
+    complete: generateAnswers,
+    isLoading: answersLoading,
+  } = useCompletion({
+    api: API_ROUTES.ANSWERS_GENERATE,
   });
 
   const getNewFlashcard: () => Omit<Flashcard, 'order'> = () =>
@@ -78,6 +92,23 @@ export const NewFlashcardModal = ({
       definition: completion,
     }));
   }, [completion]);
+
+  useEffect(() => {
+    const objects = extractObjectsFromString<{
+      answer1: string;
+      answer2: string;
+      answer3: string;
+      answer4?: string;
+    }>(generatedAnswers);
+
+    console.log(objects);
+    if (objects?.at(0)) {
+      setFormValue((prev) => ({
+        ...prev,
+        ...objects[0],
+      }));
+    }
+  }, [generatedAnswers]);
 
   const updateFormValue = () => {
     setFlashcards((prev) =>
@@ -163,29 +194,62 @@ export const NewFlashcardModal = ({
   };
 
   const handleGenerate = useCallback(async () => {
+    if (!(await isPremiumUser())) {
+      return;
+    }
+
     if (
-      ((formValue.context !== undefined && formValue.context !== '') ||
-        formValue.type === 'question') &&
-      isLoggedIn &&
-      isPlanActive
+      (formValue.context !== undefined && formValue.context !== '') ||
+      formValue.type === 'question'
     ) {
-      setLoadingGenerate(true);
       await complete(
         `generate ${formValue.type === 'question' ? 'answer' : 'description'} to: '${formValue.type === 'question' ? formValue.query : formValue.context}'; Do not repeat words from the prompt as this will break the flashcard.`,
       );
-      setLoadingGenerate(false);
     }
-  }, [formValue, complete, isLoggedIn, isPlanActive]);
+  }, [formValue, complete]);
+
+  const handleGenerateAnswers = useCallback(async () => {
+    if (!(await isPremiumUser())) {
+      return;
+    }
+
+    if (
+      formValue.type === 'single' &&
+      formValue.query !== undefined &&
+      formValue.query !== '' &&
+      formValue.definition !== undefined &&
+      formValue.definition !== '' &&
+      formValue.context !== undefined &&
+      formValue.context !== ''
+    ) {
+      await generateAnswers('', {
+        body: {
+          context: formValue.context,
+          query: formValue.query,
+          definition: formValue.definition,
+        },
+      });
+    }
+  }, [formValue, generateAnswers]);
 
   const getFormScheme = useMemo(
     () =>
       newFlashcardScheme(
         handleGenerate,
+        handleGenerateAnswers,
         loadingGenerate,
+        answersLoading,
         isLoggedIn,
         isPlanActive,
       ),
-    [handleGenerate, loadingGenerate, isLoggedIn, isPlanActive],
+    [
+      handleGenerate,
+      handleGenerateAnswers,
+      loadingGenerate,
+      answersLoading,
+      isLoggedIn,
+      isPlanActive,
+    ],
   );
 
   return (
@@ -220,6 +284,7 @@ export const NewFlashcardModal = ({
               initialValues={formValue as Flashcard}
               debug={{
                 values: true,
+                visibility: true,
               }}
             />
           </Modal.Body>

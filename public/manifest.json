@@ -1,8 +1,8 @@
 {
   "id": "1fe3d5e7-78f9-468f-acc4-16ced50e7fe7",
-  "name": "Flashcards - Learning Words Made Easy",
-  "short_name": "flashcards",
-  "description": "Flashcards by Jarosław Kudzia is the perfect tool for mastering vocabulary and learning words effortlessly.",
+  "name": "Final Phase: AI Flashcards & Study Tools for Students",
+  "short_name": "Final Phase",
+  "description": "Master any subject faster with Final Phase. AI-powered flashcards, personalized study plans, spaced repetition (SRS), and focus stats for busy students.",
   "theme_color": "#020617",
   "background_color": "#020617",
   "start_url": "/flashcards/learn",

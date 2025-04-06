@@ -131,7 +131,7 @@ function Checkout({
         <div className='flex w-full flex-col items-center gap-4 pt-8'>
           {cancel && (
             <form
-              action={`/api/checkout-sessions/?plan=standard`}
+              action={`/api/checkout-sessions/?plan=premium`}
               method='POST'
               className='contents'
             >

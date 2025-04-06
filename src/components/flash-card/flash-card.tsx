@@ -107,7 +107,7 @@ export default function FlashcardComponent({
     const chunks = data.split(';');
     return (
       <div className={cn(['flex flex-col gap-1'])}>
-        <span className='font-serif font-semibold text-gray-600 dark:text-slate-200'>
+        <span className='font-fredoka text-xs font-semibold text-gray-600 dark:text-slate-200'>
           {title}
         </span>
         {chunks.length <= 1 ? (
@@ -173,9 +173,9 @@ export default function FlashcardComponent({
             {flashcard.query && (
               <h5
                 className={cn([
-                  'z-20 flex h-auto w-full flex-col items-center hyphens-auto text-center font-serif font-semibold text-green-400 [text-shadow:_0_2px_4px_rgba(209,213,219,0.4)]',
+                  'font-fredoka z-20 flex h-auto w-full flex-col items-center hyphens-auto text-center font-semibold text-green-400',
                   size === 'sm' && 'text-lg leading-[120%]',
-                  size === 'horizontal-sm' && 'text-sm leading-[100%]',
+                  size === 'horizontal-sm' && 'text-lg leading-[100%]',
                   size === 'md' && 'text-2xl',
                   size === 'lg' && 'text-3xl',
                 ])}

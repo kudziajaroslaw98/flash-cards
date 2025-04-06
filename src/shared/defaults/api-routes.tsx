@@ -5,6 +5,7 @@ export const API_ROUTES = {
   SYNC_SETS: '/api/set/sync',
   SYNC_METADATA: '/api/metadata/sync',
   ANSWER_GENERATE: '/api/ai/flashcard/answer/generate',
+  ANSWERS_GENERATE: '/api/ai/flashcard/answers/generate',
   SET_DESCRIPTION: '/api/ai/set/description/generate',
   SET_FLASHCARDS: '/api/ai/set/flashcards/generate',
   GENERATE_SUGGESTED_FLASHCARDS: '/api/ai/study/plan/flashcards',

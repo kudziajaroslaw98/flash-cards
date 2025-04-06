@@ -1,11 +1,12 @@
 'use client';
 
 import { isInternalInput } from '#/shared/guards/is-internal-input';
-import type { ExtendedSchemeKeys } from '#/types/extended-scheme-keys';
-import type { FormScheme, InternalConstraint } from '#/types/form-scheme.type';
-import type { InternalAccordion } from '#/types/input-types';
+import type { ExtendedSchemeKeys } from '#/types/form/extended-scheme-keys.type';
+import { FormScheme, InternalConstraint } from '#/types/form/form-scheme.type';
+import type { InternalAccordion } from '#/types/form/input-types';
 import { useMemo, type FormEvent } from 'react';
 import { Accordion } from '../_ui/accordion/accordion';
+import { Button } from '../_ui/button/button';
 import { Separator } from '../_ui/separator/separator';
 import FormInput from './form-input';
 
@@ -18,7 +19,7 @@ type FormInputsProps<T> = {
   ) => void;
   handleOnChange: (value: unknown | unknown[], key: string) => void;
   handleOnFocus: (key: string) => void;
-  handleOnBlur: () => void;
+  handleOnBlur: (key: string) => void;
   touchedInputs: Record<string, boolean>;
   inputsValidity: Record<string, boolean>;
   inputsErrors: Record<string, string | null>;
@@ -63,6 +64,7 @@ export default function FormInputsComponent<T>({
         const isSeparator = input?.type === '_internal_separator';
         const isAccordion = input?.type === '_internal_accordion';
         const isGroupTitle = input?.type === '_internal_group_title';
+        const isButton = input?.type === '_internal_button';
 
         let accordionInputs: InternalAccordion<T>['inputs'] = {};
 
@@ -115,6 +117,23 @@ export default function FormInputsComponent<T>({
                 <h6 className='mt-4'>{input.title}</h6>
                 <hr className='mb-4 mt-2 border-gray-200 dark:border-slate-900' />
               </div>
+            );
+          } else if (isButton) {
+            return (
+              <Button
+                key={`form-item-${inputName}-${index}`}
+                disabled={input.disabled}
+                label={input.label}
+                alt={input.alt}
+                onFocus={input.onFocus}
+                onBlur={input.onBlur}
+                onClick={input.onClick}
+                icon={input.icon}
+                iconPosition={input.iconPosition}
+                size={input.size}
+                loading={input.loading}
+                className={input.className}
+              />
             );
           } else {
             return (

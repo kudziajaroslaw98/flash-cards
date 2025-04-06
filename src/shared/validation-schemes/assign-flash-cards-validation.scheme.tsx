@@ -1,5 +1,6 @@
 import { DictionaryValue } from '#/types/dictionary-value.type';
-import { FormScheme } from '#/types/form-scheme.type';
+import type { FormScheme } from '#/types/form/form-scheme.type';
+
 import { z } from 'zod';
 import { FlashcardSet } from '../../types/flash-card-set.type';
 

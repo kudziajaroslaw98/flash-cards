@@ -11,6 +11,7 @@ import { learningStyleAdaptationSchema } from '#/schemas/learning-style-adaptati
 import { mnemonicPreferencesSchema } from '#/schemas/mnemonic-preferences.schema';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { extractObjectsFromString } from '#/shared/utils/extract-objects-from-string';
+import { isDifferent } from '#/shared/utils/is-different.util';
 import type { CardLength } from '#/types/card-length.type';
 import { DictionaryValue } from '#/types/dictionary-value.type';
 import type { KnowledgeLevel } from '#/types/knowledge-level.type';
@@ -68,18 +69,18 @@ export function StudyPlanStep1({
 
   const handleFormValueChange = (value: Partial<PlanSetupState['step1']>) => {
     setState((prev) => ({ ...prev, step1: value }) as PlanSetupState);
-    generateBrainstormIdeas(value);
   };
 
   const generateBrainstormIdeas = (value: Partial<PlanSetupState['step1']>) => {
-    if (
-      value.focusTags &&
-      value.focusTags.length > 0 &&
-      value.knowledgeLevel &&
-      value.knowledgeLevel !== null &&
-      suggestions.length === 0 &&
-      !isLoading
-    ) {
+    if (!value.focusTags || value.focusTags.length === 0) {
+      return;
+    }
+
+    if (!value.knowledgeLevel || value.knowledgeLevel === null) {
+      return;
+    }
+
+    if (!isLoading && isDifferent(value.focusTags, suggestions)) {
       setIsLoading(true);
       complete('prompt', {
         body: {
@@ -89,6 +90,10 @@ export function StudyPlanStep1({
       });
     }
   };
+
+  useEffect(() => {
+    generateBrainstormIdeas(state.step1);
+  }, [state.step1.focusTags, state.step1.knowledgeLevel]);
 
   useEffect(() => {
     const objects =

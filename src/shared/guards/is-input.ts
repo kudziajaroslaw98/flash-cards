@@ -1,4 +1,4 @@
-import type { InputDefinitions, VanillaInputType } from '#/types/input-types';
+import { InputDefinitions, VanillaInputType } from '#/types/form/input-types';
 
 export default function isInput<T>(
   item: InputDefinitions<T>,

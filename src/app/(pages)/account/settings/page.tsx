@@ -38,7 +38,7 @@ export default function SettingsPage() {
       updateUser({
         data: {
           ...user?.user_metadata,
-          stripe_subscribed_plan: 'standard',
+          stripe_subscribed_plan: 'premium',
           stripe_subscription_status: 'active',
         },
       });
@@ -283,6 +283,21 @@ export default function SettingsPage() {
             </section>
           </Accordion.Item>
         </Accordion>
+
+        <div className='text-muted-foreground mt-8 flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm'>
+          <Link
+            href='/privacy-policy'
+            className='hover:text-primary hover:underline'
+          >
+            Privacy Policy
+          </Link>
+          <Link
+            href='/terms-of-service'
+            className='hover:text-primary hover:underline'
+          >
+            Terms of Service
+          </Link>
+        </div>
       </div>
     </div>
   );

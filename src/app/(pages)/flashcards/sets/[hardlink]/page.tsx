@@ -10,6 +10,7 @@ import FlashcardComponent from '#/components/flash-card/flash-card';
 import { FloatingButtons } from '#/components/floating-buttons/floating-buttons';
 import { NewFlashcardModal } from '#/components/new-flash-card-modal/new-flash-card-modal';
 import { NewSetModal } from '#/components/new-set-modal/new-set-modal';
+import { FlashcardGenerateDialog } from '#/components/sets-dialogs/flashcard-generate-dialog/flashcard-generate-dialog';
 import { db } from '#/db/dexie.db';
 import { useAppContext } from '#/providers/app-context';
 import { useSessionContext } from '#/providers/session-provider.component';
@@ -444,14 +445,18 @@ export default function SetHardlinkPage() {
             }
           />
 
-          <Button
-            disabled={!isLoggedIn || !isPlanActive}
-            icon={<Sparkles className='size-4' />}
-            size={'icon-square'}
-            variant={'secondary-outline'}
-            onClick={handleGenerateFlashcards}
-            loading={isLoading}
-            alt='Generate flashcards'
+          <FlashcardGenerateDialog
+            trigger={
+              <Button
+                disabled={!isLoggedIn || !isPlanActive}
+                icon={<Sparkles className='size-4' />}
+                size={'icon-square'}
+                variant={'secondary-outline'}
+                loading={isLoading}
+                alt='Generate flashcards'
+              />
+            }
+            handleSubmit={(e) => console.log(e)}
           />
         </FloatingButtons>
       </div>

@@ -115,21 +115,6 @@ export async function POST(req: NextRequest) {
     blacklist?: string[];
   } = await req.json();
 
-  console.log('-----------');
-  console.log({
-    focusTags,
-    knowledgeLevel,
-    coverageFocus,
-    duration,
-    flashcardsNeeded,
-    learningStyle,
-    cardLength,
-    mnemonicPreference,
-    userPrompt,
-    blacklist,
-  });
-  console.log('-----------');
-
   try {
     const error = await validateBody({
       focusTags,
@@ -190,24 +175,6 @@ export async function POST(req: NextRequest) {
   const gemini = createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_AI_API_KEY,
   });
-
-  // const {response} = await generateText({
-  //   model: gemini('gemini-2.0-flash-thinking-exp-01-21'),
-  //   prompt: `
-  //   **Subject-Style Mapping for Adaptive Flashcard Selection:**
-
-  //   * **Technical/STEM:** Styles: How/Why Questions, Process Flashcards, Diagram Labeling, Formula/Equation, Application Scenarios, Definition (Concise).  Focus: Mechanisms, Problem-Solving, Formulas.
-  //   * **Language Learning:** Styles: Example Sentences, Scenario Dialogues, Fill-in-Blank, Meaning in Context (Idioms), Synonym/Antonym, Grammar Rules. Focus: Usage, Vocabulary, Conversation.
-  //   * **Humanities/Social Sciences:** Styles: Who/What/When/Where Questions, Concept Definitions, Timeline Flashcards, Cause-Effect, Compare-Contrast, Argument/Counter-Argument. Focus: Facts, Concepts, Theories, Arguments.
-  //   * **Arts & Music:** Styles: Image-Based (Art), Audio-Based (Music), Identify Artist/Artwork, Identify Instrument/Sound, Technique/Process, Definition (Art/Music Terms). Focus: Recognition, Techniques, Concepts.
-  //   * **Law & Business:** Styles: Case Studies (Scenario-Based), Definition (Legal/Business Terms), Principle/Rule, Ethical Dilemma (Scenario), Process Flashcards, Compare Concepts/Strategies. Focus: Application, Terminology, Principles.
-  //   * **Medical/Healthcare:** Styles: Diagram Labeling (Anatomy), Process/Mechanism, Medical Terminology, Clinical Scenarios, Drug Mechanism, Disease Pathology, Definition (Medical). Focus: Structures, Processes, Terms, Scenarios.
-
-  //   **Response**:
-  //   Respond in JSON format. Array of a`,
-  //   temperature: 0.8,
-  //   system: `You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards. Your primary responsibilities are:
-  // })
 
   const getTemperature = (knowledgeLevel: KnowledgeLevel) => {
     switch (knowledgeLevel) {
@@ -301,10 +268,10 @@ export async function POST(req: NextRequest) {
     "definition": "The detailed explanation elaborating on WHY the 'answer' is correct, providing context, or further defining the concept.", // The back of the flashcard
     "context": "The main subject or topic inferred from the Focus Tags (e.g., 'Computer Science', 'English Grammar').",
     "tags": ["list", "of", "relevant", "tags", "derived", "from", "FocusTags", "and", "specific", "card", "content"],
-    "answer1": "The correct, comprehensive answer or explanation forming the back of the flashcard.", // The back of the flashcard
-    "answer2": "wrong_answer",
-    "answer3": "wrong_answer",
-    "answer4": "wrong_answer",
+    "answer1": "The correct, comprehensive answer.", // The back of the flashcard
+    "answer2": "Incorrect plausible answer",
+    "answer3": "Incorrect plausible answer",
+    "answer4": "Incorrect plausible answer",
     "examples": "Optional: Usage example(s) separated by semicolon if multiple.",
     "keyPoints": "Optional: Key takeaway(s) or note(s) separated by semicolon if multiple.",
     "synonyms": "Optional: Alternative term(s) separated by semicolon if multiple.",

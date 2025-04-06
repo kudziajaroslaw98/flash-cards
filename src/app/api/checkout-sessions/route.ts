@@ -6,10 +6,8 @@ import { z } from 'zod';
 
 export const dynamic = 'force-dynamic'; // defaults to auto
 
-const validationScheme = z.union([
-  z.string().max(4).toLowerCase().includes('free'),
-  z.string().max(8).toLowerCase().includes('standard'),
-]);
+const planValidationSchema = z.enum(['free', 'premium']);
+const paymentValidationSchema = z.enum(['monthly', 'yearly']).nullish();
 
 const createOrRetrieveCustomerId = async (
   user: User,
@@ -64,6 +62,8 @@ const createOrRetrieveCheckoutSession = async (
   customerId: string,
   user: User,
   request: Request,
+  plan: 'free' | 'premium',
+  payment?: 'monthly' | 'yearly' | null,
 ) => {
   const checkoutSessions = await stripe.checkout.sessions.list({
     customer: customerId,
@@ -100,14 +100,43 @@ const createOrRetrieveCheckoutSession = async (
     ')',
   );
 
+  const productionPrices = {
+    premium_monthly: 'price_1QTmyMDKMh5G3jeEjRhDFjXH',
+    premium_yearly: 'price_1R9CseDKMh5G3jeENPoPsI32',
+  };
+
+  const developmentPrices = {
+    premium_monthly: 'price_1QUDAGDKMh5G3jeEEXb0W0tg',
+    premium_yearly: 'price_1R9DDADKMh5G3jeEuQH7iJtk',
+  };
+
+  let priceId = '';
+  const monthly =
+    process.env.NODE_ENV === 'production'
+      ? productionPrices.premium_monthly
+      : developmentPrices.premium_monthly;
+  const yearly =
+    process.env.NODE_ENV === 'production'
+      ? productionPrices.premium_yearly
+      : developmentPrices.premium_yearly;
+
+  if (plan === 'free') {
+    priceId = monthly;
+  } else {
+    if (payment === 'monthly') {
+      priceId = monthly;
+    } else if (payment === 'yearly') {
+      priceId = yearly;
+    } else {
+      priceId = monthly;
+    }
+  }
+
   const checkoutSession = await stripe.checkout.sessions.create({
     customer: customerId,
     line_items: [
       {
-        price:
-          process.env.NODE_ENV === 'production'
-            ? 'price_1QTmyMDKMh5G3jeEjRhDFjXH'
-            : 'price_1QUDAGDKMh5G3jeEEXb0W0tg',
+        price: priceId,
         quantity: 1,
       },
     ],
@@ -138,12 +167,15 @@ const createOrRetrieveCheckoutSession = async (
 export async function POST(request: Request) {
   try {
     const plan = new URL(request.url).searchParams.get('plan');
-    const validation = validationScheme.safeParse(plan);
+    const payment = new URL(request.url).searchParams.get('payment');
+    const planValidation = planValidationSchema.safeParse(plan);
+    const paymentValidation = paymentValidationSchema.safeParse(payment);
 
-    if (!validation.success) {
+    if (!planValidation.success || !paymentValidation.success) {
       console.error(
-        '[checkout-session] checkout error - invalid plan:',
-        validation.error.message,
+        '[checkout-session] checkout error - invalid plan or payment:',
+        planValidation?.error?.message,
+        paymentValidation?.error?.message,
       );
       throw new Error('Invalid plan');
     }
@@ -167,6 +199,8 @@ export async function POST(request: Request) {
       customerId,
       user,
       request,
+      planValidation.data,
+      paymentValidation.data,
     );
 
     console.log(

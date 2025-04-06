@@ -24,12 +24,12 @@ export const metadata: Metadata = {
       'Create, manage, and study your flashcard sets. Organize your learning materials efficiently.',
     images: [
       {
-        url: 'https://flashcards.finalphase.app/og/og_image.png',
+        url: 'https://finalphase.app/og/og_image.png',
         width: 800,
         height: 600,
       },
     ],
-    url: 'https://flashcards.finalphase.app/',
+    url: 'https://finalphase.app/',
     siteName: 'Flashcard Sets - Organize Your Learning',
     locale: 'en-US',
     type: 'website',
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
       'Create, manage, and study your flashcard sets. Organize your learning materials efficiently.',
     images: [
       {
-        url: 'https://flashcards.finalphase.app/og/og_image.png',
+        url: 'https://finalphase.app/og/og_image.png',
         width: 800,
         height: 600,
       },
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   },
   applicationName: 'Flashcards - Learning Words Made Easy',
   alternates: {
-    canonical: 'https://flashcards.finalphase.app/',
+    canonical: 'https://finalphase.app/',
   },
   manifest: '/manifest.json',
 };

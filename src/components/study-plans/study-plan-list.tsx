@@ -161,9 +161,15 @@ export function StudyPlanList({
                     <div className='flex w-full items-center gap-2'>
                       {plan.focusTags && (
                         <div className='flex flex-wrap gap-2'>
-                          {plan.focusTags.map((tag) => (
+                          {plan.focusTags.slice(0, 4).map((tag) => (
                             <Badge key={tag}>{tag}</Badge>
                           ))}
+
+                          {plan.focusTags.length > 4 && (
+                            <Badge key={`and-more-badge${plan.name}`}>
+                              {`+ ${plan.focusTags.length - 4} more`}
+                            </Badge>
+                          )}
                         </div>
                       )}
                     </div>

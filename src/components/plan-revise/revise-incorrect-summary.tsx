@@ -57,7 +57,6 @@ export function ReviseIncorrectSummary({
   };
 
   useEffect(() => {
-    console.log(summaries);
     const parsedJSON = parseStreamingJSON<{
       simplifiedDefinition?: string;
       commonMisconceptions?: string;
@@ -67,19 +66,11 @@ export function ReviseIncorrectSummary({
       mnemonic?: string;
       visualExample?: string;
     }>(summaries);
-    console.log('🚀 ~ :71 ~ useEffect ~ parsedJSON:', parsedJSON);
 
-    if (generateSummaryLoading && summaries) {
-      setIncorrectSummaries([
-        ...parsedJSON.completeObjects,
-        {
-          ...(parsedJSON.currentObject ?? {}),
-        },
-      ]);
-    } else {
+    if (summaries) {
       setIncorrectSummaries(parsedJSON.completeObjects);
     }
-  }, [summaries, generateSummaryLoading]);
+  }, [summaries]);
 
   useEffect(() => {
     if (
@@ -104,9 +95,9 @@ export function ReviseIncorrectSummary({
   }) => {
     return (
       <div className='flex flex-col gap-2'>
-        <span className='font-ibm-serif flex items-center gap-1 text-sm font-semibold'>
+        <span className='font-ibm-fredoka flex items-center gap-1 text-sm font-semibold'>
           <Dot className='size-4 text-green-500' />
-          <span className='font-serif text-gray-600 dark:text-slate-200'>
+          <span className='font-fredoka text-gray-600 dark:text-slate-200'>
             {title}
           </span>
         </span>
@@ -121,7 +112,7 @@ export function ReviseIncorrectSummary({
   return (
     <div className='flex w-full flex-col items-center gap-8'>
       <div className='flex w-full max-w-2xl flex-col gap-2'>
-        <span className='font-serif font-bold uppercase text-gray-600 dark:text-slate-200'>
+        <span className='font-fredoka font-semibold text-gray-600 dark:text-slate-200'>
           New cards summary
         </span>
 
@@ -138,12 +129,12 @@ export function ReviseIncorrectSummary({
 
           <span className='text-gray-200'>|</span>
 
-          <span>{retention * 100}% retention</span>
+          <span>{(retention * 100).toFixed(2)}% retention</span>
         </div>
       </div>
 
       <div className='flex w-full max-w-2xl flex-col gap-4'>
-        <span className='font-serif font-bold uppercase text-gray-600 dark:text-slate-200'>
+        <span className='font-fredoka font-semibold text-gray-600 dark:text-slate-200'>
           Incorrect flashcard summaries
         </span>
 

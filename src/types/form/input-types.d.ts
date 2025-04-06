@@ -26,6 +26,32 @@ export type InternalGroupTitle = {
   title: string | React.ReactNode;
 };
 
+export type InternalButton = {
+  name: string;
+  type: '_internal_button';
+  label?: string;
+  icon?: string | React.ReactNode;
+  iconPosition?: 'left' | 'right';
+  size?:
+    | 'default'
+    | 'sm'
+    | 'lg'
+    | 'xlg'
+    | 'icon'
+    | 'icon-square'
+    | 'icon-square-sm'
+    | 'icon-sm'
+    | 'icon-xs'
+    | 'full';
+  alt: string;
+  onClick: () => void;
+  disabled?: boolean;
+  className?: string;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  loading?: boolean;
+};
+
 export type VanillaInputType = Omit<
   InputComponentProps,
   'value' | 'error' | 'valid'
@@ -44,4 +70,5 @@ export type InputDefinitions<T> =
   | Omit<DateTimePickerProps, 'value' | 'error' | 'valid'>
   | InternalSeparator
   | InternalAccordion<T>
-  | InternalGroupTitle;
+  | InternalGroupTitle
+  | InternalButton;

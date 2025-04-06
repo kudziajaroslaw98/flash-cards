@@ -148,7 +148,9 @@ export default function NewStudyPlanPage() {
     <div className='flex h-full w-full grow flex-col items-center gap-12 md:pb-12'>
       <div className='flex w-full flex-col items-center justify-center gap-8 sm:items-start md:justify-between'>
         <div className='flex w-full flex-col items-center justify-center gap-2 sm:items-start md:justify-between'>
-          <h4 className='w-52 text-green-400'>Create new plan</h4>
+          <h4 className='w-52 font-fredoka font-semibold text-green-400'>
+            Create new plan
+          </h4>
         </div>
       </div>
       {process.env.NODE_ENV === 'production' ? (
@@ -223,7 +225,10 @@ export default function NewStudyPlanPage() {
               stepIdentification='4'
             >
               <StudyPlanStep5
-                focusTags={[...state.step1.focusTags, ...state.step1.suggestedFocusAreas]}
+                focusTags={[
+                  ...state.step1.focusTags,
+                  ...state.step1.suggestedFocusAreas,
+                ]}
                 flashcards={flashcards}
                 summaries={flashcards.map((flashcard) => ({
                   frontUuid: flashcard.frontUuid,

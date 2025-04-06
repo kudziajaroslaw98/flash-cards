@@ -152,7 +152,9 @@ export default function Sets() {
     <div className='flex w-full flex-col gap-2'>
       <div className='flex w-full items-center justify-start gap-4 sm:items-start md:justify-between'>
         <div className='flex w-full flex-col items-start justify-center sm:items-start md:justify-between'>
-          <h4 className='text-green-400'>Your Sets</h4>
+          <h4 className='font-fredoka w-52 font-semibold text-green-400'>
+            Your Sets
+          </h4>
           <span className='flex flex-wrap items-center gap-4 text-center text-sm text-gray-500 dark:text-slate-400'>
             <span>{sets.length} sets created</span>
           </span>

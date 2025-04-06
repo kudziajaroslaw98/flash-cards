@@ -25,12 +25,12 @@ export const metadata: Metadata = {
       'Review your flashcards with our advanced revision system. Strengthen your memory and track your progress.',
     images: [
       {
-        url: 'https://flashcards.finalphase.app/og/og_image.png',
+        url: 'https://finalphase.app/og/og_image.png',
         width: 800,
         height: 600,
       },
     ],
-    url: 'https://flashcards.finalphase.app/',
+    url: 'https://finalphase.app/',
     siteName: 'Revise Flashcards - Review and Remember',
     locale: 'en-US',
     type: 'website',
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
       'Review your flashcards with our advanced revision system. Strengthen your memory and track your progress.',
     images: [
       {
-        url: 'https://flashcards.finalphase.app/og/og_image.png',
+        url: 'https://finalphase.app/og/og_image.png',
         width: 800,
         height: 600,
       },
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   },
   applicationName: 'Flashcards - Learning Words Made Easy',
   alternates: {
-    canonical: 'https://flashcards.finalphase.app/',
+    canonical: 'https://finalphase.app/',
   },
   manifest: '/manifest.json',
 };

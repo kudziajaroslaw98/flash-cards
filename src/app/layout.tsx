@@ -1,6 +1,6 @@
 import '#/shared/utils/polyfills';
 import type { Metadata } from 'next';
-import { Domine, Inter, Roboto_Mono } from 'next/font/google';
+import { Domine, Fredoka, Inter, Roboto_Mono } from 'next/font/google';
 
 import ClientSideProviders from '#/providers/client-side-providers.component';
 import Script from 'next/script';
@@ -11,13 +11,6 @@ const inter = Inter({
   display: 'swap',
   variable: '--font-inter',
 });
-
-// const courierPrime = Courier_Prime({
-//   display: 'swap',
-//   variable: '--font-serif',
-//   subsets: ['latin'],
-//   weight: ['400', '700'],
-// });
 
 const serif_font = Domine({
   display: 'swap',
@@ -32,87 +25,115 @@ const roboto_mono = Roboto_Mono({
   variable: '--font-roboto-mono',
 });
 
+const fredoka = Fredoka({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-fredoka',
+});
+
 export const metadata: Metadata = {
-  title: 'Flashcards - Learning Words Made Easy',
+  title: 'Final Phase: AI Flashcards & Study Tools for Students',
   description:
-    'Flashcards by Jarosław Kudzia is the perfect tool for mastering vocabulary and learning words effortlessly.',
+    'Master any subject faster with Final Phase. AI-powered flashcards, personalized study plans, spaced repetition (SRS), and focus stats for busy students.',
+  applicationName: 'Final Phase', // Concise application name
+
+  // --- Authorship ---
   authors: [
-    { name: 'Final Phase', url: 'https://finalphase.app' },
+    { name: 'Final Phase', url: 'https://finalphase.app' }, // Brand first
     { name: 'Jarosław Kudzia', url: 'https://github.com/kudziajaroslaw98' },
   ],
   creator: 'Jarosław Kudzia',
+
+  // --- Keywords (Revised for Final Phase & AI focus) ---
   keywords: [
-    // high importance keywords for search engines
-    'flashcards',
+    // High Importance / Core
+    'Final Phase', // Brand name
+    'AI flashcards',
+    'AI study planner',
+    'spaced repetition system',
+    'SRS app',
     'flashcards app',
-    'learning words made easy',
     'study tool',
-    'vocabulary learning',
-    'language learning',
-    'spaced repetition',
+    'student study app',
     'active recall',
-    // secondary keywords for search engines
-    'custom flashcards',
-    'language practice',
-    'study flashcards',
-    'word practice',
-    'memory training',
+    'focus tracking', // Unique feature
+    'study statistics',
+
+    // Secondary / Use Case
+    'university study tool',
+    'college study app',
+    'exam preparation',
+    'learn faster',
+    'study smarter',
     'efficient studying',
-    'word recall practice',
-    'learn vocabulary fast',
-    // Long tail keywords for search engines
-    'best flashcards app for studying',
-    'how to learn vocabulary effectively',
-    'top vocabulary learning tools',
-    'easy-to-use flashcards for language learning',
-    'personalized flashcards for better memory',
-    'improve language skills with flashcards',
-    'study planner with spaced repetition',
-    // broader reach keywords for search engines
-    'vocabulary trainer tools',
-    'educational tools for memory improvement',
-    'flashcards website for learning',
-    'language study resources',
-    'learning apps for vocabulary building',
+    'save study time',
+    'online flashcards',
+    'PWA study app', // Progressive Web App
+
+    // Long Tail Keywords
+    'best AI flashcard generator for students',
+    'study planner app with spaced repetition',
+    'how to study effectively for college exams',
+    'app to track study focus',
+    'flashcard app with AI features',
+    'generate flashcards from notes AI',
+    'customizable study plans',
+
+    // Broader Reach
+    'educational technology',
+    'learning tools online',
+    'study software',
+    'AI study assistant',
+    'memory improvement tools',
+    'digital flashcards',
   ],
+
+  // --- Open Graph (for social sharing - Facebook, LinkedIn, etc.) ---
   openGraph: {
-    title: 'Flashcards - Learning Words Made Easy',
+    title: 'Final Phase: AI Flashcards & Study Tools for Students', // Consistent title
     description:
-      'Flashcards by Jarosław Kudzia is the perfect tool for mastering vocabulary and learning words effortlessly.',
+      'Master subjects faster with AI-powered flashcards, personalized study plans, SRS, and focus stats designed for busy students on Final Phase.', // Slightly adapted for OG
     images: [
       {
-        url: 'https://flashcards.finalphase.app/og/og_image.png',
-        width: 800,
-        height: 600,
+        url: 'https://finalphase.app/og/og_image.png', // Ensure this image reflects Final Phase branding
+        width: 1200, // Standard OG width
+        height: 630, // Standard OG height
       },
     ],
-    url: 'https://flashcards.finalphase.app',
-    siteName: 'Flashcards - Learning Words Made Easy',
+    url: 'https://finalphase.app',
+    siteName: 'Final Phase', // Brand name
     locale: 'en-US',
     type: 'website',
   },
+
+  // --- Twitter Card ---
   twitter: {
     card: 'summary_large_image',
-    title: 'Flashcards - Learning Words Made Easy',
+    title: 'Final Phase: AI Flashcards & Study Tools for Students', // Consistent title
     description:
-      'Flashcards by Jarosław Kudzia is the perfect tool for mastering vocabulary and learning words effortlessly.',
+      'Master subjects faster with AI-powered flashcards, personalized study plans, SRS, and focus stats designed for busy students on Final Phase.', // Consistent description
     images: [
       {
-        url: 'https://flashcards.finalphase.app/og/og_image.png',
-        width: 800,
-        height: 600,
+        url: 'https://finalphase.app/og/og_image.png', // Use the same OG image (ensure it's updated)
+        width: 1200,
+        height: 630,
       },
     ],
+    // Optional: Add creator handle if relevant
+    // creator: '@YourTwitterHandle',
   },
+
+  // --- Search Engine Directives ---
   robots: {
     index: true,
     follow: true,
   },
-  applicationName: 'Flashcards - Learning Words Made Easy',
+
+  // --- Web App Manifest & Canonical URL ---
   alternates: {
-    canonical: 'https://flashcards.finalphase.app/',
+    canonical: 'https://finalphase.app/',
   },
-  manifest: '/manifest.json',
+  manifest: '/manifest.json', // Ensure this manifest file is also updated
 };
 
 export default function RootLayout({
@@ -123,7 +144,7 @@ export default function RootLayout({
   return (
     <html
       lang='en'
-      className={`${inter.variable} ${roboto_mono.variable} ${serif_font.variable} dark flex font-sans`}
+      className={`${inter.variable} ${roboto_mono.variable} ${serif_font.variable} ${fredoka.variable} dark flex font-sans`}
       suppressHydrationWarning
     >
       <head>

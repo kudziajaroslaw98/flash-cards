@@ -1,10 +1,11 @@
 import useLongPress from '#/hooks/use-long-press.hook';
 import { cn } from '#/shared/utils/cn.util';
 import type { Flashcard } from '#/types/flash-card.type';
-import { BadgeCheck } from 'lucide-react';
+import { BadgeCheck, Dot } from 'lucide-react';
 import { Variant } from 'motion/react';
 import * as m from 'motion/react-m';
 import { useEffect, useState } from 'react';
+import Markdown from 'react-markdown';
 import Card from '../_ui/card/card';
 
 export type AISuggestedFlashcardType = Pick<
@@ -92,6 +93,40 @@ export function AISuggestedFlashcard({
     },
   };
 
+  const FlashcardSection = ({
+    title,
+    data,
+  }: {
+    title: string;
+    data?: string;
+  }) => {
+    if (!data) return null;
+
+    const chunks = data?.split(';');
+    return (
+      <div className={cn(['flex flex-col gap-1'])}>
+        <span className='font-fredoka text-xs font-semibold text-gray-600 dark:text-slate-200'>
+          {title}
+        </span>
+        {chunks.length <= 1 ? (
+          <Markdown>{chunks[0].trim()}</Markdown>
+        ) : (
+          <ul>
+            {chunks.map((chunk) => (
+              <li
+                className='flex'
+                key={chunk.trim()}
+              >
+                <Dot className='size-5 min-w-5 text-green-400' />
+                <Markdown>{chunk.trim()}</Markdown>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  };
+
   return (
     <m.div
       onMouseDown={(e) => onStart(e, flashcard)}
@@ -151,12 +186,12 @@ export function AISuggestedFlashcard({
                 )}
 
                 {flashcard.type === 'single' && (
-                  <>
+                  <div className='flex h-full w-full flex-col items-center justify-center gap-4'>
                     {flashcard.query && (
                       <h5
                         className={cn([
-                          'z-20 flex h-auto w-full flex-col items-center justify-start hyphens-auto text-center font-serif text-green-400',
-                          'text-xs leading-[90%]',
+                          'z-20 flex h-auto w-full flex-col items-center hyphens-auto text-center font-fredoka font-semibold text-green-400',
+                          'text-lg leading-[100%]',
                         ])}
                       >
                         {flashcard.context}
@@ -166,14 +201,14 @@ export function AISuggestedFlashcard({
                     {flashcard.query && (
                       <h5
                         className={cn([
-                          'z-20 flex h-full w-full flex-col items-center justify-center text-center',
+                          'z-20 flex h-auto w-full flex-col items-center justify-center text-center',
                           'text-[0.6875rem] leading-[120%]',
                         ])}
                       >
                         {flashcard.query}
                       </h5>
                     )}
-                  </>
+                  </div>
                 )}
               </>
             </span>
@@ -193,79 +228,30 @@ export function AISuggestedFlashcard({
               </div>
 
               <div className='flex flex-col gap-4'>
-                <div className='flex flex-col gap-1'>
-                  <span className='text-gray-400'>Definition:</span>
-                  <span>{flashcard?.definition}</span>
-                </div>
-
-                {flashcard?.answer1 && (
-                  <div className='flex flex-col gap-1'>
-                    <span className='text-gray-400'>Answer:</span>
-                    <span>{flashcard?.answer1.trim()}</span>
-                  </div>
-                )}
-
-                {flashcard?.examples && (
-                  <div className='flex flex-col gap-1'>
-                    <span className='text-gray-400'>Examples:</span>
-                    <ul className='flex list-inside !list-disc flex-col gap-1 '>
-                      {flashcard?.examples.split(';').map((example) => (
-                        <li
-                          className='list-item decoration-gray-600'
-                          key={example.trim()}
-                        >
-                          {example.trim()}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {flashcard?.synonyms && (
-                  <div className='flex flex-col gap-1'>
-                    <span className='text-gray-400'>Synonyms:</span>
-                    <ul className='flex list-inside !list-disc flex-col gap-1 '>
-                      {flashcard?.synonyms.split(';').map((synonym) => (
-                        <li
-                          className='list-item decoration-gray-600'
-                          key={synonym.trim()}
-                        >
-                          {synonym.trim()}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {flashcard?.keyPoints && (
-                  <div className='flex flex-col gap-1'>
-                    <span className='text-gray-400'>Key Points:</span>
-                    <ul className='flex list-inside !list-disc flex-col gap-1 '>
-                      {flashcard?.keyPoints.split(';').map((keyPoint) => (
-                        <li
-                          className='list-item decoration-gray-600'
-                          key={keyPoint.trim()}
-                        >
-                          {keyPoint.trim()}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {flashcard?.relatedFacts && (
-                  <div className='flex flex-col gap-1'>
-                    <span className='text-gray-400'>Related Facts:</span>
-                    <ul className='flex list-inside !list-disc flex-col gap-1 '>
-                      {flashcard?.relatedFacts.split(';').map((fact) => (
-                        <li
-                          className='list-item decoration-gray-600'
-                          key={fact.trim()}
-                        >
-                          {fact.trim()}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                <FlashcardSection
+                  title='Definition:'
+                  data={flashcard?.definition}
+                />
+                <FlashcardSection
+                  title='Answer:'
+                  data={flashcard?.answer1}
+                />
+                <FlashcardSection
+                  title='Examples:'
+                  data={flashcard?.examples}
+                />
+                <FlashcardSection
+                  title='Synonyms:'
+                  data={flashcard?.synonyms}
+                />
+                <FlashcardSection
+                  title='Key Points:'
+                  data={flashcard?.keyPoints}
+                />
+                <FlashcardSection
+                  title='Related Facts:'
+                  data={flashcard?.relatedFacts}
+                />
               </div>
 
               <div className='sticky bottom-0 w-full'>
