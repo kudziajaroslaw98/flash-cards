@@ -69,8 +69,7 @@ export default function FlashcardReviseComponent() {
   });
 
   const { activeTime, timerStart, distractionsRef } = useFocusTracker();
-  // eslint-disable-next-line no-undef
-  const cardTime = useRef<Date>(new Date()); //in seconds
+  const cardTime = useRef<Date>(new Date());
 
   const setFlashcards = useMemo(
     () =>

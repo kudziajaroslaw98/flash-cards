@@ -12,16 +12,23 @@ import { learningStyleAdaptationSchema } from '#/schemas/learning-style-adaptati
 import { mnemonicPreferencesSchema } from '#/schemas/mnemonic-preferences.schema';
 import { FlashcardGenerationOptions } from '#/types/flashcard-generation-options.type';
 import { FormScheme } from '#/types/form/form-scheme.type';
+import { Dot } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { z } from 'zod';
 
 interface FlashcardGenerateDialogProps {
+  setName: string;
+  setDescription: string;
+  flashcardCount: number;
   handleSubmit: (value: FlashcardGenerationOptions) => Promise<void> | void;
   trigger: React.ReactNode;
   initialData?: Partial<FlashcardGenerationOptions>; // Array of initial data
 }
 
 export const FlashcardGenerateDialog = ({
+  setName,
+  setDescription,
+  flashcardCount,
   handleSubmit,
   trigger,
   initialData = {}, // Default to an array with one empty object
@@ -43,16 +50,13 @@ export const FlashcardGenerateDialog = ({
         name: 'focusAreas',
         maxTags: 10,
         placeholder: 'Enter areas...',
-        required: true,
+        required: false,
         _internal_default_value: [], // Default for each new instance
         _internal_constraints: [
           {
             type: 'validation',
-            key: 'knowledgeLevel',
-            constraint: z
-              .array(z.string().min(1).max(100))
-              .min(1, 'Focus areas is required')
-              .max(10, 'Maximum 10 focus areas allowed'),
+            key: 'focusAreas',
+            constraint: z.array(z.string()).max(10, ''),
           },
         ],
       },
@@ -126,16 +130,14 @@ export const FlashcardGenerateDialog = ({
   };
 
   const handleDialogSubmit = async () => {
-    console.log(formValue);
     await formRef.current?.checkValidity();
 
     if (!formRef.current?.isValid()) {
       return;
     }
 
-    setIsModalOpen(false);
-
     handleSubmit(formValue);
+    setIsModalOpen(false);
     setFormValue({});
   };
 
@@ -156,7 +158,41 @@ export const FlashcardGenerateDialog = ({
           variant='form'
           className='flex flex-col items-center justify-center pb-8 pt-4'
         >
+          <div className='flex w-full max-w-96 flex-col p-4'>
+            <h6 className='font-fredoka font-medium text-gray-600 dark:text-slate-300'>
+              Also included in generation:{' '}
+            </h6>
+
+            <span className='flex items-center text-gray-600 dark:text-slate-300'>
+              <Dot className='size-4 text-green-500' />
+              <span>
+                <span className='font-semibold'>Set name: </span>
+                <span>{setName}</span>
+              </span>
+            </span>
+
+            <span className='flex items-center text-gray-600 dark:text-slate-300'>
+              <span className=''>
+                <span className='line-clamp-3 overflow-hidden text-ellipsis'>
+                  <span className='float-left mr-1 flex font-semibold'>
+                    <Dot className='size-4 text-green-500' />
+                    Set description:{' '}
+                  </span>{' '}
+                  {setDescription}
+                </span>
+              </span>
+            </span>
+
+            <span className='flex items-center text-gray-600 dark:text-slate-300'>
+              <Dot className='size-4 text-green-500' />
+              Summary of {
+                flashcardCount
+              } flashcards
+            </span>
+          </div>
+
           <FormComponent<FlashcardGenerationOptions>
+            ref={formRef}
             className='w-full max-w-96'
             scheme={getFormScheme}
             emitFormValue={setFormValue}
@@ -166,7 +202,7 @@ export const FlashcardGenerateDialog = ({
 
         <Modal.Footer
           variant='form'
-          className='flex items-center justify-end gap-2 py-4'
+          className='flex items-center justify-center gap-2 py-4 lg:justify-end'
         >
           <Button
             ref={submitRef}

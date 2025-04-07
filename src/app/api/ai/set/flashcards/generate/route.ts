@@ -1,7 +1,16 @@
+import { cardLengthDictionary } from '#/dictionaries/card-length.dictionary';
+import { knowledgeLevelDictionary } from '#/dictionaries/knowledge-level.dictionary';
+import { learningStyleDictionary } from '#/dictionaries/learning-style.dictionary';
+import { mnemonicPreferenceDictionary } from '#/dictionaries/mnemonic-preference.dictionary';
+import { cardLengthSchema } from '#/schemas/card-length.schema';
+import { knowledgeLevelSchema } from '#/schemas/knowledge-level.schema';
+import { learningStyleAdaptationSchema } from '#/schemas/learning-style-adaptation.schema';
+import { mnemonicPreferencesSchema } from '#/schemas/mnemonic-preferences.schema';
 import { Logger } from '#/shared/helpers/logger/logger';
 import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { createClient } from '#/shared/utils/supabase/server';
+import { FlashcardGenerationOptions } from '#/types/flashcard-generation-options.type';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamObject } from 'ai';
 import type { NextRequest } from 'next/server';
@@ -11,6 +20,15 @@ export const maxDuration = 30;
 
 async function validateBody(body: Record<string, unknown>) {
   const validationScheme = z.object({
+    options: z.object({
+      knowledgeLevel: knowledgeLevelSchema.nullish(),
+      learningStyle: learningStyleAdaptationSchema.nullish(),
+      mnemonic: mnemonicPreferencesSchema.nullish(),
+      cardLength: cardLengthSchema.nullish(),
+      blacklist: z.array(z.string()).nullish(),
+      focusAreas: z.array(z.string()).nullish(),
+      additionalUserPrompt: z.string().nullish(),
+    }),
     flashcards: z.array(
       z
         .string()
@@ -32,7 +50,6 @@ const rateLimit = new RateLimit(1, 10, 'ai/set/flashcards/generate');
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const user = (await supabase.auth.getUser()).data.user;
-
   try {
     if (user === null) {
       Logger.error('User not logged in', 'ai/set/flashcards/generate');
@@ -57,10 +74,20 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { flashcards: flashcards, setName, setDescription } = await req.json();
+  const {
+    flashcards: flashcards,
+    setName,
+    setDescription,
+    options,
+  }: {
+    flashcards: string[];
+    setName: string;
+    setDescription: string;
+    options: Partial<FlashcardGenerationOptions>;
+  } = await req.json();
 
   try {
-    validateBody({ flashcards, setName, setDescription });
+    validateBody({ flashcards, setName, setDescription, options });
   } catch {
     Logger.error(
       `Invalid request body from user [${user.id}]`,
@@ -94,6 +121,23 @@ export async function POST(req: NextRequest) {
   flashcardsRecords?.forEach((flashcard) =>
     flashcard.tags.forEach((tag: string) => focusTagsSet.add(tag)),
   );
+  options.focusAreas?.forEach((area) => {
+    focusTagsSet.add(area);
+  });
+
+  const pickedKnowledgeLevel = knowledgeLevelDictionary.find(
+    (level) => level.value === options.knowledgeLevel,
+  );
+
+  const pickedLearningStyle = learningStyleDictionary.find(
+    (style) => style.value === options.learningStyle,
+  );
+  const pickedCardLength = cardLengthDictionary.find(
+    (style) => style.value === options.cardLength,
+  );
+  const pickedMemonic = mnemonicPreferenceDictionary.find(
+    (style) => style.value === options.mnemonic,
+  );
 
   Logger.info(
     `User [ ${user.id} ] is generating flashcards.`,
@@ -101,64 +145,96 @@ export async function POST(req: NextRequest) {
   );
 
   const prompt = `
-**Objective**: Generate 10 unique flashcards aligned with flashcards deck [name: ${setName}; description: ${setDescription}], study scope: "Comprehensive coverage". 
+      **IMPORTANT: All generated cards MUST strictly conform to the SINGLE specified Knowledge Level: ${pickedKnowledgeLevel}. Do NOT generate simpler content.**
+      # ROLE: You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards tailored to user specifications.
 
-**Critical Requirements**:
-1. STRICTLY AVOID DUPLICATES: 
-   - Never repeat core concepts/words/information from existing flashcards (analyzed below)
-   - No conceptual duplicates even with different wording
-   - No rephrased versions of same questions / words / information
+      # GOAL: Generate 10 unique flashcards based on the provided inputs, strictly adhering to the specified knowledge level and content focus.
 
-**Existing Flashcards Analysis** (DO NOT REPEAT THESE CORE CONCEPTS):
-[START PREVIOUS]
-${flashcardsRecords.length > 0 ? flashcardsRecords.map((s) => `> ${s.frontUuid} - ${s.context}; ${s.query}; ${s.definition}`).join('\n') : 'No previous flashcards'}
-[END PREVIOUS]
+      # INPUTS:
+      *   **Sets name:** ${setName}
+      *   **Sets description:** ${setDescription}
+      *   **Knowledge Level:** ${pickedKnowledgeLevel} (This is the PRIMARY determinant of difficulty for ALL cards)
+      *   **Focus Tags:** [${new Array(focusTagsSet).join(', ')}] (These define the specific topics/concepts to cover)
+      *   **Subject Area & Topic:** (Infer the general Subject Area [e.g., Technical/STEM, Language Learning] and specific Topic Name from the Focus Tags. Use this context for applying style and knowledge level guidance.)
+      *   **Excluded Topics (Blacklist):** ${options.blacklist && options.blacklist.length > 0 ? `[${options.blacklist.join(', ')}]` : 'None specified'} (Strictly AVOID generating cards primarily about these concepts.)
+      *   **Existing Cards (Avoid Duplication):**
+          ${flashcardsRecords && flashcardsRecords.length > 0 ? flashcardsRecords.map((summary) => `• ID: ${summary.id}, Topic: ${summary.topic}, Question: ${summary.query}, Context: ${summary.context}`).join('\n') : '  None provided.'}
+      *   **Optional User Preferences:**
+          *   Learning style preference: ${pickedLearningStyle ?? 'Non specified'}
+          *   Card length preference: ${pickedCardLength ?? 'Non specified'}
+          *   Mnemonic preference: ${pickedMemonic ?? 'Non specified'}
+          *   Additional instructions: ${options.additionalUserPrompt ?? 'Non specified'}
+          *(Note: These preferences are secondary. Knowledge Level and Coverage Focus constraints MUST take precedence.)*
 
-**Generation Rules**:
-- Each flashcard must be aligned with flashcards deck [name: ${setName}; description: ${setDescription}]
-- Each flashcard must be non-duplicate
-- Detect if knowledge level is specified if yes align generation accordingly.
-- Required differentiation methods:
-  * Different abstraction levels (macro vs micro)
-  * Different relationships (cause-effect vs comparison)
-  * Different knowledge types (fact vs application)
-  * Different cognitive levels (recall vs analysis)
-- Vary Question Types and Learning Objectives:  Don't just ask for definitions.  Vary the type of flashcards you generate to test different learning objectives.  Examples of diverse flashcard types include:
-  * Definition/Identification: "Define X", "Identify Y"
-  * Explanation/Process: "Explain how Z works", "Describe the process of W"
-  * Comparison/Contrast: "Compare A and B", "What are the differences between C and D?"
-  * Cause/Effect: "What are the causes of E?", "What are the effects of F?"
-  * Examples/Applications: "Give examples of G", "Where is H applied?"
-  * Problem Solving/Application: "Solve problem J related to K", "Apply concept L to scenario M"
-  * Key Characteristics/Properties: "What are the key properties of N?", "List the characteristics of O"
+          # CORE INSTRUCTIONS & GUIDANCE:
 
-**Examples** (BAD vs GOOD):
-BAD DUPLICATES: "Define X", "What is X?", "Explain X"
-GOOD UNIQUE: 
-1. "X vs Y comparison" 
-2. "Practical application of X"
-3. "Components of X"
+          **1. Subject-Specific Style Guidance (Base Styles):**
+              *   **Technical/STEM:** How/Why Questions, Process, Application Scenarios, Comparisons, Consequences, Components. Focus: Mechanisms, Problem-Solving.
+              *   **Language Learning:** Example Sentences, Dialogues, Fill-in-Blank, Meaning in Context, Synonym/Antonym, Grammar Rules. Focus: Usage, Vocabulary, Conversation.
+              *   **Humanities/Social Sciences:** Who/What/When/Where, Concept Definitions, Timelines, Cause-Effect, Compare-Contrast, Arguments. Focus: Facts, Concepts, Theories, Arguments.
+              *   **Arts & Music:** Image/Audio-Based ID, Technique/Process, Definitions, Artist/Style Recognition. Focus: Recognition, Techniques, Concepts.
+              *   **Law & Business:** Case Studies, Definitions, Principles/Rules, Ethical Scenarios, Process, Comparisons. Focus: Application, Terminology, Principles.
+              *   **Medical/Healthcare:** Diagrams, Process/Mechanism, Terminology, Clinical Scenarios, Drug/Disease Info, Definitions. Focus: Structures, Processes, Terms, Scenarios.
+              *(Select appropriate styles from this list based on the inferred Subject Area and the specific Focus Tags.)*
 
-flashcard structure: 
-- A concise and clear question or term for the front of the flashcard (query).
-- A brief and accurate definition or explanation for the back of the flashcard (definition).
-- A word/term/topic of the flashcard (topic).
-- A 1-3 tags related to this flashcard (tags).
-- A correct answer to the question (answer1)
-- 3 incorrect answers to the question (answer2, answer3, answer4)
-- *optional* Examples of use separated by semicolon (;) (examples).
-- *optional* A key points of these flashcards separated by semicolon (;) (keyPoints).
-- *optional* Synonyms to this flashcard [to context] separated by semicolon (;) (synonyms).
-- *optional* Related facts to this flashcard separated by semicolon (;) (relatedFacts).
-Decide if optional fields bring value to the overall flashcard. For example, synonyms are required when the flashcard is about definition etc. Keep flashcards consistent with flashcards deck: [name: ${setName}; description: ${setDescription}].
-  `;
+          **2. Knowledge Level Application (CRITICAL - Determines Complexity):**
+              *(Apply ONE level consistently to ALL generated cards based on the 'Knowledge Level' input: ${pickedKnowledgeLevel})*
+
+              *   **unfamiliar:** Focus ONLY on the absolute most basic definitions and identifications. Assume ZERO prior knowledge.
+              *   **beginner:** Focus on understanding foundational concepts, simple rules, and core definitions. Assume familiarity ONLY with absolute basics.
+              *   **developing:** Focus on connecting basic concepts, simple application, and explaining 'how' things work. Assume basic definitions are known. DO NOT ask for basic definitions.
+              *   **proficient:** Focus on APPLYING concepts in context, understanding NUANCES, comparing simple approaches, and basic analysis. Assume fundamentals are well understood. DO NOT ask for basic definitions or simple 'what is' questions. Questions MUST require application or analysis.
+              *   **advanced:** Focus on complex scenarios, evaluating trade-offs, synthesis, and subtle distinctions. Assume strong practical understanding. DO NOT ask basic/intermediate 'what is' or 'how does it work' questions. Questions MUST require evaluation or synthesis.
+              *   **expert:** Focus on deep analysis, design trade-offs, critique, advanced theory, and teaching complex topics. Assume mastery. DO NOT ask questions covered in standard textbooks/undergrad courses. Questions MUST require high-level evaluation, design, or critical analysis. (Refer back to the detailed expert guidance section if needed for specific examples/constraints, especially for STEM).
+                -   **(Optional: Keep the detailed expert section separate or integrate a shorter version here, but ensure the negative constraints are prominent).**
+
+          **3. Content Selection (Applying Focus & Coverage):**
+              *   **Prioritize Focus Tags:** Generate content *primarily* related to the concepts specified in the ''Focus Tags''.
+              *   **Identify gaps:** Identify gaps in users flashcards set and fill it with suitable content.
+
+
+          **4. Constraint Checklist & Quality Control:**
+              *   **Knowledge Level Consistency:** ALL cards MUST strictly match the single ''Knowledge Level'' specified. NO mixing of difficulties.
+              *   **Focus Tag Relevance:** Content MUST be directly relevant to the provided ''Focus Tags''.
+              *   **Blacklist Adherence:** Verify NO card's primary subject is from the ''Excluded Topics (Blacklist)''.
+              *   **Uniqueness:** Avoid semantic overlap or simple reformulations of ''Existing Cards'' or other generated cards in this batch.
+              *   **Style Appropriateness:** Chosen flashcard style MUST fit the Subject Area, Focus Tag content, and the complexity required by the Knowledge Level.
+              *   **Accuracy & Clarity: Information must be accurate. Questions (''query''), concise answers (''answer''), and explanations (''definition'') must be clear and sufficiently detailed for the level.
+              *  **Answer & Explanation Quality:**
+                  -   The ''answer'' MUST be the direct, concise, and correct response to the ''query''.
+                  -   The ''definition'' MUST clearly elaborate on *why* the ''answer'' is correct, provide necessary context, or break down the concept further, appropriate to the ''Knowledge Level''.
+                  -   Avoid including keywords from the ''query'' directly in the ''answer'' or ''definition'' where possible if it would make the answer too obvious (no trivial hints).
+
+          # OUTPUT FORMAT:
+          Generate the response as a JSON array, where each object represents a single flashcard conforming to this structure:
+    [
+      {
+        "id": "unique_string_ID_for_this_card",
+        "query": "The clear and concise question or prompt forming the front of the flashcard.",, // The front of the flashcard
+        "definition": "The detailed explanation elaborating on WHY the 'answer' is correct, providing context, or further defining the concept.", // The back of the flashcard
+        "context": "The main subject or topic inferred from the Focus Tags (e.g., 'Computer Science', 'English Grammar').",
+        "tags": ["list", "of", "relevant", "tags", "derived", "from", "FocusTags", "and", "specific", "card", "content"],
+        "answer1": "The correct, comprehensive answer.", // The back of the flashcard
+        "answer2": "Incorrect plausible answer",
+        "answer3": "Incorrect plausible answer",
+        "answer4": "Incorrect plausible answer",
+        "examples": "Optional: Usage example(s) separated by semicolon if multiple.",
+        "keyPoints": "Optional: Key takeaway(s) or note(s) separated by semicolon if multiple.",
+        "synonyms": "Optional: Alternative term(s) separated by semicolon if multiple.",
+        "relatedFacts": "Optional: Related concept(s) or fact(s) separated by semicolon if multiple."
+      }
+    ]
+    Only include optional fields (examples, keyPoints, synonyms, relatedFacts) when they add significant pedagogical value relevant to the card's content and knowledge level.
+    Both answer and explanation fields are required.
+    Ensure the JSON is valid.
+    `;
 
   const gemini = createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_AI_API_KEY,
   });
 
   const result = streamObject({
-    model: gemini('gemini-2.0-flash-001'),
+    model: gemini('gemini-2.0-flash'),
     output: 'array',
     schema: z.object({
       id: z.string(),
@@ -175,7 +251,14 @@ Decide if optional fields bring value to the overall flashcard. For example, syn
       answer3: z.string(),
       answer4: z.string(),
     }),
-    system: `You are an expert flashcard content generator focused on creating UNIQUE and NON-REDUNDANT flashcards. Your primary goal is to expand the user's decks with NEW and DISTINCT concepts/words/information related to the given deck: [name: ${setName}; description: ${setDescription}].  Avoid generating flashcards that are semantically similar to concepts/words/information already covered. Prioritize novelty and comprehensive topic coverage.`,
+    system: `You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards based on detailed user specifications. Your primary responsibilities, guided by the main prompt, are:
+
+    1.  **UNIQUENESS & RELEVANCE:** Generate flashcards exploring DISTINCT concepts relevant to the specified ''Focus Tags'', strictly avoiding semantic overlap or reformulation of ''Existing Cards'' or other generated content in the current batch.
+    2.  **PEDAGOGICAL APPROPRIATENESS:** Employ varied question styles and cognitive tasks (e.g., application, analysis, evaluation) that are *strictly appropriate for the single Knowledge Level specified in the main prompt*. Do NOT mix difficulty levels across cards in one request.
+    3.  **KNOWLEDGE CALIBRATION (Primary Directive):** Precisely match the complexity, depth, and scope of ALL generated content (''query'', ''answer'', ''definition'', optional fields) to the *single* ''Knowledge Level'' provided in the main prompt. Adhere meticulously to the detailed guidance for that specific level.
+    4.  **ANSWER & EXPLANATION QUALITY:** Create a clearly correct, concise ''answer'' and a detailed, accurate ''definition'' that effectively clarifies *why* the answer is correct, provides necessary context, and aligns with the required ''Knowledge Level'', following the JSON structure defined in the main prompt.
+    5.  **CONSTRAINT ADHERENCE:** Strictly follow all constraints specified in the main prompt, including ''Coverage Focus'', ''Excluded Topics (Blacklist)'', ''Subject-Specific Styles'', and the required ''OUTPUT FORMAT''. *The main prompt's detailed instructions always take precedence.*
+`,
     prompt: prompt,
   });
 

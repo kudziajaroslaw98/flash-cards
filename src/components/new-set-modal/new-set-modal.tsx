@@ -174,7 +174,9 @@ export const NewSetModal = ({
       isPlanActive
     ) {
       setLoadingGenerate(true);
-      await complete(`generate description to: '${formValue.name}'`);
+      await complete(
+        `generate description to: '${formValue.name}' around 240 characters`,
+      );
       setLoadingGenerate(false);
     }
   }, [formValue, complete, isLoggedIn, isPlanActive]);
