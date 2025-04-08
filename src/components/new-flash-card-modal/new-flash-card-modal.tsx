@@ -40,7 +40,7 @@ export const NewFlashcardModal = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const { isLoggedIn, isPlanActive } = useSessionContext();
   const submitRef = useRef<HTMLButtonElement>(null);
-  const formRef = useRef<FormMethods<Omit<Flashcard, 'order'>>>(null);
+  const formRef = useRef<FormMethods<Flashcard>>(null);
   const {
     completion,
     complete,

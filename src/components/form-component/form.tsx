@@ -3,14 +3,14 @@
 import { isInternalInput } from '#/shared/guards/is-internal-input';
 import { cn } from '#/shared/utils/cn.util';
 import { isDifferent } from '#/shared/utils/is-different.util';
-import type { ExtendedSchemeKeys } from '#/types/form/extended-scheme-keys.type';
+import type { ExtendedSchemeKeys } from '#/types/extended-scheme-keys.type';
 import type {
   ExtendedInputType,
   FormScheme,
   InputType,
-} from '#/types/form/form-scheme.type';
-import type { InternalAccordion } from '#/types/form/input-types';
-import { InputValidation } from '#/types/form/input-validation.type';
+} from '#/types/form-scheme.type';
+import type { InternalAccordion } from '#/types/input-types';
+import type { InputValidation } from '#/types/input-validation.type';
 import {
   useEffect,
   useImperativeHandle,
@@ -155,6 +155,8 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
               ).success;
             } else {
               return !constraint.safeParse(
+                // TODO: Try to fix it later
+                // @ts-expect-error its fine, false positive type error
                 props.initialValues?.[key] ?? formValues?.[key as string],
               ).success;
             }

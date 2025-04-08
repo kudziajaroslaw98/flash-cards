@@ -1,4 +1,4 @@
-import type { FormScheme } from '#/types/form/form-scheme.type';
+import type { FormScheme } from '#/types/form-scheme.type';
 import {
   type Dispatch,
   type RefObject,

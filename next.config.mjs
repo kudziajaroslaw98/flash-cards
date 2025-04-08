@@ -29,7 +29,7 @@ const withMDX = createMDX();
 const cspHeader =
   process.env.NODE_ENV === 'development'
     ? `default-src 'self' https://umami.finalphase.app https://supabase.finalphase.app wss://supabase.finalphase.app https://n8n-hc0sc0wskgo4cckgck8ks8ss.finalphase.app ws://localhost:54321 http://localhost:54321;
-    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://umami.finalphase.app https://js.stripe.com blob:;
+    script-src 'self' 'unsafe-inline' https://umami.finalphase.app https://js.stripe.com blob:;
     style-src 'self' 'unsafe-inline';
     img-src 'self' avatars.githubusercontent.com lh3.googleusercontent.com blob: data: https://*.stripe.com;
     font-src 'self';
@@ -41,8 +41,8 @@ const cspHeader =
     upgrade-insecure-requests;`
     : `
     default-src 'self' https://umami.finalphase.app https://supabase.finalphase.app wss://supabase.finalphase.app https://n8n-hc0sc0wskgo4cckgck8ks8ss.finalphase.app;
-    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://umami.finalphase.app https://js.stripe.com blob:;
-    style-src 'self' 'unsafe-inline';
+    script-src 'self' 'unsafe-inline' 'https://umami.finalphase.app https://js.stripe.com blob:;
+    style-src 'self' 'unsafe-inline' ;
     img-src 'self' avatars.githubusercontent.com lh3.googleusercontent.com blob: data: https://*.stripe.com;
     font-src 'self';
     object-src 'none';

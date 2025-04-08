@@ -1,6 +1,6 @@
 import { type PropsWithChildren } from 'react';
 
-export function AllRevised(props: PropsWithChildren) {
+export function AllRevised({ children }: PropsWithChildren) {
   return (
     <div className='flex h-full w-full flex-col items-center justify-center gap-4'>
       <p className='flex flex-col gap-1 text-center text-gray-600 dark:text-slate-400'>
@@ -12,7 +12,7 @@ export function AllRevised(props: PropsWithChildren) {
         </span>
       </p>
 
-      {props.children}
+      {children}
     </div>
   );
 }

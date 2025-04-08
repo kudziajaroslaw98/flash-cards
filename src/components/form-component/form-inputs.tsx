@@ -1,9 +1,9 @@
 'use client';
 
 import { isInternalInput } from '#/shared/guards/is-internal-input';
-import type { ExtendedSchemeKeys } from '#/types/form/extended-scheme-keys.type';
-import { FormScheme, InternalConstraint } from '#/types/form/form-scheme.type';
-import type { InternalAccordion } from '#/types/form/input-types';
+import type { ExtendedSchemeKeys } from '#/types/extended-scheme-keys.type';
+import { FormScheme, InternalConstraint } from '#/types/form-scheme.type';
+import type { InternalAccordion } from '#/types/input-types';
 import { useMemo, type FormEvent } from 'react';
 import { Accordion } from '../_ui/accordion/accordion';
 import { Button } from '../_ui/button/button';

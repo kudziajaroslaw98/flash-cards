@@ -11,7 +11,7 @@ import { knowledgeLevelSchema } from '#/schemas/knowledge-level.schema';
 import { learningStyleAdaptationSchema } from '#/schemas/learning-style-adaptation.schema';
 import { mnemonicPreferencesSchema } from '#/schemas/mnemonic-preferences.schema';
 import { FlashcardGenerationOptions } from '#/types/flashcard-generation-options.type';
-import { FormScheme } from '#/types/form/form-scheme.type';
+import { FormScheme } from '#/types/form-scheme.type';
 import { Dot } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { z } from 'zod';

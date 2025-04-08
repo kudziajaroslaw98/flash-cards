@@ -12,4 +12,5 @@ export const API_ROUTES = {
   GENERATE_PLAN: '/api/ai/study/plan',
   GENERATE_INCORRECT_REVIEW_SUMMARY: '/api/ai/study/plan/incorrect-reviews',
   GENERATE_BRAINSTORM_TAG_IDEAS: '/api/ai/study/plan/brainstorm-tags',
+  FEEDBACK: '/api/feedback',
 } as const;

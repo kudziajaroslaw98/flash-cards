@@ -1,16 +1,16 @@
 'use client';
 
+import isDateTimePicker from '#/shared/guards/is-datetime-picker';
 import isDropdown from '#/shared/guards/is-dropdown';
 import isInput from '#/shared/guards/is-input';
 import isInputSwitch from '#/shared/guards/is-switch-input';
 import isTagInput from '#/shared/guards/is-tag-input';
 import isTextArea from '#/shared/guards/is-text-area';
-import isDateTimePicker from '#/shared/guards/it-datetime-picket';
 import {
   ExtendedInputType,
   InputType,
   InternalConstraint,
-} from '#/types/form/form-scheme.type';
+} from '#/types/form-scheme.type';
 import * as m from 'motion/react-m';
 import type { FormEvent } from 'react';
 import DateTimePicker from '../_ui/date-picker/date-picker';
