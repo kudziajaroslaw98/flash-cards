@@ -22,24 +22,24 @@ export function ReviseOptions({
   const [clickedAnswer, setClickedAnswer] = useState<string | undefined>();
   const spaceRepetitionOptions = [
     {
-      value: 'easy',
-      label: 'Easy',
-      description: 'Show again in ~ 1 week',
-    },
-    {
-      value: 'good',
-      label: 'Good',
-      description: 'Show again in ~ 1 day',
+      value: 'again',
+      label: 'Again',
+      description: 'Resetting card',
     },
     {
       value: 'hard',
       label: 'Hard',
-      description: 'Show again in ~ 1 hour',
+      description: 'Review sooner',
     },
     {
-      value: 'again',
-      label: 'Again',
-      description: 'Show again in ~ 10 minutes',
+      value: 'good',
+      label: 'Good',
+      description: 'Review on schedule',
+    },
+    {
+      value: 'easy',
+      label: 'Easy',
+      description: 'Review later',
     },
   ] as const;
 

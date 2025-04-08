@@ -18,6 +18,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 
+import { Accordion } from '#/components/_ui/accordion/accordion';
 import Badge from '#/components/_ui/badge/badge';
 import LinkComponent from '#/components/_ui/link/link';
 import { ScrollReveal } from '#/components/_ui/scroll-reveal/scroll-reveal';
@@ -80,6 +81,49 @@ export default async function Home() {
       id: 6,
       icon: <MessageSquarePlus className='size-8 text-green-500' />,
       body: 'You shape the future of Final Phase with your feedback and ideas.',
+    },
+  ];
+
+  const faqItems = [
+    {
+      question: 'What is Final Phase?',
+      answer:
+        'Final Phase is an AI-powered learning application designed to help students study more effectively using flashcards, spaced repetition, and personalized study plans.',
+    },
+    {
+      question: 'How does the AI work?',
+      answer:
+        'Our AI analyzes the topics you provide to generate relevant flashcards, suggests tailored study schedules based on your goals and deadlines, and helps create descriptions for your study sets, saving you time and effort.',
+    },
+    {
+      question: 'What is Spaced Repetition (SRS)?',
+      answer:
+        'Spaced Repetition is a learning technique that involves reviewing information at increasing intervals. Our app uses an algorithm to determine the optimal time to show you each flashcard again, helping you move information from short-term to long-term memory efficiently.',
+    },
+    {
+      question: 'Is Final Phase free to use?',
+      answer:
+        'Yes, Final Phase offers a generous free plan with unlimited flashcards, sets, and core study features like SRS and progress tracking. We also offer a Premium plan that unlocks advanced AI features like flashcard generation and study plan creation.',
+    },
+    {
+      question: 'Do I need an account to use the app?',
+      answer:
+        'You can explore some features as a guest, but creating an account (using Google, GitHub, or email) allows you to save your progress, sync across devices, and access personalized features.',
+    },
+    {
+      question: 'Can I use Final Phase offline?',
+      answer:
+        'Final Phase is a Progressive Web App (PWA). Once loaded, you can review existing flashcards offline. However, features requiring AI processing or data synchronization need an internet connection.',
+    },
+    {
+      question: 'How is my data used?',
+      answer:
+        'We prioritize your privacy. Your study content is used primarily to provide the Service features, including processing by AI partners (like Google) when you use AI generation tools. We use anonymized usage analytics (via Umami) to improve the app. We do not sell your personal data. Please see our Privacy Policy for full details.',
+    },
+    {
+      question: 'How can I provide feedback or suggest features?',
+      answer:
+        'We love hearing from our users! You can submit feedback directly through the "Feedback" section in the app or contact us via the email provided in the "Contact" section on this page.',
     },
   ];
 
@@ -701,6 +745,35 @@ export default async function Home() {
               items={timelineItems}
               title='2025'
             />
+          </ScrollReveal>
+        </section>
+
+        {/* FAQ Section */}
+        <section
+          id='faq'
+          className='container relative flex scroll-mt-16 flex-col items-center justify-center gap-8 py-12'
+        >
+          <ScrollReveal className='flex flex-col items-center justify-center gap-4'>
+            <h4 className='font-fredoka font-semibold text-green-500'>
+              Frequently Asked Questions
+            </h4>
+            <span className='text-center text-slate-400'>
+              Got questions? We&apos;ve got answers.
+            </span>
+          </ScrollReveal>
+
+          <ScrollReveal className=''>
+            <Accordion variant='default'>
+              {faqItems.map((item, index) => (
+                <Accordion.Item
+                  key={`faq-item-${index}`}
+                  title={item.question}
+                  variant='default'
+                >
+                  <p className='text-sm text-slate-300'>{item.answer}</p>
+                </Accordion.Item>
+              ))}
+            </Accordion>
           </ScrollReveal>
         </section>
 

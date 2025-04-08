@@ -1,3 +1,5 @@
+'use client';
+
 import { cn } from '#/shared/utils/cn.util';
 import uuid from '#/shared/utils/uuid.util';
 import { cva } from 'class-variance-authority';
