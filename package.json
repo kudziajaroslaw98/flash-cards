@@ -42,7 +42,7 @@
     "dexie-react-hooks": "^1.1.7",
     "lucide-react": "^0.465.0",
     "motion": "^12.6.3",
-    "next": "^15.2.4",
+    "next": "^15.3.0",
     "postcss": "^8.5.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
