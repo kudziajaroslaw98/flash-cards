@@ -1,10 +1,6 @@
 'use client';
 import { cn } from '#/shared/utils/cn.util';
-import {
-  useMotionTemplate,
-  useMotionValue,
-  type MotionValue,
-} from 'motion/react';
+import { useMotionValue } from 'motion/react';
 import { DetailedHTMLProps, HTMLAttributes, PropsWithChildren } from 'react';
 
 export interface CardProps
@@ -14,7 +10,6 @@ export interface CardProps
 }
 
 export default function Card({
-  backgroundGradientWidth,
   className,
   children,
   motion = true,
@@ -33,15 +28,6 @@ export default function Card({
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);
   };
-
-  const lightBackground = useMotionTemplate`radial-gradient(${
-    backgroundGradientWidth ?? 300
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  }px circle at ${mouseX}px ${mouseY}px, rgb(243 244 246 / .4), transparent 60%)` as MotionValue<any>;
-  const darkBackground = useMotionTemplate`radial-gradient(${
-    backgroundGradientWidth ?? 300
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  }px circle at ${mouseX}px ${mouseY}px, rgb(10 15 27 / 1), transparent 60%)` as MotionValue<any>;
 
   return (
     <div
