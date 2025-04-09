@@ -1,6 +1,5 @@
 import { cn } from '#/shared/utils/cn.util';
 import type { Flashcard } from '#/types/flash-card.type';
-import { useEffect, useState } from 'react';
 
 type ReviseOptionsProps = {
   clicked: boolean;
@@ -8,18 +7,21 @@ type ReviseOptionsProps = {
   clickedOption: string | undefined;
   spaceRepetitionClick: (value: 'again' | 'hard' | 'good' | 'easy') => void;
   changeClicked: (answer: string, key?: string) => void;
+  clickedAnswer?: string;
+  answersAvailable?: boolean;
+  answers?: string[];
 };
 
 export function ReviseOptions({
   clicked,
   revisedCard,
   clickedOption,
+  clickedAnswer,
   spaceRepetitionClick,
   changeClicked,
+  answersAvailable = false,
+  answers = [],
 }: ReviseOptionsProps) {
-  const [answers, setAnswers] = useState<string[]>([]);
-  const [answersAvailable, setAnswersAvailable] = useState<boolean>(false);
-  const [clickedAnswer, setClickedAnswer] = useState<string | undefined>();
   const spaceRepetitionOptions = [
     {
       value: 'again',
@@ -43,18 +45,7 @@ export function ReviseOptions({
     },
   ] as const;
 
-  useEffect(() => {
-    const answers = [
-      revisedCard?.answer1 ?? null,
-      revisedCard?.answer2 ?? null,
-      revisedCard?.answer3 ?? null,
-      revisedCard?.answer4 ?? null,
-    ]
-      .filter((answer) => answer !== null && answer !== '')
-      .sort(() => Math.random() - 0.5) as string[];
-    setAnswers(answers);
-    setAnswersAvailable(answers.some((answer) => answer !== null));
-  }, [revisedCard]);
+  console.log(answers, revisedCard);
 
   return (
     <div className='mt-8 grid w-full grid-cols-[repeat(1,1fr)] items-stretch justify-items-center gap-2 lg:w-auto lg:grid-cols-[repeat(2,minmax(20rem,1fr))]'>
@@ -129,7 +120,6 @@ export function ReviseOptions({
               key={`answer-${index + 1}`}
               onClick={() => {
                 changeClicked(answer);
-                setClickedAnswer(answer);
               }}
             >
               <span className='flex size-8 min-h-8 min-w-8 items-center justify-center rounded-md bg-green-400 text-gray-100 dark:text-slate-900'>

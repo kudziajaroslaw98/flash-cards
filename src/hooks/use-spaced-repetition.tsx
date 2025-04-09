@@ -270,9 +270,8 @@ export default function useSpacedRepetition({
       numberOfItems,
     );
     if (
-      array.length === 0 &&
-      setNameRef.current === revisedSetId &&
-      setNameRef.current !== null
+      (array.length === 0 && !continueReroll) ||
+      (setNameRef.current === revisedSetId && setNameRef.current !== null)
     ) {
       return;
     }
@@ -294,6 +293,7 @@ export default function useSpacedRepetition({
       console.log(
         `[Spaced Repetition] Initializing deck with ${initialDeck.length} Today's items for set: ${revisedSetId}`,
       );
+      setNameRef.current = revisedSetId;
     } else if (continueReroll && array.length > 0) {
       // If no items are due OR we finished them, AND continueReroll is true, use all items from the current set
       source = 'all';
@@ -301,6 +301,7 @@ export default function useSpacedRepetition({
       console.log(
         `[Spaced Repetition] Initializing deck with ${initialDeck.length} All items (continueReroll) for set: ${revisedSetId}`,
       );
+      setNameRef.current = revisedSetId;
     } else {
       // No items due and not continuing, or array is empty
       source = null;
@@ -327,7 +328,6 @@ export default function useSpacedRepetition({
       setRandomItems([]); // Clear random items if deck is empty
     }
 
-    setNameRef.current = revisedSetId;
     // No need to update arrayRef here
     // Dependencies: watch for changes in the calculated todayItems, the continueReroll flag,
     // the base array reference, and numberOfItems.

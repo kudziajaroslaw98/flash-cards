@@ -52,11 +52,14 @@ export default function FlashcardReviseComponent() {
   ] as const;
 
   const defaultSet = { value: 'default', label: 'All flashcards' };
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [answersAvailable, setAnswersAvailable] = useState<boolean>(false);
   const [revisedCard, setRevisedCard] = useState<Flashcard | undefined>();
   const [revisedSet, setRevisedSet] = useState<string>(defaultSet.value);
   const [clickedOption, setClickedOption] = useState<
     ReviseOptionsType | undefined
   >();
+  const [clickedAnswer, setClickedAnswer] = useState<string | undefined>();
   const [clicked, setClicked] = useState(false);
   const cardsReviewed = useRef(0);
   const cardsRecalled = useRef(0);
@@ -83,8 +86,6 @@ export default function FlashcardReviseComponent() {
     [flashcards, revisedSet],
   );
 
-  console.log(setFlashcards);
-
   const {
     reroll,
     calculateRepetition,
@@ -97,6 +98,7 @@ export default function FlashcardReviseComponent() {
   } = useSpacedRepetition({
     array: setFlashcards,
     revisedSetId: revisedSet,
+    numberOfItems: 1,
   });
 
   const spaceRepetitionClick = (value: ReviseOptionsType) => {
@@ -157,8 +159,6 @@ export default function FlashcardReviseComponent() {
       synced: false,
     };
 
-    const isSRSOption  = answer === 'again' || answer === 'hard' || answer === 'good' || answer === 'easy';
-
     let reviseOption: ReviseOptionsType;
     if (correct) {
       reviewLog.recalled = true;
@@ -181,7 +181,8 @@ export default function FlashcardReviseComponent() {
 
     db.reviewLogs.add(reviewLog);
     updateMetadata({ ...clonedStats });
-    setClickedOption(isSRSOption ? reviseOption : answer);
+    setClickedAnswer(answer);
+    setClickedOption(reviseOption);
     setClicked(true);
   };
 
@@ -199,6 +200,7 @@ export default function FlashcardReviseComponent() {
 
       // Reset UI state for the next card
       setClickedOption(undefined);
+      setClickedAnswer(undefined);
       setClicked(false);
       // revisedCard will be updated by the useEffect watching randomItems
 
@@ -215,6 +217,7 @@ export default function FlashcardReviseComponent() {
     // Resetting state when set changes
     setClicked(false);
     setClickedOption(undefined);
+    setClickedAnswer(undefined);
     setRevisedCard(undefined);
     setRevisedSet(value);
   };
@@ -223,6 +226,7 @@ export default function FlashcardReviseComponent() {
     window?.umami?.track('Continue reshuffling');
     setRevisedCard(undefined); // Clear current card display
     setClickedOption(undefined); // Reset options
+    setClickedAnswer(undefined);
     setClicked(false); // Reset clicked state
     setContinueReroll(true);
   };
@@ -234,11 +238,8 @@ export default function FlashcardReviseComponent() {
       if (index < spaceRepetitionOptions.length) {
         spaceRepetitionClick(spaceRepetitionOptions[index].value);
       }
-    } else if (revisedCard?.type === 'single') {
-      const answerKey = `answer${index + 1}` as keyof Flashcard;
-      if (answerKey in revisedCard && revisedCard[answerKey]) {
-        changeClicked(revisedCard[answerKey] as string, key);
-      }
+    } else if (revisedCard?.type === 'single' && answersAvailable) {
+      changeClicked(answers[index], key);
     }
   };
 
@@ -305,6 +306,19 @@ export default function FlashcardReviseComponent() {
       updateDailyStats();
     };
   }, [distractionsRef, timerStart, updateMetadata]);
+
+  useEffect(() => {
+    const answers = [
+      revisedCard?.answer1 ?? null,
+      revisedCard?.answer2 ?? null,
+      revisedCard?.answer3 ?? null,
+      revisedCard?.answer4 ?? null,
+    ]
+      .filter((answer) => answer !== null && answer !== '')
+      .sort(() => Math.random() - 0.5) as string[];
+    setAnswers(answers);
+    setAnswersAvailable(answers.some((answer) => answer !== null));
+  }, [revisedCard]);
 
   useKeyPress([' '], () => handleReshuffle('Space'));
   useKeyPress(['ArrowRight'], () => handleReshuffle('ArrowRight'));
@@ -435,6 +449,9 @@ export default function FlashcardReviseComponent() {
           revisedCard={revisedCard}
           spaceRepetitionClick={spaceRepetitionClick}
           changeClicked={changeClicked}
+          clickedAnswer={clickedAnswer}
+          answers={answers}
+          answersAvailable={answersAvailable}
         />
       </div>
 
