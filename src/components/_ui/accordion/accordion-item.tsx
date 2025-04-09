@@ -46,7 +46,7 @@ export const AccordionItem = ({
         className={cn([accordionLabelVariants({ variant }), 'w-full'])}
         onClick={handleClick}
       >
-        <span className='flex w-full max-w-full truncate text-left text-sm font-medium text-gray-600 dark:text-slate-300'>
+        <span className='flex w-full max-w-full text-left text-sm font-medium text-gray-600 dark:text-slate-300'>
           {title}
         </span>
 

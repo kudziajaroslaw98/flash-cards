@@ -103,7 +103,7 @@ export default async function Home() {
     {
       question: 'Is Final Phase free to use?',
       answer:
-        "Yes, Final Phase offers a generous free plan with unlimited flashcards, sets, and core study features like SRS and progress tracking. We also offer Premium plans (monthly/yearly) that unlock advanced AI features (flashcard/plan generation, AI summaries) and support the app's development. See our [Pricing Section](/#pricing) for details.",
+        "Yes, Final Phase offers a generous free plan with unlimited flashcards, sets, and core study features like SRS and progress tracking. We also offer Premium plans (monthly/yearly) that unlock advanced AI features (flashcard/plan generation, AI summaries) and support the app's development. See our Pricing Section above for details.",
     },
     {
       question: 'Do I need an account to use the app?',
@@ -778,7 +778,7 @@ export default async function Home() {
             </span>
           </ScrollReveal>
 
-          <ScrollReveal className=''>
+          <ScrollReveal className='max-w-full'>
             <Accordion variant='default'>
               {faqItems.map((item, index) => (
                 <Accordion.Item
