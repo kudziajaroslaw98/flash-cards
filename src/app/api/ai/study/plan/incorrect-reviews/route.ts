@@ -184,8 +184,5 @@ You can use markdown in this fields: commonMisconceptions/contextualExample/keyT
         routePath,
       );
     },
-    onChunk: (chunk) => {
-      console.log(chunk);
-    },
   }).toDataStreamResponse();
 }

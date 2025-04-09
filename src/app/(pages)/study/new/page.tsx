@@ -138,8 +138,6 @@ export default function NewStudyPlanPage() {
       return;
     }
 
-    console.log('🚀 ~ :119 ~ useEffect ~ objects:', objects);
-
     setSuggestions(
       objects.map(
         (element) =>

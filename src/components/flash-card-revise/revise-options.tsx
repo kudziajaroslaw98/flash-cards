@@ -45,8 +45,6 @@ export function ReviseOptions({
     },
   ] as const;
 
-  console.log(answers, revisedCard);
-
   return (
     <div className='mt-8 grid w-full grid-cols-[repeat(1,1fr)] items-stretch justify-items-center gap-2 lg:w-auto lg:grid-cols-[repeat(2,minmax(20rem,1fr))]'>
       {revisedCard && !answersAvailable && (

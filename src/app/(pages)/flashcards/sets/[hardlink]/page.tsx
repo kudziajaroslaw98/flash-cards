@@ -241,7 +241,6 @@ export default function SetHardlinkPage() {
 
   useEffect(() => {
     if (!generatedFlashcards) return;
-    console.log(generatedFlashcards);
     setGenerated(
       generatedFlashcards
         ?.filter((flashcard) => flashcard)

@@ -246,7 +246,6 @@ export default function useSpacedRepetition({
     if (currentDeck.length === 0) {
       setRandomItems([]); // No more items left in this session
       sessionSourceRef.current = null; // Indicate session ended
-      console.log('[Spaced Repetition] Session deck empty.');
       return [];
     }
 
@@ -262,13 +261,6 @@ export default function useSpacedRepetition({
   };
 
   useEffect(() => {
-    console.log(
-      setNameRef.current,
-      revisedSetId,
-      array,
-      continueReroll,
-      numberOfItems,
-    );
     if (
       (array.length === 0 && !continueReroll) ||
       (setNameRef.current === revisedSetId && setNameRef.current !== null)
@@ -290,25 +282,16 @@ export default function useSpacedRepetition({
       // If there are items due for the current set, use them
       source = 'today';
       initialDeck = [...currentTodayItems];
-      console.log(
-        `[Spaced Repetition] Initializing deck with ${initialDeck.length} Today's items for set: ${revisedSetId}`,
-      );
       setNameRef.current = revisedSetId;
     } else if (continueReroll && array.length > 0) {
       // If no items are due OR we finished them, AND continueReroll is true, use all items from the current set
       source = 'all';
       initialDeck = [...array];
-      console.log(
-        `[Spaced Repetition] Initializing deck with ${initialDeck.length} All items (continueReroll) for set: ${revisedSetId}`,
-      );
       setNameRef.current = revisedSetId;
     } else {
       // No items due and not continuing, or array is empty
       source = null;
       initialDeck = [];
-      console.log(
-        `[Spaced Repetition] Initializing deck as empty for set: ${revisedSetId}. No items due or not continuing.`,
-      );
     }
 
     setSessionDeck(initialDeck);
@@ -359,7 +342,6 @@ export default function useSpacedRepetition({
     }
 
     return () => {
-      console.log('[Spaced Repetition] Terminating worker.');
       worker.terminate();
       workerRef.current = null;
     };

@@ -101,7 +101,6 @@ export const NewFlashcardModal = ({
       answer4?: string;
     }>(generatedAnswers);
 
-    console.log(objects);
     if (objects?.at(0)) {
       setFormValue((prev) => ({
         ...prev,

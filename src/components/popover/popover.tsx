@@ -231,7 +231,6 @@ export function Popover({
 
   const handleTogglePopover = () => {
     setIsOpen((prev) => !prev);
-    console.log(position);
   };
 
   return (

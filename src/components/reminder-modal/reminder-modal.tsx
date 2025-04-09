@@ -50,7 +50,6 @@ export function ReminderModal({
   };
 
   useEffect(() => {
-    console.log(selected);
     if (selected.length === 0) {
       setValues([getNewValue()]);
     } else {
@@ -67,7 +66,6 @@ export function ReminderModal({
       const x = prev.map((item) =>
         item.frontUuid === formValue.frontUuid ? (formValue as Reminder) : item,
       );
-      console.log(x);
       return x;
     });
   };

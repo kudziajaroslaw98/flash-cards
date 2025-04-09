@@ -78,7 +78,6 @@ export function StudyPlanStep5({
       day?.newCards?.map((card) => uniqueFlashcards.add(card as string));
       day?.cardsToReview?.map((card) => uniqueFlashcards.add(card as string));
     });
-    console.log('usedUniqueFlashcards', uniqueFlashcards);
   }, [object]);
 
   const handleAcceptPlan = () => {

@@ -105,8 +105,6 @@ export function StudyPlanStep1({
     }
 
     setSuggestions(objects);
-
-    console.log('🚀 ~ :119 ~ useEffect ~ objects:', objects);
   }, [completion]);
 
   return (
