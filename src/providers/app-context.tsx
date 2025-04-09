@@ -424,8 +424,6 @@ export default function AppProvider(props: PropsWithChildren) {
         user_uuid: user?.id,
       })),
     );
-
-    console.log(bulkReminders, error);
   };
 
   const removeReminders = async (reminders: Reminder[]) => {

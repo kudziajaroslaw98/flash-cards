@@ -1,5 +1,6 @@
 'use client';
 
+import { useRedirectUnauthorized } from '#/hooks/use-redirect-unauthorized';
 import { useRevisePlanContext } from '#/providers/revise-plan-provider';
 import { APP_ROUTES } from '#/shared/defaults/app.routes';
 import type { StudyPlan } from '#/types/study-plan.type';
@@ -25,6 +26,10 @@ export function PlanRevise() {
   >([]);
 
   const router = useRouter();
+  useRedirectUnauthorized({
+    redirectOnInactivePlan: true,
+    inactivePathname: APP_ROUTES.pricing,
+  });
 
   const handlePlanPick = (plan: StudyPlan) => {
     setPickedPlan(plan);

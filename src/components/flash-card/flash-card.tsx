@@ -59,41 +59,7 @@ export default function FlashcardComponent({
     }
   }, [isInSelectionMode]);
 
-  const FlashcardSection = ({
-    title,
-    data,
-    snap = true,
-  }: {
-    title: string;
-    data: string;
-    snap?: boolean;
-  }) => {
-    return (
-      <div
-        className={cn([
-          'flex flex-col gap-1',
-          snap && 'snap-start snap-always',
-        ])}
-      >
-        <span className='font-serif uppercase text-gray-600 dark:text-slate-200'>
-          {title}
-        </span>
-        <ul>
-          {data.split(';').map((chunk) => (
-            <li
-              className='flex'
-              key={chunk.trim()}
-            >
-              <Dot className='size-5 min-w-5 text-green-400' />
-              <Markdown>{chunk.trim()}</Markdown>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  };
-
-  const cardVariants = {
+  const cardVariants: Record<string, Variant> = {
     hovered: {
       top: 0,
       left: 0,
@@ -101,7 +67,7 @@ export default function FlashcardComponent({
       zIndex: 40,
       height: '22.75rem',
       width: '100%',
-    } as Variant,
+    },
     unhovered: {
       translateY: '0%',
       opacity: 100,
@@ -111,8 +77,17 @@ export default function FlashcardComponent({
         position: 'relative',
         zIndex: 21,
       },
-    } as Variant,
-    initial: { translateY: '10%', opacity: 0, zIndex: -20 },
+    },
+    initial: {
+      width: '100%',
+      translateY: '10%',
+      opacity: 0,
+      zIndex: -20,
+      transitionEnd: {
+        position: 'relative',
+        zIndex: 20,
+      },
+    },
     exit: {
       translateY: '-5%',
       opacity: 0,
@@ -120,6 +95,38 @@ export default function FlashcardComponent({
       maxHeight: 0,
       height: 0,
     },
+  };
+
+  const FlashcardSection = ({
+    title,
+    data,
+  }: {
+    title: string;
+    data: string;
+  }) => {
+    const chunks = data.split(';');
+    return (
+      <div className={cn(['flex flex-col gap-1'])}>
+        <span className='font-fredoka text-xs font-semibold text-gray-600 dark:text-slate-200'>
+          {title}
+        </span>
+        {chunks.length <= 1 ? (
+          <Markdown>{chunks[0].trim()}</Markdown>
+        ) : (
+          <ul>
+            {chunks.map((chunk) => (
+              <li
+                className='flex'
+                key={chunk.trim()}
+              >
+                <Dot className='size-5 min-w-5 text-green-400' />
+                <Markdown>{chunk.trim()}</Markdown>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
   };
 
   const FrontSide = () => (
@@ -133,9 +140,9 @@ export default function FlashcardComponent({
           <>
             <h5
               className={cn([
-                'z-20 flex h-auto w-full flex-col items-center justify-start hyphens-auto text-center font-serif text-green-400',
+                'z-20 flex h-full w-full flex-col items-center justify-center hyphens-auto text-center text-green-400',
                 size === 'sm' && 'text-lg leading-[120%]',
-                size === 'horizontal-sm' && 'text-xs leading-[90%]',
+                size === 'horizontal-sm' && 'text-sm leading-[120%]',
                 size === 'md' && 'text-2xl',
                 size === 'lg' && 'text-3xl',
               ])}
@@ -162,13 +169,13 @@ export default function FlashcardComponent({
         )}
 
         {flashcard.type === 'single' && (
-          <>
+          <div className='flex h-full w-full flex-col items-center justify-center gap-4'>
             {flashcard.query && (
               <h5
                 className={cn([
-                  'z-20 flex h-auto w-full flex-col items-center justify-start hyphens-auto text-center font-serif text-green-400',
+                  'font-fredoka z-20 flex h-auto w-full flex-col items-center hyphens-auto text-center font-semibold text-green-400',
                   size === 'sm' && 'text-lg leading-[120%]',
-                  size === 'horizontal-sm' && 'text-xs leading-[90%]',
+                  size === 'horizontal-sm' && 'text-lg leading-[100%]',
                   size === 'md' && 'text-2xl',
                   size === 'lg' && 'text-3xl',
                 ])}
@@ -180,7 +187,7 @@ export default function FlashcardComponent({
             {flashcard.query && (
               <h5
                 className={cn([
-                  'z-20 flex h-full w-full flex-col items-center justify-center text-center',
+                  'z-20 flex h-auto w-full flex-col items-center justify-center text-center',
                   size === 'sm' && 'text-[0.6875rem] leading-[120%]',
                   size === 'horizontal-sm' && 'text-[0.6875rem] leading-[120%]',
                   size === 'md' && 'text-xs',
@@ -190,7 +197,7 @@ export default function FlashcardComponent({
                 {flashcard.query}
               </h5>
             )}
-          </>
+          </div>
         )}
       </>
     </span>
@@ -199,7 +206,7 @@ export default function FlashcardComponent({
   const BackSide = () => (
     <div
       className={cn([
-        'scrollbar-hidden relative z-20 flex h-full w-full snap-y snap-mandatory scroll-pt-8 flex-col overflow-y-auto scroll-smooth hyphens-auto py-6 text-gray-500 dark:text-slate-400',
+        'scrollbar-hidden relative z-20 flex h-full w-full snap-y snap-mandatory scroll-pt-8 flex-col overflow-y-auto scroll-smooth hyphens-auto py-6 text-gray-300 text-gray-500 dark:text-slate-400',
         size === 'sm' && 'text-[.7rem]',
         size === 'horizontal-sm' && 'text-[.7rem]',
         size === 'md' && 'text-xs',
@@ -214,28 +221,24 @@ export default function FlashcardComponent({
 
       <div className='flex flex-col gap-4'>
         {flashcard?.query && (
-          <div className='flex snap-start scroll-pt-8 flex-col gap-1'>
-            <span className='font-serif uppercase text-gray-600 dark:text-slate-200'>
-              Question:
-            </span>
-            <span>{flashcard?.query}</span>
-          </div>
+          <FlashcardSection
+            title='Question:'
+            data={flashcard?.query}
+          />
         )}
 
-        <div className='flex snap-start scroll-pt-8 flex-col gap-1'>
-          <span className='font-serif uppercase text-gray-600 dark:text-slate-200'>
-            Definition:
-          </span>
-          <span>{flashcard?.definition}</span>
-        </div>
+        {flashcard?.definition && (
+          <FlashcardSection
+            title='Definition:'
+            data={flashcard?.definition}
+          />
+        )}
 
         {flashcard?.answer1 && (
-          <div className='flex snap-start scroll-pt-8 flex-col gap-1'>
-            <span className='font-serif uppercase text-gray-600 dark:text-slate-200'>
-              Answer:
-            </span>
-            <span>{flashcard?.answer1}</span>
-          </div>
+          <FlashcardSection
+            title='Answer:'
+            data={flashcard?.answer1}
+          />
         )}
 
         {flashcard?.examples && (
@@ -282,12 +285,12 @@ export default function FlashcardComponent({
       onTouchStart={(e) => onStart(e, flashcard)}
       onTouchEnd={onEnd}
       onTouchMove={onMove}
-      className={cn(['relative flex'])}
+      className={cn(['relative flex h-44 w-full'])}
     >
       <m.div
         variants={cardVariants}
         animate={'unhovered'}
-        initial={false}
+        initial={'initial'}
         exit={'exit'}
         whileHover={isFlipped ? 'hovered' : ''}
         key={`${flashcard.frontUuid}:${isFlipped ? 'flipped' : 'unflipped'}`}
@@ -295,7 +298,7 @@ export default function FlashcardComponent({
         <Card
           tabIndex={0}
           className={cn([
-            'z-10 h-full cursor-pointer flex-col items-center px-2 py-2 outline-none focus-visible:ring  focus-visible:ring-green-400/50',
+            'z-10 h-full cursor-pointer flex-col items-center p-4 outline-none focus-visible:ring  focus-visible:ring-green-400/50',
             isSelected ? 'ring ring-green-400/60' : '',
           ])}
           {...props}

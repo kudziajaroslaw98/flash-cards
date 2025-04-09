@@ -55,6 +55,10 @@ export default function SessionProvider(props: Readonly<PropsWithChildren>) {
     db.dailyStats.clear();
     db.focusSessions.clear();
     db.reviewLogs.clear();
+    db.studyPlans.clear();
+    db.studyDays.clear();
+    db.studySessions.clear();
+    db.reminders.clear();
     window.location.reload();
   };
 

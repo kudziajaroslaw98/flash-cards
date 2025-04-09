@@ -18,4 +18,4 @@ Allow: /guide/
 User-agent: *
 Allow: /sign-in/
 
-Sitemap: https://flashcards.finalphase.app/sitemap.xml
+Sitemap: https://finalphase.app/sitemap.xml

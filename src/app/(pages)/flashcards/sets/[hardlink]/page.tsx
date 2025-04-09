@@ -10,6 +10,7 @@ import FlashcardComponent from '#/components/flash-card/flash-card';
 import { FloatingButtons } from '#/components/floating-buttons/floating-buttons';
 import { NewFlashcardModal } from '#/components/new-flash-card-modal/new-flash-card-modal';
 import { NewSetModal } from '#/components/new-set-modal/new-set-modal';
+import { FlashcardGenerateDialog } from '#/components/sets-dialogs/flashcard-generate-dialog/flashcard-generate-dialog';
 import { db } from '#/db/dexie.db';
 import { useAppContext } from '#/providers/app-context';
 import { useSessionContext } from '#/providers/session-provider.component';
@@ -20,6 +21,7 @@ import { cn } from '#/shared/utils/cn.util';
 import uuid from '#/shared/utils/uuid.util';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { Flashcard } from '#/types/flash-card.type';
+import { FlashcardGenerationOptions } from '#/types/flashcard-generation-options.type';
 import { experimental_useObject as useObject } from '@ai-sdk/react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
@@ -64,7 +66,12 @@ export default function SetHardlinkPage() {
   );
   const [selected, setSelected] = useState<Flashcard[]>([]);
   const [generated, setGenerated] = useState<Flashcard[]>([]);
-  const { submit, isLoading, object } = useObject({
+
+  const {
+    submit: generateFlashcards,
+    isLoading: isGeneratingFlashcards,
+    object: generatedFlashcards,
+  } = useObject({
     api: API_ROUTES.SET_FLASHCARDS,
     schema: z.array(
       z.object({
@@ -148,14 +155,17 @@ export default function SetHardlinkPage() {
     },
   ];
 
-  const handleGenerateFlashcards = async () => {
+  const handleGenerateFlashcards = async (
+    options: Partial<FlashcardGenerationOptions>,
+  ) => {
     window?.umami?.track('Generate flashcards');
     if (!isLoggedIn || !isPlanActive) return;
 
-    submit({
+    generateFlashcards({
       flashcards: setFlashcards.map((flashcard) => flashcard.frontUuid) ?? [],
       setName: set?.name ?? '',
       setDescription: set?.description ?? '',
+      options: options,
     });
   };
 
@@ -230,10 +240,9 @@ export default function SetHardlinkPage() {
   }, [sets, setHardLink]);
 
   useEffect(() => {
-    if (!object) return;
-    console.log(object);
+    if (!generatedFlashcards) return;
     setGenerated(
-      object
+      generatedFlashcards
         ?.filter((flashcard) => flashcard)
         ?.map((flashcard, index) =>
           flashcardsMerge(defaultFlashcard(), {
@@ -247,7 +256,7 @@ export default function SetHardlinkPage() {
         ) as Flashcard[],
     );
 
-    if (object && !isLoading) {
+    if (generatedFlashcards && !isGeneratingFlashcards) {
       const mappedFlashcards: Flashcard[] = generated.map((flashcard) =>
         flashcardsMerge(defaultFlashcard(), {
           ...flashcard,
@@ -270,7 +279,7 @@ export default function SetHardlinkPage() {
         setGenerated([]);
       }
     }
-  }, [object, isLoading]);
+  }, [generatedFlashcards, isGeneratingFlashcards]);
 
   return (
     <div className='flex h-full w-full grow flex-col items-center gap-8 md:pb-24'>
@@ -444,14 +453,21 @@ export default function SetHardlinkPage() {
             }
           />
 
-          <Button
-            disabled={!isLoggedIn || !isPlanActive}
-            icon={<Sparkles className='size-4' />}
-            size={'icon-square'}
-            variant={'secondary-outline'}
-            onClick={handleGenerateFlashcards}
-            loading={isLoading}
-            alt='Generate flashcards'
+          <FlashcardGenerateDialog
+            setName={set?.name}
+            flashcardCount={setFlashcards.length}
+            setDescription={set?.description}
+            trigger={
+              <Button
+                disabled={!isLoggedIn || !isPlanActive}
+                icon={<Sparkles className='size-4' />}
+                size={'icon-square'}
+                variant={'secondary-outline'}
+                loading={isGeneratingFlashcards}
+                alt='Generate flashcards'
+              />
+            }
+            handleSubmit={handleGenerateFlashcards}
           />
         </FloatingButtons>
       </div>

@@ -21,7 +21,6 @@ export function StudyPlanStep5({
   focusTags,
   flashcards,
   summaries,
-  planType,
   duration,
 }: {
   focusTags: string[];
@@ -32,7 +31,6 @@ export function StudyPlanStep5({
     query: string;
     definition: string;
   }>[];
-  planType: string;
   duration: string;
 }) {
   const [planDays, setPlanDays] = useState<(StudyDay & { name: string })[]>([]);
@@ -61,11 +59,10 @@ export function StudyPlanStep5({
   });
 
   useEffect(() => {
-    if (summaries && planType && duration && initialLoadReg.current === false) {
+    if (summaries && duration && initialLoadReg.current === false) {
       initialLoadReg.current = true;
       submit({
         summaries,
-        planType,
         duration,
       });
     }
@@ -81,7 +78,6 @@ export function StudyPlanStep5({
       day?.newCards?.map((card) => uniqueFlashcards.add(card as string));
       day?.cardsToReview?.map((card) => uniqueFlashcards.add(card as string));
     });
-    console.log('usedUniqueFlashcards', uniqueFlashcards);
   }, [object]);
 
   const handleAcceptPlan = () => {
@@ -157,9 +153,11 @@ export function StudyPlanStep5({
   }) => {
     return (
       <div className='flex w-full flex-col gap-2'>
-        <span className='flex items-center gap-1 font-serif text-sm font-semibold uppercase'>
+        <span className='flex items-center gap-1 text-sm font-semibold uppercase'>
           <Dot className='size-4 text-green-500' />
-          <span className='text-gray-600 dark:text-slate-200'>{title}</span>
+          <span className='font-fredoka text-gray-600 dark:text-slate-200'>
+            {title}
+          </span>
         </span>
 
         {text && (

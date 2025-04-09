@@ -14,7 +14,8 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-inter)'],
         mono: ['var(--font-roboto-mono)'],
-        serif: ['var(--font-serif)']
+        serif: ['var(--font-serif)'],
+        fredoka: ['var(--font-fredoka)']
       },
       textShadow: {
         sm: '0 1px 2px var(--tw-shadow-color)',

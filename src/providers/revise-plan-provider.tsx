@@ -107,7 +107,6 @@ export default function RevisePlanProvider(props: Readonly<PropsWithChildren>) {
       if (!currentSession) {
         return [];
       }
-      console.log('🚀 ~ :84 ~ useLiveQuery ~ currentSession:', currentSession);
       return db.flashcards
         .where('frontUuid')
         .anyOf([...currentSession.completedCards])
@@ -133,7 +132,6 @@ export default function RevisePlanProvider(props: Readonly<PropsWithChildren>) {
 
   useEffect(() => {
     if (reviseStage === 6 && currentSession && currentDay) {
-      console.log(currentSession.currentDay + 1);
       db.studySessions.update(currentSession.frontUuid, {
         currentDay: currentSession.currentDay + 1,
         nextRevisionDate: endOfToday().toUTCString(),

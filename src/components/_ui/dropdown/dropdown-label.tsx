@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Loader } from 'lucide-react';
 
 export default function DropdownLabel({
   selectedCount,
@@ -6,12 +6,14 @@ export default function DropdownLabel({
   multipleLabel,
   visible,
   onClick,
+  loading,
 }: {
   selectedCount?: number;
   label: string;
   multipleLabel?: string;
   visible: boolean;
   onClick?: () => void;
+  loading?: boolean;
 }) {
   return (
     <span
@@ -20,19 +22,33 @@ export default function DropdownLabel({
     >
       {selectedCount && selectedCount > 1 ? (
         <span className='flex gap-2 text-inherit'>
-          <span>{selectedCount}</span>
-          <span>{multipleLabel}</span>
+          {loading ? (
+            <span className='animate-pulse'>Loading...</span>
+          ) : (
+            <>
+              <span>{selectedCount}</span>
+              <span>{multipleLabel}</span>
+            </>
+          )}
         </span>
       ) : (
         <span className='line-clamp-1 overflow-ellipsis text-inherit'>
-          {label}
+          {loading ? (
+            <span className='animate-pulse'>Loading...</span>
+          ) : (
+            <>{label}</>
+          )}
         </span>
       )}
 
       <span className='text-inherit'>
-        <ChevronDown
-          className={`h-4 w-4 transition ${visible ? 'rotate-180' : ''}`}
-        />
+        {loading ? (
+          <Loader className='h-4 w-4 animate-spin transition' />
+        ) : (
+          <ChevronDown
+            className={`h-4 w-4 transition ${visible ? 'rotate-180' : ''}`}
+          />
+        )}
       </span>
     </span>
   );

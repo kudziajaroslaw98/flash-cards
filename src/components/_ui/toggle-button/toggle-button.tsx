@@ -1,36 +1,44 @@
 import { Button, type ButtonProps } from '#/components/_ui/button/button';
 import { forwardRef, useCallback, type ReactNode } from 'react';
 
-type ToggleButtonProps =
-  | ({
-      animated: false;
-      activeIcon: ReactNode;
-      inactiveIcon: ReactNode;
-      animatedIcon?: ReactNode;
-      toggled: boolean;
-      toggle?: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-      toggleVariant?: 'outline' | 'text';
-    } & ButtonProps)
-  | ({
-      animated: true;
-      animatedIcon: ReactNode;
-      activeIcon?: ReactNode;
-      inactiveIcon?: ReactNode;
-      toggled: boolean;
-      toggle?: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-      toggleVariant?: 'outline' | 'text';
-    } & ButtonProps);
+type BaseToggleButtonProps = {
+  toggled: boolean;
+  toggle?: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  toggleVariant?: 'outline' | 'text';
+  toggledLabel?: string;
+} & ButtonProps;
+
+type AnimatedToggleButtonProps = {
+  animated: true;
+  animatedIcon: ReactNode;
+};
+
+type NonAnimatedToggleButtonProps = {
+  animated: false;
+  activeIcon: ReactNode;
+  inactiveIcon: ReactNode;
+};
+
+type ToggleButtonProps = (
+  | AnimatedToggleButtonProps
+  | NonAnimatedToggleButtonProps
+) &
+  BaseToggleButtonProps;
 
 const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonProps>(
   (
     {
       animated = false,
-      activeIcon,
-      inactiveIcon,
-      animatedIcon,
       toggled = true,
       toggle = () => {},
       toggleVariant = 'outline',
+      // @ts-expect-error false positive error
+      animatedIcon,
+      // @ts-expect-error false positive error
+      activeIcon,
+      // @ts-expect-error false positive error
+      inactiveIcon,
+      toggledLabel,
       ...props
     }: ToggleButtonProps,
     ref,
@@ -41,7 +49,7 @@ const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonProps>(
       } else {
         return toggled ? activeIcon : inactiveIcon;
       }
-    }, [animated, activeIcon, inactiveIcon, animatedIcon]);
+    }, [animated, toggled, props]);
 
     const getVariantType = () => {
       if (toggled) {
@@ -68,6 +76,7 @@ const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonProps>(
         icon={icon()}
         variant={getVariantType()}
         {...props}
+        label={toggled ? toggledLabel : props.label}
       ></Button>
     );
   },

@@ -15,14 +15,14 @@ export default function HeaderComponent() {
               <Image
                 width={24}
                 height={24}
-                src={'/images/flash-cards-logo.svg'}
+                src={'/images/finalphase-logo.svg'}
                 alt={'Flashcards Logo'}
                 loading='eager'
               />
             </span>
 
-            <h1 className='bg-gradient-to-r from-green-600 to-green-400 bg-clip-text px-1 text-2xl font-black uppercase tracking-tighter text-transparent transition-all'>
-              FLASHCARDS
+            <h1 className='bg-gradient-to-r from-green-600 to-green-400 bg-clip-text px-1 font-fredoka text-2xl font-black tracking-tight text-transparent transition-all'>
+              Final Phase
             </h1>
           </Link>
         </div>

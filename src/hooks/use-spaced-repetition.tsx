@@ -9,28 +9,28 @@ import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util'
 import type { Flashcard } from '#/types/flash-card.type';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-type SpaceRepetitionAlgorithmProps = {
-  items: Flashcard[];
-  debug?: boolean;
-  numberOfItems?: number;
-};
-
 type UseSpacedRepetitionProps = {
   array: Flashcard[];
   numberOfItems?: number;
+  revisedSetId: string;
 };
 export default function useSpacedRepetition({
   array,
   numberOfItems = 4,
+  revisedSetId,
 }: UseSpacedRepetitionProps) {
   const todayItemsRef = useRef<number | null>(null);
   const workerRef = useRef<Worker | null>(null);
-  const [randomItems, setRandomItems] = useState<Flashcard[] | null>(null);
+  const [randomItems, setRandomItems] = useState<Flashcard[]>([]);
+  const [sessionDeck, setSessionDeck] = useState<Flashcard[]>([]);
+  const sessionSourceRef = useRef<'today' | 'all' | null>(null);
   const [continueReroll, setContinueReroll] = useState(false);
   const todayItems = useMemo(
     () =>
       array.filter(
-        (card) => new Date(card.spacedRepetition.dueDate) < new Date(),
+        (card) =>
+          new Date(card.spacedRepetition.dueDate).getTime() <
+          new Date().getTime(),
       ),
     [array],
   );
@@ -52,6 +52,7 @@ export default function useSpacedRepetition({
       return Math.max(max, weight);
     }, 0);
   }, [array]);
+  const setNameRef = useRef<string | null>(null);
 
   function findRandomWeightedItem({
     items,
@@ -61,82 +62,66 @@ export default function useSpacedRepetition({
     numberOfItems: number;
   }) {
     const MAX_RETRIES = 10;
-
-    const itemsCopy = [...items];
-    const randomItems: Flashcard[] = [];
-    const max = items[items.length - 1]?.spacedRepetition?.culmulativeWeight;
-
     let retries = 0;
 
-    while (randomItems.length < numberOfItems && retries < MAX_RETRIES) {
-      if (itemsCopy.length <= numberOfItems) {
-        return itemsCopy;
-      }
+    const itemsCopy = [...items];
+    const selectedItems: Flashcard[] = [];
+    const maxCumulativeWeight =
+      itemsCopy[itemsCopy.length - 1]?.spacedRepetition?.culmulativeWeight;
 
-      const randomNumber = getRandomRangedNumber(0, max);
+    if (itemsCopy.length === 0) return [];
+    if (itemsCopy.length <= numberOfItems) return itemsCopy;
+
+    itemsCopy.sort(
+      (a, b) =>
+        (a.spacedRepetition.culmulativeWeight ?? 0) -
+        (b.spacedRepetition.culmulativeWeight ?? 0),
+    );
+
+    while (
+      selectedItems.length < numberOfItems &&
+      itemsCopy.length > 0 &&
+      retries < MAX_RETRIES
+    ) {
+      const randomNumber = getRandomRangedNumber(0, maxCumulativeWeight);
       const foundIndex = binarySearch(
         itemsCopy,
         'spacedRepetition.culmulativeWeight',
         randomNumber,
       );
 
-      if (foundIndex >= 0) {
-        const item = itemsCopy[foundIndex];
-
-        if (!randomItems.includes(item) && item) {
-          randomItems.push(item);
-          itemsCopy.splice(foundIndex, 1);
-          retries = 0;
-        } else {
-          retries++;
-          continue;
-        }
+      if (foundIndex !== -1 && itemsCopy[foundIndex]) {
+        const item = itemsCopy.splice(foundIndex, 1)[0]; // Select and remove the item
+        selectedItems.push(item);
+        // Recalculate max weight? Potentially complex, skip for now assuming distribution remains similar enough
+        retries = 0;
       } else {
+        // Handle case where binary search didn't find an exact match (might land between items)
+        // Or if index was -1. A simple retry might suffice.
         retries++;
-        continue;
       }
     }
 
-    return randomItems.sort(
+    if (selectedItems.length < numberOfItems) {
+      console.warn(
+        `[Spaced Repetition] Could only select ${selectedItems.length} weighted items.`,
+      );
+    }
+
+    return selectedItems.sort(
       (a, b) =>
         b.spacedRepetition.reversedWeight - a.spacedRepetition.reversedWeight,
     );
   }
 
-  function findRandomItem(array: Flashcard[], numberOfItems: number) {
-    return getRandomArrayItems(array, numberOfItems);
-  }
-
-  function spaceRepetitionAlgorithm({
+  function findRandomItem({
     items,
-    numberOfItems = 4,
-  }: SpaceRepetitionAlgorithmProps) {
-    try {
-      if (items.length === 0) {
-        throw new Error(
-          '[Spaced Repetition Algorithm] - No items in the array',
-        );
-      }
-
-      let randomItems = [];
-      randomItems = findRandomWeightedItem({
-        items: items,
-        numberOfItems,
-      });
-
-      return {
-        randomItems,
-      };
-    } catch (e) {
-      console.error(e);
-      return {
-        reversedWeights: [],
-        randomItems: null,
-        culmulativeWeights: [],
-        min: null,
-        max: null,
-      };
-    }
+    numberOfItems,
+  }: {
+    items: Flashcard[];
+    numberOfItems: number;
+  }) {
+    return getRandomArrayItems(items, numberOfItems);
   }
 
   const recalculateCulmulatives = async () => {
@@ -167,54 +152,74 @@ export default function useSpacedRepetition({
       return item;
     }
 
-    const itemCopy = { ...item };
+    const itemCopy = structuredClone(item);
     const sr = itemCopy.spacedRepetition;
     const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
     const currentDate = new Date();
 
-    const DEFAULT_INTERVALS = {
+    const DEFAULT_INTERVALS_IN_DAYS = {
       again: 10 / (24 * 60), // 10 minutes in days
       hard: 1 / 24, // 1 hour in days
-      good: 1, // 1 day
-      easy: 7, // 1 week
+      good: sr.interval < 1 ? 1 : sr.interval * sr.easeFactor, // 1 day
+      easy: sr.interval < 1 ? 4 : sr.interval * sr.easeFactor * 1.3, // 1 week
     };
 
-    const calculateEaseFactor = (easeFactor: number) => {
-      let q;
-      switch (type) {
-        case 'easy':
-          q = 5;
-          break;
-        case 'good': {
-          q = 4;
-          break;
-        }
-        case 'hard': {
-          q = 1;
-          break;
-        }
-        case 'again': {
-          q = 0;
-          break;
-        }
-      }
-      const sm2EaseFactor =
-        easeFactor + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
-      return sm2EaseFactor > 0 ? sm2EaseFactor : 0;
-    };
+    let quality: number;
+    switch (type) {
+      case 'again':
+        quality = 0;
+        break;
+      case 'hard':
+        quality = 3;
+        break; // Adjusted based on common SM-2 interpretation
+      case 'good':
+        quality = 4;
+        break;
+      case 'easy':
+        quality = 5;
+        break;
+      default:
+        quality = 4; // Default to good
+    }
 
-    const calculateInterval = () => {
-      const calculatedInterval = Math.round(
-        sr.interval * sr.easeFactor * DEFAULT_INTERVALS[type],
+    if (quality < 3) {
+      // Failed recall, reset interval
+      sr.reviews = 0; // Reset review count for interval calculation
+      sr.interval = DEFAULT_INTERVALS_IN_DAYS.again; // Start over with 'again' interval
+    } else {
+      // Successful recall
+      sr.reviews += 1;
+      // Update ease factor
+      sr.easeFactor = Math.max(
+        1.3,
+        sr.easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)),
       );
-      return calculatedInterval > 0
-        ? calculatedInterval
-        : DEFAULT_INTERVALS[type];
-    };
 
-    sr.reviews += 1;
-    sr.easeFactor = calculateEaseFactor(sr.easeFactor);
-    sr.interval = calculateInterval();
+      // Calculate next interval based on review count and type
+      if (sr.reviews === 1) {
+        sr.interval = DEFAULT_INTERVALS_IN_DAYS.good; // Typically 1 day first time
+      } else if (sr.reviews === 2) {
+        sr.interval = Math.max(DEFAULT_INTERVALS_IN_DAYS.good + 1, 6); // Typically 6 days second time
+      } else {
+        sr.interval = Math.round(sr.interval * sr.easeFactor);
+      }
+
+      // Apply type specific multiplier/adjustment *after* base interval calculation if needed
+      if (type === 'hard') {
+        // If marked hard, slightly reduce next interval compared to 'good'
+        sr.interval = Math.max(
+          DEFAULT_INTERVALS_IN_DAYS.hard,
+          sr.interval * 0.8,
+        );
+      } else if (type === 'easy') {
+        // If marked easy, slightly increase next interval
+        sr.interval = Math.max(
+          DEFAULT_INTERVALS_IN_DAYS.easy,
+          sr.interval * 1.2,
+        );
+      }
+    }
+
     sr.lastReviewAt = currentDate;
     sr.dueDate = new Date(currentDate.getTime() + sr.interval * ONE_DAY_IN_MS);
     sr.weight = calculateWeight(sr.dueDate);
@@ -223,74 +228,123 @@ export default function useSpacedRepetition({
       overDueMax ?? allMax,
     );
 
-    db.flashcards.update(item.frontUuid, itemCopy);
+    db.flashcards.update(item.frontUuid, { spacedRepetition: sr });
     recalculateCulmulatives();
+
+    return itemCopy;
   };
 
-  const reroll = () => {
-    if (todayItems.length === 0) {
-      if (!continueReroll) {
-        return [];
-      } else {
-        const randomItems = findRandomItem(array, numberOfItems);
-
-        setRandomItems(randomItems);
-
-        return randomItems;
-      }
+  const reroll = (lastItemFrontUuid?: string) => {
+    let currentDeck = [...sessionDeck];
+    if (lastItemFrontUuid) {
+      currentDeck = currentDeck.filter(
+        (item) => item.frontUuid !== lastItemFrontUuid,
+      );
+      // Update the session deck state immediately
+      setSessionDeck(currentDeck);
+    }
+    if (currentDeck.length === 0) {
+      setRandomItems([]); // No more items left in this session
+      sessionSourceRef.current = null; // Indicate session ended
+      return [];
     }
 
-    const randomItems = findRandomWeightedItem({
-      items: todayItems.length > 0 ? todayItems : array,
+    const useWeighted = sessionSourceRef.current === 'today';
+    const drawFunction = useWeighted ? findRandomWeightedItem : findRandomItem;
+    const nextRandomItems = drawFunction({
+      items: currentDeck,
       numberOfItems,
     });
 
-    setRandomItems(randomItems);
-    console.log(randomItems);
-
-    return randomItems;
+    setRandomItems(nextRandomItems);
+    return nextRandomItems;
   };
 
   useEffect(() => {
+    if (
+      (array.length === 0 && !continueReroll) ||
+      (setNameRef.current === revisedSetId && setNameRef.current !== null)
+    ) {
+      return;
+    }
+
+    let initialDeck: Flashcard[] = [];
+    let source: 'today' | 'all' | null = null;
+
+    // Use the *current* array prop to determine today's items for *this specific set*
+    const currentTodayItems = array.filter(
+      (card) =>
+        new Date(card.spacedRepetition.dueDate).getTime() <
+        new Date().getTime(),
+    );
+
+    if (currentTodayItems.length > 0) {
+      // If there are items due for the current set, use them
+      source = 'today';
+      initialDeck = [...currentTodayItems];
+      setNameRef.current = revisedSetId;
+    } else if (continueReroll && array.length > 0) {
+      // If no items are due OR we finished them, AND continueReroll is true, use all items from the current set
+      source = 'all';
+      initialDeck = [...array];
+      setNameRef.current = revisedSetId;
+    } else {
+      // No items due and not continuing, or array is empty
+      source = null;
+      initialDeck = [];
+    }
+
+    setSessionDeck(initialDeck);
+    sessionSourceRef.current = source;
+
+    if (initialDeck.length > 0) {
+      const useWeighted = source === 'today';
+      const drawFunction = useWeighted
+        ? findRandomWeightedItem
+        : findRandomItem;
+      const initialRandomItems = drawFunction({
+        items: initialDeck,
+        numberOfItems,
+      });
+      setRandomItems(initialRandomItems);
+    } else {
+      setRandomItems([]); // Clear random items if deck is empty
+    }
+
+    // No need to update arrayRef here
+    // Dependencies: watch for changes in the calculated todayItems, the continueReroll flag,
+    // the base array reference, and numberOfItems.
+  }, [revisedSetId, array, continueReroll, numberOfItems]);
+
+  useEffect(() => {
     if (todayItems.length > 0 && todayItemsRef.current === null) {
+      // Set the initial count only once when items first become available
       todayItemsRef.current = todayItems.length;
+    } else if (todayItems.length === 0 && todayItemsRef.current !== null) {
+      setNameRef.current = null;
+
+      // Reset if today's items are cleared (e.g., session finished)
+      // This might depend on desired behavior - keep showing total reviewed vs initial?
+      // todayItemsRef.current = null; // Optional: reset when empty
     }
   }, [todayItems]);
 
   useEffect(() => {
-    if (array.length === 0 || (todayItems.length === 0 && !continueReroll)) {
-      return;
-    }
+    const worker = new Worker(
+      new URL('../workers/space-repetition-worker.ts', import.meta.url),
+      { type: 'module' }, // Ensure worker type is module if using modern JS features
+    );
+    workerRef.current = worker;
 
-    const { randomItems } = spaceRepetitionAlgorithm({
-      items: todayItems.length > 0 ? todayItems : array,
-      numberOfItems,
-    });
-
-    if ((todayItems.length === 0 && continueReroll) || todayItems.length > 0) {
-      setRandomItems(randomItems);
-    }
-  }, [array, numberOfItems, todayItems, continueReroll]);
-
-  useEffect(() => {
-    if (continueReroll) {
-      reroll();
-    }
-  }, [continueReroll]);
-
-  useEffect(() => {
+    // Initial calculation if array has items on mount
     if (array.length > 0) {
       recalculateCulmulatives();
     }
-  }, []);
 
-  useEffect(() => {
-    const worker = new Worker(
-      new URL('../workers/space-repetition-worker.ts', import.meta.url),
-    );
-
-    workerRef.current = worker;
-    return () => worker.terminate();
+    return () => {
+      worker.terminate();
+      workerRef.current = null;
+    };
   }, []);
 
   return {
@@ -301,5 +355,6 @@ export default function useSpacedRepetition({
     setContinueReroll,
     todayItems: todayItemsRef.current,
     availableTodayItems: todayItems.length,
+    sessionItemsCount: sessionDeck.length,
   };
 }

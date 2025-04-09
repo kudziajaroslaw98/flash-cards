@@ -45,9 +45,9 @@ export async function POST(req: Request) {
   });
 
   const result = streamText({
-    model: gemini('gemini-2.0-flash-001'),
+    model: gemini('gemini-2.0-flash'),
     system:
-      'You are expert in english vocabulary, you are generating descriptions for flashcard sets. You always give unique and fitting descriptions. Dont quote answer.',
+      'You are expert in english vocabulary, you are generating descriptions for flashcard sets. You always give unique and fitting descriptions.',
     prompt: prompt,
   });
 

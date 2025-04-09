@@ -23,7 +23,7 @@ export const modalHeaderVariants = cva(
 );
 
 export const modalBodyVariants = cva(
-  'flex w-full max-h-[500px] flex-col text-sm text-slate-500',
+  'flex w-full max-h-[600px] flex-col text-sm text-slate-500',
   {
     variants: {
       variant: {
@@ -51,7 +51,7 @@ export const modalFooterVariants = cva(
       variant: {
         default: 'px-6 py-4',
         alert: 'px-6 pb-4 pt-2 justify-center flex w-full gap-2',
-        form: 'px-6 py-4',
+        form: 'px-6 py-4 items-center justify-center lg:justify-end',
         compact: 'px-4 py-3',
       },
       borderVisible: {

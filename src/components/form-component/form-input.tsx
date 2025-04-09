@@ -1,12 +1,12 @@
 'use client';
 
+import isDateTimePicker from '#/shared/guards/is-datetime-picker';
 import isDropdown from '#/shared/guards/is-dropdown';
 import isInput from '#/shared/guards/is-input';
 import isInputSwitch from '#/shared/guards/is-switch-input';
 import isTagInput from '#/shared/guards/is-tag-input';
 import isTextArea from '#/shared/guards/is-text-area';
-import isDateTimePicker from '#/shared/guards/it-datetime-picket';
-import type {
+import {
   ExtendedInputType,
   InputType,
   InternalConstraint,
@@ -34,7 +34,7 @@ type FormInputProps<T> = {
   ) => void;
   handleOnChange: (value: unknown | unknown[], key: string) => void;
   handleOnFocus: (key: string) => void;
-  handleOnBlur: () => void;
+  handleOnBlur: (key: string) => void;
   inputProps: ExtendedInputType<InputType<T>, T>;
   constraintProps: InternalConstraint<T>[];
 };
@@ -82,7 +82,7 @@ export default function FormInput<T>({
           touched={touched}
           onInput={(e) => handleOnInput(e, inputName)}
           onFocus={() => handleOnFocus(inputName)}
-          onBlur={handleOnBlur}
+          onBlur={() => handleOnBlur(inputName)}
           {...constraintProps}
         ></TextArea>
       )}
@@ -97,7 +97,7 @@ export default function FormInput<T>({
           touched={touched}
           onChange={(e: unknown) => handleOnChange(e, inputName)}
           onFocus={() => handleOnFocus(inputName)}
-          onBlur={handleOnBlur}
+          onBlur={() => handleOnBlur(inputName)}
           {...constraintProps}
         ></Dropdown>
       )}
@@ -105,6 +105,7 @@ export default function FormInput<T>({
       {isInput(inputProps) && (
         <Input
           {...inputProps}
+          inputType={inputProps.type}
           key={`${inputName}-${index}`}
           valid={touched ? valid : true}
           error={touched ? error : null}
@@ -112,7 +113,7 @@ export default function FormInput<T>({
           value={(value as string) ?? ''}
           onInput={(e) => handleOnInput(e, inputName)}
           onFocus={() => handleOnFocus(inputName)}
-          onBlur={handleOnBlur}
+          onBlur={() => handleOnBlur(inputName)}
           {...constraintProps}
         />
       )}
@@ -127,7 +128,7 @@ export default function FormInput<T>({
           value={(value as string[]) ?? []}
           onChange={(value) => handleOnChange(value, inputName)}
           onFocus={() => handleOnFocus(inputName)}
-          onBlur={handleOnBlur}
+          onBlur={() => handleOnBlur(inputName)}
           {...constraintProps}
         />
       )}
@@ -142,7 +143,7 @@ export default function FormInput<T>({
           value={(value as string) ?? []}
           onChange={(value) => handleOnChange(value, inputName)}
           onFocus={() => handleOnFocus(inputName)}
-          onBlur={handleOnBlur}
+          onBlur={() => handleOnBlur(inputName)}
           {...constraintProps}
         />
       )}
@@ -157,7 +158,7 @@ export default function FormInput<T>({
           value={(value as boolean) ?? false}
           onChange={(value) => handleOnChange(value, inputName)}
           onFocus={() => handleOnFocus(inputName)}
-          onBlur={handleOnBlur}
+          onBlur={() => handleOnBlur(inputName)}
           {...constraintProps}
         />
       )}

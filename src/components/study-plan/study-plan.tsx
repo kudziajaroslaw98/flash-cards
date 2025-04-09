@@ -46,7 +46,7 @@ export function StudyPlan({ planId }: { planId: string }) {
   }) => {
     return (
       <div className='flex w-full flex-col gap-2'>
-        <span className='flex items-center gap-1 font-serif text-sm font-semibold uppercase'>
+        <span className='flex items-center gap-1 font-fredoka text-sm font-semibold uppercase'>
           <Dot className='size-4 text-green-500' />
           <span className='text-gray-600 dark:text-slate-200'>{title}</span>
         </span>
@@ -81,7 +81,7 @@ export function StudyPlan({ planId }: { planId: string }) {
           />
         </div>
 
-        <span className='flex w-full flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-slate-400'>
+        <span className='flex w-full flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-slate-400'>
           {studyPlan?.focusTags &&
             studyPlan?.focusTags.map((tag) => (
               <div key={`tag-${tag}`}>

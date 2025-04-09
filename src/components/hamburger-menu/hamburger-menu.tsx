@@ -20,7 +20,7 @@ import {
   Layers,
   LogIn,
   LogOut,
-  PlayCircle,
+  MessagesSquare,
   Settings,
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -58,10 +58,10 @@ export default function HamburgerMenuComponent() {
     },
     {
       type: 'item',
-      label: 'Playground',
-      href: '/playground',
-      visible: process.env.NODE_ENV === 'development',
-      icon: <PlayCircle className={`${iconSize} `} />,
+      label: 'Feedback',
+      href: APP_ROUTES.feedback,
+      visible: true,
+      icon: <MessagesSquare className={iconSize} />,
     },
     {
       type: 'group',
@@ -105,6 +105,7 @@ export default function HamburgerMenuComponent() {
           label: 'Plans',
           href: APP_ROUTES.study.plans,
           icon: <BookA className={iconSize} />,
+          locked: !isPlanActive || !isLoggedIn,
         },
         {
           type: 'item',
@@ -112,6 +113,7 @@ export default function HamburgerMenuComponent() {
           href: APP_ROUTES.study.revise,
           icon: <Languages className={iconSize} />,
           indicator: 'new',
+          locked: !isPlanActive || !isLoggedIn,
         },
       ],
     },
@@ -125,7 +127,8 @@ export default function HamburgerMenuComponent() {
           label: 'Settings',
           href: APP_ROUTES.account.settings,
           icon: <Settings className={iconSize} />,
-          visible: isLoggedIn,
+          visible: true,
+          locked: !isLoggedIn,
         },
         {
           type: 'action',
@@ -185,7 +188,12 @@ export default function HamburgerMenuComponent() {
           icon: item.icon,
           active: item.href === pathName,
           visible: item.visible,
+          locked: item.locked,
+          indicator: item.indicator,
           onClick: () => {
+            if (item.locked) {
+              return;
+            }
             router.push(item.href);
             setOpen(false);
             toggle(false);

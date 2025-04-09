@@ -34,7 +34,8 @@ export const AssignFlashcardsModal = ({
         flashcards?.map((flashcard) => {
           if (flashcard.type === 'index' || flashcard.type === 'single') {
             return {
-              label: flashcard.query ?? flashcard.context,
+              label:
+                flashcard.query !== '' ? flashcard.query! : flashcard.context!,
               value: flashcard.frontUuid,
             };
           }

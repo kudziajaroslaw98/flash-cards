@@ -1,22 +1,24 @@
 import { Button } from '#/components/_ui/button/button';
 import Card from '#/components/_ui/card/card';
 import {
-  Activity,
-  AppWindow,
-  CircleSlash,
+  BellOff,
+  BrainCircuit,
+  BrainCog,
+  CalendarCheck,
+  ChartLine,
+  Check,
   DollarSign,
   Dot,
+  Eye,
   GithubIcon,
-  LayoutGrid,
+  Hourglass,
+  Library,
   MailIcon,
-  Meh,
-  MessageCircleOff,
-  MessageCircleReply,
-  Shapes,
-  Smile,
+  MessageSquarePlus,
   Sparkles,
 } from 'lucide-react';
 
+import { Accordion } from '#/components/_ui/accordion/accordion';
 import Badge from '#/components/_ui/badge/badge';
 import LinkComponent from '#/components/_ui/link/link';
 import { ScrollReveal } from '#/components/_ui/scroll-reveal/scroll-reveal';
@@ -29,62 +31,125 @@ export default async function Home() {
   const painPoints = [
     {
       id: 1,
-      icon: <Meh className='size-8 text-green-500' />,
-      body: 'It was hard for you to learn a new word?',
+      icon: <Library className='size-8 text-green-500' />,
+      body: 'Drowning in lecture notes and textbook chapters?',
     },
     {
       id: 2,
-      icon: <MessageCircleOff className='size-8 text-green-500' />,
-      body: 'You felt like you lack of words you could use in conversations?',
+      icon: <Hourglass className='size-8 text-green-500' />,
+      body: 'Spending more time making flashcards than actually studying?',
     },
     {
       id: 3,
-      icon: <AppWindow className='size-8 text-green-500' />,
-      body: 'App you currently use looks bad and distrating?',
+      icon: <BrainCog className='size-8 text-green-500' />,
+      body: 'Forgetting key information right before the exam creeps up?',
     },
     {
       id: 4,
-      icon: <Shapes className='size-8 text-green-500' />,
-      body: 'App you currently use is bloated with unnecessary features?',
+      icon: <BellOff className='size-8 text-green-500' />,
+      body: 'Struggling to stay focused during long study sessions?',
     },
   ];
 
   const valuePoints = [
     {
       id: 1,
-      icon: <Smile className='size-8 text-green-500' />,
-      body: "It's easy to learn and revise new words",
+      icon: <Sparkles className='size-8 text-green-500' />,
+      body: 'AI instantly generates flashcards from your topics, saving you hours.',
     },
     {
       id: 2,
-      icon: <CircleSlash className='size-8 text-green-500' />,
-      body: 'There is no ads.',
+      icon: <BrainCircuit className='size-8 text-green-500' />,
+      body: 'You master concepts long-term with smart spaced repetition (SRS)',
     },
     {
       id: 3,
-      icon: <Sparkles className='size-8 text-green-500' />,
-      body: 'You have access to AI that will help you with creativity block.',
+      icon: <CalendarCheck className='size-8 text-green-500' />,
+      body: 'AI helps create tailored study plans to fit your goals and deadlines.',
     },
     {
       id: 4,
-      icon: <LayoutGrid className='size-8 text-green-500' />,
-      body: 'Interface looks good and snapy.',
+      icon: <Eye className='size-8 text-green-500' />,
+      body: 'You study without distractions in a clean, intuitive interface.',
     },
     {
       id: 5,
-      icon: <MessageCircleReply className='size-8 text-green-500' />,
-      body: 'You actually have possibility to make this app better by giving feedback.',
+      icon: <ChartLine className='size-8 text-green-500' />,
+      body: 'You track your focus and progress with insightful, actionable statistics.',
     },
     {
       id: 6,
-      icon: <Activity className='size-8 text-green-500' />,
-      body: 'You can track your progress and study statistics.',
+      icon: <MessageSquarePlus className='size-8 text-green-500' />,
+      body: 'You shape the future of Final Phase with your feedback and ideas.',
     },
   ];
 
-  const listItem = (text: string) => (
+  const faqItems = [
+    {
+      question: 'What is Final Phase?',
+      answer:
+        'Final Phase is an AI-powered learning application designed to help students study more effectively. It uses digital flashcards, a smart spaced repetition system (SRS) for long-term memory, AI tools to generate content and personalized study plans, and provides stats to track your progress and focus.',
+    },
+    {
+      question: 'How does the AI work?',
+      answer:
+        "Our AI (powered by Google's Generative AI models) analyzes the topics, existing content, and preferences you provide to generate relevant flashcards, suggest tailored study schedules based on your goals and deadlines, create descriptions for your study sets, and provide summaries for incorrectly answered cards. This saves you time and helps personalize your learning.",
+    },
+    {
+      question: 'What is Spaced Repetition (SRS)?',
+      answer:
+        'Spaced Repetition is a learning technique that involves reviewing information at increasing intervals. Our app uses an algorithm to determine the optimal time to show you each flashcard again, helping you move information from short-term to long-term memory efficiently.',
+    },
+    {
+      question: 'Is Final Phase free to use?',
+      answer:
+        "Yes, Final Phase offers a generous free plan with unlimited flashcards, sets, and core study features like SRS and progress tracking. We also offer Premium plans (monthly/yearly) that unlock advanced AI features (flashcard/plan generation, AI summaries) and support the app's development. See our Pricing Section above for details.",
+    },
+    {
+      question: 'Do I need an account to use the app?',
+      answer:
+        'You can create and study flashcards as a guest, storing data locally on your device. However, creating a free account (using Google or GitHub) is required to synchronize your data across devices, back it up to our self-hosted cloud infrastructure (using Supabase software on Hetzner), and access AI features (Premium required for AI generation).',
+    },
+    {
+      question: 'How is my data stored and synced?',
+      answer:
+        "Your flashcards, sets, progress, and other study data are primarily stored locally in your browser's IndexedDB (using Dexie.js). This allows for offline access to your existing data. If you are logged in, this local data is automatically synchronized with our secure, self-hosted cloud database (using Supabase software running on Hetzner infrastructure) to provide backup and allow you to access your information across different devices.",
+    },
+    {
+      question: 'Can I use Final Phase offline?',
+      answer:
+        'Yes, to some extent. Final Phase is a Progressive Web App (PWA). Once the app is loaded and your data is stored locally (in IndexedDB), you can review existing flashcards, sets, and plans offline. However, features requiring AI processing (like generation), data synchronization between devices, or initial login require an active internet connection.',
+    },
+    {
+      question: 'How is my data used? (Privacy)',
+      answer:
+        "We prioritize your privacy. Your study content (flashcards, sets, etc.) is stored locally and, if logged in, synced securely to our self-hosted database (using Supabase software on Hetzner infrastructure) for backup/cross-device use. When using AI features, relevant content (like topics or prompts) is sent to Google's AI API only for generating the requested output; Google does not use this API data for training their models. We use privacy-focused Umami Analytics for anonymized usage data to improve the app. We do not sell your personal data. Please see our Privacy Policy for full details.",
+    },
+    {
+      question: 'How do notifications work?',
+      answer:
+        "If you grant permission, the app can send you push notifications for study reminders you set. We store your browser's push subscription details securely in our self-hosted database (using Supabase software on Hetzner infrastructure) to enable this. You can revoke permission anytime in your browser or operating system settings. We only use notifications for reminders you configure or essential app updates.",
+    },
+    {
+      question:
+        'What\'s the difference between "Clear Local Data" and "Delete Account"?',
+      answer:
+        '"Clear Local Data" (in Settings > Danger Zone) removes all flashcards, sets, stats, etc., stored only on your current device\'s browser. It does not affect data synced to the cloud if you are logged in. "Delete Account" (in Settings > Danger Zone) is permanent. It removes your user account and all associated data (flashcards, sets, progress, etc.) from our self-hosted cloud database (using Supabase software on Hetzner infrastructure). Your local data on devices won\'t be automatically cleared but will no longer sync.',
+    },
+    {
+      question: 'How can I provide feedback or suggest features?',
+      answer:
+        'We love hearing from our users! You can submit feedback directly through the "Feedback" section in the app or contact us via the email provided in the "Contact" section on this page.',
+    },
+  ];
+
+  const listItem = (text: string, done?: boolean) => (
     <li className='flex gap-2'>
-      <Dot className='flex size-6 min-w-6 text-green-500' />
+      {done ? (
+        <Check className='flex size-6 min-w-6 text-green-500' />
+      ) : (
+        <Dot className='flex size-6 min-w-6 text-green-500' />
+      )}
       <span className='max-w-72 hyphens-auto'>{text}</span>
     </li>
   );
@@ -94,13 +159,14 @@ export default async function Home() {
       active: true,
       body: (
         <ul className='flex flex-col gap-2'>
-          {listItem('Generate sets from pdf/txt files')}
-          {listItem('Ai Agent to manage flashcard with simple chat')}
-          {listItem('Filters on flashcard list')}
+          {listItem('Filters on flashcard list', true)}
           {listItem(
             'More detailed flashcard - real-world examples, key points, synonyms, related facts.',
+            true,
           )}
-          {listItem('More advanced spaced repetition algorithm')}
+          {listItem('More advanced spaced repetition algorithm', true)}
+          {listItem('More customization options for generating with AI', true)}
+          {listItem('Improved stats page', true)}
         </ul>
       ),
       headline: 'Q1',
@@ -112,8 +178,9 @@ export default async function Home() {
           {listItem(
             'Create more rewarding system for flashcards (e.g. streaks/points)',
           )}
-          {listItem('More customization options for generating with AI')}
-          {listItem('Improved stats page')}
+          {listItem('Generate sets from pdf/txt files')}
+          {listItem('Export / Import flashcards to / from CSV')}
+          {listItem('Community section with shared decks')}
         </ul>
       ),
       headline: 'Q2',
@@ -125,8 +192,8 @@ export default async function Home() {
           {listItem(
             'Chrome extension to add flashcards from the text you read on the web',
           )}
-          {listItem('Export / Import flashcards to / from CSV')}
-          {listItem('Community section with shared decks')}
+          {listItem('Ai Agent to manage flashcard with simple chat')}
+
           <li>More coming soon..</li>
         </ul>
       ),
@@ -200,16 +267,16 @@ export default async function Home() {
         <nav className='z-30 flex h-full w-full items-start justify-between px-4 py-4 md:px-16 md:pt-8'>
           <div className='flex items-center justify-center'>
             <Image
-              src='/images/flash-cards-logo.svg'
+              src='/images/finalphase-logo.svg'
               alt='Flashcards Logo'
               width={32}
               height={32}
             />
 
             <span
-              className={`hidden overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text px-1 text-xl font-black uppercase tracking-tighter text-transparent transition-all lg:flex`}
+              className={`hidden overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text px-1 font-fredoka text-xl font-black tracking-tight text-transparent transition-all lg:flex`}
             >
-              FlashCards
+              Final Phase
             </span>
           </div>
 
@@ -254,7 +321,7 @@ export default async function Home() {
               <Link href='/sign-in'>
                 <Button
                   variant='primary-outline'
-                  label='Start Now'
+                  label='Get Started Free'
                   className='group mx-auto min-w-36 font-semibold'
                   icon={animatedPlayIcon}
                   iconPosition='right'
@@ -266,34 +333,35 @@ export default async function Home() {
         </nav>
       </header>
 
-      {/* Hero section */}
       <div className='absolute bottom-0 left-0 right-0 top-0 h-[800px] bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_20%,#000_70%,transparent_110%)]'></div>
       <div className='relative mx-auto flex h-auto min-h-full w-full max-w-7xl flex-col items-center justify-center gap-8 p-4 pt-20 md:pt-0 xl:gap-8'>
+        {/* Hero section */}
         <div className='relative flex w-full max-w-2xl flex-col items-center justify-center gap-4 py-32 md:py-48'>
           <Image
-            src='/images/flash-cards-logo.svg'
+            src='/images/finalphase-logo.svg'
             alt='Flashcards Logo'
             width={64}
             height={64}
           />
 
-          <h1 className='flex flex-col items-center gap-4 bg-gradient-to-r from-green-600 to-green-400 bg-clip-text p-2 text-center text-5xl !font-black text-transparent'>
-            Learning words made
+          <h1 className='flex flex-col items-center gap-4 bg-gradient-to-r from-green-600 to-green-400 bg-clip-text p-2 text-center font-fredoka text-5xl !font-black text-transparent'>
+            Reach your Final Phase of
             <span className='relative inline-block max-w-min px-4 before:absolute before:-inset-1 before:block before:-skew-y-3 before:rounded-sm before:bg-green-400'>
-              <span className='relative z-10 text-slate-950'>easy</span>
+              <span className='relative z-10 text-slate-950'>learning.</span>
             </span>
           </h1>
 
           <div className='flex w-full items-center justify-center gap-4'>
             <p className='text-center text-lg text-slate-200'>
-              Anywhere, anytime.
+              Stop making flashcards, start mastering subjects. <br />{' '}
+              AI-powered study tools for busy students.
             </p>
           </div>
 
           <Link href='/sign-in'>
             <Button
               variant='primary-outline'
-              label='Start Now'
+              label='Get Started Free'
               className='group mx-auto mt-8 min-w-36 font-semibold'
               icon={animatedPlayIcon}
               iconPosition='right'
@@ -301,12 +369,15 @@ export default async function Home() {
             />
           </Link>
 
-          <ScrollReveal className='hero-section-img mt-16 flex h-96 w-full items-center justify-center rounded-md'></ScrollReveal>
+          <ScrollReveal className='hero-section-img mt-16 flex h-96 w-full items-center justify-center rounded-md object-cover md:object-contain'></ScrollReveal>
         </div>
 
+        {/* Pain Points section */}
         <section className='container flex flex-col items-center justify-center gap-8 py-12'>
           <ScrollReveal>
-            <h4 className='text-slate-200'>Did you ever felt like that?</h4>
+            <h4 className='font-fredoka font-semibold text-slate-200'>
+              Does this sound familiar?
+            </h4>
           </ScrollReveal>
 
           <div>
@@ -322,9 +393,9 @@ export default async function Home() {
                   key={`pain-point-${id}`}
                   variants={itemVariants}
                 >
-                  <li className='relative flex w-full max-w-72 flex-col gap-8 rounded-md border  border-gray-900 p-4  text-sm  text-slate-200'>
+                  <li className='relative flex w-full max-w-72 flex-col items-center justify-center gap-4 rounded-md  border  border-gray-900 p-4 text-center text-sm  text-slate-200 md:items-start  md:justify-start  md:text-left'>
                     <div className='absolute left-0 top-0 z-[2] h-full w-full  bg-[radial-gradient(#22c55e15_1px,transparent_1px)] bg-[size:20px_20px]'></div>
-                    {icon}
+                    <div className='p-2'>{icon}</div>
                     <span>{body}</span>
                   </li>
                 </ScrollReveal>
@@ -333,15 +404,18 @@ export default async function Home() {
           </div>
         </section>
 
+        {/* Values section */}
         <section
           id='features'
           className='container relative flex scroll-mt-16 flex-col items-center justify-center gap-8 py-12'
         >
           <div className='absolute left-0 top-0 z-[2] h-full w-full bg-[radial-gradient(at_75%_60%,#7ed321_0px,transparent_50%),radial-gradient(at_64%_21%,#417505_0px,transparent_50%),radial-gradient(at_7%_69%,#417505_0px,transparent_50%)] opacity-20 blur-3xl'></div>
           <ScrollReveal className='z-10 flex flex-col items-center justify-center gap-4'>
-            <h4 className='text-green-500'>I felt like that too.</h4>
-            <span className='text-center  text-slate-400'>
-              That&apos;s why I created this app. The place where...
+            <h4 className='text-center font-fredoka font-semibold text-green-500'>
+              That&apos;s why we built Final Phase <br />
+            </h4>
+            <span className='text-center text-slate-400'>
+              The Place Where...
             </span>
           </ScrollReveal>
           <div>
@@ -360,10 +434,10 @@ export default async function Home() {
                 >
                   <li
                     key={`value-point-${id}`}
-                    className='relative flex w-full max-w-72 flex-col gap-8 rounded-md border border-gray-900 p-4  text-sm text-slate-200'
+                    className='relative flex w-full max-w-72 flex-col items-center justify-center gap-4 rounded-md border border-gray-900 p-4 text-center text-sm text-slate-200 md:items-start  md:justify-start md:text-left'
                   >
                     <div className='absolute left-0 top-0 z-[2] h-full w-full  bg-[radial-gradient(#22c55e15_1px,transparent_1px)] bg-[size:20px_20px]'></div>
-                    {icon}
+                    <div className='p-2'>{icon}</div>
                     <span className='z-10 rounded-md bg-black/5 p-2 backdrop-blur-md'>
                       {body}
                     </span>
@@ -374,17 +448,22 @@ export default async function Home() {
           </div>
         </section>
 
+        {/* CTA section */}
         <section className='container z-[2] flex flex-col items-center justify-start rounded-md py-6 backdrop-blur-md'>
           <ScrollReveal className='flex flex-col items-center gap-4'>
-            <h4 className=' text-slate-200'>So, what are you waiting for?</h4>
-            <span className=' text-slate-400'>Start learning now!</span>
+            <h4 className=' text-center font-fredoka font-semibold text-slate-200'>
+              Ready to conquer your courses?
+            </h4>
+            <span className='text-slate-400'>
+              Start learning smarter, not just harder.
+            </span>
           </ScrollReveal>
 
           <ScrollReveal>
             <Link href='/sign-in'>
               <Button
                 variant='primary-outline'
-                label='Start Now'
+                label='Get Started Free'
                 className='group mx-auto mt-8 min-w-36 font-semibold'
                 icon={animatedPlayIcon}
                 iconPosition='right'
@@ -394,14 +473,17 @@ export default async function Home() {
           </ScrollReveal>
         </section>
 
+        {/* Pricing section */}
         <section
           id='pricing'
           className='container relative flex scroll-mt-16 flex-col items-center justify-center gap-8 py-12'
         >
           <ScrollReveal className='flex flex-col items-center justify-center gap-4'>
-            <h4 className='text-green-500'>Pricing</h4>
+            <h4 className='font-fredoka font-semibold text-green-500 '>
+              Pricing
+            </h4>
             <span className='text-center  text-slate-400'>
-              Need more details? I got you covered. <br />
+              Simple plans for every student. <br /> Upgrade anytime.
             </span>
           </ScrollReveal>
 
@@ -412,19 +494,20 @@ export default async function Home() {
             variants={containerVariants}
             className='flex flex-wrap  justify-center gap-8 md:gap-4'
           >
+            {/* Free */}
             <ScrollReveal variants={itemVariants}>
               <Card
-                className='w-72'
+                className='h-[580px] w-72'
                 motion={false}
               >
                 <div className='flex flex-col gap-4'>
                   <div className='flex flex-col gap-2'>
-                    <h5 className='flex items-center justify-between text-2xl font-bold'>
+                    <h5 className='flex items-center justify-between text-xl font-bold'>
                       <span>Free</span>
                     </h5>
 
-                    <p className='text-sm text-slate-500'>
-                      Free forever, no credit card required
+                    <p className='pb-5 text-sm text-slate-400'>
+                      Get started, no credit card required.
                     </p>
                   </div>
 
@@ -434,7 +517,7 @@ export default async function Home() {
                       <span>0</span>
                     </span>
 
-                    <span className='pt-2  text-slate-500'>per month</span>
+                    <span className='pt-2  text-slate-300'>per month</span>
                   </span>
                   <Link
                     href='/sign-in'
@@ -451,8 +534,10 @@ export default async function Home() {
                   <div className='h-[2px] w-full bg-slate-800'></div>
 
                   <div className='flex flex-col gap-2'>
-                    <p className='font-semibold text-slate-400'>Features:</p>
-                    <ul className='flex flex-col gap-2 text-sm text-slate-500'>
+                    <p className='font-semibold text-slate-200'>
+                      Free Includes:
+                    </p>
+                    <ul className='flex flex-col gap-2 text-sm text-slate-400'>
                       <li className='flex gap-2'>
                         <span>•</span>
                         <span>Unlimited flashcards</span>
@@ -460,17 +545,32 @@ export default async function Home() {
 
                       <li className='flex gap-2'>
                         <span>•</span>
-                        <span>Unlimited decks</span>
+                        <span>Unlimited sets</span>
                       </li>
 
                       <li className='flex gap-2'>
                         <span>•</span>
-                        <span>Unlimited revise</span>
+                        <span>Spaced Repetition System</span>
                       </li>
 
                       <li className='flex gap-2'>
                         <span>•</span>
-                        <span>Cross-device sync</span>
+                        <span>Study Session Tracking</span>
+                      </li>
+
+                      <li className='flex gap-2'>
+                        <span>•</span>
+                        <span className='flex flex-col'>
+                          <span>Advanced Study Statistics</span>
+                          <span className='text-xs text-slate-500'>
+                            (Incl. Focus Tracking)
+                          </span>
+                        </span>
+                      </li>
+
+                      <li className='flex gap-2'>
+                        <span>•</span>
+                        <span>Cross-Device Sync</span>
                       </li>
                     </ul>
                   </div>
@@ -478,24 +578,25 @@ export default async function Home() {
               </Card>
             </ScrollReveal>
 
+            {/* Premium */}
             <ScrollReveal
               variants={itemVariants}
               className='relative'
             >
               <Card
-                className='z-20 w-72'
+                className='z-20 h-[580px] w-72'
                 motion={false}
               >
                 <div className='flex flex-col gap-4'>
                   <div className='flex flex-col gap-2'>
-                    <h5 className='flex items-center justify-between text-2xl font-bold'>
-                      <span>Standard</span>
+                    <h5 className='flex items-center justify-between text-xl font-bold'>
+                      <span>Premium</span>
                       <Badge className='h-6 px-2 py-0 text-xs font-normal'>
                         Popular
                       </Badge>
                     </h5>
-                    <p className='text-sm text-slate-500'>
-                      Not creative today? I got you
+                    <p className='text-sm text-slate-400'>
+                      Unlock AI Superpowers & Advanced Features
                     </p>
                   </div>
 
@@ -505,7 +606,7 @@ export default async function Home() {
                       <span>2.5</span>
                     </span>
 
-                    <span className='pt-2 text-slate-500'>per month</span>
+                    <span className='pt-2 text-slate-300'>per month</span>
                   </span>
 
                   <Link
@@ -513,7 +614,7 @@ export default async function Home() {
                     className='contents'
                   >
                     <Button
-                      label={'Get started'}
+                      label={'Unlock AI Features'}
                       variant={'primary-outline'}
                       className='font-bold'
                       type='submit'
@@ -524,26 +625,105 @@ export default async function Home() {
                   <div className='h-[2px] w-full bg-slate-800'></div>
 
                   <div className='flex flex-col gap-2'>
-                    <p className='font-semibold text-slate-400'>Features:</p>
-                    <ul className='flex flex-col gap-2 text-sm text-slate-500'>
+                    <p className='font-semibold text-slate-200'>
+                      Everything in Free, plus:
+                    </p>
+                    <ul className='flex flex-col gap-2 text-sm text-slate-400'>
                       <li className='flex gap-2'>
                         <span>•</span>
-                        <span>Generate flashcards</span>
+                        <span>AI Flashcard Generation</span>
                       </li>
 
                       <li className='flex gap-2'>
                         <span>•</span>
-                        <span>Generate set descriptions</span>
+                        <span>AI Study Plan Creation</span>
                       </li>
 
                       <li className='flex gap-2'>
                         <span>•</span>
-                        <span>Generate flashcard answers</span>
+                        <span>AI Set Description Generation</span>
                       </li>
 
                       <li className='flex gap-2'>
                         <span>•</span>
-                        <span>Access to all upcoming features</span>
+                        <span>Access to all upcoming premium features</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </Card>
+              <div className='radial-gradient absolute -left-[2px] -top-[2px] z-10 flex h-[calc(100%+4px)] w-[calc(100%+4px)] rounded-md opacity-30 content-[""]'></div>
+            </ScrollReveal>
+
+            {/* Yearly */}
+            <ScrollReveal
+              variants={itemVariants}
+              className='relative'
+            >
+              <Card
+                className='z-20 h-[580px] w-72 bg-transparent dark:bg-transparent'
+                motion={false}
+              >
+                <div className='flex flex-col gap-4'>
+                  <div className='flex flex-col gap-2'>
+                    <h5 className='flex items-center justify-between text-xl font-bold'>
+                      <span>Yearly Premium</span>
+                      <Badge className='h-6 px-2 py-0 text-xs font-normal'>
+                        Best Value
+                      </Badge>
+                    </h5>
+                    <p className='text-sm text-slate-400'>
+                      Unlock AI Superpowers & Advanced Features
+                    </p>
+                  </div>
+
+                  <span className='flex flex-col items-center justify-center py-6'>
+                    <span className='flex -translate-x-4 items-center text-7xl font-semibold'>
+                      <DollarSign className='size-8 -translate-y-3 text-green-500' />
+                      <span>25</span>
+                    </span>
+
+                    <span className='pt-2 text-slate-300'>annually</span>
+                  </span>
+
+                  <Link
+                    href={proLink.href}
+                    className='contents'
+                  >
+                    <Button
+                      label={'Unlock AI Features'}
+                      variant={'primary-outline'}
+                      className='font-bold'
+                      type='submit'
+                      alt='Redirect to pricing in page'
+                    />
+                  </Link>
+
+                  <div className='h-[2px] w-full bg-slate-800'></div>
+
+                  <div className='flex flex-col gap-2'>
+                    <p className='font-semibold text-slate-200'>
+                      Everything in Free, plus:
+                    </p>
+                    <ul className='flex flex-col gap-2 text-sm text-slate-400'>
+                      <li className='flex gap-2'>
+                        <span>•</span>
+                        <span>AI Flashcard Generation</span>
+                      </li>
+
+                      <li className='flex gap-2'>
+                        <span>•</span>
+                        <span>AI Study Plan Creation</span>
+                      </li>
+
+                      <li className='flex gap-2'>
+                        <span>•</span>
+                        <span>AI Set Description Generation</span>
+                      </li>
+
+                      <li className='flex gap-2'>
+                        <span>•</span>
+                        <span>Access to all upcoming premium features</span>
                       </li>
                     </ul>
                   </div>
@@ -554,6 +734,7 @@ export default async function Home() {
           </m.div>
         </section>
 
+        {/* Roadmap section */}
         <section
           id='roadmap'
           className='container relative flex scroll-mt-16 flex-col items-center justify-center gap-8 py-12'
@@ -561,10 +742,13 @@ export default async function Home() {
           <div className='absolute left-0 top-0 z-[2] h-full w-full bg-[radial-gradient(at_20%_80%,#7ed321_0px,transparent_50%),radial-gradient(at_44%_41%,#417505_0px,transparent_50%),radial-gradient(at_90%_69%,#417505_0px,transparent_50%)] opacity-20 blur-3xl'></div>
 
           <ScrollReveal className='flex flex-col items-center justify-center gap-4'>
-            <h4 className='text-slate-200'>Road Map</h4>
+            <h4 className='font-fredoka font-semibold text-slate-200 '>
+              Road Map
+            </h4>
             <span className='text-center text-slate-400'>
-              You have decided to support me? Wonderful! <br /> Here is what you
-              can expect to come.
+              We&apos;re constantly evolving Final Phase based on your feedback.{' '}
+              <br />
+              Here&apos;s what&apos;s planned:
             </span>
           </ScrollReveal>
 
@@ -580,14 +764,46 @@ export default async function Home() {
           </ScrollReveal>
         </section>
 
+        {/* FAQ Section */}
+        <section
+          id='faq'
+          className='container relative flex scroll-mt-16 flex-col items-center justify-center gap-8 py-12'
+        >
+          <ScrollReveal className='flex flex-col items-center justify-center gap-4'>
+            <h4 className='font-fredoka font-semibold text-green-500'>
+              Frequently Asked Questions
+            </h4>
+            <span className='text-center text-slate-400'>
+              Got questions? We&apos;ve got answers.
+            </span>
+          </ScrollReveal>
+
+          <ScrollReveal className='max-w-full'>
+            <Accordion variant='default'>
+              {faqItems.map((item, index) => (
+                <Accordion.Item
+                  key={`faq-item-${index}`}
+                  title={item.question}
+                  variant='default'
+                >
+                  <p className='text-sm text-slate-300'>{item.answer}</p>
+                </Accordion.Item>
+              ))}
+            </Accordion>
+          </ScrollReveal>
+        </section>
+
+        {/* Contact section */}
         <section
           id='contact'
           className='container z-[2] flex flex-col items-center justify-start gap-4 rounded-md  py-6 backdrop-blur-md'
         >
           <ScrollReveal className='flex flex-col items-center justify-center gap-2'>
-            <h4 className=' text-slate-200'>Contact</h4>
+            <h4 className=' font-fredoka font-semibold text-slate-200 '>
+              Contact
+            </h4>
             <span className='text-center text-slate-400'>
-              More questions? Reach out to Me!
+              Questions? Feedback? Reach out!
             </span>
           </ScrollReveal>
 
@@ -600,49 +816,51 @@ export default async function Home() {
           >
             <ScrollReveal variants={itemVariants}>
               <Link
-                href={'mailto:jaroslawkudzia73@gmail.com'}
+                href={'mailto:support@finalphase.app'}
                 target='_blank'
                 className='flex items-center gap-8 underline decoration-green-500 underline-offset-2'
               >
                 <MailIcon className='size-6 text-green-500' />
-                <span className=' text-slate-200'>
-                  jaroslawkudzia73@gmail.com
-                </span>
-              </Link>
-            </ScrollReveal>
-
-            <ScrollReveal variants={itemVariants}>
-              <Link
-                href={'https://x.com/@baldmanhimself'}
-                target='_blank'
-                className='flex items-center gap-8 underline decoration-green-500 underline-offset-2'
-              >
-                {xLogo}
-                <span className=' text-slate-200'>@baldmanhimself</span>
+                <span className=' text-slate-200'>support@finalphase.app</span>
               </Link>
             </ScrollReveal>
           </m.div>
         </section>
 
-        <footer className='container relative flex flex-col items-center justify-center gap-8 pt-12'>
+        <footer className='container relative flex flex-col items-center justify-center gap-8 border-t border-slate-800 py-8'>
           <div className='flex items-center justify-center gap-2'>
             <Image
-              src={'/images/flash-cards-logo.svg'}
+              src={'/images/finalphase-logo.svg'}
               alt='Flashcards Logo'
               width={32}
               height={32}
             />
 
             <span
-              className={`overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text px-2 text-xl font-black uppercase tracking-tighter text-transparent transition-all`}
+              className={`overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text px-2 font-fredoka text-xl font-black tracking-tight text-transparent transition-all`}
             >
-              FlashCards
+              Final Phase
             </span>
           </div>
 
           <div className='flex flex-col items-center justify-center gap-4'>
-            <span className='text-center text-slate-400'>
-              © {new Date().getFullYear()} Flashcards. All rights reserved.
+            <div className='flex items-center justify-center gap-4 text-sm text-slate-400'>
+              <Link
+                href='/privacy-policy'
+                className='hover:text-green-500'
+              >
+                Privacy Policy
+              </Link>
+              <span>|</span>
+              <Link
+                href='/terms-of-service'
+                className='hover:text-green-500'
+              >
+                Terms of Service
+              </Link>
+            </div>
+            <span className='text-center text-sm text-slate-400'>
+              © {new Date().getFullYear()} Final Phase. All rights reserved.
             </span>
           </div>
 
@@ -650,7 +868,8 @@ export default async function Home() {
             <Link
               href={'https://x.com/baldmanhimself'}
               target='_blank'
-              className='flex items-center gap-8 rounded-full bg-slate-900/50 p-2 underline decoration-green-500 underline-offset-2'
+              aria-label='Final Phase on X/Twitter'
+              className='flex items-center gap-8 rounded-full bg-slate-900/50 p-2 transition-colors hover:bg-slate-800'
             >
               {xLogo}
             </Link>
@@ -658,7 +877,8 @@ export default async function Home() {
             <Link
               href={'https://github.com/kudziajaroslaw98'}
               target='_blank'
-              className='flex items-center gap-8 rounded-full bg-slate-900/50 p-2 underline decoration-green-500 underline-offset-2'
+              aria-label='Final Phase on GitHub'
+              className='flex items-center gap-8 rounded-full bg-slate-900/50 p-2 transition-colors hover:bg-slate-800'
             >
               <GithubIcon className='size-6 text-green-500' />
             </Link>

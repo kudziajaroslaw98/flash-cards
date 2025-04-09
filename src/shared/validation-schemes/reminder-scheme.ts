@@ -1,4 +1,4 @@
-import { FormScheme } from '#/types/form-scheme.type';
+import type { FormScheme } from '#/types/form-scheme.type';
 import type { Reminder } from '#/types/reminder.type';
 import { z } from 'zod';
 

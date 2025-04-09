@@ -8,4 +8,5 @@ export type NavigationItem = {
   indicator?: ReactNode;
   active?: boolean;
   visible?: boolean;
+  locked?: boolean;
 };

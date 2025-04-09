@@ -8,7 +8,7 @@ import { ModalBody } from './modal-body';
 import { ModalFooter } from './modal-footer';
 import { ModalHeader } from './modal-header';
 
-interface ModalProps
+export interface ModalProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   className?: string;
 }

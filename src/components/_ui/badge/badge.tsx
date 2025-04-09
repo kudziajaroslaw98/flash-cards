@@ -10,7 +10,7 @@ const Badge = ({
   return (
     <span
       className={cn([
-        'inline-flex items-center rounded-full border border-green-400 px-4 py-1 font-serif text-xs font-semibold uppercase leading-3 tracking-tight text-green-400',
+        'font-fredoka inline-flex items-center rounded-full border border-green-400 px-4 py-1 text-xs font-medium leading-3 tracking-tight text-green-400',
         className,
       ])}
     >

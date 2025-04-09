@@ -1,6 +1,5 @@
 import { cn } from '#/shared/utils/cn.util';
 import type { Flashcard } from '#/types/flash-card.type';
-import { useEffect, useState } from 'react';
 
 type ReviseOptionsProps = {
   clicked: boolean;
@@ -8,53 +7,43 @@ type ReviseOptionsProps = {
   clickedOption: string | undefined;
   spaceRepetitionClick: (value: 'again' | 'hard' | 'good' | 'easy') => void;
   changeClicked: (answer: string, key?: string) => void;
+  clickedAnswer?: string;
+  answersAvailable?: boolean;
+  answers?: string[];
 };
 
 export function ReviseOptions({
   clicked,
   revisedCard,
   clickedOption,
+  clickedAnswer,
   spaceRepetitionClick,
   changeClicked,
+  answersAvailable = false,
+  answers = [],
 }: ReviseOptionsProps) {
-  const [answers, setAnswers] = useState<string[]>([]);
-  const [answersAvailable, setAnswersAvailable] = useState<boolean>(false);
-  const [clickedAnswer, setClickedAnswer] = useState<string | undefined>();
   const spaceRepetitionOptions = [
     {
-      value: 'easy',
-      label: 'Easy',
-      description: 'Show again in ~ 1 week',
-    },
-    {
-      value: 'good',
-      label: 'Good',
-      description: 'Show again in ~ 1 day',
+      value: 'again',
+      label: 'Again',
+      description: 'Resetting card',
     },
     {
       value: 'hard',
       label: 'Hard',
-      description: 'Show again in ~ 1 hour',
+      description: 'Review sooner',
     },
     {
-      value: 'again',
-      label: 'Again',
-      description: 'Show again in ~ 10 minutes',
+      value: 'good',
+      label: 'Good',
+      description: 'Review on schedule',
+    },
+    {
+      value: 'easy',
+      label: 'Easy',
+      description: 'Review later',
     },
   ] as const;
-
-  useEffect(() => {
-    const answers = [
-      revisedCard?.answer1 ?? null,
-      revisedCard?.answer2 ?? null,
-      revisedCard?.answer3 ?? null,
-      revisedCard?.answer4 ?? null,
-    ]
-      .filter((answer) => answer !== null)
-      .sort(() => Math.random() - 0.5) as string[];
-    setAnswers(answers);
-    setAnswersAvailable(answers.some((answer) => answer !== null));
-  }, [revisedCard]);
 
   return (
     <div className='mt-8 grid w-full grid-cols-[repeat(1,1fr)] items-stretch justify-items-center gap-2 lg:w-auto lg:grid-cols-[repeat(2,minmax(20rem,1fr))]'>
@@ -117,16 +106,18 @@ export function ReviseOptions({
                 clicked &&
                   answer === revisedCard.answer1 &&
                   clickedAnswer === answer &&
-                  'border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
+                  'scale-110 border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
                 clicked &&
                   answer !== revisedCard.answer1 &&
                   clickedAnswer === answer &&
-                  'border-red-400/50 bg-red-400/20 hover:!bg-red-100 dark:!border-red-400/40 dark:bg-red-400/20 dark:hover:!bg-red-400/20',
+                  'scale-110 border-red-400/50 bg-red-400/20 hover:!bg-red-100 dark:!border-red-400/40 dark:bg-red-400/20 dark:hover:!bg-red-400/20',
+                clicked &&
+                  clickedAnswer !== answer &&
+                  'scale-95 opacity-25 blur-[2px]',
               ])}
               key={`answer-${index + 1}`}
               onClick={() => {
                 changeClicked(answer);
-                setClickedAnswer(answer);
               }}
             >
               <span className='flex size-8 min-h-8 min-w-8 items-center justify-center rounded-md bg-green-400 text-gray-100 dark:text-slate-900'>

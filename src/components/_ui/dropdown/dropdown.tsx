@@ -1,37 +1,19 @@
 'use client';
 
+import { Popover } from '#/components/popover/popover';
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import { cn } from '#/shared/utils/cn.util';
 import { isDifferent } from '#/shared/utils/is-different.util';
 import { DictionaryValue } from '#/types//dictionary-value.type';
-import { cva, VariantProps } from 'class-variance-authority';
 import { Eraser, Plus, Search } from 'lucide-react';
-import * as m from 'motion/react-m';
-import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Button } from '../button/button';
 import { FieldLabel } from '../field-label/field-label';
 import Input from '../input/input';
 import DropdownItem from './dropdown-item';
 import DropdownLabel from './dropdown-label';
 
-const DropdownVariants = cva(
-  `absolute flex-col overflow-visible rounded-md border dark:border-slate-900/95 dark:bg-slate-950 flex bg-gray-50/95 backdrop-blur-lg`,
-  {
-    variants: {
-      contextPosition: {
-        top: '',
-        'top-right': '',
-        'top-left': '',
-        bottom: '',
-      },
-    },
-    defaultVariants: {
-      contextPosition: 'bottom',
-    },
-  },
-);
-
-interface BaseDropdownProps<T> extends VariantProps<typeof DropdownVariants> {
+interface BaseDropdownProps<T> {
   type: 'dropdown';
   config: DictionaryValue<T>[];
   value?: T | T[];
@@ -49,8 +31,11 @@ interface BaseDropdownProps<T> extends VariantProps<typeof DropdownVariants> {
   onFocus?: () => void;
   onAddNew?: (value: string) => void;
   disabled?: boolean;
+  loading?: boolean;
   contextClassName?: string;
   name?: string;
+  nestedPopover?: boolean;
+  contextPosition?: 'top' | 'bottom' | 'bottom-right';
 }
 
 export type DropdownProps<T> =
@@ -76,7 +61,6 @@ export default function Dropdown<T>({
   config,
   valid,
   required,
-  contextPosition = 'bottom',
   labelClassName,
   contextClassName,
   onChange,
@@ -86,6 +70,9 @@ export default function Dropdown<T>({
   error = null,
   touched = false,
   disabled = false,
+  loading = false,
+  nestedPopover = false,
+  contextPosition = 'bottom',
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   type = 'dropdown',
   ...props
@@ -105,7 +92,7 @@ export default function Dropdown<T>({
   const dropdownLabelRef = useRef<HTMLDivElement>(null);
   const configRef = useRef<DictionaryValue<T>[] | null>(null);
   const valueRef = useRef<T | T[] | null | undefined>(null);
-  const popoverRef = useRef<HTMLDivElement>(null);
+  const popoverItemsEndRef = useRef<HTMLDivElement>(null);
   const hasFocus = useRef(false);
 
   useOutsideAlerter(dropdownWrapperRef, () => {
@@ -119,80 +106,6 @@ export default function Dropdown<T>({
       }
     }
   });
-
-  const updatePopoverPosition = useCallback(() => {
-    if (
-      !dropdownWrapperRef.current ||
-      !popoverRef.current ||
-      !dropdownLabelRef.current
-    )
-      return;
-
-    if (contextPosition === 'bottom') {
-      const minOffset = 48;
-      const buttonRect = dropdownLabelRef.current.getBoundingClientRect();
-      const top =
-        (((dropdownLabelRef.current.getBoundingClientRect().y as number) +
-          dropdownLabelRef.current.getBoundingClientRect().height) as number) +
-        8;
-
-      popoverRef.current.style.top = `${top}px`;
-      popoverRef.current.style.left = `${buttonRect.left + window.scrollX}px`;
-      popoverRef.current.style.width = `${dropdownLabelRef.current.getBoundingClientRect().width}px`;
-
-      const availableSpace =
-        window.innerHeight -
-        popoverRef.current.getBoundingClientRect().bottom -
-        16 +
-        popoverRef.current.getBoundingClientRect().height -
-        minOffset;
-
-      if (popoverRef.current.getBoundingClientRect().height > availableSpace) {
-        popoverRef.current.style.height = `${availableSpace}px`;
-        popoverRef.current.style.maxHeight = `${availableSpace}px`;
-      }
-    }
-
-    if (contextPosition === 'top') {
-      const minOffset = 48;
-      const buttonRect = dropdownLabelRef.current.getBoundingClientRect();
-      const top =
-        (dropdownLabelRef.current.getBoundingClientRect().y as number) -
-        (popoverRef.current.getBoundingClientRect().height as number) -
-        8;
-
-      popoverRef.current.style.top = `${top}px`;
-      popoverRef.current.style.left = `${buttonRect.left + window.scrollX}px`;
-      popoverRef.current.style.width = `${dropdownLabelRef.current.getBoundingClientRect().width}px`;
-
-      const availableSpace =
-        window.innerHeight -
-        popoverRef.current.getBoundingClientRect().top -
-        16 +
-        popoverRef.current.getBoundingClientRect().height -
-        minOffset;
-
-      if (popoverRef.current.getBoundingClientRect().height > availableSpace) {
-        popoverRef.current.style.height = `${availableSpace}px`;
-        popoverRef.current.style.maxHeight = `${availableSpace}px`;
-      }
-    }
-  }, [contextPosition]);
-
-  useEffect(() => {
-    if (visible) {
-      updatePopoverPosition();
-      window.addEventListener('scroll', updatePopoverPosition, {
-        passive: true,
-      });
-      window.addEventListener('resize', updatePopoverPosition);
-    }
-
-    return () => {
-      window.removeEventListener('scroll', updatePopoverPosition);
-      window.removeEventListener('resize', updatePopoverPosition);
-    };
-  }, [visible, updatePopoverPosition]);
 
   useEffect(() => {
     if (
@@ -249,7 +162,7 @@ export default function Dropdown<T>({
 
   const toggleDropdown = () => {
     window?.umami?.track('Dropdown - Toggle', { name: props.name ?? label });
-    if (disabled) return;
+    if (disabled || loading) return;
     setVisible((prev) => !prev);
     setSearchValue('');
   };
@@ -339,6 +252,10 @@ export default function Dropdown<T>({
       onChange(newItem.value as T & T[]);
       setSelected([newItem]);
     }
+
+    setTimeout(() => {
+      popoverItemsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 10);
   };
 
   const handleNewElementChange = (event: FormEvent<HTMLInputElement>) => {
@@ -349,7 +266,7 @@ export default function Dropdown<T>({
     <div
       ref={dropdownWrapperRef}
       className={cn([
-        'group relative flex w-full max-w-md flex-col',
+        'group flex w-full max-w-md flex-col',
         controlLabel ? 'pt-2' : '',
         labelClassName ?? '',
         visible ? 'z-50' : 'z-40',
@@ -366,67 +283,63 @@ export default function Dropdown<T>({
       )}
 
       <div className='w-full'>
-        <div
-          ref={dropdownLabelRef}
-          className={cn([
-            'border-gray-300 text-gray-600 dark:border-slate-800 dark:text-slate-400',
-            'group relative flex h-10 w-full cursor-pointer items-center justify-center rounded-md border text-sm outline-none group-has-[:focus]:ring',
-            hasFocus.current ? 'ring' : '',
-            'transition',
-            touched && !valid
-              ? 'border-red-400 text-red-400 ring-red-400/50 dark:border-red-400'
-              : '',
-            touched && valid
-              ? 'border-green-500 text-green-500 ring-green-400/50'
-              : '',
-            error ? 'border-red-400 text-red-400 dark:border-red-400' : '',
-            disabled
-              ? 'bg-gray-100 text-gray-200 dark:bg-slate-900 dark:text-slate-800'
-              : '',
-          ])}
-          onClick={(e) => {
-            e.preventDefault();
-            handleClickOnDropdown();
-            toggleDropdown();
-          }}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              handleClickOnDropdown();
-              toggleDropdown();
-            }
-          }}
-          tabIndex={0}
+        <Popover
+          trigger={
+            <div
+              ref={dropdownLabelRef}
+              className={cn([
+                'border-gray-300 text-gray-600 dark:border-slate-800 dark:text-slate-400',
+                'group relative flex h-10 w-full cursor-pointer items-center justify-center rounded-md border text-sm outline-none group-has-[:focus]:ring',
+                hasFocus.current ? 'ring' : '',
+                'transition',
+                touched && !valid
+                  ? 'border-red-400 text-red-400 ring-red-400/50 dark:border-red-400'
+                  : '',
+                touched && valid
+                  ? 'border-green-500 text-green-500 ring-green-400/50'
+                  : '',
+                error ? 'border-red-400 text-red-400 dark:border-red-400' : '',
+                disabled
+                  ? 'bg-gray-100 text-gray-200 dark:bg-slate-900 dark:text-slate-800'
+                  : '',
+              ])}
+              onClick={(e) => {
+                e.preventDefault();
+                handleClickOnDropdown();
+                toggleDropdown();
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  handleClickOnDropdown();
+                  toggleDropdown();
+                }
+              }}
+              tabIndex={0}
+            >
+              {multiple ? (
+                <DropdownLabel
+                  visible={visible}
+                  selectedCount={selected.length}
+                  label={selected[0]?.label ?? label}
+                  multipleLabel={multipleLabel}
+                  loading={loading}
+                />
+              ) : (
+                <DropdownLabel
+                  onClick={() => {}}
+                  visible={visible}
+                  label={selected[0]?.label ?? label}
+                  loading={loading}
+                />
+              )}
+            </div>
+          }
+          position={contextPosition}
+          nested={nestedPopover}
         >
-          {multiple ? (
-            <DropdownLabel
-              visible={visible}
-              selectedCount={selected.length}
-              label={selected[0]?.label ?? label}
-              multipleLabel={multipleLabel}
-            />
-          ) : (
-            <DropdownLabel
-              onClick={() => {}}
-              visible={visible}
-              label={selected[0]?.label ?? label}
-            />
-          )}
-        </div>
-        {visible && (
-          <m.div
-            data-open={visible}
-            className={cn([
-              DropdownVariants({ contextPosition }),
-              'fixed border border-gray-300 shadow-xl dark:border-slate-900 dark:shadow-black',
-              contextClassName,
-            ])}
-            ref={popoverRef}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-          >
+          <div className='flex h-full w-full flex-col'>
             {props.searchable && (
-              <div className='min-w-fit rounded-t-md border-b p-2 dark:border-slate-800/40'>
+              <div className='w-full min-w-fit rounded-t-md border-b p-2 dark:border-slate-800/40'>
                 <Input
                   inputType='text'
                   value={searchValue}
@@ -443,7 +356,7 @@ export default function Dropdown<T>({
             <div
               tabIndex={-1}
               className={cn([
-                'flex h-full flex-col gap-1 overflow-y-auto p-2',
+                'flex w-full grow flex-col gap-1 overflow-y-auto p-2',
                 (props.searchable || props.clearAll) &&
                   items?.length > 0 &&
                   'py-3',
@@ -469,7 +382,12 @@ export default function Dropdown<T>({
                     selectable={!!multiple}
                   />
                 ))}
+              <div
+                ref={popoverItemsEndRef}
+                className='flex size-[0.5px]'
+              ></div>
             </div>
+
             {props.addNew && !isInAddNewMode && (
               <div
                 className='flex h-11 w-full cursor-pointer items-center justify-center rounded-b-md border-t bg-gray-50 px-4 py-2 text-gray-500 outline-none transition hover:text-green-400 focus:ring focus:ring-green-400/50  dark:border-slate-800/40 dark:bg-slate-950'
@@ -482,9 +400,10 @@ export default function Dropdown<T>({
                 <Plus className='mr-2 h-4 w-4' /> Add new
               </div>
             )}
+
             {props.addNew && isInAddNewMode && (
               <div>
-                <div className='min-w-fit  bg-gray-50 p-1 py-2 outline-none focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-950'>
+                <div className='w-full min-w-fit bg-gray-50 p-1 py-2 outline-none focus:ring  focus:ring-green-400/50 dark:border-slate-800/40 dark:bg-slate-950'>
                   <Input
                     inputType='text'
                     value={newItemValue}
@@ -541,8 +460,8 @@ export default function Dropdown<T>({
                 <Eraser className='mr-2 h-4 w-4' /> Clear All
               </div>
             )}
-          </m.div>
-        )}
+          </div>
+        </Popover>
       </div>
 
       <span

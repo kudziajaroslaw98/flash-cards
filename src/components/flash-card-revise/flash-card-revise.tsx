@@ -32,29 +32,34 @@ export default function FlashcardReviseComponent() {
     {
       value: 'again',
       label: 'Again',
-      description: 'Show again in ~ 10 minutes',
+      description: 'Resetting card',
     },
     {
       value: 'hard',
       label: 'Hard',
-      description: 'Show again in ~ 1 hour',
+      description: 'Review sooner',
     },
     {
       value: 'good',
       label: 'Good',
-      description: 'Show again in ~ 1 day',
+      description: 'Review on schedule',
     },
     {
       value: 'easy',
       label: 'Easy',
-      description: 'Show again in ~ 1 week',
+      description: 'Review later',
     },
   ] as const;
 
   const defaultSet = { value: 'default', label: 'All flashcards' };
-  const [revisedCard, setRevisedCard] = useState<Flashcard>();
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [answersAvailable, setAnswersAvailable] = useState<boolean>(false);
+  const [revisedCard, setRevisedCard] = useState<Flashcard | undefined>();
   const [revisedSet, setRevisedSet] = useState<string>(defaultSet.value);
-  const [clickedOption, setClickedOption] = useState<string>();
+  const [clickedOption, setClickedOption] = useState<
+    ReviseOptionsType | undefined
+  >();
+  const [clickedAnswer, setClickedAnswer] = useState<string | undefined>();
   const [clicked, setClicked] = useState(false);
   const cardsReviewed = useRef(0);
   const cardsRecalled = useRef(0);
@@ -68,13 +73,16 @@ export default function FlashcardReviseComponent() {
     timestamp: new Date().toISOString(),
   });
 
-  const { activeTime, timerStart, distractionsRef } = useFocusTracker();
-  // eslint-disable-next-line no-undef
-  const cardTime = useRef<Date>(new Date()); //in seconds
+  const { timerStart, distractionsRef } = useFocusTracker();
+  const cardTime = useRef<Date>(new Date());
 
   const setFlashcards = useMemo(
     () =>
-      flashcards.filter((flashcard) => flashcard?.sets?.includes(revisedSet)),
+      revisedSet === defaultSet.value
+        ? flashcards
+        : flashcards.filter((flashcard) =>
+            flashcard?.sets?.includes(revisedSet),
+          ),
     [flashcards, revisedSet],
   );
 
@@ -86,8 +94,11 @@ export default function FlashcardReviseComponent() {
     setContinueReroll,
     todayItems,
     availableTodayItems,
+    sessionItemsCount,
   } = useSpacedRepetition({
-    array: revisedSet === defaultSet.value ? flashcards : setFlashcards,
+    array: setFlashcards,
+    revisedSetId: revisedSet,
+    numberOfItems: 1,
   });
 
   const spaceRepetitionClick = (value: ReviseOptionsType) => {
@@ -123,16 +134,12 @@ export default function FlashcardReviseComponent() {
   };
 
   const changeClicked = (answer: string, key?: string) => {
-    if (!answer || !revisedCard) return;
+    if (!answer || !revisedCard || clicked) return;
 
     if (key) {
       window?.umami?.track('Answer clicked', { key });
     } else {
       window?.umami?.track('Answer clicked', { key: null });
-    }
-
-    if (clicked) {
-      return;
     }
 
     const correct = revisedCard?.answer1 === answer;
@@ -152,16 +159,19 @@ export default function FlashcardReviseComponent() {
       synced: false,
     };
 
+    let reviseOption: ReviseOptionsType;
     if (correct) {
       reviewLog.recalled = true;
+    } else {
+      reviewLog.recalled = false;
     }
 
     if (revisedCard.type === 'single' && correct) {
       clonedStats.correctAnswers += 1;
       cardsRecalled.current += 1;
-      setClickedOption('easy');
+      reviseOption = 'easy';
     } else {
-      setClickedOption('again');
+      reviseOption = 'again';
       clonedStats.incorrectAnswers += 1;
     }
 
@@ -171,73 +181,92 @@ export default function FlashcardReviseComponent() {
 
     db.reviewLogs.add(reviewLog);
     updateMetadata({ ...clonedStats });
+    setClickedAnswer(answer);
+    setClickedOption(reviseOption);
     setClicked(true);
   };
 
-  const reshuffleFlashcards = () => {
-    window?.umami?.track('Reshuffle flashcards', { key: null, clicked });
-    if (!clicked || !revisedCard) return;
+  const handleReshuffle = async (key?: string) => {
+    const trigger = key || 'button';
+    window?.umami?.track('Reshuffle flashcards', { trigger, clicked });
 
-    calculateRepetition(revisedCard, clickedOption as ReviseOptionsType);
-    setClickedOption(undefined);
-    setClicked(false);
-  };
+    if (!clicked || !revisedCard || !clickedOption) return;
 
-  const reshuffleFlashcardsWithKey = (key: string) => {
-    window?.umami?.track('Reshuffle flashcards', { key, clicked });
-    if (!clicked || !revisedCard) return;
+    const lastCardUuid = revisedCard.frontUuid;
 
-    calculateRepetition(revisedCard, clickedOption as ReviseOptionsType);
-    setRevisedCard(undefined);
-    setClickedOption(undefined);
-    setClicked(false);
+    try {
+      // Perform calculation first (this updates the card in the DB)
+      await calculateRepetition(revisedCard, clickedOption);
 
-    reroll();
+      // Reset UI state for the next card
+      setClickedOption(undefined);
+      setClickedAnswer(undefined);
+      setClicked(false);
+      // revisedCard will be updated by the useEffect watching randomItems
+
+      // Reroll, removing the just-reviewed card from the session deck
+      reroll(lastCardUuid);
+    } catch (error) {
+      console.error('Error during reshuffle:', error);
+      // Handle error appropriately, maybe show a notification
+    }
   };
 
   const changeRevisedSet = (value: string) => {
     window?.umami?.track('Change revised set', { value });
+    // Resetting state when set changes
     setClicked(false);
+    setClickedOption(undefined);
+    setClickedAnswer(undefined);
+    setRevisedCard(undefined);
     setRevisedSet(value);
   };
 
   const continueRerollClick = () => {
     window?.umami?.track('Continue reshuffling');
-    setRevisedCard(undefined);
-    setClickedOption(undefined);
-    setClicked(false);
+    setRevisedCard(undefined); // Clear current card display
+    setClickedOption(undefined); // Reset options
+    setClickedAnswer(undefined);
+    setClicked(false); // Reset clicked state
     setContinueReroll(true);
   };
 
   const clickRevisedOption = (key: string) => {
     const index = parseInt(key) - 1;
+    if (index < 0 || index > 3) return; // Invalid key
     if (revisedCard?.type === 'index' || revisedCard?.type === 'question') {
-      spaceRepetitionClick(spaceRepetitionOptions[index].value);
-    } else {
-      // TODO: Find better way to handle this type.
-      // @ts-expect-error ts error
-      changeClicked(revisedCard?.[`answer${index + 1}`] as string, key);
+      if (index < spaceRepetitionOptions.length) {
+        spaceRepetitionClick(spaceRepetitionOptions[index].value);
+      }
+    } else if (revisedCard?.type === 'single' && answersAvailable) {
+      changeClicked(answers[index], key);
     }
   };
 
   useEffect(() => {
-    if (!randomItems?.length) return;
-
-    setRevisedCard(randomItems?.[0]);
-    cardTime.current = new Date();
+    if (randomItems && randomItems.length > 0) {
+      // Display the first item from the potentially new batch
+      setRevisedCard(randomItems[0]);
+      cardTime.current = new Date(); // Reset timer for the new card
+    } else {
+      // Handle case where randomItems becomes empty (e.g., end of deck)
+      setRevisedCard(undefined);
+    }
   }, [randomItems]);
 
   useEffect(() => {
     return () => {
       if (!focusSession.current || timerStart.current === null) return;
       const now = new Date();
-      const activeTime =
-        (now.setMilliseconds(0) - timerStart.current.setMilliseconds(0)) / 1000;
+      const sessionActiveTime = timerStart.current
+        ? (now.setMilliseconds(0) - timerStart.current.setMilliseconds(0)) /
+          1000
+        : 0;
       db.focusSessions.put({
         ...focusSession.current,
         timestamp: new Date().toISOString(),
         end: new Date().toISOString(),
-        activeTime: activeTime,
+        activeTime: sessionActiveTime,
         distractions: distractionsRef.current,
       });
 
@@ -257,7 +286,7 @@ export default function FlashcardReviseComponent() {
             ),
             cardsReviewed: dailyStat.cardsReviewed + cardsReviewed.current,
             cardsRecalled: dailyStat.cardsRecalled + cardsRecalled.current,
-            timeSpent: dailyStat.timeSpent + activeTime,
+            timeSpent: dailyStat.timeSpent + sessionActiveTime,
             synced: false,
           });
         } else {
@@ -268,7 +297,7 @@ export default function FlashcardReviseComponent() {
             retention: cardsReviewed.current / cardsRecalled.current,
             cardsReviewed: cardsReviewed.current,
             cardsRecalled: cardsRecalled.current,
-            timeSpent: activeTime,
+            timeSpent: sessionActiveTime,
             synced: false,
           });
         }
@@ -276,90 +305,167 @@ export default function FlashcardReviseComponent() {
 
       updateDailyStats();
     };
-  }, []);
+  }, [distractionsRef, timerStart, updateMetadata]);
 
-  useKeyPress([' '], () => reshuffleFlashcardsWithKey('Space'));
-  useKeyPress(['ArrowRight'], () => reshuffleFlashcardsWithKey('ArrowRight'));
+  useEffect(() => {
+    const answers = [
+      revisedCard?.answer1 ?? null,
+      revisedCard?.answer2 ?? null,
+      revisedCard?.answer3 ?? null,
+      revisedCard?.answer4 ?? null,
+    ]
+      .filter((answer) => answer !== null && answer !== '')
+      .sort(() => Math.random() - 0.5) as string[];
+    setAnswers(answers);
+    setAnswersAvailable(answers.some((answer) => answer !== null));
+  }, [revisedCard]);
+
+  useKeyPress([' '], () => handleReshuffle('Space'));
+  useKeyPress(['ArrowRight'], () => handleReshuffle('ArrowRight'));
   useKeyPress(['1'], () => clickRevisedOption('1'));
   useKeyPress(['2'], () => clickRevisedOption('2'));
   useKeyPress(['3'], () => clickRevisedOption('3'));
   useKeyPress(['4'], () => clickRevisedOption('4'));
 
-  return flashcards.length > 0 ? (
-    <div className='flex h-full w-full flex-col justify-stretch'>
-      <div className='flex h-full w-full flex-col items-center gap-8 pb-12'>
-        {(availableTodayItems === 0 && continueReroll) ||
-        availableTodayItems > 0 ? (
-          <>
-            <div className='flex flex-col gap-4'>
-              <ReviseSession
-                totalCards={todayItems ?? 0}
-                recalled={cardsRecalled.current}
-                reviewed={cardsReviewed.current}
-                timeSpent={activeTime}
-              />
+  // Determine if there are cards available to revise
+  const canRevise = randomItems && randomItems.length > 0 && revisedCard;
+  // Determine if the session is completely finished (no items due, not continuing)
+  const sessionFinished =
+    availableTodayItems === 0 && !continueReroll && sessionItemsCount === 0;
+  // Determine if user finished today's cards but could continue
+  const finishedTodayCanContinue =
+    availableTodayItems === 0 &&
+    !continueReroll &&
+    sessionItemsCount === 0 &&
+    flashcards.length > 0;
 
-              <Accordion className='hidden md:grid'>
-                <Accordion.Item title='Shortcuts'>
-                  <ShortcutList
-                    className='hidden md:flex md:flex-col md:items-center'
-                    shortcuts={[
-                      {
-                        name: 'Reshuffle',
-                        keys: [
-                          'Space',
-                          <ArrowRight
-                            key='ArrowBigRight'
-                            className='size-4'
-                          />,
-                        ],
-                      },
-                      {
-                        name: 'Answer 1 - 4',
-                        keys: ['1', '2', '3', '4'],
-                      },
-                    ]}
-                  />
-                </Accordion.Item>
-              </Accordion>
-            </div>
+  if (flashcards.length === 0) {
+    return (
+      <div className='flex h-full w-full flex-col items-center justify-center gap-4'>
+        <div className='flex w-full flex-col items-center justify-center py-10 text-center'>
+          <Coffee className='mb-8 size-12 text-green-500' />
+          <span>This review session is a no-show</span>
+          <span>your flashcards must be off on a coffee break.</span>
 
-            <ReviseItem
-              clicked={clicked}
-              revisedCard={revisedCard}
+          <LinkComponent
+            href='/flashcards/learn'
+            className='mt-8'
+          >
+            <Button
+              label={'Time to bring them back!'}
+              icon={<ArrowRight className='size-4' />}
+              iconPosition='right'
+              alt='Redirect to learn page'
             />
+          </LinkComponent>
+        </div>
+      </div>
+    );
+  }
 
-            <ReviseOptions
-              clicked={clicked}
-              clickedOption={clickedOption}
-              revisedCard={revisedCard}
-              spaceRepetitionClick={spaceRepetitionClick}
-              changeClicked={changeClicked}
-            />
-          </>
-        ) : (
+  if (!canRevise && finishedTodayCanContinue) {
+    // Finished today's due cards, show option to continue
+    return (
+      <div className='flex h-full w-full flex-col justify-stretch'>
+        <div className='flex h-full w-full flex-col items-center gap-8 pb-12'>
           <AllRevised>
             <Button
-              label='Continue'
+              label='Continue with All Cards'
               size={'sm'}
               onClick={continueRerollClick}
-              alt='Continue reshuffling'
+              alt='Continue reshuffling with all cards'
             />
           </AllRevised>
-        )}
+        </div>
+      </div>
+    );
+  }
+
+  if (
+    (!canRevise && finishedTodayCanContinue) ||
+    (!canRevise && sessionFinished)
+  ) {
+    // All cards revised, nothing left to do
+    return (
+      <div className='flex h-full w-full flex-col justify-stretch'>
+        <div className='flex h-full w-full flex-col items-center gap-8 pb-12'>
+          <AllRevised>
+            <Button
+              label='Continue with All Cards'
+              size={'sm'}
+              onClick={continueRerollClick}
+              alt='Continue reshuffling with all cards'
+            />
+          </AllRevised>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className='flex h-full w-full flex-col justify-stretch'>
+      <div className='flex h-full w-full flex-col items-center gap-8 pb-12'>
+        <div className='flex flex-col gap-4'>
+          <ReviseSession
+            totalCards={todayItems ?? 0}
+            recalled={cardsRecalled.current}
+            reviewed={cardsReviewed.current}
+            timerStart={timerStart}
+          />
+
+          <Accordion className='hidden md:grid'>
+            <Accordion.Item title='Shortcuts'>
+              <ShortcutList
+                className='hidden md:flex md:flex-col md:items-center'
+                shortcuts={[
+                  {
+                    name: 'Reshuffle',
+                    keys: [
+                      'Space',
+                      <ArrowRight
+                        key='ArrowBigRight'
+                        className='size-4'
+                      />,
+                    ],
+                  },
+                  {
+                    name: 'Answer 1 - 4',
+                    keys: ['1', '2', '3', '4'],
+                  },
+                ]}
+              />
+            </Accordion.Item>
+          </Accordion>
+        </div>
+
+        <ReviseItem
+          clicked={clicked}
+          revisedCard={revisedCard}
+        />
+
+        <ReviseOptions
+          clicked={clicked}
+          clickedOption={clickedOption}
+          revisedCard={revisedCard}
+          spaceRepetitionClick={spaceRepetitionClick}
+          changeClicked={changeClicked}
+          clickedAnswer={clickedAnswer}
+          answers={answers}
+          answersAvailable={answersAvailable}
+        />
       </div>
 
       <FloatingButtons>
         <div className='flex w-full flex-col items-center justify-center gap-2 py-2'>
           <Button
-            label={'Reshuffle'}
+            label={'Next Card'}
             icon={<RefreshCw className='h-4 w-4' />}
             iconPosition={'right'}
-            onClick={reshuffleFlashcards}
+            onClick={() => handleReshuffle()}
             size={'xlg'}
             className='!w-full !max-w-xs'
-            disabled={!clicked}
-            alt='Reshuffle flashcards'
+            disabled={!clicked || !revisedCard}
+            alt='Proceed to next flashcard'
           />
 
           <Dropdown
@@ -367,32 +473,12 @@ export default function FlashcardReviseComponent() {
             multiple={false}
             config={[defaultSet, ...setsDictionary]}
             onChange={changeRevisedSet}
-            value={defaultSet.value}
-            contextPosition={'top'}
+            value={revisedSet}
+            contextPosition='top'
             labelClassName='max-w-xs bg-gray-50 dark:bg-slate-950'
           />
         </div>
       </FloatingButtons>
-    </div>
-  ) : (
-    <div className='flex h-full w-full flex-col items-center justify-center gap-4'>
-      <div className='flex w-full flex-col items-center justify-center py-10 text-center'>
-        <Coffee className='mb-8 size-12 text-green-500' />
-        <span>This review session is a no-show</span>
-        <span>your flashcards must be off on a coffee break.</span>
-
-        <LinkComponent
-          href='/flashcards/learn'
-          className='mt-8'
-        >
-          <Button
-            label={'Time to bring them back!'}
-            icon={<ArrowRight className='size-4' />}
-            iconPosition='right'
-            alt='Redirect to learn page'
-          />
-        </LinkComponent>
-      </div>
     </div>
   );
 }

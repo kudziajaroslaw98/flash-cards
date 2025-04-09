@@ -1,4 +1,4 @@
-import { DropdownProps } from '#/components/_ui/dropdown/dropdown';
+import type { DropdownProps } from '#/components/_ui/dropdown/dropdown';
 import type { InputDefinitions } from '#/types/input-types';
 
 export default function isDropdown<T>(

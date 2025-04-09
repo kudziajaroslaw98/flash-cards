@@ -15,12 +15,12 @@ export default function PricingPage() {
       <div className='flex h-full w-full flex-col items-center justify-center gap-4'>
         <section className='flex flex-wrap justify-center gap-4'>
           <Card
-            className='w-72'
+            className='h-[580px] w-72'
             motion={false}
           >
             <div className='flex flex-col gap-4'>
               <div className='flex flex-col gap-2'>
-                <h5 className='flex items-center justify-between text-2xl font-bold'>
+                <h5 className='flex items-center justify-between text-xl font-bold'>
                   <span>Free</span>
                   {isLoggedIn && pickedPlan === null && (
                     <Badge className='h-6 px-2 py-0 text-xs font-normal'>
@@ -29,18 +29,18 @@ export default function PricingPage() {
                   )}
                 </h5>
 
-                <p className='text-sm text-gray-500 dark:text-slate-500'>
-                  Free forever, no credit card required
+                <p className='pb-5 text-sm text-gray-500 dark:text-slate-400'>
+                  Get started, no credit card required.
                 </p>
               </div>
 
               <span className='flex flex-col items-center justify-center py-6'>
                 <span className='flex -translate-x-4 items-center text-7xl font-semibold '>
                   <DollarSign className='size-8 -translate-y-3 text-green-500' />
-                  <span>0</span>
+                  <span className='text-gray-800 dark:text-slate-100'>0</span>
                 </span>
 
-                <span className='pt-2 text-gray-500 dark:text-slate-500'>
+                <span className='pt-2 text-gray-500 dark:text-slate-300'>
                   per month
                 </span>
               </span>
@@ -56,10 +56,10 @@ export default function PricingPage() {
               <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800'></div>
 
               <div className='flex flex-col gap-2'>
-                <p className='font-semibold text-gray-600 dark:text-slate-400'>
-                  Features:
+                <p className='font-semibold text-gray-600 dark:text-slate-300'>
+                  Free Includes:
                 </p>
-                <ul className='flex flex-col gap-2 text-sm text-gray-500 dark:text-slate-500'>
+                <ul className='flex flex-col gap-2 text-sm text-gray-500 dark:text-slate-400'>
                   <li className='flex gap-2'>
                     <span>•</span>
                     <span>Unlimited flashcards</span>
@@ -67,17 +67,32 @@ export default function PricingPage() {
 
                   <li className='flex gap-2'>
                     <span>•</span>
-                    <span>Unlimited decks</span>
+                    <span>Unlimited sets</span>
                   </li>
 
                   <li className='flex gap-2'>
                     <span>•</span>
-                    <span>Unlimited revise</span>
+                    <span>Spaced Repetition System</span>
                   </li>
 
                   <li className='flex gap-2'>
                     <span>•</span>
-                    <span>Cross-device sync</span>
+                    <span>Study Session Tracking</span>
+                  </li>
+
+                  <li className='flex gap-2'>
+                    <span>•</span>
+                    <span className='flex flex-col'>
+                      <span>Advanced Study Statistics</span>
+                      <span className='text-xs text-gray-400 dark:text-slate-500'>
+                        (Incl. Focus Tracking)
+                      </span>
+                    </span>
+                  </li>
+
+                  <li className='flex gap-2'>
+                    <span>•</span>
+                    <span>Cross-Device Sync</span>
                   </li>
                 </ul>
               </div>
@@ -85,46 +100,51 @@ export default function PricingPage() {
           </Card>
 
           <form
-            action={`/api/checkout-sessions/?plan=standard`}
+            action={`/api/checkout-sessions/?plan=premium&payment=monthly`}
             method='POST'
             className='relative'
           >
             <Card
-              className='z-20 w-72'
+              className='z-20 h-[580px] w-72'
               motion={false}
             >
               <div className='flex flex-col gap-4'>
                 <div className='flex flex-col gap-2'>
-                  <h5 className='flex items-center justify-between text-2xl font-bold'>
-                    <span>Standard</span>
-                    {isLoggedIn &&
-                      pickedPlan === 'standard' &&
-                      isPlanActive && (
-                        <Badge className='h-6 px-2 py-0 text-xs font-normal'>
-                          Active
-                        </Badge>
-                      )}
+                  <h5 className='flex items-center justify-between text-xl font-bold'>
+                    <span>Premium</span>
+                    {isLoggedIn && pickedPlan === 'premium' && isPlanActive && (
+                      <Badge className='h-6 px-2 py-0 text-xs font-normal'>
+                        Active
+                      </Badge>
+                    )}
+                    {isLoggedIn && !isPlanActive && (
+                      <Badge className='h-6 px-2 py-0 text-xs font-normal'>
+                        Popular
+                      </Badge>
+                    )}
                   </h5>
-                  <p className='text-sm text-gray-500 dark:text-slate-500'>
-                    Not creative today? I got you
+                  <p className='text-sm text-gray-500 dark:text-slate-400'>
+                    Unlock AI Superpowers & Advanced Features
                   </p>
                 </div>
 
                 <span className='flex flex-col items-center justify-center py-6'>
                   <span className='flex -translate-x-4 items-center text-7xl font-semibold'>
                     <DollarSign className='size-8 -translate-y-3 text-green-500' />
-                    <span>2.5</span>
+                    <span className='text-gray-800 dark:text-slate-100'>
+                      2.5
+                    </span>
                   </span>
 
-                  <span className='pt-2 text-gray-500 dark:text-slate-500'>
+                  <span className='pt-2 text-gray-500 dark:text-slate-300'>
                     per month
                   </span>
                 </span>
 
                 <Button
-                  disabled={pickedPlan === 'standard' && isPlanActive}
+                  disabled={pickedPlan === 'premium' && isPlanActive}
                   label={
-                    pickedPlan === 'standard' && isPlanActive
+                    pickedPlan === 'premium' && isPlanActive
                       ? 'Active'
                       : 'Get started'
                   }
@@ -137,28 +157,116 @@ export default function PricingPage() {
                 <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800'></div>
 
                 <div className='flex flex-col gap-2'>
-                  <p className='font-semibold text-gray-600 dark:text-slate-400'>
-                    Features:
+                  <p className='font-semibold text-gray-600 dark:text-slate-300'>
+                    Everything in Free, plus:
                   </p>
-                  <ul className='flex flex-col gap-2 text-sm text-gray-500 dark:text-slate-500'>
+                  <ul className='flex flex-col gap-2 text-sm text-gray-500 dark:text-slate-400'>
                     <li className='flex gap-2'>
                       <span>•</span>
-                      <span>Generate flashcards</span>
+                      <span>AI Flashcard Generation</span>
                     </li>
 
                     <li className='flex gap-2'>
                       <span>•</span>
-                      <span>Generate set descriptions</span>
+                      <span>AI Study Plan Creation</span>
                     </li>
 
                     <li className='flex gap-2'>
                       <span>•</span>
-                      <span>Generate flashcard answers</span>
+                      <span>AI Set Description Generation</span>
                     </li>
 
                     <li className='flex gap-2'>
                       <span>•</span>
-                      <span>Access to all upcoming features</span>
+                      <span>Access to all upcoming premium features</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+            <div className='radial-gradient absolute -left-[2px] -top-[2px] z-10 flex h-[calc(100%+4px)] w-[calc(100%+4px)] rounded-md opacity-30 content-[""]'></div>
+          </form>
+
+          <form
+            action={`/api/checkout-sessions/?plan=premium&payment=yearly`}
+            method='POST'
+            className='relative'
+          >
+            <Card
+              className='z-20 h-[580px] w-72 bg-transparent dark:bg-transparent'
+              motion={false}
+            >
+              <div className='flex flex-col gap-4'>
+                <div className='flex flex-col gap-2'>
+                  <h5 className='flex items-center justify-between text-xl font-bold'>
+                    <span>Yearly Premium</span>
+                    {isLoggedIn && pickedPlan === 'premium' && isPlanActive && (
+                      <Badge className='h-6 px-2 py-0 text-xs font-normal'>
+                        Active
+                      </Badge>
+                    )}
+                    {isLoggedIn && !isPlanActive && (
+                      <Badge className='h-6 px-2 py-0 text-xs font-normal'>
+                        Best Value
+                      </Badge>
+                    )}
+                  </h5>
+                  <p className='text-sm text-gray-500 dark:text-slate-400'>
+                    Unlock AI Superpowers & Advanced Features
+                  </p>
+                </div>
+
+                <span className='flex flex-col items-center justify-center py-6'>
+                  <span className='flex -translate-x-4 items-center text-7xl font-semibold'>
+                    <DollarSign className='size-8 -translate-y-3 text-green-500' />
+                    <span className='text-gray-800 dark:text-slate-100'>
+                      25
+                    </span>
+                  </span>
+
+                  <span className='pt-2 text-gray-500 dark:text-slate-300'>
+                    annually
+                  </span>
+                </span>
+
+                <Button
+                  disabled={pickedPlan === 'premium' && isPlanActive}
+                  label={
+                    pickedPlan === 'premium' && isPlanActive
+                      ? 'Active'
+                      : 'Get started'
+                  }
+                  variant={'primary-outline'}
+                  className='font-bold'
+                  type='submit'
+                  alt='Get started'
+                />
+
+                <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800'></div>
+
+                <div className='flex flex-col gap-2'>
+                  <p className='font-semibold text-gray-600 dark:text-slate-300'>
+                    Everything in Free, plus:
+                  </p>
+                  <ul className='flex flex-col gap-2 text-sm text-gray-500 dark:text-slate-400'>
+                    <li className='flex gap-2'>
+                      <span>•</span>
+                      <span>AI Flashcard Generation</span>
+                    </li>
+
+                    <li className='flex gap-2'>
+                      <span>•</span>
+                      <span>AI Study Plan Creation</span>
+                    </li>
+
+                    <li className='flex gap-2'>
+                      <span>•</span>
+                      <span>AI Set Description Generation</span>
+                    </li>
+
+                    <li className='flex gap-2'>
+                      <span>•</span>
+                      <span>Access to all upcoming premium features</span>
                     </li>
                   </ul>
                 </div>

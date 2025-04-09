@@ -1,4 +1,6 @@
-import type { PropsWithChildren } from 'react';
+import { cn } from '#/shared/utils/cn.util';
+import { Lock } from 'lucide-react';
+import type { PropsWithChildren, ReactNode } from 'react';
 
 interface MenuItemProps {
   visible?: boolean;
@@ -6,6 +8,8 @@ interface MenuItemProps {
   onClick?: () => void;
   active?: boolean;
   border?: boolean;
+  locked?: boolean;
+  indicator?: ReactNode;
 }
 
 export default function MenuItem(props: PropsWithChildren<MenuItemProps>) {
@@ -16,30 +20,37 @@ export default function MenuItem(props: PropsWithChildren<MenuItemProps>) {
     onClick: handleItemClick,
     visible = true,
     border = true,
+    locked,
+    indicator,
   } = props;
 
   const handleClick = () => {
-    if (handleItemClick) {
+    if (handleItemClick && !locked) {
       window?.umami?.track('Click context menu item');
       handleItemClick();
     }
   };
+
   return (
     visible && (
       <li
-        onClick={handleClick}
-        className={`
-        ${active ? 'border-l-2 !border-l-green-400' : ''}
-        ${border ? 'border-b border-b-slate-200 last:border-b-0 dark:border-b-slate-800' : 'border-b-0  last:border-b '}
-        ${
+        onClick={locked ? undefined : handleClick}
+        className={cn([
+          active ? 'border-l-2 !border-l-green-400' : '',
+          border
+            ? 'border-b border-b-slate-200 last:border-b-0 dark:border-b-slate-800'
+            : 'border-b-0  last:border-b ',
           handleItemClick
             ? 'cursor-pointer hover:bg-green-400 hover:text-green-50 dark:hover:bg-slate-800 dark:hover:text-green-50'
-            : ''
-        }
-         flex w-full items-center gap-4  border-b border-b-slate-200 bg-gray-50 px-4 py-2  text-sm text-green-400 last:border-b-0 dark:border-b-slate-800 dark:bg-slate-900 dark:text-green-400
-         ${className ?? ''}`}
+            : '',
+
+          'flex w-full items-center gap-4  border-b border-b-slate-200 bg-gray-50 px-4 py-2  text-sm text-green-400 last:border-b-0 dark:border-b-slate-800 dark:bg-slate-900 dark:text-green-400',
+          locked ? 'cursor-not-allowed opacity-50' : '',
+          className ?? '',
+        ])}
       >
-        {children}
+        {children} {indicator && !locked && indicator}{' '}
+        {locked && <Lock className={'size-4'} />}
       </li>
     )
   );

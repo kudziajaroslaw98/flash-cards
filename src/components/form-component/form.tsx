@@ -3,14 +3,14 @@
 import { isInternalInput } from '#/shared/guards/is-internal-input';
 import { cn } from '#/shared/utils/cn.util';
 import { isDifferent } from '#/shared/utils/is-different.util';
-import {
+import type { ExtendedSchemeKeys } from '#/types/extended-scheme-keys.type';
+import type {
+  ExtendedInputType,
   FormScheme,
-  type ExtendedInputType,
-  type InputType,
-  type InputValidation,
-} from '#/types//form-scheme.type';
-import type { ExtendedSchemeKeys } from '#/types/extended-scheme-keys';
+  InputType,
+} from '#/types/form-scheme.type';
 import type { InternalAccordion } from '#/types/input-types';
+import type { InputValidation } from '#/types/input-validation.type';
 import {
   useEffect,
   useImperativeHandle,
@@ -155,6 +155,8 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
               ).success;
             } else {
               return !constraint.safeParse(
+                // TODO: Try to fix it later
+                // @ts-expect-error its fine, false positive type error
                 props.initialValues?.[key] ?? formValues?.[key as string],
               ).success;
             }
@@ -212,15 +214,6 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
       }
     });
 
-    console.log({
-      initialInputs,
-      initialValids,
-      initialErrors,
-      initialVisibility,
-      initialValidations,
-      tmpValues,
-    });
-
     return {
       initialInputs,
       initialValids,
@@ -248,8 +241,6 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
           ][]),
         ),
       );
-
-    console.log('🚀 ~ :240 ~ getAllInputs ~ allInputs:', allInputs);
     return allInputs;
   };
 
@@ -289,96 +280,8 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
         ...initialValidations,
         ...result.initialValidations,
       };
-      console.log(
-        '🚀 ~ :305 ~ useEffect ~ initialVisibility:',
-        initialVisibility,
-      );
+
       tmpValues = { ...tmpValues, ...result.tmpValues };
-      // inputs.forEach(([inputName, input]) => {
-      //   initialVisibility = { ...initialVisibility, [inputName]: true };
-      //   initialValidations = { ...initialValidations, [inputName]: [] };
-
-      //   if (input?._internal_constraints) {
-      //     const showConstraints = input._internal_constraints.filter(
-      //       ({ type }) => type === 'show',
-      //     );
-      //     const validationConstraints = input._internal_constraints.filter(
-      //       ({ type }) => type === 'validation',
-      //     );
-
-      //     initialValidations = {
-      //       ...initialValidations,
-      //       [inputName]: validationConstraints,
-      //     };
-
-      //     if (showConstraints.length > 0) {
-      //       const isInvalid = showConstraints.some(({ key, constraint }) => {
-      //         if (isInternalInput<T>(key)) {
-      //           return !constraint.safeParse(
-      //             formValues?.[key as string] ?? input._internal_default_value,
-      //           ).success;
-      //         } else {
-      //           return !constraint.safeParse(
-      //             props.initialValues?.[key] ?? formValues?.[key as string],
-      //           ).success;
-      //         }
-      //       });
-
-      //       if (isInvalid) {
-      //         initialVisibility = { ...initialVisibility, [inputName]: false };
-      //       }
-      //     }
-      //   }
-
-      //   initialInputs = [...initialInputs, inputName as string];
-      //   initialValids = { ...initialValids, [inputName]: true };
-      //   initialErrors = { ...initialErrors, [inputName]: null };
-
-      //   let inputDefaultInitialValue;
-
-      //   if (!isInternalInput<T>(inputName)) {
-      //     if (input?._internal_default_value !== undefined) {
-      //       inputDefaultInitialValue = input._internal_default_value;
-      //     } else {
-      //       switch (typeof props.initialValues?.[inputName]) {
-      //         case 'string':
-      //           inputDefaultInitialValue = '';
-      //           break;
-      //         case 'number':
-      //           inputDefaultInitialValue = 0;
-      //           break;
-      //         case 'boolean':
-      //           inputDefaultInitialValue = false;
-      //           break;
-      //         default:
-      //           if (Array.isArray(props.initialValues?.[inputName])) {
-      //             inputDefaultInitialValue = [];
-      //           } else {
-      //             inputDefaultInitialValue = '';
-      //           }
-      //       }
-      //     }
-
-      //     tmpValues = {
-      //       ...tmpValues,
-      //       [inputName]: (props.initialValues?.[inputName] as string)
-      //         ? props.initialValues?.[inputName]
-      //         : inputDefaultInitialValue,
-      //     };
-      //   } else if (
-      //     isInternalInput<T>(inputName) &&
-      //     input.type === '_internal_accordion'
-      //   ) {
-      //   } else {
-      //     inputDefaultInitialValue =
-      //       formValues?.[inputName] ?? input._internal_default_value ?? null;
-
-      //     tmpValues = {
-      //       ...tmpValues,
-      //       [inputName]: inputDefaultInitialValue,
-      //     };
-      //   }
-      // });
 
       const initialValues: Record<keyof T, string | unknown[]> = {
         ...props.initialValues,

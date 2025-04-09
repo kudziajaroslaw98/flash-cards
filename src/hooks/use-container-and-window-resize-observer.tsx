@@ -85,7 +85,6 @@ function useContainerAndWindowResizeObserver<
 
   // Debounced version of the check function
   const debouncedCheck = useCallback(() => {
-    console.log('sadsa');
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
     }

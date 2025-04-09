@@ -1,3 +1,5 @@
+'use client';
+
 import { cn } from '#/shared/utils/cn.util';
 import { cva, VariantProps } from 'class-variance-authority';
 import { LoaderCircle } from 'lucide-react';
@@ -69,7 +71,17 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
+  extends Pick<
+      ButtonHTMLAttributes<HTMLButtonElement>,
+      | 'disabled'
+      | 'name'
+      | 'className'
+      | 'onClick'
+      | 'onKeyDown'
+      | 'type'
+      | 'onFocus'
+      | 'onBlur'
+    >,
     VariantProps<typeof buttonVariants> {
   label?: string;
   icon?: React.ReactNode;

@@ -20,7 +20,6 @@ import {
   LogIn,
   LogOut,
   MessagesSquare,
-  PlayCircle,
   Settings,
 } from 'lucide-react';
 import Image from 'next/image';
@@ -69,13 +68,6 @@ export default function SidebarComponent() {
       href: APP_ROUTES.guide,
       visible: true,
       icon: <BookOpenText className={`${iconSize} `} />,
-    },
-    {
-      type: 'item',
-      label: 'Playground',
-      href: '/playground',
-      visible: process.env.NODE_ENV === 'development',
-      icon: <PlayCircle className={`${iconSize} `} />,
     },
     {
       type: 'item',
@@ -130,6 +122,7 @@ export default function SidebarComponent() {
           href: APP_ROUTES.study.plans,
           icon: <BookA className={iconSize} />,
           indicator: plansLength,
+          locked: !isPlanActive || !isLoggedIn,
         },
         {
           type: 'item',
@@ -137,19 +130,21 @@ export default function SidebarComponent() {
           href: APP_ROUTES.study.revise,
           icon: <Languages className={iconSize} />,
           indicator: 'new',
+          locked: !isPlanActive || !isLoggedIn,
         },
       ],
     },
     {
       type: 'group',
       label: 'Account',
-      visible: isLoggedIn,
+      visible: true,
       items: [
         {
           type: 'item',
           label: 'Settings',
           href: APP_ROUTES.account.settings,
           icon: <Settings className={iconSize} />,
+          locked: !isLoggedIn,
         },
       ],
     },
@@ -186,17 +181,17 @@ export default function SidebarComponent() {
           className={`flex items-center font-thin tracking-wider outline-none focus:ring focus:ring-green-400/50 ${expanded && 'gap-4'}`}
         >
           <Image
-            width={24}
-            height={24}
-            src={'/images/flash-cards-logo.svg'}
-            alt={'Flashcards Logo'}
+            width={32}
+            height={32}
+            src={'/images/finalphase-logo.svg'}
+            alt={'Finalphase Logo'}
             loading='eager'
           />
 
           <span
-            className={`overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text pr-1 text-xl font-black uppercase tracking-tighter text-transparent transition-all ${expanded ? 'max-w-full' : 'hidden max-w-0'}`}
+            className={`overflow-clip bg-gradient-to-r from-green-600 to-green-400 bg-clip-text pr-1 font-fredoka text-xl font-black tracking-tight text-transparent transition-all ${expanded ? 'max-w-full' : 'hidden max-w-0'}`}
           >
-            FlashCards
+            Final Phase
           </span>
         </Link>
 

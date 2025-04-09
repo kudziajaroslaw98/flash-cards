@@ -4,7 +4,9 @@ import { z } from 'zod';
 
 export const newFlashcardScheme = (
   handleGenerate: () => void,
+  handleGenerateAnswers: () => void,
   loadingGenerate: boolean,
+  answersLoading: boolean,
   isLoggedIn: boolean,
   isPlanActive: boolean,
 ): FormScheme<Omit<Flashcard, 'order'>> => ({
@@ -63,10 +65,7 @@ export const newFlashcardScheme = (
           propName: 'required',
           propValue: true,
           key: 'type',
-          constraint: z
-            .string()
-            .includes('single')
-            .or(z.string().includes('question')),
+          constraint: z.enum(['single', 'question']),
         },
         {
           type: 'validation',
@@ -77,6 +76,13 @@ export const newFlashcardScheme = (
             .string()
             .includes('question')
             .or(z.string().includes('single')),
+        },
+        {
+          type: 'prop',
+          key: '_internal_show_answers',
+          constraint: z.boolean().refine((value) => value === true),
+          propName: 'label',
+          propValue: 'Definition',
         },
       ],
       type: 'textarea',
@@ -122,7 +128,7 @@ export const newFlashcardScheme = (
       type: 'textarea',
       name: 'query',
       label: 'Question',
-      placeholder: 'What is the definition of word below?',
+      placeholder: 'Your question here...',
     },
     tags: {
       type: 'tags',
@@ -145,7 +151,7 @@ export const newFlashcardScheme = (
       type: '_internal_separator',
       name: '_internal_separator_1',
     },
-    _internal_showAnswers: {
+    _internal_show_answers: {
       _internal_constraints: [
         {
           type: 'show',
@@ -154,7 +160,7 @@ export const newFlashcardScheme = (
         },
       ],
       type: 'switch',
-      name: '_internal_showAnswers',
+      name: '_internal_show_answers',
       label: 'Add custom answers',
       checkedLabel: 'Yes',
       uncheckedLabel: 'No',
@@ -165,7 +171,7 @@ export const newFlashcardScheme = (
       _internal_constraints: [
         {
           type: 'show',
-          key: '_internal_showAnswers',
+          key: '_internal_show_answers',
           constraint: z.boolean().refine((value) => value === true),
         },
       ],
@@ -184,7 +190,7 @@ export const newFlashcardScheme = (
               type: 'validation',
               key: 'answer1',
               constraint: z.string().min(1, 'Answer is required'),
-              whenKey: '_internal_showAnswers',
+              whenKey: '_internal_show_answers',
               whenConstraint: z.boolean().refine((value) => value === true),
             },
           ],
@@ -200,7 +206,7 @@ export const newFlashcardScheme = (
               type: 'validation',
               key: 'answer1',
               constraint: z.string().min(1, 'Answer is required'),
-              whenKey: '_internal_showAnswers',
+              whenKey: '_internal_show_answers',
               whenConstraint: z.boolean().refine((value) => value === true),
             },
           ],
@@ -216,7 +222,7 @@ export const newFlashcardScheme = (
               type: 'validation',
               key: 'answer1',
               constraint: z.string().min(1, 'Answer is required'),
-              whenKey: '_internal_showAnswers',
+              whenKey: '_internal_show_answers',
               whenConstraint: z.boolean().refine((value) => value === true),
             },
           ],
@@ -227,6 +233,24 @@ export const newFlashcardScheme = (
           label: 'Incorrect Answer 3',
           placeholder: 'Type incorrect answer here',
           required: false,
+        },
+        _internal_generate_answers: {
+          name: '_internal_generate_answers',
+          type: '_internal_button',
+          alt: 'Generate Answers',
+          label: 'Generate Answers',
+          onClick: handleGenerateAnswers,
+          disabled: !isLoggedIn || !isPlanActive,
+          loading: answersLoading,
+          size: 'full',
+          className: 'mt-4 max-w-full',
+          _internal_constraints: [
+            {
+              type: 'show',
+              key: '_internal_show_answers',
+              constraint: z.boolean().refine((value) => value === true),
+            },
+          ],
         },
       },
     },

@@ -14,15 +14,8 @@ import type { Flashcard } from '#/types/flash-card.type';
 
 import useContainerAndWindowResizeObserver from '#/hooks/use-container-and-window-resize-observer';
 import { cn } from '#/shared/utils/cn.util';
-import { splitArrayIntoChunks } from '#/shared/utils/split-array-into-chunks';
 import { TreePalm } from 'lucide-react';
 import { VirtualizedFlashcardList } from './virtualized-flashcard-list';
-
-interface Column {
-  key: string;
-  name: string;
-  width: number;
-}
 
 export default function FlashcardsList({
   selected,
@@ -35,8 +28,7 @@ export default function FlashcardsList({
 }) {
   const { flashcards } = useAppContext();
   const [isInSelectionMode, setIsInSelectionMode] = useState(false);
-  const [columns, setColumns] = useState<Column[]>([]);
-  const [data, setData] = useState<Flashcard[][]>([]);
+  const [columns, setColumns] = useState<number>(1);
 
   const isSelected = useCallback(
     (flashcard: Flashcard) => {
@@ -62,77 +54,29 @@ export default function FlashcardsList({
   );
 
   const containerRef = useContainerAndWindowResizeObserver(
-    ({ windowWidth, containerWidth }) => {
-      let columns = [];
-      let data: Flashcard[][] = [];
-
+    ({ windowWidth }) => {
       if (windowWidth >= 1536) {
-        columns = generateColumns(4, containerWidth);
+        setColumns(4);
       } else if (windowWidth >= 1280) {
-        columns = generateColumns(3, containerWidth);
+        setColumns(3);
       } else if (windowWidth >= 600) {
-        columns = generateColumns(2, containerWidth);
+        setColumns(2);
       } else {
-        columns = generateColumns(1, containerWidth);
-      }
-
-      if (columns) {
-        data = generateData(columns);
-        setData(data);
+        setColumns(1);
       }
     },
   );
 
-  const generateColumns = (
-    columnsCount: number,
-    containerWidth: number | null,
-  ): Column[] => {
-    if (containerWidth === null) {
-      return [];
-    } else {
-      const columns = new Array(columnsCount).fill(0).map((_, i) => {
-        const key: string = i.toString();
-        return {
-          key,
-          name: `Column-${i}`,
-          width: containerWidth / columnsCount,
-        };
-      });
-
-      setColumns(columns);
-      return columns;
-    }
-  };
-
-  const generateData = useCallback(
-    (columns: Column[]) =>
-      splitArrayIntoChunks<Flashcard>(
-        filteredFlashcards.slice(),
-        columns.length,
-      ),
-    [filteredFlashcards, columns],
-  );
-
   useEffect(() => {
     const width = typeof window !== 'undefined' ? window.innerWidth : 0;
-    const containerWidth =
-      containerRef.current?.getBoundingClientRect().width ?? null;
-    let columns = [];
-    let data: Flashcard[][] = [];
-
     if (width >= 1536) {
-      columns = generateColumns(4, containerWidth);
+      setColumns(4);
     } else if (width >= 1280) {
-      columns = generateColumns(3, containerWidth);
+      setColumns(3);
     } else if (width >= 600) {
-      columns = generateColumns(2, containerWidth);
+      setColumns(2);
     } else {
-      columns = generateColumns(1, containerWidth);
-    }
-
-    if (columns) {
-      data = generateData(columns);
-      setData(data);
+      setColumns(1);
     }
   }, [filteredFlashcards]);
 
@@ -160,8 +104,8 @@ export default function FlashcardsList({
         <div className='h-full w-full'>
           <div className={cn(['grid h-full w-full gap-4 transition-all'])}>
             <VirtualizedFlashcardList
+              data={filteredFlashcards}
               columns={columns}
-              data={data}
               isInSelectionMode={isInSelectionMode}
               isSelected={isSelected}
               toggleSelected={toggleSelected}

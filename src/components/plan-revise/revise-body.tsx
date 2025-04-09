@@ -71,7 +71,6 @@ export function ReviseBody({
     }
 
     const correct = revisedCard.answer1 === answer;
-    console.log(correct);
     // const clonedStats = { ...metadata };
 
     // cardsReviewed.current += 1;

@@ -36,6 +36,8 @@ export default function MenuGroupItem(props: PropsWithChildren<MenuItemProps>) {
                     key={`group-item-${item.label}-${index}`}
                     active={item.active}
                     visible={item.visible}
+                    locked={item.locked}
+                    indicator={item.indicator}
                     onClick={() => {
                       item.onClick();
                     }}

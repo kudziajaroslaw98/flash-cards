@@ -2,13 +2,6 @@ import type { ZodTypeAny } from 'zod';
 import type { ExtendedSchemeKeys } from './extended-scheme-keys';
 import type { InputDefinitions } from './input-types';
 
-export type InputValidation<T> = {
-  key: ExtendedSchemeKeys<T>;
-  constraint: ZodTypeAny;
-  whenKey?: ExtendedSchemeKeys<T>;
-  whenConstraint?: ZodTypeAny;
-};
-
 /**
  * Represents an internal constraint that can be applied to a schema.
  *
