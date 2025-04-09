@@ -9,19 +9,15 @@ import getRandomRangedNumber from '#/shared/utils/get-random-ranged-number.util'
 import type { Flashcard } from '#/types/flash-card.type';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-type SpaceRepetitionAlgorithmProps = {
-  items: Flashcard[];
-  debug?: boolean;
-  numberOfItems?: number;
-};
-
 type UseSpacedRepetitionProps = {
   array: Flashcard[];
   numberOfItems?: number;
+  revisedSetId: string;
 };
 export default function useSpacedRepetition({
   array,
   numberOfItems = 4,
+  revisedSetId,
 }: UseSpacedRepetitionProps) {
   const todayItemsRef = useRef<number | null>(null);
   const workerRef = useRef<Worker | null>(null);
@@ -56,6 +52,7 @@ export default function useSpacedRepetition({
       return Math.max(max, weight);
     }, 0);
   }, [array]);
+  const setNameRef = useRef<string | null>(null);
 
   function findRandomWeightedItem({
     items,
@@ -125,38 +122,6 @@ export default function useSpacedRepetition({
     numberOfItems: number;
   }) {
     return getRandomArrayItems(items, numberOfItems);
-  }
-
-  function spaceRepetitionAlgorithm({
-    items,
-    numberOfItems = 4,
-  }: SpaceRepetitionAlgorithmProps) {
-    try {
-      if (items.length === 0) {
-        throw new Error(
-          '[Spaced Repetition Algorithm] - No items in the array',
-        );
-      }
-
-      let randomItems = [];
-      randomItems = findRandomWeightedItem({
-        items: items,
-        numberOfItems,
-      });
-
-      return {
-        randomItems,
-      };
-    } catch (e) {
-      console.error(e);
-      return {
-        reversedWeights: [],
-        randomItems: null,
-        culmulativeWeights: [],
-        min: null,
-        max: null,
-      };
-    }
   }
 
   const recalculateCulmulatives = async () => {
@@ -297,86 +262,84 @@ export default function useSpacedRepetition({
   };
 
   useEffect(() => {
+    console.log(
+      setNameRef.current,
+      revisedSetId,
+      array,
+      continueReroll,
+      numberOfItems,
+    );
+    if (
+      array.length === 0 &&
+      setNameRef.current === revisedSetId &&
+      setNameRef.current !== null
+    ) {
+      return;
+    }
+
     let initialDeck: Flashcard[] = [];
     let source: 'today' | 'all' | null = null;
-    let needsUpdate = false;
 
-    if (todayItems.length > 0 && sessionSourceRef.current !== 'today') {
-      // Start or switch to today's items if available and not already the source
-      initialDeck = [...todayItems];
+    // Use the *current* array prop to determine today's items for *this specific set*
+    const currentTodayItems = array.filter(
+      (card) =>
+        new Date(card.spacedRepetition.dueDate).getTime() <
+        new Date().getTime(),
+    );
+
+    if (currentTodayItems.length > 0) {
+      // If there are items due for the current set, use them
       source = 'today';
-      needsUpdate = true;
+      initialDeck = [...currentTodayItems];
       console.log(
-        "[Spaced Repetition] Initializing deck with Today's items:",
-        initialDeck.length,
+        `[Spaced Repetition] Initializing deck with ${initialDeck.length} Today's items for set: ${revisedSetId}`,
       );
-    } else if (
-      todayItems.length === 0 &&
-      continueReroll &&
-      sessionSourceRef.current !== 'all' &&
-      array.length > 0
-    ) {
-      // Start or switch to all items if today's are done, continueReroll is true, and not already the source
-      initialDeck = [...array];
+    } else if (continueReroll && array.length > 0) {
+      // If no items are due OR we finished them, AND continueReroll is true, use all items from the current set
       source = 'all';
-      needsUpdate = true;
+      initialDeck = [...array];
       console.log(
-        '[Spaced Repetition] Initializing deck with All items (continueReroll):',
-        initialDeck.length,
+        `[Spaced Repetition] Initializing deck with ${initialDeck.length} All items (continueReroll) for set: ${revisedSetId}`,
       );
-    } else if (
-      todayItems.length === 0 &&
-      !continueReroll &&
-      sessionDeck.length > 0
-    ) {
-      // If todayItems becomes empty and not continuing, clear the deck
-      initialDeck = [];
+    } else {
+      // No items due and not continuing, or array is empty
       source = null;
-      needsUpdate = true;
+      initialDeck = [];
       console.log(
-        '[Spaced Repetition] Clearing deck, no items due and not continuing.',
+        `[Spaced Repetition] Initializing deck as empty for set: ${revisedSetId}. No items due or not continuing.`,
       );
     }
 
-    // Additional check: If the underlying array reference changes, force a reset
-    // This is a basic check; more sophisticated checks might compare content if needed
-    // Note: This might reset unnecessarily if parent passes new array ref for same data
-    // Consider adding a deep comparison or specific trigger if this is problematic.
-    // if (array !== arrayRef.current) { // Need to useRef for previous array if using this
-    //      needsUpdate = true;
-    //      // Re-evaluate initialDeck and source based on new array
-    //      console.log("[Spaced Repetition] Base array changed, re-evaluating deck.");
-    //      // Resetting logic here based on new array and todayItems/continueReroll
-    // }
+    setSessionDeck(initialDeck);
+    sessionSourceRef.current = source;
 
-    if (needsUpdate) {
-      setSessionDeck(initialDeck);
-      sessionSourceRef.current = source;
-
-      if (initialDeck.length > 0) {
-        const useWeighted = source === 'today';
-        const drawFunction = useWeighted
-          ? findRandomWeightedItem
-          : findRandomItem;
-        const initialRandomItems = drawFunction({
-          items: initialDeck,
-          numberOfItems,
-        });
-        setRandomItems(initialRandomItems);
-        // console.log('[Spaced Repetition] Initial draw:', initialRandomItems.map(i=>i.front)); // Debugging
-      } else {
-        setRandomItems([]); // Clear random items if deck is empty
-      }
+    if (initialDeck.length > 0) {
+      const useWeighted = source === 'today';
+      const drawFunction = useWeighted
+        ? findRandomWeightedItem
+        : findRandomItem;
+      const initialRandomItems = drawFunction({
+        items: initialDeck,
+        numberOfItems,
+      });
+      setRandomItems(initialRandomItems);
+    } else {
+      setRandomItems([]); // Clear random items if deck is empty
     }
+
+    setNameRef.current = revisedSetId;
+    // No need to update arrayRef here
     // Dependencies: watch for changes in the calculated todayItems, the continueReroll flag,
     // the base array reference, and numberOfItems.
-  }, [array, todayItems, continueReroll, numberOfItems]);
+  }, [revisedSetId, array, continueReroll, numberOfItems]);
 
   useEffect(() => {
     if (todayItems.length > 0 && todayItemsRef.current === null) {
       // Set the initial count only once when items first become available
       todayItemsRef.current = todayItems.length;
     } else if (todayItems.length === 0 && todayItemsRef.current !== null) {
+      setNameRef.current = null;
+
       // Reset if today's items are cleared (e.g., session finished)
       // This might depend on desired behavior - keep showing total reviewed vs initial?
       // todayItemsRef.current = null; // Optional: reset when empty

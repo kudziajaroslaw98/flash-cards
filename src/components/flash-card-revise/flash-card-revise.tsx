@@ -70,7 +70,7 @@ export default function FlashcardReviseComponent() {
     timestamp: new Date().toISOString(),
   });
 
-  const { activeTime, timerStart, distractionsRef } = useFocusTracker();
+  const { timerStart, distractionsRef } = useFocusTracker();
   const cardTime = useRef<Date>(new Date());
 
   const setFlashcards = useMemo(
@@ -83,6 +83,8 @@ export default function FlashcardReviseComponent() {
     [flashcards, revisedSet],
   );
 
+  console.log(setFlashcards);
+
   const {
     reroll,
     calculateRepetition,
@@ -94,6 +96,7 @@ export default function FlashcardReviseComponent() {
     sessionItemsCount,
   } = useSpacedRepetition({
     array: setFlashcards,
+    revisedSetId: revisedSet,
   });
 
   const spaceRepetitionClick = (value: ReviseOptionsType) => {
@@ -154,6 +157,8 @@ export default function FlashcardReviseComponent() {
       synced: false,
     };
 
+    const isSRSOption  = answer === 'again' || answer === 'hard' || answer === 'good' || answer === 'easy';
+
     let reviseOption: ReviseOptionsType;
     if (correct) {
       reviewLog.recalled = true;
@@ -176,7 +181,7 @@ export default function FlashcardReviseComponent() {
 
     db.reviewLogs.add(reviewLog);
     updateMetadata({ ...clonedStats });
-    setClickedOption(reviseOption);
+    setClickedOption(isSRSOption ? reviseOption : answer);
     setClicked(true);
   };
 
@@ -252,12 +257,10 @@ export default function FlashcardReviseComponent() {
     return () => {
       if (!focusSession.current || timerStart.current === null) return;
       const now = new Date();
-      const sessionActiveTime =
-        activeTime ||
-        (timerStart.current
-          ? (now.setMilliseconds(0) - timerStart.current.setMilliseconds(0)) /
-            1000
-          : 0);
+      const sessionActiveTime = timerStart.current
+        ? (now.setMilliseconds(0) - timerStart.current.setMilliseconds(0)) /
+          1000
+        : 0;
       db.focusSessions.put({
         ...focusSession.current,
         timestamp: new Date().toISOString(),
@@ -282,7 +285,7 @@ export default function FlashcardReviseComponent() {
             ),
             cardsReviewed: dailyStat.cardsReviewed + cardsReviewed.current,
             cardsRecalled: dailyStat.cardsRecalled + cardsRecalled.current,
-            timeSpent: dailyStat.timeSpent + activeTime,
+            timeSpent: dailyStat.timeSpent + sessionActiveTime,
             synced: false,
           });
         } else {
@@ -293,7 +296,7 @@ export default function FlashcardReviseComponent() {
             retention: cardsReviewed.current / cardsRecalled.current,
             cardsReviewed: cardsReviewed.current,
             cardsRecalled: cardsRecalled.current,
-            timeSpent: activeTime,
+            timeSpent: sessionActiveTime,
             synced: false,
           });
         }
@@ -301,7 +304,7 @@ export default function FlashcardReviseComponent() {
 
       updateDailyStats();
     };
-  }, [activeTime, distractionsRef, timerStart, updateMetadata]);
+  }, [distractionsRef, timerStart, updateMetadata]);
 
   useKeyPress([' '], () => handleReshuffle('Space'));
   useKeyPress(['ArrowRight'], () => handleReshuffle('ArrowRight'));
@@ -393,7 +396,7 @@ export default function FlashcardReviseComponent() {
             totalCards={todayItems ?? 0}
             recalled={cardsRecalled.current}
             reviewed={cardsReviewed.current}
-            timeSpent={activeTime}
+            timerStart={timerStart}
           />
 
           <Accordion className='hidden md:grid'>

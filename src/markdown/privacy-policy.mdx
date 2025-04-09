@@ -15,12 +15,13 @@ We reserve the right to make changes to this Privacy Policy at any time. We will
 We may collect information about you in a variety of ways. The information we may collect via the Service includes:
 
 - **Personal Data:** Personally identifiable information received from third-party authentication providers if you register/log in via them. This may include your name, email address, and public profile information associated with your GitHub account or Google account, depending on the permissions you grant during the authentication process.
-- **User Content:** Information and content you create, upload, or generate within the Service, such as the text on your flashcards, topics for study plans, set descriptions, and any notes or information submitted for processing by our AI features.
+- **User Content:** Information and content you create, upload, or generate within the Service, such as the text on your flashcards, set details, study plans, reminders, review logs, focus session data, and any notes or information submitted for processing by our AI features. **For logged-out users, this content is stored locally on your device using IndexedDB (via Dexie.js). For logged-in users, this content is stored both locally and synchronized with our secure cloud database (Supabase/Postgres) for backup and cross-device access.**
 - **Usage Data:** Information automatically collected when you access and use the Service, such as your IP address (potentially anonymized depending on configuration), browser type, operating system, access times, pages viewed, features used, study session duration, spaced repetition progress, referral sources, screen size, language, country, and other interaction data. **We utilize Umami Analytics, a privacy-focused analytics service, to gather this information to understand usage patterns and improve the Service.** Umami is designed to anonymize data where possible and may not use cookies depending on its configuration.
 - **Device Data:** Information about the computer or mobile device you use to access the Service, such as device model, operating system version, and browser type.
+- **Push Notification Subscription Data:** If you grant permission, we collect and store your web push notification subscription object (provided by your browser) in our secure database (Supabase). This object contains an endpoint URL and keys necessary to send you push notifications but does not directly identify you personally beyond this subscription context.
 - **Data Collected by Cookies and Similar Technologies:** We may use cookies, web beacons, local storage, and other similar technologies to help customize the Service and improve your experience. This helps us understand usage patterns and maintain your session.
 - **Payment Data:** If you subscribe to our Premium plan, we use a third-party payment processor (Stripe) to handle payments. We do not directly collect or store your full payment card details. Stripe provides us with confirmation of payment and potentially limited information like the last four digits of your card number and expiration date for verification and account management purposes. You should review Stripe's Privacy Policy to understand how they handle your payment information.
-- **Data Processed by AI:** When you use AI features (like generating flashcards or study plans), the content you provide (e.g., topics, notes, flashcards) is sent to Google's AI API (such as Google Gemini or Vertex AI) for processing to generate the requested output.
+- **Data Processed by AI:** When you use AI features (like generating flashcards, set descriptions, study plans, or review summaries), the relevant **User Content (such as topics, existing card summaries, set details, learning preferences, and user prompts)** is sent to Google's AI API (such as Google Gemini or Vertex AI) for processing to generate the requested output.
 
 ## 3. How We Use Your Information
 
@@ -28,8 +29,10 @@ Having accurate information permits us to provide you with a smooth, efficient, 
 
 - Create and manage your account.
 - Provide, operate, and maintain the Service, including core features like flashcards, spaced repetition, and study plans.
+- Synchronize your User Content between your local device storage (IndexedDB) and our cloud database (Supabase) if you are logged in, enabling backup and cross-device access.
 - Process your content using our AI features to generate flashcards, study plans, or other requested outputs.
 - Provide and display user statistics and study progress.
+- Send you push notifications (e.g., study reminders) if you have opted-in.
 - Process payments for Premium subscriptions via our third-party payment processor.
 - Respond to your comments, questions, and provide customer support.
 - Monitor and analyze usage and trends to improve the Service and user experience using tools like Umami Analytics.
@@ -44,7 +47,9 @@ We do not sell your personal information. We may share information we have colle
 - **With Service Providers:** We may share your information with third-party vendors, consultants, and other service providers who perform services for us or on our behalf. This includes:
   - **Authentication Providers:** If you register or log in using a third-party service like GitHub or Google, we share information with and receive information from that service as required to authenticate your account. This interaction is governed by GitHub's and Google's policies. You can review Google's [Privacy Policy](https://www.google.com/url?sa=E&q=https%3A%2F%2Fpolicies.google.com%2Fprivacy) and GitHub's [Privacy Statement](https://www.google.com/url?sa=E&q=https%3A%2F%2Fdocs.github.com%2Fen%2Fsite-policy%2Fprivacy-policies%2Fgithub-privacy-statement).
   - **Analytics Providers:** We use **Umami Analytics** to understand how our Service is used. Umami collects usage data as described in Section 2. You can learn more about Umami's privacy practices [here](https://umami.is/privacy).
-  - **AI Processing Partners:** To provide AI-powered features, we send the relevant User Content you submit (e.g., topics for card generation) to **Google's AI services (Google Cloud AI / Gemini API)**. Google processes this data solely to provide the AI functionality back to you through our Service. Google's handling of this data is subject to their terms and privacy policies. [Google AI/Cloud privacy terms](https://transparency.google/intl/en_US/our-policies/privacy-policy-terms-of-service/).
+  - **Database and Backend Provider:** **Supabase** provides our backend infrastructure, including user authentication management and the secure cloud database (Postgres) where logged-in user data and User Content is stored and synchronized.
+  - **AI Processing Partners:** (Google Cloud AI / Gemini API) ... (Refined description) To provide AI-powered features, we send the relevant User Content (e.g., topics, card summaries, prompts) to Google's AI services. Google processes this data solely to provide the AI functionality back to you through our Service. Review [Google AI/Cloud privacy terms](https://transparency.google/intl/en_US/our-policies/privacy-policy-terms-of-service/).
+  - **Notification Service:** We use browser-native Web Push technology and our backend infrastructure (potentially involving Supabase Functions or similar) to send notifications to users who have subscribed. This involves using the stored subscription endpoints.
   - **Hosting Providers:** Our Service infrastructure and user data are primarily hosted within the European Union by our hosting provider(s) like Hetzner.
   - Other service providers for functions like website hosting (if different), customer service, and email delivery. These providers will only have access to your information to the extent necessary to perform their functions.
 - **With Payment Processors:** We share necessary transaction information with **Stripe** to process your payments when you subscribe to Premium. You should review [Stripe's Privacy Policy](https://stripe.com/privacy).
@@ -59,6 +64,12 @@ We use administrative, technical, and physical security measures to help protect
 
 We will retain your personal information and user content for as long as your account is active or as needed to provide you the Service, comply with our legal obligations, resolve disputes, and enforce our agreements. You can delete your account and associated data by contacting us.
 
+**Local Data:** User Content stored locally in your browser's IndexedDB persists until you manually clear your browser data, uninstall the PWA, or use the "Clear Local Data" option within the app's settings. Clearing local data does not affect data stored in the cloud for your account.
+
+**Cloud Data:** For logged-in users, synchronized data is retained in our cloud database (Supabase) as long as your account is active.
+
+**Account Deletion:** You can delete your account through the app's settings or by contacting us. **Account deletion is permanent and will remove your personal information and associated User Content from our cloud database (Supabase).** Locally stored data on your devices will not be automatically removed by this action but will no longer sync.
+
 ## 7. Your Data Rights
 
 Depending on your location (e.g., GDPR, CCPA), you may have certain rights regarding your personal information, such as:
@@ -71,13 +82,15 @@ Depending on your location (e.g., GDPR, CCPA), you may have certain rights regar
 
 To exercise these rights, please contact us using the contact information provided below. We will respond to your request within a reasonable timeframe and in accordance with applicable laws.
 
+**Notification Preferences:** You can manage push notification permissions through your browser or operating system settings at any time. You can also use the "Unsubscribe" functionality if provided within the app to remove your subscription endpoint from our database.
+
 ## 8. Policy for Children
 
 Our Service is not intended for use by children under the age of 13 (or a higher age threshold if required by applicable law, such as 16 in the EEA). We do not knowingly collect personal information from children under this age. If we learn that we have collected personal information from a child under the relevant age without verification of parental consent, we will take steps to delete that information.
 
 ## 9. Third-Party Websites and Services
 
-The Service uses and may contain links to third-party websites or services that are not affiliated with us. This includes our payment processor (**Stripe**), our analytics provider (**Umami**), our AI processing provider (**Google Cloud AI / Gemini API**), and our authentication providers (**GitHub**, **Google**). We are not responsible for the privacy practices of these third parties. We encourage you to review their respective privacy policies.
+The Service uses and may contain links to third-party websites or services that are not affiliated with us. This includes our payment processor (**Stripe**), our analytics provider (**Umami**), our AI processing provider (**Google Cloud AI / Gemini API**), our authentication providers (**GitHub**, **Google**), and our backend/database provider (**Supabase**). We are not responsible for the privacy practices of these third parties. We encourage you to review their respective privacy policies.
 
 ## 10. Contact Us
 

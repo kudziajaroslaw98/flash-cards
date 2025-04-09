@@ -121,6 +121,19 @@ export const FlashcardGenerateDialog = ({
           },
         ],
       },
+      additionalUserPrompt: {
+        type: 'input',
+        inputType: 'text',
+        label: 'Your additional prompt...',
+        _internal_default_value: null,
+        _internal_constraints: [
+          {
+            type: 'validation',
+            key: 'additionalUserPrompt',
+            constraint: z.string().max(1000, 'Max 1000 characters').nullish(),
+          },
+        ],
+      },
     },
   };
 

@@ -88,12 +88,12 @@ export default async function Home() {
     {
       question: 'What is Final Phase?',
       answer:
-        'Final Phase is an AI-powered learning application designed to help students study more effectively using flashcards, spaced repetition, and personalized study plans.',
+        'Final Phase is an AI-powered learning application designed to help students study more effectively. It uses digital flashcards, a smart spaced repetition system (SRS) for long-term memory, AI tools to generate content and personalized study plans, and provides stats to track your progress and focus.',
     },
     {
       question: 'How does the AI work?',
       answer:
-        'Our AI analyzes the topics you provide to generate relevant flashcards, suggests tailored study schedules based on your goals and deadlines, and helps create descriptions for your study sets, saving you time and effort.',
+        "Our AI (powered by Google's Generative AI models) analyzes the topics, existing content, and preferences you provide to generate relevant flashcards, suggest tailored study schedules based on your goals and deadlines, create descriptions for your study sets, and provide summaries for incorrectly answered cards. This saves you time and helps personalize your learning.",
     },
     {
       question: 'What is Spaced Repetition (SRS)?',
@@ -103,22 +103,38 @@ export default async function Home() {
     {
       question: 'Is Final Phase free to use?',
       answer:
-        'Yes, Final Phase offers a generous free plan with unlimited flashcards, sets, and core study features like SRS and progress tracking. We also offer a Premium plan that unlocks advanced AI features like flashcard generation and study plan creation.',
+        "Yes, Final Phase offers a generous free plan with unlimited flashcards, sets, and core study features like SRS and progress tracking. We also offer Premium plans (monthly/yearly) that unlock advanced AI features (flashcard/plan generation, AI summaries) and support the app's development. See our [Pricing Section](/#pricing) for details.",
     },
     {
       question: 'Do I need an account to use the app?',
       answer:
-        'You can explore some features as a guest, but creating an account (using Google, GitHub, or email) allows you to save your progress, sync across devices, and access personalized features.',
+        'You can create and study flashcards as a guest, storing data locally on your device. However, creating a free account (using Google or GitHub) is required to synchronize your data across devices, back it up to the cloud (Supabase), and access AI features (Premium required for AI generation).',
+    },
+    {
+      question: 'How is my data stored and synced?',
+      answer:
+        "Your flashcards, sets, progress, and other study data are primarily stored locally in your browser's IndexedDB (using Dexie.js). This allows for offline access to your existing data. If you are logged in, this local data is automatically synchronized with our secure cloud database (Supabase) to provide backup and allow you to access your information across different devices.",
     },
     {
       question: 'Can I use Final Phase offline?',
       answer:
-        'Final Phase is a Progressive Web App (PWA). Once loaded, you can review existing flashcards offline. However, features requiring AI processing or data synchronization need an internet connection.',
+        'Yes, to some extent. Final Phase is a Progressive Web App (PWA). Once the app is loaded and your data is stored locally (in IndexedDB), you can review existing flashcards, sets, and plans offline. However, features requiring AI processing (like generation), data synchronization between devices, or initial login require an active internet connection.',
     },
     {
-      question: 'How is my data used?',
+      question: 'How is my data used? (Privacy)',
       answer:
-        'We prioritize your privacy. Your study content is used primarily to provide the Service features, including processing by AI partners (like Google) when you use AI generation tools. We use anonymized usage analytics (via Umami) to improve the app. We do not sell your personal data. Please see our Privacy Policy for full details.',
+        "We prioritize your privacy. Your study content (flashcards, sets, etc.) is stored locally and, if logged in, synced securely to Supabase for backup/cross-device use. When using AI features, relevant content (like topics or prompts) is sent to Google's AI API *only* for generating the requested output; Google does not use this API data for training their models. We use privacy-focused Umami Analytics for anonymized usage data to improve the app. We do *not* sell your personal data. Please see our Privacy Policy for full details.",
+    },
+    {
+      question: 'How do notifications work?',
+      answer:
+        "If you grant permission, the app can send you push notifications for study reminders you set. We store your browser's push subscription details securely (in Supabase) to enable this. You can revoke permission anytime in your browser or operating system settings. We only use notifications for reminders you configure or essential app updates.",
+    },
+    {
+      question:
+        'What\'s the difference between "Clear Local Data" and "Delete Account"?',
+      answer:
+        '"Clear Local Data" (in Settings > Danger Zone) removes all flashcards, sets, stats, etc., stored only on your current device\'s browser. It does not affect data synced to the cloud if you are logged in. "Delete Account" (in Settings > Danger Zone) is permanent. It removes your user account and all associated data (flashcards, sets, progress, etc.) from our cloud database (Supabase). Your local data on devices won\'t be automatically cleared but will no longer sync.',
     },
     {
       question: 'How can I provide feedback or suggest features?',

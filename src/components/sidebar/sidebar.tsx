@@ -20,7 +20,6 @@ import {
   LogIn,
   LogOut,
   MessagesSquare,
-  PlayCircle,
   Settings,
 } from 'lucide-react';
 import Image from 'next/image';
@@ -69,13 +68,6 @@ export default function SidebarComponent() {
       href: APP_ROUTES.guide,
       visible: true,
       icon: <BookOpenText className={`${iconSize} `} />,
-    },
-    {
-      type: 'item',
-      label: 'Playground',
-      href: '/playground',
-      visible: process.env.NODE_ENV === 'development',
-      icon: <PlayCircle className={`${iconSize} `} />,
     },
     {
       type: 'item',
@@ -130,6 +122,7 @@ export default function SidebarComponent() {
           href: APP_ROUTES.study.plans,
           icon: <BookA className={iconSize} />,
           indicator: plansLength,
+          locked: !isPlanActive || !isLoggedIn,
         },
         {
           type: 'item',
@@ -137,19 +130,21 @@ export default function SidebarComponent() {
           href: APP_ROUTES.study.revise,
           icon: <Languages className={iconSize} />,
           indicator: 'new',
+          locked: !isPlanActive || !isLoggedIn,
         },
       ],
     },
     {
       type: 'group',
       label: 'Account',
-      visible: isLoggedIn,
+      visible: true,
       items: [
         {
           type: 'item',
           label: 'Settings',
           href: APP_ROUTES.account.settings,
           icon: <Settings className={iconSize} />,
+          locked: !isLoggedIn,
         },
       ],
     },

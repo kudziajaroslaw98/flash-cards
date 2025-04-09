@@ -4,6 +4,7 @@ import MenuItem from '#/components/_ui/context-menu/menu-item';
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
 import { cn } from '#/shared/utils/cn.util';
 import { cva, VariantProps } from 'class-variance-authority';
+import { Lock } from 'lucide-react';
 import {
   useEffect,
   useRef,
@@ -41,6 +42,8 @@ export type ContextMenuItem =
       icon?: ReactNode;
       onClick: () => void;
       active?: boolean;
+      locked?: boolean;
+      indicator?: ReactNode;
       visible?: boolean;
     }
   | {
@@ -138,11 +141,14 @@ export default function ContextMenu({
                     key={`item-${item.label?.replaceAll(' ', '-')}-${index}`}
                     active={item.active}
                     visible={item.visible}
+                    locked={item.locked}
+                    indicator={item.indicator}
                     onClick={() => {
                       item.onClick();
                     }}
                   >
-                    {item.icon && item.icon} {item.label}
+                    {item.icon && item.icon} {item.label}{' '}
+                    {item.locked && <Lock className='size-4' />}
                   </MenuItem>
                 );
               } else {

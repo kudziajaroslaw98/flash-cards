@@ -105,17 +105,19 @@ export default function FeedbackPage() {
       <FormComponent<Feedback>
         ref={formRef}
         scheme={feedbackFormScheme}
-        className='w-full max-w-md px-0'
+        className='w-full max-w-md px-4'
       />
-      <Button
-        label='Send Feedback'
-        icon={<Send className='size-4' />}
-        onClick={handleSubmit}
-        loading={isLoading}
-        disabled={isLoading}
-        className='w-full max-w-lg'
-        alt='Send Feedback'
-      />
+      <div className='flex w-full max-w-md flex-col items-center justify-center gap-4 px-4'>
+        <Button
+          label='Send Feedback'
+          icon={<Send className='size-4' />}
+          onClick={handleSubmit}
+          loading={isLoading}
+          disabled={isLoading}
+          className='w-full max-w-md'
+          alt='Send Feedback'
+        />
+      </div>
     </div>
   );
 }

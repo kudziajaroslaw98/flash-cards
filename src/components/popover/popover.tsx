@@ -1,5 +1,4 @@
 import useOutsideAlerter from '#/hooks/use-click-outside.hook';
-import useTailwindBreakpoint from '#/hooks/use-tailwind-breakpoint';
 import { cn } from '#/shared/utils/cn.util';
 import * as m from 'motion/react-m';
 import {
@@ -27,7 +26,6 @@ export function Popover({
   trigger,
   position,
   children,
-  minWidth = 320,
   nested = false,
   popoverClassName,
 }: PropsWithChildren<{
@@ -37,7 +35,6 @@ export function Popover({
   popoverClassName?: string;
   minWidth?: number;
 }>) {
-  const breakpoint = useTailwindBreakpoint();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const triggerRef = useRef<HTMLDivElement | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
@@ -170,17 +167,65 @@ export function Popover({
   }, [position, nested, isOpen]);
 
   useEffect(() => {
-    if (isOpen) {
-      updatePopoverPosition();
-      window.addEventListener('scroll', updatePopoverPosition, {
-        passive: true,
-      });
-      window.addEventListener('resize', updatePopoverPosition);
-    }
+    if (!isOpen || !window) return;
+    // Debounce or throttle updatePopoverPosition if performance becomes an issue
+
+    // eslint-disable-next-line no-undef
+    let debounceTimeout: NodeJS.Timeout | null = null;
+    const debouncedUpdatePosition = () => {
+      if (debounceTimeout) clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(() => {
+        requestAnimationFrame(updatePopoverPosition);
+      }, 50); // Adjust debounce delay as needed
+    };
+
+    window.addEventListener('scroll', debouncedUpdatePosition, {
+      passive: true,
+      capture: true,
+    }); // Use capture phase for scroll
+    window.addEventListener('resize', debouncedUpdatePosition);
+    debouncedUpdatePosition(); // Initial position update
 
     return () => {
-      window.removeEventListener('scroll', updatePopoverPosition);
-      window.removeEventListener('resize', updatePopoverPosition);
+      // Make sure to remove the same function reference
+      if (debounceTimeout) clearTimeout(debounceTimeout);
+      window.removeEventListener('scroll', debouncedUpdatePosition, {
+        capture: true,
+      });
+      window.removeEventListener('resize', debouncedUpdatePosition);
+    };
+  }, [isOpen, updatePopoverPosition]);
+
+  useEffect(() => {
+    if (!isOpen || !triggerRef.current) return;
+
+    // Debounce the update function to avoid excessive recalculations during rapid mutations
+    // eslint-disable-next-line no-undef
+    let debounceTimeout: NodeJS.Timeout | null = null;
+    const debouncedUpdatePosition = () => {
+      if (debounceTimeout) clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(() => {
+        requestAnimationFrame(updatePopoverPosition);
+      }, 50); // Adjust debounce delay as needed
+    };
+
+    const observer = new MutationObserver(() => {
+      // Check if the trigger element's position actually changed significantly
+      // This check is optional but can prevent unnecessary updates
+      // For simplicity, we'll just call the debounced update directly
+      debouncedUpdatePosition();
+    });
+
+    // Observe the body for subtree modifications (additions/removals)
+    // Consider observing a closer ancestor if possible for better performance
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
+      if (debounceTimeout) clearTimeout(debounceTimeout);
     };
   }, [isOpen, updatePopoverPosition]);
 

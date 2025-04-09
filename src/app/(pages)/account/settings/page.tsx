@@ -9,7 +9,9 @@ import Tooltip from '#/components/_ui/tooltip/tooltip';
 import ThemeSwitchComponent from '#/components/theme-switch/theme-switch';
 import { db } from '#/db/dexie.db';
 import { useClientPermissions } from '#/hooks/use-client-permissions';
+import { useRedirectUnauthorized } from '#/hooks/use-redirect-unauthorized';
 import { useSessionContext } from '#/providers/session-provider.component';
+import { APP_ROUTES } from '#/shared/defaults/app.routes';
 import { capitalize } from '#/shared/utils/helpers';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Banknote, Bell, Info, Palette } from 'lucide-react';
@@ -27,6 +29,11 @@ export default function SettingsPage() {
   const metadata = useLiveQuery(() =>
     db.table('metadata').toCollection().first(),
   );
+
+  useRedirectUnauthorized({
+    redirectNotLoggedIn: true,
+    notLoggedInPathname: APP_ROUTES.signIn,
+  });
 
   const handleDeleteUser = () => {
     setIsDeleting(true);

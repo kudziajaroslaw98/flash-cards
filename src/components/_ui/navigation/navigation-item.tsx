@@ -2,6 +2,7 @@
 
 import { cn } from '#/shared/utils/cn.util';
 import { NavigationItem } from '#/types//navigation-item.type';
+import { Lock } from 'lucide-react';
 import * as m from 'motion/react-m';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -34,52 +35,126 @@ export default function NavigationItemComponent({
         show={!expanded}
       >
         <div className='flex flex-col'>
-          <Link
-            href={item.href}
-            className={cn([
-              'relative flex items-center justify-center gap-2 rounded-md px-2 py-1 text-gray-500 transition-all duration-300 dark:text-slate-300',
-              'hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-slate-900 dark:hover:text-slate-200',
-              isPathActive &&
-                'bg-gray-100 !text-green-400 hover:bg-gray-200 dark:bg-slate-900 dark:hover:bg-slate-800',
-              expanded ? 'max-w-full' : 'max-w-9 px-2',
-              className,
-            ])}
-          >
-            <div
+          {!item.locked ? (
+            <Link
+              href={item.href}
               className={cn([
-                'flex flex-grow items-center',
-                expanded ? 'gap-2' : 'gap-0',
+                'relative flex items-center justify-center gap-2 rounded-md px-2 py-1 text-gray-500 transition-all duration-300 dark:text-slate-300',
+                'hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-slate-900 dark:hover:text-slate-200',
+                isPathActive &&
+                  'bg-gray-100 !text-green-400 hover:bg-gray-200 dark:bg-slate-900 dark:hover:bg-slate-800',
+                item.locked && 'cursor-not-allowed opacity-50',
+                expanded ? 'max-w-full' : 'max-w-9 px-2',
+                className,
               ])}
             >
-              <span>{item.icon}</span>
-              <span
-                className={`overflow-clip font-medium ${expanded ? 'max-w-full' : 'max-w-0'}`}
-              >
-                <span className='flex-grow'>{expanded && item.label}</span>
-              </span>
-            </div>
-            {item?.indicator !== undefined && (
-              <span
+              <div
                 className={cn([
-                  'flex h-3 w-fit items-center justify-center rounded-full px-1 text-[10px] font-semibold',
-                  'bg-gray-200 text-gray-600 dark:bg-slate-800 dark:text-slate-200',
-                  !expanded && 'absolute -right-1 -top-1',
+                  'flex flex-grow items-center',
+                  expanded ? 'gap-2' : 'gap-0',
                 ])}
               >
-                {item.indicator}
-              </span>
-            )}
+                <span>{item.icon}</span>
+                <span
+                  className={`overflow-clip font-medium ${expanded ? 'max-w-full' : 'max-w-0'}`}
+                >
+                  <span className='flex-grow'>{expanded && item.label}</span>
+                </span>
+              </div>
+              {item?.indicator !== undefined && !item.locked && (
+                <span
+                  className={cn([
+                    'flex h-3 w-fit items-center justify-center rounded-full px-1 text-[10px] font-semibold',
+                    'bg-gray-200 text-gray-600 dark:bg-slate-800 dark:text-slate-200',
+                    !expanded && 'absolute -right-1 -top-1',
+                  ])}
+                >
+                  {item.indicator}
+                </span>
+              )}
 
-            {isPathActive && (
-              <m.span
-                layoutId='link-underline'
+              {item.locked && (
+                <span
+                  className={cn([
+                    'flex h-3 w-fit items-center justify-center rounded-full px-1 text-[10px] font-semibold',
+                    'text-gray-400 dark:text-slate-400',
+                    !expanded && 'absolute -right-1 -top-1',
+                  ])}
+                >
+                  <Lock className='size-4' />
+                </span>
+              )}
+
+              {isPathActive && (
+                <m.span
+                  layoutId='link-underline'
+                  className={cn([
+                    '-left-2 top-1/2 h-1 w-1',
+                    'absolute rounded bg-green-400 group-hover:bg-green-400',
+                  ])}
+                ></m.span>
+              )}
+            </Link>
+          ) : (
+            <div
+              className={cn([
+                'relative flex items-center justify-center gap-2 rounded-md px-2 py-1 text-gray-500 transition-all duration-300 dark:text-slate-300',
+                'hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-slate-900 dark:hover:text-slate-200',
+                isPathActive &&
+                  'bg-gray-100 !text-green-400 hover:bg-gray-200 dark:bg-slate-900 dark:hover:bg-slate-800',
+                item.locked && 'cursor-not-allowed opacity-50',
+                expanded ? 'max-w-full' : 'max-w-9 px-2',
+                className,
+              ])}
+            >
+              <div
                 className={cn([
-                  '-left-2 top-1/2 h-1 w-1',
-                  'absolute rounded bg-green-400 group-hover:bg-green-400',
+                  'flex flex-grow items-center',
+                  expanded ? 'gap-2' : 'gap-0',
                 ])}
-              ></m.span>
-            )}
-          </Link>
+              >
+                <span>{item.icon}</span>
+                <span
+                  className={`overflow-clip font-medium ${expanded ? 'max-w-full' : 'max-w-0'}`}
+                >
+                  <span className='flex-grow'>{expanded && item.label}</span>
+                </span>
+              </div>
+              {item?.indicator !== undefined && !item.locked && (
+                <span
+                  className={cn([
+                    'flex h-3 w-fit items-center justify-center rounded-full px-1 text-[10px] font-semibold',
+                    'bg-gray-200 text-gray-600 dark:bg-slate-800 dark:text-slate-200',
+                    !expanded && 'absolute -right-1 -top-1',
+                  ])}
+                >
+                  {item.indicator}
+                </span>
+              )}
+
+              {item.locked && (
+                <span
+                  className={cn([
+                    'flex h-3 w-fit items-center justify-center rounded-full px-1 text-[10px] font-semibold',
+                    'text-gray-400 dark:text-slate-400',
+                    !expanded && 'absolute -right-1 -top-1',
+                  ])}
+                >
+                  <Lock className='size-4' />
+                </span>
+              )}
+
+              {isPathActive && (
+                <m.span
+                  layoutId='link-underline'
+                  className={cn([
+                    '-left-2 top-1/2 h-1 w-1',
+                    'absolute rounded bg-green-400 group-hover:bg-green-400',
+                  ])}
+                ></m.span>
+              )}
+            </div>
+          )}
         </div>
       </Tooltip>
     )
