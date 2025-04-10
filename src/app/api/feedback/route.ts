@@ -33,16 +33,20 @@ async function validateBody(body: Record<string, unknown>) {
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   let userId: string | null = null;
+  const ip = req.headers.get('x-forwarded-for');
+
+  console.log(ip);
+
+  // Check if user is logged in (optional, feedback can be anonymous)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  userId = user?.id ?? null;
+
+  // Apply rate limiting based on user ID if logged in, otherwise use IP (less reliable but fallback)
+  const limiterId = userId ?? ip ?? 'unknown_ip';
 
   try {
-    // Check if user is logged in (optional, feedback can be anonymous)
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    userId = user?.id ?? null;
-
-    // Apply rate limiting based on user ID if logged in, otherwise use IP (less reliable but fallback)
-    const limiterId = userId ?? 'unknown_ip';
     rateLimit.checkRateLimit(limiterId);
   } catch (error) {
     return new Response(
@@ -100,26 +104,24 @@ export async function POST(req: NextRequest) {
     routePath,
   );
 
-  // TODO: uncomment after implementing feedback table
-  // const { error: insertError } = await supabase.from('feedback').insert({
-  //   user_uuid: userId, // Can be null for anonymous feedback
-  //   feedback_type: feedbackType,
-  //   subject,
-  //   description,
-  //   // created_at is handled by default value in DB
-  // });
+  const { error: insertError } = await supabase.from('feedback').insert({
+    user_uuid: userId, // Can be null for anonymous feedback
+    feedback_type: feedbackType,
+    subject,
+    description,
+  });
 
-  // if (insertError) {
-  //   Logger.error(
-  //     `Failed to insert feedback for user [${userId ?? 'anonymous'}]`,
-  //     routePath,
-  //     JSON.stringify(insertError),
-  //   );
-  //   return new Response(
-  //     JSON.stringify({ success: false, error: 'Failed to submit feedback.' }),
-  //     { status: 500 },
-  //   );
-  // }
+  if (insertError) {
+    Logger.error(
+      `Failed to insert feedback for user [${userId ?? 'anonymous'}]`,
+      routePath,
+      JSON.stringify(insertError),
+    );
+    return new Response(
+      JSON.stringify({ success: false, error: 'Failed to submit feedback.' }),
+      { status: 500 },
+    );
+  }
 
   return new Response(JSON.stringify({ success: true }), { status: 201 });
 }
