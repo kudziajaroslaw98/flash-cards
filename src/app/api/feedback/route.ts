@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
 
   const { error: insertError } = await supabase.from('feedback').insert({
     user_uuid: userId, // Can be null for anonymous feedback
-    feedback_type: feedbackType,
+    feedbackType,
     subject,
     description,
   });
