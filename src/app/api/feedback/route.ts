@@ -35,8 +35,6 @@ export async function POST(req: NextRequest) {
   let userId: string | null = null;
   const ip = req.headers.get('x-forwarded-for');
 
-  console.log(ip);
-
   // Check if user is logged in (optional, feedback can be anonymous)
   const {
     data: { user },
@@ -123,5 +121,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  return new Response(JSON.stringify({ success: true }), { status: 201 });
+  return new Response(JSON.stringify({ success: true }), {
+    status: 201,
+  });
 }

@@ -34,7 +34,6 @@ export function AISuggestedFlashcard({
   flashcard,
   onSelect,
   isInSelectionMode,
-  ...props
 }: Readonly<AISuggestedFlashcardProps>) {
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -150,7 +149,6 @@ export function AISuggestedFlashcard({
             'z-10 h-full cursor-pointer flex-col items-center px-2 py-2 outline-none focus-visible:ring  focus-visible:ring-green-400/50',
             isSelected ? 'ring ring-green-400/60' : '',
           ])}
-          {...props}
         >
           {!isFlipped && (
             <span className={cn(['flex h-full w-full flex-col'])}>
