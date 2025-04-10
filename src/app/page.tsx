@@ -265,7 +265,7 @@ export default async function Home() {
       <header className='fixed left-0 top-0 z-50 hidden h-32 w-full flex-col items-center justify-center md:flex '>
         <div className='absolute left-0 top-0 z-20 flex h-full w-full items-center justify-center bg-transparent bg-[radial-gradient(transparent_1px,#020617_1px)] from-transparent via-black via-60% to-black to-100% bg-[size:4px_4px] backdrop-blur-sm mask-image-gradient-to-t' />
         <nav className='z-30 flex h-full w-full items-start justify-between px-4 py-4 md:px-16 md:pt-8'>
-          <div className='flex items-center justify-center'>
+          <div className='flex h-[40px] items-center justify-center'>
             <Image
               src='/images/finalphase-logo.svg'
               alt='Flashcards Logo'
@@ -314,6 +314,24 @@ export default async function Home() {
                 className='text-sm'
               >
                 Contact
+              </LinkComponent>
+            </li>
+
+            <li>
+              <LinkComponent
+                href='/privacy-policy'
+                className='text-sm'
+              >
+                Privacy Policy
+              </LinkComponent>
+            </li>
+
+            <li>
+              <LinkComponent
+                href='/terms-of-service'
+                className='text-sm'
+              >
+                Terms of Service
               </LinkComponent>
             </li>
 
@@ -848,6 +866,7 @@ export default async function Home() {
               <Link
                 href='/privacy-policy'
                 className='hover:text-green-500'
+                aria-label='Privacy Policy'
               >
                 Privacy Policy
               </Link>
@@ -855,6 +874,7 @@ export default async function Home() {
               <Link
                 href='/terms-of-service'
                 className='hover:text-green-500'
+                aria-label='Terms of Service'
               >
                 Terms of Service
               </Link>
