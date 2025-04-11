@@ -241,20 +241,29 @@ export default function SetHardlinkPage() {
 
   useEffect(() => {
     if (!generatedFlashcards) return;
-    setGenerated(
-      generatedFlashcards
-        ?.filter((flashcard) => flashcard)
-        ?.map((flashcard, index) =>
-          flashcardsMerge(defaultFlashcard(), {
-            ...flashcard,
-            frontUuid: uuid(),
-            order: setFlashcards.length + index,
-            context: flashcard?.topic,
-            type: 'single',
-            tags: [...(flashcard?.tags as string[])],
-          }),
-        ) as Flashcard[],
-    );
+    setGenerated((prev) => {
+      const length = prev.length;
+      const validGeneratedFlashcards = generatedFlashcards?.filter(
+        (flashcard) => flashcard,
+      );
+
+      const newFlashcards = validGeneratedFlashcards.slice(
+        length,
+        validGeneratedFlashcards.length,
+      );
+      const mappedFlashcards = newFlashcards?.map((flashcard, index) =>
+        flashcardsMerge(defaultFlashcard(), {
+          ...flashcard,
+          frontUuid: uuid(),
+          order: setFlashcards.length + newFlashcards.length + index,
+          context: flashcard?.topic,
+          type: 'single',
+          tags: [...(flashcard?.tags as string[])],
+        }),
+      ) as Flashcard[];
+
+      return [...prev, ...mappedFlashcards];
+    });
 
     if (generatedFlashcards && !isGeneratingFlashcards) {
       const mappedFlashcards: Flashcard[] = generated.map((flashcard) =>
@@ -371,8 +380,8 @@ export default function SetHardlinkPage() {
                 />
               </div>
             ))}
-            {generated.map((flashcard, index) => (
-              <div key={`flashcard-${index}`}>
+            {generated.map((flashcard) => (
+              <div key={`flashcard-${flashcard.frontUuid}`}>
                 <FlashcardComponent
                   flashcard={flashcard}
                   isSelected={isSelected(flashcard)}
