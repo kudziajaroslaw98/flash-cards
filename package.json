@@ -48,6 +48,7 @@
     "react-dom": "19.0.0",
     "react-markdown": "^10.1.0",
     "react-rewards": "^2.1.0",
+    "react-use-measure": "^2.1.7",
     "sharp": "^0.33.5",
     "stripe": "^17.6.0",
     "tailwind-merge": "^2.6.0",
