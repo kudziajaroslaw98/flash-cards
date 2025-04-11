@@ -29,12 +29,14 @@ async function validateBody(body: Record<string, unknown>) {
       focusAreas: z.array(z.string()).nullish(),
       additionalUserPrompt: z.string().nullish(),
     }),
-    flashcards: z.array(
-      z
-        .string()
-        .min(1, 'flashcard is required')
-        .max(255, 'flashcard is too long'),
-    ),
+    flashcards: z
+      .array(
+        z
+          .string()
+          .min(1, 'flashcard is required')
+          .max(255, 'flashcard is too long'),
+      )
+      .nullish(),
     setName: z.string().min(1),
     setDescription: z.string().min(1),
   });
