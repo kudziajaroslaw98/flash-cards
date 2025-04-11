@@ -149,7 +149,9 @@ export const FlashcardGenerateDialog = ({
       return;
     }
 
-    handleSubmit(formValue);
+    const formData = formRef.current?.value;
+
+    handleSubmit(formData);
     setIsModalOpen(false);
     setFormValue({});
   };

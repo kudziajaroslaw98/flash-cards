@@ -17,5 +17,6 @@ export const setsMerge = (
     isFavourite: set.isFavourite ?? defaultSet.isFavourite,
     reminders: set.reminders ?? defaultSet.reminders,
     synced: set.synced ?? defaultSet.synced,
+    generationOptions: set.generationOptions ?? defaultSet.generationOptions,
   } as FlashcardSet;
 };

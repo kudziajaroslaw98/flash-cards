@@ -13,4 +13,5 @@ export const defaultSet: FlashcardSet = {
   hardlink: '',
   synced: false,
   reminders: [],
+  generationOptions: {},
 } as FlashcardSet;

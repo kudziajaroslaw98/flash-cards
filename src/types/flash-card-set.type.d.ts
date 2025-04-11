@@ -1,3 +1,4 @@
+import type { FlashcardGenerationOptions } from './flashcard-generation-options.type';
 export type FlashcardSet = {
   frontUuid: string;
   name: string;
@@ -10,4 +11,5 @@ export type FlashcardSet = {
   updatedAt: string;
   synced: boolean;
   reminders: string[];
+  generationOptions?: FlashcardGenerationOptions;
 };
