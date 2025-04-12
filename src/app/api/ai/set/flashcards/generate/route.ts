@@ -11,6 +11,7 @@ import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { createClient } from '#/shared/utils/supabase/server';
 import { FlashcardGenerationOptions } from '#/types/flashcard-generation-options.type';
+import type { KnowledgeLevel } from '#/types/knowledge-level.type';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamObject } from 'ai';
 import type { NextRequest } from 'next/server';
@@ -141,6 +142,23 @@ export async function POST(req: NextRequest) {
     (style) => style.value === options.mnemonic,
   );
 
+  const getTemperature = (knowledgeLevel: KnowledgeLevel) => {
+    switch (knowledgeLevel) {
+      case 'unfamiliar':
+        return 1.0;
+      case 'beginner':
+        return 1.0;
+      case 'developing':
+        return 0.9;
+      case 'proficient':
+        return 0.8;
+      case 'advanced':
+        return 0.6;
+      case 'expert':
+        return 0.5;
+    }
+  };
+
   Logger.info(
     `User [ ${user.id} ] is generating flashcards.`,
     'ai/set/flashcards/generate',
@@ -153,12 +171,19 @@ export async function POST(req: NextRequest) {
       # GOAL: Generate 10 unique flashcards based on the provided inputs, strictly adhering to the specified knowledge level and content focus.
 
       # INPUTS:
-      *   **Sets name:** ${setName}
-      *   **Sets description:** ${setDescription}
+      ${
+        flashcardsRecords.length === 0 && focusTagsSet.size === 0
+          ? '*   **Sets name:** ' +
+            setName +
+            '  *   ** Sets description:** ' +
+            setDescription
+          : ''
+      }
+      
       *   **Knowledge Level:** ${pickedKnowledgeLevel} (This is the PRIMARY determinant of difficulty for ALL cards)
       *   **Focus Tags:** [${new Array(focusTagsSet).join(', ')}] (These define the specific topics/concepts to cover)
       *   **Subject Area & Topic:** (Infer the general Subject Area [e.g., Technical/STEM, Language Learning] and specific Topic Name from the Focus Tags. Use this context for applying style and knowledge level guidance.)
-      *   **Excluded Topics (Blacklist):** ${options.blacklist && options.blacklist.length > 0 ? `[${options.blacklist.join(', ')}]` : 'None specified'} (Strictly AVOID generating cards primarily about these concepts.)
+      *   **Excluded Topics (Blacklist):** ${options.blacklist && options.blacklist.length > 0 ? `[${options.blacklist.join(', ')}, ${flashcardsRecords.map((summary) => `${summary.query}`).join(', ')}]` : 'None specified'} (Strictly AVOID generating cards primarily about these concepts.)
       *   **Existing Cards (Avoid Duplication):**
           ${flashcardsRecords && flashcardsRecords.length > 0 ? flashcardsRecords.map((summary) => `• ID: ${summary.id}, Topic: ${summary.topic}, Question: ${summary.query}, Context: ${summary.context}`).join('\n') : '  None provided.'}
       *   **Optional User Preferences:**
@@ -238,6 +263,9 @@ export async function POST(req: NextRequest) {
   const result = streamObject({
     model: gemini('gemini-2.0-flash'),
     output: 'array',
+    temperature: options.knowledgeLevel
+      ? getTemperature(options.knowledgeLevel!)
+      : 1,
     schema: z.object({
       id: z.string(),
       query: z.string(),

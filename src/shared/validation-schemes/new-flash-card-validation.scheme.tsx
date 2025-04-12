@@ -47,7 +47,7 @@ export const newFlashcardScheme = (
       inputType: 'text',
       name: 'context',
       label: 'Context',
-      placeholder: 'Prowess',
+      placeholder: 'e.g., Photosynthesis, Mitochondria, "To be or not to be"',
       required: true,
     },
     definition: {
@@ -88,7 +88,7 @@ export const newFlashcardScheme = (
       type: 'textarea',
       name: 'definition',
       label: 'Answer',
-      placeholder: 'Military valor and skill.',
+      placeholder: 'e.g., Process plants use to convert light into energy',
       handleGenerate: handleGenerate,
       loadingGenerate,
       blockGenerate: !isLoggedIn || !isPlanActive,
@@ -128,14 +128,14 @@ export const newFlashcardScheme = (
       type: 'textarea',
       name: 'query',
       label: 'Question',
-      placeholder: 'Your question here...',
+      placeholder: 'e.g., What is the powerhouse of the cell?',
     },
     tags: {
       type: 'tags',
       name: 'tags',
       label: 'Tags',
       required: true,
-      placeholder: 'Add tags by pressing enter or coma',
+      placeholder: 'e.g., Biology, Literature (press Enter/Comma)',
       _internal_constraints: [
         {
           type: 'validation',
@@ -156,7 +156,7 @@ export const newFlashcardScheme = (
         {
           type: 'show',
           key: 'type',
-          constraint: z.string().includes('single'),
+          constraint: z.enum(['single', 'question']),
         },
       ],
       type: 'switch',
@@ -281,8 +281,9 @@ export const newFlashcardScheme = (
           type: 'textarea',
           name: 'examples',
           label: 'Examples',
+          minHeight: 98,
           placeholder:
-            'Enter examples of usage of the term, separated by semicolons ( ; )',
+            'e.g., The sun provides energy for photosynthesis; Mitochondria are often called the powerhouses of the cell. Separated by semicolons ( ; )',
           _internal_constraints: [
             {
               type: 'show',
@@ -302,8 +303,9 @@ export const newFlashcardScheme = (
           type: 'textarea',
           name: 'synonyms',
           label: 'Synonyms',
+          minHeight: 82,
           placeholder:
-            'Enter synonyms to the term, separated by semicolons ( ; )',
+            'e.g., Happy: joyful, cheerful, content; Sad: unhappy, sorrowful, dejected. Separated by semicolons ( ; )',
           _internal_constraints: [
             {
               type: 'show',
@@ -323,8 +325,9 @@ export const newFlashcardScheme = (
           type: 'textarea',
           name: 'keyPoints',
           label: 'Key Points',
+          minHeight: 98,
           placeholder:
-            'Enter key points about the term, separated by semicolons ( ; )',
+            'e.g., Photosynthesis requires sunlight, water, and CO2; Mitochondria produce ATP through cellular respiration. Separated by semicolons ( ; )',
           _internal_constraints: [
             {
               type: 'show',
@@ -344,8 +347,9 @@ export const newFlashcardScheme = (
           type: 'textarea',
           name: 'relatedFacts',
           label: 'Related Facts',
+          minHeight: 82,
           placeholder:
-            'Enter related facts about the term, separated by semicolons ( ; )',
+            'e.g., Chlorophyll is the pigment that captures light; Cellular respiration occurs in both plants and animals. Separated by semicolons ( ; )',
           _internal_constraints: [
             {
               type: 'show',
@@ -363,88 +367,5 @@ export const newFlashcardScheme = (
         },
       },
     },
-    // examples: {
-    //   type: 'textarea',
-    //   name: 'examples',
-    //   label: 'Examples',
-    //   placeholder:
-    //     'Enter examples of usage of the term, separated by semicolons ( ; )',
-    //   _internal_constraints: [
-    //     {
-    //       type: 'show',
-    //       key: 'type',
-    //       constraint: z.string().includes('single'),
-    //     },
-    //     {
-    //       type: 'prop',
-    //       propName: 'required',
-    //       propValue: false,
-    //       key: 'type',
-    //       constraint: z.string().includes('single'),
-    //     },
-    //   ],
-    // },
-    // synonyms: {
-    //   type: 'textarea',
-    //   name: 'synonyms',
-    //   label: 'Synonyms',
-    //   placeholder: 'Enter synonyms to the term, separated by semicolons ( ; )',
-    //   _internal_constraints: [
-    //     {
-    //       type: 'show',
-    //       key: 'type',
-    //       constraint: z.string().includes('single'),
-    //     },
-    //     {
-    //       type: 'prop',
-    //       propName: 'required',
-    //       propValue: false,
-    //       key: 'type',
-    //       constraint: z.string().includes('single'),
-    //     },
-    //   ],
-    // },
-    // keyPoints: {
-    //   type: 'textarea',
-    //   name: 'keyPoints',
-    //   label: 'Key Points',
-    //   placeholder:
-    //     'Enter key points about the term, separated by semicolons ( ; )',
-    //   _internal_constraints: [
-    //     {
-    //       type: 'show',
-    //       key: 'type',
-    //       constraint: z.string().includes('single'),
-    //     },
-    //     {
-    //       type: 'prop',
-    //       propName: 'required',
-    //       propValue: false,
-    //       key: 'type',
-    //       constraint: z.string().includes('single'),
-    //     },
-    //   ],
-    // },
-    // relatedFacts: {
-    //   type: 'textarea',
-    //   name: 'relatedFacts',
-    //   label: 'Related Facts',
-    //   placeholder:
-    //     'Enter related facts about the term, separated by semicolons ( ; )',
-    //   _internal_constraints: [
-    //     {
-    //       type: 'show',
-    //       key: 'type',
-    //       constraint: z.string().includes('single'),
-    //     },
-    //     {
-    //       type: 'prop',
-    //       propName: 'required',
-    //       propValue: false,
-    //       key: 'type',
-    //       constraint: z.string().includes('single'),
-    //     },
-    //   ],
-    // },
   },
 });

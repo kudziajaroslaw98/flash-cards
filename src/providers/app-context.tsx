@@ -206,6 +206,15 @@ export default function AppProvider(props: PropsWithChildren) {
         user_uuid: user?.id,
       })),
     );
+
+    db.metadata.put(
+      {
+        ...metadata,
+        createdFlashCards: metadata.createdFlashCards + flashcards.length,
+        updatedAt: new Date().toUTCString(),
+      },
+      'current',
+    );
   };
 
   const removeFlashcards = async (flashcards: Flashcard[]) => {
@@ -273,26 +282,47 @@ export default function AppProvider(props: PropsWithChildren) {
     setUuid: string,
   ) => {
     const set = await db.sets.get(setUuid);
-    const flashcards = await db.flashcards.bulkGet(flashcardUuids);
 
     if (!set) {
       console.warn('Set not found');
       return;
     }
 
-    const newFlashcards = Array.from(
-      new Set([...set.flashcards, ...flashcardUuids]),
+    const currentlyAssignedUuids = set.flashcards;
+    const newAssignmentUuids = new Set(flashcardUuids);
+    const flashcardsToUnassignUuids = currentlyAssignedUuids.filter(
+      (uuid) => !newAssignmentUuids.has(uuid),
     );
 
     await db.sets.update(setUuid, {
-      flashcards: newFlashcards,
+      flashcards: flashcardUuids,
     });
-    await db.flashcards.bulkPut(
-      flashcards.map((flashcard) => ({
-        ...flashcard,
-        sets: [...(flashcard?.sets ?? []), setUuid],
-      })) as Flashcard[],
-    );
+
+    const allRelevantUuids = [...flashcardUuids, ...flashcardsToUnassignUuids];
+    const flashcardsToUpdate = await db.flashcards.bulkGet(allRelevantUuids);
+
+    const bulkUpdateData = flashcardsToUpdate
+      .map((flashcard) => {
+        if (!flashcard) return null;
+
+        const currentSets = new Set(flashcard.sets ?? []);
+
+        if (newAssignmentUuids.has(flashcard.frontUuid)) {
+          currentSets.add(setUuid);
+        } else if (flashcardsToUnassignUuids.includes(flashcard.frontUuid)) {
+          currentSets.delete(setUuid);
+        }
+
+        return {
+          ...flashcard,
+          sets: Array.from(currentSets),
+        };
+      })
+      .filter(Boolean) as Flashcard[];
+
+    if (bulkUpdateData.length > 0) {
+      await db.flashcards.bulkPut(bulkUpdateData);
+    }
   };
 
   const unassignFlashcardsFromSet = async (
@@ -395,7 +425,10 @@ export default function AppProvider(props: PropsWithChildren) {
   const updateMetadata = async (update: Partial<Metadata>) => {
     const updatedMetadata = metadataMerge(defaultMetadata, update);
 
-    await db.metadata.update('current', updatedMetadata);
+    await db.metadata.update('current', {
+      ...updatedMetadata,
+      updatedAt: new Date().toUTCString(),
+    });
     await supabase.from('metadata').update(updatedMetadata);
   };
 
@@ -594,6 +627,34 @@ export default function AppProvider(props: PropsWithChildren) {
   const syncLocalToRemote = async () => {
     if (!isLoggedIn || user === null) return;
 
+    const metadata = await db.metadata.get('current');
+    const newLastSyncAt = new Date().toUTCString();
+    let lastSyncAt: string;
+
+    if (
+      metadata === undefined ||
+      metadata.lastSyncAt === null ||
+      metadata.lastSyncAt === undefined ||
+      isNaN(new Date(metadata.lastSyncAt).getTime())
+    ) {
+      // First sync or invalid date: use epoch
+      lastSyncAt = new Date(0).toUTCString();
+    } else {
+      // Valid date: use ISO string
+      lastSyncAt = new Date(metadata.lastSyncAt).toUTCString();
+    }
+
+    const fiveMinsInMillis = 5 * 60 * 1000; // 5 minutes in milliseconds
+    if (
+      new Date().getTime() - new Date(lastSyncAt).getTime() <
+      fiveMinsInMillis
+    ) {
+      console.log(
+        'Sync [local ⇒ remote] skipped: Last sync was less than 5 minutes ago.',
+      );
+      return; // Skip sync
+    }
+
     await Promise.allSettled([
       // FLASHCARDS
       localToRemoteFlashcardsSync(supabase, user),
@@ -602,7 +663,7 @@ export default function AppProvider(props: PropsWithChildren) {
       localToRemoteSetsSync(supabase, user),
 
       // METADATA
-      localToRemoteMetadataSync(supabase, user),
+      localToRemoteMetadataSync(supabase, user, newLastSyncAt),
 
       // FOCUS SESSIONS
       localToRemoteFocusSessionsSync(supabase, user),
@@ -622,12 +683,13 @@ export default function AppProvider(props: PropsWithChildren) {
 
     const metadata = await db.metadata.get('current');
     const newLastSyncAt = new Date().toUTCString();
-    const emptyMetadata = !metadata;
+    const emptyMetadata = metadata === undefined;
     let lastSyncAt: string;
 
     if (
-      !metadata ||
-      !metadata.lastSyncAt ||
+      metadata === undefined ||
+      metadata.lastSyncAt === null ||
+      metadata.lastSyncAt === undefined ||
       isNaN(new Date(metadata.lastSyncAt).getTime())
     ) {
       // First sync or invalid date: use epoch
@@ -635,6 +697,17 @@ export default function AppProvider(props: PropsWithChildren) {
     } else {
       // Valid date: use ISO string
       lastSyncAt = new Date(metadata.lastSyncAt).toUTCString();
+    }
+
+    const fiveMinsInMillis = 5 * 60 * 1000; // 5 minutes in milliseconds
+    if (
+      new Date().getTime() - new Date(lastSyncAt).getTime() <
+      fiveMinsInMillis
+    ) {
+      console.log(
+        'Sync [remote ⇒ local] skipped: Last sync was less than 5 minutes ago.',
+      );
+      return; // Skip sync
     }
 
     await Promise.allSettled([
@@ -645,7 +718,13 @@ export default function AppProvider(props: PropsWithChildren) {
       remoteToLocalSetsSync(supabase, lastSyncAt),
 
       // METADATA
-      remoteToLocalMetadataSync(supabase, lastSyncAt, emptyMetadata, metadata),
+      remoteToLocalMetadataSync(
+        supabase,
+        lastSyncAt,
+        emptyMetadata,
+        user,
+        metadata,
+      ),
 
       // FOCUS SESSIONS
       remoteToLocalFocusSessionsSync(supabase, lastSyncAt),
@@ -658,9 +737,10 @@ export default function AppProvider(props: PropsWithChildren) {
     ]);
     // REVIEW LOGS
     await remoteToLocalReviewLogsSync(supabase, lastSyncAt);
-
     await db.metadata.update('current', {
       lastSyncAt: new Date(newLastSyncAt),
+      synced: true,
+      updatedAt: new Date().toUTCString(),
     });
   };
 
@@ -668,14 +748,13 @@ export default function AppProvider(props: PropsWithChildren) {
     // LOCAL TO REMOTE
     if (!isLoggedIn || user === null) return;
 
+    // SYNC LOCAL TO REMOTE
     await syncLocalToRemote();
 
     // REMOTE TO LOCAL
-
     await syncRemoteToLocal();
 
     // WEB SOCKETS
-
     await applyWebsockets();
   };
 

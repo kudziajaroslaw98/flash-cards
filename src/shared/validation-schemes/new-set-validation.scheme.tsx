@@ -32,16 +32,15 @@ export const newSetFormScheme = (
         {
           type: 'validation',
           key: 'description',
-          constraint: z
-            .string()
-            .min(1, 'Description is required')
-            .max(255, 'Description is too long'),
+          constraint: z.string().nullish(),
         },
       ],
+      _internal_default_value: '',
       type: 'textarea',
       name: 'description',
       label: 'Description',
       placeholder: 'Set description',
+      required: false,
       handleGenerate: handleGenerate,
       loadingGenerate: loadingGenerate,
       blockGenerate: !isLoggedIn || !isPlanActive,

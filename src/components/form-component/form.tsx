@@ -52,7 +52,7 @@ export type FormProps<T> = {
 };
 
 export interface FormMethods<T> {
-  checkValidity: () => Promise<void>;
+  checkValidity: () => Promise<boolean>;
   isValid: () => boolean;
   value: T;
 }
@@ -394,8 +394,8 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
 
   const checkFormValidity = async (
     newTouched?: Record<string, boolean>,
-  ): Promise<void> => {
-    const checking: Promise<void> = new Promise((resolve) => {
+  ): Promise<boolean> => {
+    const checking: Promise<boolean> = new Promise((resolve) => {
       const inputs = Object.keys(props.scheme.inputs);
       let valids = defaultValids;
       let errors = {};
@@ -479,7 +479,7 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
         }
       }
 
-      resolve();
+      resolve(Object.values(valids).every((item) => item));
     });
 
     return await checking;
@@ -493,7 +493,7 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
       touchedTmp = { ...touchedTmp, [inputName]: true };
     });
 
-    await checkFormValidity(touchedTmp);
+    return await checkFormValidity(touchedTmp);
   };
 
   const getFormValidity = () => {

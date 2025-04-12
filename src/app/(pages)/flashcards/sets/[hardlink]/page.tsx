@@ -100,12 +100,6 @@ export default function SetHardlinkPage() {
       ...prev,
       flashcards,
     }));
-    updateSets([
-      {
-        ...set,
-        flashcards,
-      },
-    ]);
     assignFlashcardsToSet(flashcards, set.frontUuid);
   };
 
@@ -160,6 +154,13 @@ export default function SetHardlinkPage() {
   ) => {
     window?.umami?.track('Generate flashcards');
     if (!isLoggedIn || !isPlanActive) return;
+
+    updateSets([
+      {
+        ...set,
+        generationOptions: options,
+      },
+    ]);
 
     generateFlashcards({
       flashcards: setFlashcards.map((flashcard) => flashcard.frontUuid) ?? [],
@@ -241,38 +242,40 @@ export default function SetHardlinkPage() {
 
   useEffect(() => {
     if (!generatedFlashcards) return;
-    setGenerated(
-      generatedFlashcards
-        ?.filter((flashcard) => flashcard)
-        ?.map((flashcard, index) =>
-          flashcardsMerge(defaultFlashcard(), {
-            ...flashcard,
-            frontUuid: uuid(),
-            order: setFlashcards.length + index,
-            context: flashcard?.topic,
-            type: 'single',
-            tags: [...(flashcard?.tags as string[])],
-          }),
-        ) as Flashcard[],
-    );
-
-    if (generatedFlashcards && !isGeneratingFlashcards) {
-      const mappedFlashcards: Flashcard[] = generated.map((flashcard) =>
-        flashcardsMerge(defaultFlashcard(), {
-          ...flashcard,
-          type: 'single',
-          sets: [set.frontUuid],
-        }),
+    setGenerated((prev) => {
+      const length = prev.length;
+      const validGeneratedFlashcards = generatedFlashcards?.filter(
+        (flashcard) => flashcard,
       );
 
+      const newFlashcards = validGeneratedFlashcards.slice(
+        length,
+        validGeneratedFlashcards.length,
+      );
+      const mappedFlashcards = newFlashcards?.map((flashcard, index) =>
+        flashcardsMerge(defaultFlashcard(), {
+          ...flashcard,
+          frontUuid: uuid(),
+          order: setFlashcards.length + newFlashcards.length + index,
+          context: flashcard?.topic,
+          type: 'single',
+          tags: [...(flashcard?.tags as string[])],
+          sets: [set.frontUuid],
+        }),
+      ) as Flashcard[];
+
+      return [...prev, ...mappedFlashcards];
+    });
+
+    if (generatedFlashcards && !isGeneratingFlashcards) {
       if (generated.length > 0) {
-        addFlashcards(mappedFlashcards);
+        addFlashcards(generated);
         updateSets([
           {
             ...set,
             flashcards: [
               ...set.flashcards,
-              ...mappedFlashcards.map((f) => f.frontUuid),
+              ...generated.map((f) => f.frontUuid),
             ],
           },
         ]);
@@ -319,7 +322,7 @@ export default function SetHardlinkPage() {
           </div>
         </div>
 
-        <span className='line-clamp-3 w-full max-w-md text-sm text-gray-500 dark:text-slate-400'>
+        <span className='line-clamp-4 w-full max-w-md text-sm text-gray-500 dark:text-slate-400'>
           {set?.description}
         </span>
 
@@ -360,28 +363,32 @@ export default function SetHardlinkPage() {
           ])}
         >
           <AnimatePresence mode='popLayout'>
-            {setFlashcards.map((flashcard) => (
-              <div key={`flashcard-${flashcard.frontUuid}`}>
-                <FlashcardComponent
-                  flashcard={flashcard}
-                  isSelected={isSelected(flashcard)}
-                  onSelect={toggleSelected}
-                  isInSelectionMode={selected.length > 0}
-                  size={'horizontal-sm'}
-                />
-              </div>
-            ))}
-            {generated.map((flashcard, index) => (
-              <div key={`flashcard-${index}`}>
-                <FlashcardComponent
-                  flashcard={flashcard}
-                  isSelected={isSelected(flashcard)}
-                  onSelect={toggleSelected}
-                  isInSelectionMode={selected.length > 0}
-                  size={'horizontal-sm'}
-                />
-              </div>
-            ))}
+            {setFlashcards
+              .sort((head, tail) => head.order - tail.order)
+              .map((flashcard) => (
+                <div key={`flashcard-${flashcard.frontUuid}`}>
+                  <FlashcardComponent
+                    flashcard={flashcard}
+                    isSelected={isSelected(flashcard)}
+                    onSelect={toggleSelected}
+                    isInSelectionMode={selected.length > 0}
+                    size={'horizontal-sm'}
+                  />
+                </div>
+              ))}
+            {generated
+              .sort((head, tail) => head.order - tail.order)
+              .map((flashcard) => (
+                <div key={`flashcard-${flashcard.frontUuid}`}>
+                  <FlashcardComponent
+                    flashcard={flashcard}
+                    isSelected={isSelected(flashcard)}
+                    onSelect={toggleSelected}
+                    isInSelectionMode={selected.length > 0}
+                    size={'horizontal-sm'}
+                  />
+                </div>
+              ))}
           </AnimatePresence>
         </div>
 
@@ -457,6 +464,7 @@ export default function SetHardlinkPage() {
             setName={set?.name}
             flashcardCount={setFlashcards.length}
             setDescription={set?.description}
+            initialData={set?.generationOptions}
             trigger={
               <Button
                 disabled={!isLoggedIn || !isPlanActive}

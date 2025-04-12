@@ -28,8 +28,8 @@ const withMDX = createMDX();
 //TODO: change n8n domain
 const cspHeader =
   process.env.NODE_ENV === 'development'
-    ? `default-src 'self' https://umami.finalphase.app https://supabase.finalphase.app wss://supabase.finalphase.app https://n8n-hc0sc0wskgo4cckgck8ks8ss.finalphase.app ws://localhost:54321 http://localhost:54321;
-    script-src 'self' 'unsafe-inline' https://umami.finalphase.app https://js.stripe.com blob:;
+    ? `default-src 'self'  http://localhost:3000 https://umami.finalphase.app https://supabase.finalphase.app wss://supabase.finalphase.app https://n8n-hc0sc0wskgo4cckgck8ks8ss.finalphase.app ws://localhost:54321 http://localhost:54321;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:3000 https://umami.finalphase.app https://js.stripe.com blob:;
     style-src 'self' 'unsafe-inline';
     img-src 'self' avatars.githubusercontent.com lh3.googleusercontent.com blob: data: https://*.stripe.com;
     font-src 'self';

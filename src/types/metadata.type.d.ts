@@ -9,9 +9,11 @@ export type Metadata = {
   streak: number;
   lastSyncAt: Date | string | null;
   theme?: 'dark' | 'light';
+  key: string;
   synced: boolean;
   activeStudyPlan?: StudySession;
   notificationPermission: 'granted' | 'denied' | 'default';
   marketingConsent: boolean;
   updatedAt: Date | string;
+  createdAt: Date | string;
 };

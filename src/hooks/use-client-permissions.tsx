@@ -16,6 +16,7 @@ export function useClientPermissions() {
       setNotificationPermission(permission);
       db.metadata.update('current', {
         notificationPermission: permission,
+        updatedAt: new Date().toUTCString(),
       });
       handleNotificationPermissionChange(permission);
     });

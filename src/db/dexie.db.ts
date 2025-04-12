@@ -43,14 +43,27 @@ export class AppDB extends Dexie {
         'frontUuid, synced, *objectives, dayNumber, planId, *cardsToReview, *newCards',
     });
 
+    this.version(10).upgrade((transaction) => {
+      transaction.db
+        .table('metadata')
+        .toCollection()
+        .modify((metadata) => {
+          metadata.createdAt = new Date();
+          metadata.key = 'current';
+        });
+    });
+
     // Setup hooks
     this.setupHooks();
   }
 
   private setupHooks() {
     this.flashcards.hook('updating', (modifications: Partial<Flashcard>) => {
-      modifications.updatedAt = new Date().toUTCString();
-      modifications.synced = false;
+      return {
+        ...modifications,
+        updatedAt: new Date().toUTCString(),
+        synced: false,
+      };
     });
 
     this.flashcards.hook('creating', (primKey, card) => {
@@ -58,16 +71,27 @@ export class AppDB extends Dexie {
     });
 
     this.dailyStats.hook('updating', (modifications: Partial<DailyStat>) => {
-      modifications.synced = false;
+      return {
+        ...modifications,
+        updatedAt: new Date().toUTCString(),
+        synced: false,
+      };
     });
 
     this.metadata.hook('updating', (modifications: Partial<Metadata>) => {
-      modifications.synced = false;
+      console.log(modifications);
+      return {
+        ...modifications,
+        synced: modifications?.synced ?? false,
+      };
     });
 
     this.sets.hook('updating', (modifications: Partial<FlashcardSet>) => {
-      modifications.updatedAt = new Date().toUTCString();
-      modifications.synced = false;
+      return {
+        ...modifications,
+        updatedAt: new Date().toUTCString(),
+        synced: false,
+      };
     });
 
     this.sets.hook('creating', (primKey, set) => {
@@ -75,8 +99,11 @@ export class AppDB extends Dexie {
     });
 
     this.reminders.hook('updating', (modifications: Partial<Reminder>) => {
-      modifications.updatedAt = new Date().toUTCString();
-      modifications.synced = false;
+      return {
+        ...modifications,
+        updatedAt: new Date().toUTCString(),
+        synced: false,
+      };
     });
 
     this.reminders.hook('creating', (primKey, reminder) => {
@@ -84,20 +111,29 @@ export class AppDB extends Dexie {
     });
 
     this.studyPlans.hook('updating', (modifications: Partial<StudyPlan>) => {
-      modifications.updatedAt = new Date().toUTCString();
-      modifications.synced = false;
+      return {
+        ...modifications,
+        updatedAt: new Date().toUTCString(),
+        synced: false,
+      };
     });
 
     this.studyDays.hook('updating', (modifications: Partial<StudyDay>) => {
-      modifications.updatedAt = new Date().toUTCString();
-      modifications.synced = false;
+      return {
+        ...modifications,
+        updatedAt: new Date().toUTCString(),
+        synced: false,
+      };
     });
 
     this.studySessions.hook(
       'updating',
       (modifications: Partial<StudySession>) => {
-        modifications.updatedAt = new Date().toUTCString();
-        modifications.synced = false;
+        return {
+          ...modifications,
+          updatedAt: new Date().toUTCString(),
+          synced: false,
+        };
       },
     );
 
