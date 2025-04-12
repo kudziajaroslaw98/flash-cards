@@ -10,6 +10,7 @@ import { Logger } from '#/shared/helpers/logger/logger';
 import { RateLimit } from '#/shared/utils/api-limiter';
 import checkValidity from '#/shared/utils/check-validity.util';
 import { createClient } from '#/shared/utils/supabase/server';
+import uuid from '#/shared/utils/uuid.util';
 import { FlashcardGenerationOptions } from '#/types/flashcard-generation-options.type';
 import type { KnowledgeLevel } from '#/types/knowledge-level.type';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
@@ -18,6 +19,7 @@ import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
 export const maxDuration = 30;
+const routePath = 'ai/set/flashcards/generate';
 
 async function validateBody(body: Record<string, unknown>) {
   const validationScheme = z.object({
@@ -39,7 +41,7 @@ async function validateBody(body: Record<string, unknown>) {
       )
       .nullish(),
     setName: z.string().min(1),
-    setDescription: z.string().min(1),
+    setDescription: z.string().nullish(),
   });
   const validityCheck = checkValidity(body, validationScheme);
 
@@ -48,21 +50,22 @@ async function validateBody(body: Record<string, unknown>) {
   }
 }
 
-const rateLimit = new RateLimit(1, 10, 'ai/set/flashcards/generate');
+const rateLimit = new RateLimit(1, 10, routePath);
 
 export async function POST(req: NextRequest) {
+  const sessionId = uuid();
   const supabase = await createClient();
   const user = (await supabase.auth.getUser()).data.user;
   try {
     if (user === null) {
-      Logger.error('User not logged in', 'ai/set/flashcards/generate');
+      Logger.error('User not logged in', routePath);
       throw new Error('User not logged in');
     }
 
     if (user.user_metadata?.stripe_subscription_status !== 'active') {
       Logger.error(
         ` User [${user.id}] is not subscribed to a paid plan`,
-        'ai/set/flashcards/generate',
+        routePath,
       );
       throw new Error('User is not subscribed to a paid plan');
     }
@@ -92,10 +95,7 @@ export async function POST(req: NextRequest) {
   try {
     validateBody({ flashcards, setName, setDescription, options });
   } catch {
-    Logger.error(
-      `Invalid request body from user [${user.id}]`,
-      'ai/set/flashcards/generate',
-    );
+    Logger.error(`Invalid request body from user [${user.id}]`, routePath);
 
     return new Response(
       JSON.stringify({
@@ -130,17 +130,17 @@ export async function POST(req: NextRequest) {
 
   const pickedKnowledgeLevel = knowledgeLevelDictionary.find(
     (level) => level.value === options.knowledgeLevel,
-  );
+  )?.label;
 
   const pickedLearningStyle = learningStyleDictionary.find(
     (style) => style.value === options.learningStyle,
-  );
+  )?.label;
   const pickedCardLength = cardLengthDictionary.find(
     (style) => style.value === options.cardLength,
-  );
+  )?.label;
   const pickedMemonic = mnemonicPreferenceDictionary.find(
     (style) => style.value === options.mnemonic,
-  );
+  )?.label;
 
   const getTemperature = (knowledgeLevel: KnowledgeLevel) => {
     switch (knowledgeLevel) {
@@ -159,9 +159,16 @@ export async function POST(req: NextRequest) {
     }
   };
 
+  Logger.info(`User [ ${user.id} ] is generating flashcards.`, routePath);
+
   Logger.info(
-    `User [ ${user.id} ] is generating flashcards.`,
-    'ai/set/flashcards/generate',
+    `User [ ${user.id} ] is generating flashcards. ${JSON.stringify({
+      flashcards: flashcards,
+      setName,
+      setDescription,
+      options,
+    })}`,
+    routePath,
   );
 
   const prompt = `
@@ -177,11 +184,11 @@ export async function POST(req: NextRequest) {
             setName +
             '  *   ** Flashcard Deck description:** ' +
             setDescription
-          : ''
+          : ' (These define the specific topics/concepts to cover when focus tags are not provided)'
       }
       
       *   **Knowledge Level:** ${pickedKnowledgeLevel} (This is the PRIMARY determinant of difficulty for ALL cards)
-      *   **Focus Tags:** [${new Array(focusTagsSet).join(', ')}] (These define the specific topics/concepts to cover)
+      *   **Focus Tags:** [${focusTagsSet.values().toArray().join(', ')}] (These define the specific topics/concepts to cover)
       *   **Subject Area & Topic:** (Infer the general Subject Area [e.g., Technical/STEM, Language Learning] and specific Topic Name from the Focus Tags. Use this context for applying style and knowledge level guidance.)
       *   **Excluded Topics (Blacklist):** ${options.blacklist && options.blacklist.length > 0 ? `[${options.blacklist.join(', ')}, ${flashcardsRecords.map((summary) => `${summary.query}`).join(', ')}]` : 'None specified'} (Strictly AVOID generating cards primarily about these concepts.)
       *   **Existing Cards (Avoid Duplication):**
@@ -256,6 +263,8 @@ export async function POST(req: NextRequest) {
     Ensure the JSON is valid.
     `;
 
+  console.log(prompt);
+
   const gemini = createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_AI_API_KEY,
   });
@@ -290,6 +299,19 @@ export async function POST(req: NextRequest) {
     5.  **CONSTRAINT ADHERENCE:** Strictly follow all constraints specified in the main prompt, including ''Coverage Focus'', ''Excluded Topics (Blacklist)'', ''Subject-Specific Styles'', and the required ''OUTPUT FORMAT''. *The main prompt's detailed instructions always take precedence.*
 `,
     prompt: prompt,
+    onFinish(response) {
+      Logger.info(
+        `Generating flashcards session ${sessionId} finished successfully [RESPONSE DETAILS] ${JSON.stringify({ usage: response.usage })}`,
+        routePath,
+      );
+    },
+    onError: (error) => {
+      Logger.error(
+        `Generating flashcards session ${sessionId}`,
+        routePath,
+        JSON.stringify(error),
+      );
+    },
   });
 
   return result.toTextStreamResponse();

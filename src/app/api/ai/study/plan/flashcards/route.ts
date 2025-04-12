@@ -167,10 +167,10 @@ export async function POST(req: NextRequest) {
 
   const pickedCoverageFocus = coverageFocusDictionary.find(
     (plan) => plan.value === coverageFocus,
-  );
+  )?.label;
   const pickedKnowledgeLevel = knowledgeLevelDictionary.find(
     (level) => level.value === knowledgeLevel,
-  );
+  )?.label;
 
   const gemini = createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_AI_API_KEY,
