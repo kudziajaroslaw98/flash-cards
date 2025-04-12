@@ -100,12 +100,6 @@ export default function SetHardlinkPage() {
       ...prev,
       flashcards,
     }));
-    updateSets([
-      {
-        ...set,
-        flashcards,
-      },
-    ]);
     assignFlashcardsToSet(flashcards, set.frontUuid);
   };
 

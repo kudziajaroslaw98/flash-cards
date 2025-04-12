@@ -24,6 +24,7 @@ export type TextAreaProps = {
   loadingGenerate?: boolean;
   placeholder?: string;
   value: string;
+  minHeight?: number;
 } & Pick<
   TextareaHTMLAttributes<HTMLTextAreaElement>,
   | 'onChange'
@@ -49,12 +50,17 @@ export default function TextArea({
   handleGenerate,
   blockGenerate = false,
   loadingGenerate = false,
+  minHeight = 36,
   ...props
 }: TextAreaProps) {
   const [value, setValue] = useState(props.value);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
-  const { recalculateHeight } = useAutosizeTextArea(textAreaRef.current, value);
+  const { recalculateHeight } = useAutosizeTextArea(
+    textAreaRef.current,
+    value,
+    minHeight,
+  );
 
   useEffect(() => {
     setValue(props.value);

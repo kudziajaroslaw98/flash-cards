@@ -24,7 +24,6 @@ export async function remoteToLocalMetadataSync(
       // Upsert into IndexedDB
       await db.metadata.put({
         ...data,
-        lastSyncAt,
         synced: true,
         updatedAt: new Date().toUTCString(),
         key: 'current',
@@ -34,7 +33,6 @@ export async function remoteToLocalMetadataSync(
       await db.metadata.put({
         ...defaultMetadata,
         key: 'current',
-        lastSyncAt,
         updatedAt: new Date().toUTCString(),
         synced: true,
       } as unknown as Metadata);
@@ -59,7 +57,6 @@ export async function remoteToLocalMetadataSync(
           .from('metadata')
           .update({
             ...metadata,
-            lastSyncAt,
             updatedAt: new Date().toUTCString(),
             synced: true,
           })
@@ -71,15 +68,12 @@ export async function remoteToLocalMetadataSync(
           ...cloudMetadata,
           synced: true,
           updatedAt: new Date().toUTCString(),
-
-          lastSyncAt,
         } as Metadata);
       }
     } else {
       console.log('putting to cloud metadata', metadata);
       await supabase.from('metadata').insert({
         ...metadata,
-        lastSyncAt,
         updatedAt: new Date().toUTCString(),
         synced: true,
       });

@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 const useAutosizeTextArea = (
   textAreaRef: HTMLTextAreaElement | null,
   value: string,
+  minHeight: number = 36,
 ) => {
   const recalculateHeight = () => {
     if (textAreaRef) {
@@ -12,7 +13,7 @@ const useAutosizeTextArea = (
 
       // We then set the height directly, outside of the render loop
       // Trying to set this with state or a ref will product an incorrect value.
-      textAreaRef.style.height = scrollHeight + 'px';
+      textAreaRef.style.height = Math.max(scrollHeight, minHeight) + 'px';
     }
   };
 
