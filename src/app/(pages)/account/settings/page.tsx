@@ -60,6 +60,7 @@ export default function SettingsPage() {
 
   const handleMarketingConsent = () => {
     db.metadata.update('current', {
+      updatedAt: new Date().toUTCString(),
       marketingConsent: !(metadata.marketingConsent ?? false),
     });
   };

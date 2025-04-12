@@ -206,6 +206,15 @@ export default function AppProvider(props: PropsWithChildren) {
         user_uuid: user?.id,
       })),
     );
+
+    db.metadata.put(
+      {
+        ...metadata,
+        createdFlashCards: metadata.createdFlashCards + flashcards.length,
+        updatedAt: new Date().toUTCString(),
+      },
+      'current',
+    );
   };
 
   const removeFlashcards = async (flashcards: Flashcard[]) => {
@@ -395,7 +404,10 @@ export default function AppProvider(props: PropsWithChildren) {
   const updateMetadata = async (update: Partial<Metadata>) => {
     const updatedMetadata = metadataMerge(defaultMetadata, update);
 
-    await db.metadata.update('current', updatedMetadata);
+    await db.metadata.update('current', {
+      ...updatedMetadata,
+      updatedAt: new Date().toUTCString(),
+    });
     await supabase.from('metadata').update(updatedMetadata);
   };
 
@@ -594,6 +606,33 @@ export default function AppProvider(props: PropsWithChildren) {
   const syncLocalToRemote = async () => {
     if (!isLoggedIn || user === null) return;
 
+    const metadata = await db.metadata.get('current');
+    let lastSyncAt: string;
+
+    if (
+      metadata === undefined ||
+      metadata.lastSyncAt === null ||
+      metadata.lastSyncAt === undefined ||
+      isNaN(new Date(metadata.lastSyncAt).getTime())
+    ) {
+      // First sync or invalid date: use epoch
+      lastSyncAt = new Date(0).toUTCString();
+    } else {
+      // Valid date: use ISO string
+      lastSyncAt = new Date(metadata.lastSyncAt).toUTCString();
+    }
+
+    // const fiveMinsInMillis = 5 * 60 * 1000; // 5 minutes in milliseconds
+    // if (
+    //   new Date().getTime() - new Date(lastSyncAt).getTime() <
+    //   fiveMinsInMillis
+    // ) {
+    //   console.log(
+    //     'Sync [local ⇒ remote] skipped: Last sync was less than 5 minutes ago.',
+    //   );
+    //   return; // Skip sync
+    // }
+
     await Promise.allSettled([
       // FLASHCARDS
       localToRemoteFlashcardsSync(supabase, user),
@@ -622,12 +661,13 @@ export default function AppProvider(props: PropsWithChildren) {
 
     const metadata = await db.metadata.get('current');
     const newLastSyncAt = new Date().toUTCString();
-    const emptyMetadata = !metadata;
+    const emptyMetadata = metadata === undefined;
     let lastSyncAt: string;
 
     if (
-      !metadata ||
-      !metadata.lastSyncAt ||
+      metadata === undefined ||
+      metadata.lastSyncAt === null ||
+      metadata.lastSyncAt === undefined ||
       isNaN(new Date(metadata.lastSyncAt).getTime())
     ) {
       // First sync or invalid date: use epoch
@@ -637,6 +677,17 @@ export default function AppProvider(props: PropsWithChildren) {
       lastSyncAt = new Date(metadata.lastSyncAt).toUTCString();
     }
 
+    // const fiveMinsInMillis = 5 * 60 * 1000; // 5 minutes in milliseconds
+    // if (
+    //   new Date().getTime() - new Date(lastSyncAt).getTime() <
+    //   fiveMinsInMillis
+    // ) {
+    //   console.log(
+    //     'Sync [remote ⇒ local] skipped: Last sync was less than 5 minutes ago.',
+    //   );
+    //   return; // Skip sync
+    // }
+
     await Promise.allSettled([
       // FLASHCARDS
       remoteToLocalFlashcardsSync(supabase, lastSyncAt),
@@ -645,7 +696,13 @@ export default function AppProvider(props: PropsWithChildren) {
       remoteToLocalSetsSync(supabase, lastSyncAt),
 
       // METADATA
-      remoteToLocalMetadataSync(supabase, lastSyncAt, emptyMetadata, metadata),
+      remoteToLocalMetadataSync(
+        supabase,
+        lastSyncAt,
+        emptyMetadata,
+        user,
+        metadata,
+      ),
 
       // FOCUS SESSIONS
       remoteToLocalFocusSessionsSync(supabase, lastSyncAt),
@@ -658,24 +715,19 @@ export default function AppProvider(props: PropsWithChildren) {
     ]);
     // REVIEW LOGS
     await remoteToLocalReviewLogsSync(supabase, lastSyncAt);
-
-    await db.metadata.update('current', {
-      lastSyncAt: new Date(newLastSyncAt),
-    });
   };
 
   const syncWithDB = async () => {
     // LOCAL TO REMOTE
     if (!isLoggedIn || user === null) return;
 
+    // SYNC LOCAL TO REMOTE
     await syncLocalToRemote();
 
     // REMOTE TO LOCAL
-
     await syncRemoteToLocal();
 
     // WEB SOCKETS
-
     await applyWebsockets();
   };
 

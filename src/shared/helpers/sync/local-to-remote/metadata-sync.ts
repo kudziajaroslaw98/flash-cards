@@ -9,6 +9,7 @@ export async function localToRemoteMetadataSync(
 
   if (!metadata?.synced) {
     const unsyncedMetadata = { ...metadata, synced: true, user_uuid: user.id };
+    console.log(user.id);
 
     const { error: metadataError } = await supabase
       .from('metadata')

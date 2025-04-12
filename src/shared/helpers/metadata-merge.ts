@@ -20,6 +20,9 @@ export const metadataMerge = (
     incorrectAnswers:
       metadata.incorrectAnswers ?? defaultMetadata.incorrectAnswers,
     lastSyncAt: metadata.lastSyncAt ?? defaultMetadata.lastSyncAt,
+    createdAt: metadata.createdAt ?? new Date(),
+    key: 'current',
     streak: metadata.streak ?? defaultMetadata.streak,
+    marketingConsent: false,
   } as Metadata;
 };

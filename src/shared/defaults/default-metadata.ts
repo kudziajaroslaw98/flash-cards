@@ -8,6 +8,8 @@ export const defaultMetadata: Metadata = {
   createdFlashCards: 10,
   streak: 1,
   lastSyncAt: null,
+  createdAt: new Date().toUTCString(),
+  key: 'current',
   synced: false,
   notificationPermission: 'default',
   activeStudyPlan: undefined,

@@ -131,9 +131,7 @@ export const NewFlashcardModal = ({
   const handleDialogSubmit = async () => {
     window?.umami?.track('Flashcard dialog - submitted', { isInEditMode });
 
-    await formRef.current?.checkValidity();
-
-    if (!formRef.current?.isValid()) {
+    if (!(await formRef.current?.checkValidity())) {
       return;
     }
 
@@ -281,10 +279,6 @@ export const NewFlashcardModal = ({
               emitFormValue={setFormValue}
               scheme={getFormScheme}
               initialValues={formValue as Flashcard}
-              debug={{
-                values: true,
-                visibility: true,
-              }}
             />
           </Modal.Body>
 
