@@ -173,9 +173,9 @@ export async function POST(req: NextRequest) {
       # INPUTS:
       ${
         flashcardsRecords.length === 0 && focusTagsSet.size === 0
-          ? '*   **Sets name:** ' +
+          ? '*   **Flashcard Deck name:** ' +
             setName +
-            '  *   ** Sets description:** ' +
+            '  *   ** Flashcard Deck description:** ' +
             setDescription
           : ''
       }
@@ -261,7 +261,7 @@ export async function POST(req: NextRequest) {
   });
 
   const result = streamObject({
-    model: gemini('gemini-2.0-flash'),
+    model: gemini('gemini-2.0-flash-exp'),
     output: 'array',
     temperature: options.knowledgeLevel
       ? getTemperature(options.knowledgeLevel!)
