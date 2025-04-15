@@ -563,7 +563,13 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
     }));
   };
 
-  const handleOnBlur = async () => {
+  const handleOnBlur = async (inputName: string) => {
+    const field = props.scheme.inputs[inputName];
+
+    if (field && field.type === 'input' && field.inputType === 'file') {
+      setFormValues((prev) => ({ ...prev, [inputName]: null }));
+    }
+
     await checkFormValidity();
   };
 
