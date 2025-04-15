@@ -538,15 +538,16 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
   };
 
   const handleOnChange = (
-    value: unknown | unknown[] | ChangeEvent,
+    value: unknown | unknown[] | ChangeEvent<HTMLInputElement>,
     inputName: string,
   ) => {
     const field = props.scheme.inputs[inputName];
     let tmpValue = value;
 
-    if (field && field.type === 'input' && field.inputType === 'file') {
+    if (field && field.type === 'input') {
       const e = value as ChangeEvent<HTMLInputElement>;
-      tmpValue = e.target.files?.[0];
+      tmpValue =
+        field.inputType === 'file' ? e.target.files?.[0] : e.target.value;
     }
 
     if (props.emitFormValue) {
