@@ -547,7 +547,9 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
     if (field && field.type === 'input') {
       const e = value as ChangeEvent<HTMLInputElement>;
       tmpValue =
-        field.inputType === 'file' ? e.target.files?.[0] : e.target.value;
+        field.inputType === 'file' && e.target.files?.length > 0
+          ? e.target.files?.[0]
+          : e.target.value;
     }
 
     if (props.emitFormValue) {
@@ -563,13 +565,7 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
     }));
   };
 
-  const handleOnBlur = async (inputName: string) => {
-    const field = props.scheme.inputs[inputName];
-
-    if (field && field.type === 'input' && field.inputType === 'file') {
-      setFormValues((prev) => ({ ...prev, [inputName]: null }));
-    }
-
+  const handleOnBlur = async (_inputName: string) => {
     await checkFormValidity();
   };
 
