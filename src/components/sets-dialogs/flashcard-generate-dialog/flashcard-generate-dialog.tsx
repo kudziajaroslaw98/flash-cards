@@ -37,44 +37,6 @@ export const FlashcardGenerateDialog = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const submitRef = useRef<HTMLButtonElement>(null);
   const initialValue = initialData;
-  const [selectedFile, setSelectedFile] = useState<File | null>(null); // State for the selected file
-  const [fileError, setFileError] = useState<string | null>(null); // State for file validation errors
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    setFileError(null); // Reset error on new file selection
-
-    if (file) {
-      // Basic validation (can be expanded)
-      const allowedTypes = [
-        'application/pdf',
-        'image/jpeg',
-        'image/png',
-        'image/webp',
-      ];
-      const maxSize = 5 * 1024 * 1024; // 5MB
-
-      if (!allowedTypes.includes(file.type)) {
-        setFileError(
-          'Invalid file type. Please upload a PDF, JPG, PNG or WEBP.',
-        );
-        setSelectedFile(null);
-        event.target.value = ''; // Clear the input
-        return;
-      }
-
-      if (file.size > maxSize) {
-        setFileError('File size exceeds 5MB limit.');
-        setSelectedFile(null);
-        event.target.value = ''; // Clear the input
-        return;
-      }
-
-      setSelectedFile(file);
-    } else {
-      setSelectedFile(null);
-    }
-  };
 
   const getFormScheme: FormScheme<FlashcardGenerationOptions> = {
     // Schema defines the structure for EACH instance
@@ -207,7 +169,6 @@ export const FlashcardGenerateDialog = ({
         inputType: 'file',
         label: 'Upload PDF or Image (Max 5MB)',
         required: false,
-        onChange: handleFileChange,
         className:
           'cursor-pointer file:mr-4 file:cursor-pointer file:rounded-md file:border-0 file:bg-green-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-green-700 hover:file:bg-green-200 dark:file:bg-green-900/50 dark:file:text-green-300 dark:hover:file:bg-green-800/50',
         _internal_constraints: [
