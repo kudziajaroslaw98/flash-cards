@@ -163,6 +163,8 @@ export default function SetHardlinkPage() {
           return;
         }
 
+        const { additionalFile, ...withoutFile } = options;
+
         generateFlashcards('', {
           body: {
             flashcards:
@@ -171,7 +173,7 @@ export default function SetHardlinkPage() {
             setDescription: set?.description ?? '',
             fileData: fileData,
             mimeType: options.additionalFile?.type,
-            options: options,
+            options: withoutFile,
           },
         });
       };
