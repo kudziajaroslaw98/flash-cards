@@ -10,5 +10,7 @@ export interface FlashcardGenerationOptions {
   learningStyle?: LearningStyleAdaptation;
   mnemonic?: MnemonicPreferences;
   blacklist?: string[];
+  flashcardsNeeded?: '5' | '10' | '15' | '20' | '25' | '50';
   additionalUserPrompt?: string;
+  additionalFile?: File;
 }

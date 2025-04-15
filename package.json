@@ -15,7 +15,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@ai-sdk/google": "^1.2.7",
+    "@ai-sdk/google": "^1.2.11",
     "@dicebear/collection": "^9.2.2",
     "@dicebear/core": "^9.2.2",
     "@ducanh2912/next-pwa": "^10.2.9",
@@ -32,7 +32,7 @@
     "@tanstack/react-virtual": "^3.13.5",
     "@types/d3": "^7.4.3",
     "@types/mdx": "^2.0.13",
-    "ai": "^4.3.2",
+    "ai": "^4.3.6",
     "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -41,8 +41,8 @@
     "dexie": "^4.0.11",
     "dexie-react-hooks": "^1.1.7",
     "lucide-react": "^0.465.0",
-    "motion": "^12.6.3",
-    "next": "^15.2.4",
+    "motion": "^12.7.1",
+    "next": "^15.3.0",
     "postcss": "^8.5.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",

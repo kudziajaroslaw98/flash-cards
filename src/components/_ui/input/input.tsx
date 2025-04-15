@@ -26,12 +26,13 @@ export interface InputComponentProps
     | 'placeholder'
     | 'value'
     | 'name'
-    | 'onChange'
     | 'onBlur'
     | 'onFocus'
     | 'onInput'
+    | 'onChange'
     | 'onKeyDown'
     | 'tabIndex'
+    | 'accept'
   > {
   inputType: HTMLInputTypeAttribute;
   label?: string;
@@ -113,6 +114,7 @@ function Input({
           ref={inputRef}
           type={inputType}
           tabIndex={props.tabIndex ?? 0}
+          value={inputType === 'file' ? undefined : props.value}
           className={cn([
             label
               ? 'placeholder:text-gray-400 dark:placeholder:text-slate-500'

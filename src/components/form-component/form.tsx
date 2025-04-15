@@ -12,6 +12,7 @@ import type {
 import type { InternalAccordion } from '#/types/input-types';
 import type { InputValidation } from '#/types/input-validation.type';
 import {
+  ChangeEvent,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -536,17 +537,28 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
     }));
   };
 
-  const handleOnChange = (value: unknown | unknown[], inputName: string) => {
+  const handleOnChange = (
+    value: unknown | unknown[] | ChangeEvent,
+    inputName: string,
+  ) => {
+    const field = props.scheme.inputs[inputName];
+    let tmpValue = value;
+
+    if (field && field.type === 'input' && field.inputType === 'file') {
+      const e = value as ChangeEvent<HTMLInputElement>;
+      tmpValue = e.target.files?.[0];
+    }
+
     if (props.emitFormValue) {
       handleEmitValues({
         ...formValues,
-        [inputName]: value,
+        [inputName]: tmpValue,
       });
     }
 
     setFormValues((prev) => ({
       ...prev,
-      [inputName]: value,
+      [inputName]: tmpValue,
     }));
   };
 
