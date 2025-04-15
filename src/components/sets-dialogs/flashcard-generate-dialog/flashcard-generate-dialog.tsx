@@ -206,7 +206,6 @@ export const FlashcardGenerateDialog = ({
         type: 'input',
         inputType: 'file',
         label: 'Upload PDF or Image (Max 5MB)',
-        accept: '.pdf,image/jpeg,image/png,image/webp',
         required: false,
         onChange: handleFileChange,
         className:
