@@ -186,8 +186,6 @@ export async function POST(req: NextRequest) {
     routePath,
   );
 
-  const fileBuffer = Buffer.from(fileData, 'base64');
-
   const prompt = `
       **IMPORTANT: All generated cards MUST strictly conform to the SINGLE specified Knowledge Level: ${pickedKnowledgeLevel}. Do NOT generate simpler content.**
       # ROLE: You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards tailored to user specifications.
@@ -203,7 +201,7 @@ export async function POST(req: NextRequest) {
             setDescription
           : ' (These define the specific topics/concepts to cover when focus tags are not provided)'
       }
-      
+
       *   **Knowledge Level:** ${pickedKnowledgeLevel} (This is the PRIMARY determinant of difficulty for ALL cards)
       *   **Focus Tags:** [${focusTagsSet.values().toArray().join(', ')}] (These define the specific topics/concepts to cover)
       *   **Subject Area & Topic:** (Infer the general Subject Area [e.g., Technical/STEM, Language Learning] and specific Topic Name from the Focus Tags. Use this context for applying style and knowledge level guidance.)
@@ -303,17 +301,25 @@ export async function POST(req: NextRequest) {
       },
       {
         role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: prompt,
-          },
-          {
-            type: 'file',
-            data: fileBuffer,
-            mimeType: mimeType,
-          },
-        ],
+        content: fileData
+          ? [
+              {
+                type: 'text',
+                text: prompt,
+              },
+
+              {
+                type: 'file',
+                data: Buffer.from(fileData, 'base64'),
+                mimeType: mimeType,
+              },
+            ]
+          : [
+              {
+                type: 'text',
+                text: prompt,
+              },
+            ],
       },
     ],
     maxSteps: 3,
