@@ -546,9 +546,10 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
 
     if (field && field.type === 'input') {
       const e = value as ChangeEvent<HTMLInputElement>;
+      const files = e.target.files as FileList;
       tmpValue =
-        field.inputType === 'file' && e.target.files?.length > 0
-          ? e.target.files?.[0]
+        field.inputType === 'file' && files?.length > 0
+          ? files?.[0]
           : e.target.value;
     }
 
