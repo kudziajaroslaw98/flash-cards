@@ -73,7 +73,7 @@ function Input({
 
   const handleClick = () => {
     window?.umami?.track('Click input', { name: props.name });
-    if (inputRef.current) {
+    if (inputRef.current && inputType !== 'file') {
       inputRef.current.focus();
       inputRef.current.click();
     }
