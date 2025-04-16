@@ -105,13 +105,14 @@ export default function FormInput<T>({
       {isInput(inputProps) && (
         <Input
           {...inputProps}
-          inputType={inputProps.type}
+          inputType={inputProps.inputType}
           key={`${inputName}-${index}`}
           valid={touched ? valid : true}
           error={touched ? error : null}
           touched={touched}
           value={(value as string) ?? ''}
           onInput={(e) => handleOnInput(e, inputName)}
+          onChange={(e) => handleOnChange(e, inputName)}
           onFocus={() => handleOnFocus(inputName)}
           onBlur={() => handleOnBlur(inputName)}
           {...constraintProps}

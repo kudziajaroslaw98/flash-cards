@@ -26,12 +26,13 @@ export interface InputComponentProps
     | 'placeholder'
     | 'value'
     | 'name'
-    | 'onChange'
     | 'onBlur'
     | 'onFocus'
     | 'onInput'
+    | 'onChange'
     | 'onKeyDown'
     | 'tabIndex'
+    | 'accept'
   > {
   inputType: HTMLInputTypeAttribute;
   label?: string;
@@ -72,7 +73,7 @@ function Input({
 
   const handleClick = () => {
     window?.umami?.track('Click input', { name: props.name });
-    if (inputRef.current) {
+    if (inputRef.current && inputType !== 'file') {
       inputRef.current.focus();
       inputRef.current.click();
     }
@@ -113,13 +114,13 @@ function Input({
           ref={inputRef}
           type={inputType}
           tabIndex={props.tabIndex ?? 0}
+          value={inputType === 'file' ? undefined : props.value}
           className={cn([
             label
               ? 'placeholder:text-gray-400 dark:placeholder:text-slate-500'
               : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
             'peer text-sm text-gray-800 ',
             'text-inherit outline-none transition-all dark:text-slate-200',
-            // peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-red-600 checked:border-red-600
             inputType === 'checkbox'
               ? `pointer-events-none relative h-4 min-w-4 appearance-none rounded border border-gray-300 checked:border-green-500
               checked:bg-green-500 checked:after:absolute checked:after:left-0 checked:after:top-0 checked:after:z-10

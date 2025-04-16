@@ -14,7 +14,7 @@ import uuid from '#/shared/utils/uuid.util';
 import { FlashcardGenerationOptions } from '#/types/flashcard-generation-options.type';
 import type { KnowledgeLevel } from '#/types/knowledge-level.type';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { streamObject } from 'ai';
+import { streamText } from 'ai';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -23,6 +23,14 @@ const routePath = 'ai/set/flashcards/generate';
 
 async function validateBody(body: Record<string, unknown>) {
   const validationScheme = z.object({
+    fileData: z.string().nullish(),
+    mimeType: z
+      .string()
+      .refine(
+        (type) => type.startsWith('image/') || type === 'application/pdf',
+        'Invalid file type. Only images and PDFs are supported.',
+      )
+      .nullish(),
     options: z.object({
       knowledgeLevel: knowledgeLevelSchema.nullish(),
       learningStyle: learningStyleAdaptationSchema.nullish(),
@@ -31,6 +39,9 @@ async function validateBody(body: Record<string, unknown>) {
       blacklist: z.array(z.string()).nullish(),
       focusAreas: z.array(z.string()).nullish(),
       additionalUserPrompt: z.string().nullish(),
+      flashcardsNeeded: z.enum(['5', '10', '15', '20', '25', '50'], {
+        message: 'Invalid number of flashcards',
+      }),
     }),
     flashcards: z
       .array(
@@ -85,11 +96,15 @@ export async function POST(req: NextRequest) {
     setName,
     setDescription,
     options,
+    fileData,
+    mimeType,
   }: {
     flashcards: string[];
     setName: string;
     setDescription: string;
     options: Partial<FlashcardGenerationOptions>;
+    fileData: string;
+    mimeType: string;
   } = await req.json();
 
   try {
@@ -167,6 +182,7 @@ export async function POST(req: NextRequest) {
       setName,
       setDescription,
       options,
+      mimeType,
     })}`,
     routePath,
   );
@@ -175,7 +191,7 @@ export async function POST(req: NextRequest) {
       **IMPORTANT: All generated cards MUST strictly conform to the SINGLE specified Knowledge Level: ${pickedKnowledgeLevel}. Do NOT generate simpler content.**
       # ROLE: You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards tailored to user specifications.
 
-      # GOAL: Generate 10 unique flashcards based on the provided inputs, strictly adhering to the specified knowledge level and content focus.
+      # GOAL: Generate ${options.flashcardsNeeded} unique flashcards based on the provided inputs, strictly adhering to the specified knowledge level and content focus.
 
       # INPUTS:
       ${
@@ -186,9 +202,9 @@ export async function POST(req: NextRequest) {
             setDescription
           : ' (These define the specific topics/concepts to cover when focus tags are not provided)'
       }
-      
+
       *   **Knowledge Level:** ${pickedKnowledgeLevel} (This is the PRIMARY determinant of difficulty for ALL cards)
-      *   **Focus Tags:** [${focusTagsSet.values().toArray().join(', ')}] (These define the specific topics/concepts to cover)
+      *   **Focus Tags:** [${focusTagsSet.size > 0 ? focusTagsSet.values().toArray().join(', ') : 'None provided'}] (These define the specific topics/concepts to cover)
       *   **Subject Area & Topic:** (Infer the general Subject Area [e.g., Technical/STEM, Language Learning] and specific Topic Name from the Focus Tags. Use this context for applying style and knowledge level guidance.)
       *   **Excluded Topics (Blacklist):** ${options.blacklist && options.blacklist.length > 0 ? `[${options.blacklist.join(', ')}, ${flashcardsRecords.map((summary) => `${summary.query}`).join(', ')}]` : 'None specified'} (Strictly AVOID generating cards primarily about these concepts.)
       *   **Existing Cards (Avoid Duplication):**
@@ -263,34 +279,19 @@ export async function POST(req: NextRequest) {
     Ensure the JSON is valid.
     `;
 
-  console.log(prompt);
-
   const gemini = createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_AI_API_KEY,
   });
 
-  const result = streamObject({
-    model: gemini('gemini-2.0-flash-exp'),
-    output: 'array',
+  const result = streamText({
+    model: gemini('gemini-2.0-flash'),
     temperature: options.knowledgeLevel
       ? getTemperature(options.knowledgeLevel!)
       : 1,
-    schema: z.object({
-      id: z.string(),
-      query: z.string(),
-      topic: z.string(),
-      definition: z.string(),
-      tags: z.array(z.string()),
-      examples: z.string(),
-      keyPoints: z.string(),
-      synonyms: z.string(),
-      relatedFacts: z.string(),
-      answer1: z.string(),
-      answer2: z.string(),
-      answer3: z.string(),
-      answer4: z.string(),
-    }),
-    system: `You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards based on detailed user specifications. Your primary responsibilities, guided by the main prompt, are:
+    messages: [
+      {
+        role: 'system',
+        content: `You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards based on detailed user specifications. Your primary responsibilities, guided by the main prompt, are:
 
     1.  **UNIQUENESS & RELEVANCE:** Generate flashcards exploring DISTINCT concepts relevant to the specified ''Focus Tags'', strictly avoiding semantic overlap or reformulation of ''Existing Cards'' or other generated content in the current batch.
     2.  **PEDAGOGICAL APPROPRIATENESS:** Employ varied question styles and cognitive tasks (e.g., application, analysis, evaluation) that are *strictly appropriate for the single Knowledge Level specified in the main prompt*. Do NOT mix difficulty levels across cards in one request.
@@ -298,7 +299,32 @@ export async function POST(req: NextRequest) {
     4.  **ANSWER & EXPLANATION QUALITY:** Create a clearly correct, concise ''answer'' and a detailed, accurate ''definition'' that effectively clarifies *why* the answer is correct, provides necessary context, and aligns with the required ''Knowledge Level'', following the JSON structure defined in the main prompt.
     5.  **CONSTRAINT ADHERENCE:** Strictly follow all constraints specified in the main prompt, including ''Coverage Focus'', ''Excluded Topics (Blacklist)'', ''Subject-Specific Styles'', and the required ''OUTPUT FORMAT''. *The main prompt's detailed instructions always take precedence.*
 `,
-    prompt: prompt,
+      },
+      {
+        role: 'user',
+        content: fileData
+          ? [
+              {
+                type: 'text',
+                text: prompt,
+              },
+
+              {
+                type: 'file',
+                data: Buffer.from(fileData, 'base64'),
+                mimeType: mimeType,
+              },
+            ]
+          : [
+              {
+                type: 'text',
+                text: prompt,
+              },
+            ],
+      },
+    ],
+    maxSteps: 3,
+    experimental_continueSteps: true,
     onFinish(response) {
       Logger.info(
         `Generating flashcards session ${sessionId} finished successfully [RESPONSE DETAILS] ${JSON.stringify({ usage: response.usage })}`,
@@ -314,5 +340,5 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  return result.toTextStreamResponse();
+  return result.toDataStreamResponse();
 }

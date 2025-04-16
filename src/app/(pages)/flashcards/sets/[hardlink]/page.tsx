@@ -6,6 +6,7 @@ import ContextMenu, {
 } from '#/components/_ui/context-menu/context-menu';
 import LinkComponent from '#/components/_ui/link/link';
 import { AssignFlashcardsModal } from '#/components/assign-flash-cards-modal/assign-flash-cards-modal';
+import type { AISuggestedFlashcardType } from '#/components/flash-card/ai-suggested-flashcard';
 import FlashcardComponent from '#/components/flash-card/flash-card';
 import { FloatingButtons } from '#/components/floating-buttons/floating-buttons';
 import { NewFlashcardModal } from '#/components/new-flash-card-modal/new-flash-card-modal';
@@ -18,11 +19,12 @@ import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
 import { cn } from '#/shared/utils/cn.util';
+import { extractObjectsFromString } from '#/shared/utils/extract-objects-from-string';
 import uuid from '#/shared/utils/uuid.util';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { Flashcard } from '#/types/flash-card.type';
 import { FlashcardGenerationOptions } from '#/types/flashcard-generation-options.type';
-import { experimental_useObject as useObject } from '@ai-sdk/react';
+import { useCompletion } from '@ai-sdk/react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   ArrowLeft,
@@ -41,7 +43,6 @@ import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { z } from 'zod';
 
 export default function SetHardlinkPage() {
   const setHardLink = useParams()?.hardlink as string;
@@ -68,24 +69,11 @@ export default function SetHardlinkPage() {
   const [generated, setGenerated] = useState<Flashcard[]>([]);
 
   const {
-    submit: generateFlashcards,
+    complete: generateFlashcards,
+    completion: generatedFlashcards,
     isLoading: isGeneratingFlashcards,
-    object: generatedFlashcards,
-  } = useObject({
+  } = useCompletion({
     api: API_ROUTES.SET_FLASHCARDS,
-    schema: z.array(
-      z.object({
-        id: z.string(),
-        query: z.string(),
-        topic: z.string(),
-        definition: z.string(),
-        tags: z.array(z.string()),
-        examples: z.string(),
-        keyPoints: z.string(),
-        synonyms: z.string(),
-        relatedFacts: z.string(),
-      }),
-    ),
   });
 
   const setFlashcards =
@@ -162,12 +150,44 @@ export default function SetHardlinkPage() {
       },
     ]);
 
-    generateFlashcards({
-      flashcards: setFlashcards.map((flashcard) => flashcard.frontUuid) ?? [],
-      setName: set?.name ?? '',
-      setDescription: set?.description ?? '',
-      options: options,
-    });
+    if (options.additionalFile) {
+      const reader = new FileReader();
+      reader.readAsDataURL(options.additionalFile);
+      reader.onloadend = async () => {
+        const base64data = reader.result as string;
+        // Remove the data URL prefix (e.g., "data:application/pdf;base64,")
+        const fileData = base64data.split(',')[1];
+
+        if (!fileData) {
+          console.error('Failed to read file data.');
+          return;
+        }
+
+        const { additionalFile, ...withoutFile } = options;
+
+        generateFlashcards('', {
+          body: {
+            flashcards:
+              setFlashcards.map((flashcard) => flashcard.frontUuid) ?? [],
+            setName: set?.name ?? '',
+            setDescription: set?.description ?? '',
+            fileData: fileData,
+            mimeType: options.additionalFile?.type,
+            options: withoutFile,
+          },
+        });
+      };
+    } else {
+      generateFlashcards('', {
+        body: {
+          flashcards:
+            setFlashcards.map((flashcard) => flashcard.frontUuid) ?? [],
+          setName: set?.name ?? '',
+          setDescription: set?.description ?? '',
+          options: options,
+        },
+      });
+    }
   };
 
   const handleNewFlashcards = (newFlashcards: Omit<Flashcard, 'order'>[]) => {
@@ -237,14 +257,16 @@ export default function SetHardlinkPage() {
   );
 
   useEffect(() => {
-    setSet(sets.filter((set) => set?.hardlink === setHardLink)[0]);
-  }, [sets, setHardLink]);
+    const objects =
+      extractObjectsFromString<AISuggestedFlashcardType>(generatedFlashcards);
 
-  useEffect(() => {
-    if (!generatedFlashcards) return;
+    if (objects === null) {
+      return;
+    }
+
     setGenerated((prev) => {
       const length = prev.length;
-      const validGeneratedFlashcards = generatedFlashcards?.filter(
+      const validGeneratedFlashcards = objects?.filter(
         (flashcard) => flashcard,
       );
 
@@ -266,23 +288,24 @@ export default function SetHardlinkPage() {
 
       return [...prev, ...mappedFlashcards];
     });
-
-    if (generatedFlashcards && !isGeneratingFlashcards) {
-      if (generated.length > 0) {
-        addFlashcards(generated);
-        updateSets([
-          {
-            ...set,
-            flashcards: [
-              ...set.flashcards,
-              ...generated.map((f) => f.frontUuid),
-            ],
-          },
-        ]);
-        setGenerated([]);
-      }
-    }
   }, [generatedFlashcards, isGeneratingFlashcards]);
+
+  useEffect(() => {
+    if (generated && generated.length > 0 && !isGeneratingFlashcards) {
+      addFlashcards(generated);
+      updateSets([
+        {
+          ...set,
+          flashcards: [...set.flashcards, ...generated.map((f) => f.frontUuid)],
+        },
+      ]);
+      setGenerated([]);
+    }
+  }, [generated, setGenerated, isGeneratingFlashcards]);
+
+  useEffect(() => {
+    setSet(sets.filter((set) => set?.hardlink === setHardLink)[0]);
+  }, [sets, setHardLink]);
 
   return (
     <div className='flex h-full w-full grow flex-col items-center gap-8 md:pb-24'>

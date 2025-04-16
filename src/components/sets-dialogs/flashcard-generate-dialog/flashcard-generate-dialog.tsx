@@ -35,9 +35,6 @@ export const FlashcardGenerateDialog = ({
 }: FlashcardGenerateDialogProps) => {
   const formRef = useRef<FormMethods<FlashcardGenerationOptions>>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formValue, setFormValue] = useState<
-    Partial<FlashcardGenerationOptions>
-  >({});
   const submitRef = useRef<HTMLButtonElement>(null);
   const initialValue = initialData;
 
@@ -134,12 +131,76 @@ export const FlashcardGenerateDialog = ({
           },
         ],
       },
+      blacklist: {
+        type: 'tags', // Assuming a tags input exists for blacklist
+        label: 'Exclude Topics (Blacklist)',
+        name: 'blacklist',
+        maxTags: 10,
+        placeholder: 'Enter topics to exclude...',
+        required: false,
+        _internal_default_value: [],
+        _internal_constraints: [
+          {
+            type: 'validation',
+            key: 'blacklist',
+            constraint: z.array(z.string()).max(10, '').nullish(),
+          },
+        ],
+      },
+      flashcardsNeeded: {
+        type: 'dropdown',
+        multiple: false,
+        config: [
+          { value: '5', label: '5' },
+          { value: '10', label: '10' },
+          { value: '15', label: '15' },
+          { value: '20', label: '20' },
+          { value: '25', label: '25' },
+          {
+            value: '50',
+            label: '50',
+          },
+        ],
+        controlLabel: 'How many flashcards?',
+        _internal_default_value: '10',
+      },
+      additionalFile: {
+        type: 'input',
+        inputType: 'file',
+        label: 'Upload PDF or Image (Max 5MB)',
+        required: false,
+        accept: '.pdf,image/jpeg,image/png',
+        className:
+          'cursor-pointer file:mr-4 file:cursor-pointer file:rounded-md file:border-0 file:bg-green-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-green-700 hover:file:bg-green-200 dark:file:bg-green-900/50 dark:file:text-green-300 dark:hover:file:bg-green-800/50',
+        _internal_constraints: [
+          {
+            type: 'validation',
+            key: 'additionalFile',
+            constraint: z
+              .instanceof(File)
+              .refine(
+                (file) =>
+                  [
+                    'application/pdf',
+                    'image/jpeg',
+                    'image/png',
+                    'image/webp',
+                  ].includes(file.type),
+                {
+                  message: 'Invalid document file type',
+                },
+              )
+              .refine((file) => file.size <= 5 * 1024 * 1024, {
+                message: 'File size should not exceed 5MB',
+              }),
+          },
+        ],
+      },
     },
   };
 
   const handleDialogClose = () => {
     setIsModalOpen(false);
-    setFormValue({});
   };
 
   const handleDialogSubmit = async () => {
@@ -151,9 +212,8 @@ export const FlashcardGenerateDialog = ({
 
     const formData = formRef.current?.value;
 
-    handleSubmit(formData);
+    handleSubmit({ ...formData });
     setIsModalOpen(false);
-    setFormValue({});
   };
 
   return (
@@ -210,7 +270,6 @@ export const FlashcardGenerateDialog = ({
             ref={formRef}
             className='w-full max-w-96'
             scheme={getFormScheme}
-            emitFormValue={setFormValue}
             initialValues={initialValue}
           />
         </Modal.Body>
