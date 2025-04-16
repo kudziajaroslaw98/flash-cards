@@ -121,7 +121,6 @@ function Input({
               : 'placeholder:text-gray-400 dark:placeholder:text-gray-500',
             'peer text-sm text-gray-800 ',
             'text-inherit outline-none transition-all dark:text-slate-200',
-            // peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-red-600 checked:border-red-600
             inputType === 'checkbox'
               ? `pointer-events-none relative h-4 min-w-4 appearance-none rounded border border-gray-300 checked:border-green-500
               checked:bg-green-500 checked:after:absolute checked:after:left-0 checked:after:top-0 checked:after:z-10
