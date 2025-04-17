@@ -49,39 +49,54 @@
   ],
   "screenshots": [
     {
-      "src": "/images/app/screenshot-1.jpg",
-      "sizes": "1440x3088",
-      "type": "image/jpg"
+      "src": "/images/app/screenshot-1.png",
+      "sizes": "1440x3202",
+      "type": "image/png"
     },
     {
-      "src": "/images/app/screenshot-2.jpg",
-      "sizes": "1440x3088",
-      "type": "image/jpg"
+      "src": "/images/app/screenshot-2.png",
+      "sizes": "1440x3202",
+      "type": "image/png"
     },
     {
-      "src": "/images/app/screenshot-3.jpg",
-      "sizes": "1440x3088",
-      "type": "image/jpg"
+      "src": "/images/app/screenshot-3.png",
+      "sizes": "1440x3202",
+      "type": "image/png"
     },
     {
-      "src": "/images/app/screenshot-4.jpg",
-      "sizes": "1440x3088",
-      "type": "image/jpg"
+      "src": "/images/app/screenshot-4.png",
+      "sizes": "1440x3202",
+      "type": "image/png"
     },
     {
-      "src": "/images/app/screenshot-5.jpg",
-      "sizes": "1440x3088",
-      "type": "image/jpg"
+      "src": "/images/app/screenshot-5.png",
+      "sizes": "1440x3202",
+      "type": "image/png"
     },
     {
-      "src": "/images/app/screenshot-6.jpg",
-      "sizes": "1440x3088",
-      "type": "image/jpg"
+      "src": "/images/app/screenshot-6.png",
+      "sizes": "1440x3202",
+      "type": "image/png"
     },
     {
-      "src": "/images/app/screenshot-7.jpg",
-      "sizes": "1440x3088",
-      "type": "image/jpg"
+      "src": "/images/app/screenshot-7.png",
+      "sizes": "1440x3202",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/app/screenshot-8.png",
+      "sizes": "1440x3202",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/app/screenshot-9.png",
+      "sizes": "1440x3202",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/app/screenshot-10.png",
+      "sizes": "1440x3202",
+      "type": "image/png"
     }
   ],
   "shortcuts": [
