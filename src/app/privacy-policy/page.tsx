@@ -3,8 +3,67 @@ import PrivacyPolicy from '#/markdown/privacy-policy.mdx';
 import { cn } from '#/shared/utils/cn.util';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import * as m from 'motion/react-m';
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  authors: [
+    { name: 'Final Phase', url: 'https://finalphase.app' },
+    { name: 'Jarosław Kudzia', url: 'https://github.com/kudziajaroslaw98' },
+  ],
+  creator: 'Jarosław Kudzia',
+  title: 'How to Delete Your Final Phase Account',
+  description:
+    'Step-by-step instructions on how to permanently delete your Final Phase account and all associated data, including flashcards, sets, and progress.',
+  keywords: [
+    'delete account',
+    'remove account',
+    'account deletion',
+    'Final Phase account',
+    'data removal',
+    'delete flashcards',
+    'privacy',
+  ],
+  openGraph: {
+    title: 'How to Delete Your Final Phase Account',
+    description:
+      'Learn how to permanently remove your Final Phase account and data.',
+    images: [
+      {
+        url: 'https://finalphase.app/og/og_image.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
+    url: 'https://finalphase.app/account-deletion',
+    siteName: 'Final Phase',
+    locale: 'en-US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'How to Delete Your Final Phase Account',
+    description:
+      'Learn how to permanently remove your Final Phase account and data.',
+    images: [
+      {
+        url: 'https://finalphase.app/og/og_image.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  robots: {
+    index: false,
+    follow: true,
+  },
+  applicationName: 'Final Phase',
+  alternates: {
+    canonical: 'https://finalphase.app/account-deletion',
+  },
+  manifest: '/manifest.json',
+};
 
 export default function PrivacyPolicyPage() {
   const animatedPlayIcon = (

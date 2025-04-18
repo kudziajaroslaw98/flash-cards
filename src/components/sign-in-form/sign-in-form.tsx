@@ -5,8 +5,10 @@ import { createClient } from '#/shared/utils/supabase/client';
 import { ArrowLeftIcon, Fingerprint, Github } from 'lucide-react';
 import * as m from 'motion/react-m';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
+import { z } from 'zod';
+import Input from '../_ui/input/input';
 
 function AuthButtons({
   isLoading,
@@ -101,7 +103,12 @@ function AuthButtons({
 
 export default function SignInComponent() {
   const supabase = createClient();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
   const handleBackButton = () => {
     window?.umami?.track('Sign in back');
@@ -120,6 +127,54 @@ export default function SignInComponent() {
       <path d='M43.611,20.083L43.595,20L42,20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571	c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z' />
     </svg>
   );
+
+  const getRedirectUrl = () => {
+    const redirect = searchParams.get('redirect');
+    let redirectUrl;
+
+    switch (redirect) {
+      case 'pricing':
+        redirectUrl = new URL(
+          process.env.NEXT_PUBLIC_APP_LOCAL_HREF + '/pricing',
+        );
+        break;
+      default:
+        redirectUrl = new URL(
+          process.env.NEXT_PUBLIC_APP_LOCAL_HREF + '/flashcards/learn',
+        );
+        break;
+    }
+
+    return redirectUrl;
+  };
+
+  const handleSignIn = async () => {
+    const schema = z.object({
+      email: z.string().email(),
+      password: z.string().min(8),
+    });
+
+    const valid = schema.safeParse({ email, password });
+
+    if (valid.success) {
+      setIsLoading(true);
+      const { data, error: loginError } =
+        await supabase.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+
+      if (!loginError && data.user !== null) {
+        const redirectUrl = getRedirectUrl();
+        router.push(redirectUrl.toString());
+      } else {
+        setError(loginError?.message || 'An error occurred');
+      }
+      setIsLoading(false);
+    } else {
+      setError(valid.error.issues?.[0].message);
+    }
+  };
 
   return (
     <m.div
@@ -146,6 +201,62 @@ export default function SignInComponent() {
       </h1>
 
       <div className='z-20 flex w-full flex-col gap-2'>
+        <div className='z-20 flex w-full flex-col gap-2'>
+          <Input
+            inputType={'email'}
+            placeholder={'Email'}
+            valid
+            onInput={(event) =>
+              setEmail(
+                (event.target as HTMLInputElement | HTMLTextAreaElement)?.value,
+              )
+            }
+          />
+          <Input
+            inputType={'password'}
+            placeholder={'Password'}
+            valid
+            onInput={(event) =>
+              setPassword(
+                (event.target as HTMLInputElement | HTMLTextAreaElement)?.value,
+              )
+            }
+          />
+
+          {error && (
+            <div className='py-2 text-center text-sm text-red-500'>{error}</div>
+          )}
+
+          <Button
+            label='Sign in'
+            onClick={() => handleSignIn()}
+            variant={'primary'}
+            alt='Sign in'
+            loading={isLoading}
+          />
+
+          <Link
+            href={'/flashcards/learn'}
+            className='pt-4'
+          >
+            <Button
+              variant={'primary-outline'}
+              disabled={isLoading ?? false}
+              loading={isLoading ?? false}
+              iconPosition='left'
+              label='Continue as guest'
+              size={'full'}
+              alt='Continue as guest'
+            ></Button>
+          </Link>
+        </div>
+
+        <div className='flex w-full items-center justify-center gap-4 py-4'>
+          <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800' />
+          <span className='text-sm text-gray-300 dark:text-slate-700'>OR</span>
+          <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800' />
+        </div>
+
         <Suspense
           fallback={
             <>
@@ -178,26 +289,8 @@ export default function SignInComponent() {
           />
         </Suspense>
 
-        <div className='flex w-full items-center justify-center gap-4 py-4'>
-          <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800' />
-          <span className='text-sm text-gray-300 dark:text-slate-700'>OR</span>
-          <div className='h-[2px] w-full bg-gray-200 dark:bg-slate-800' />
-        </div>
-
-        <Link href={'/flashcards/learn'}>
-          <Button
-            variant={'primary-outline'}
-            disabled={isLoading ?? false}
-            loading={isLoading ?? false}
-            iconPosition='left'
-            label='Continue as guest'
-            size={'full'}
-            alt='Continue as guest'
-          ></Button>
-        </Link>
-
         <p className='mt-4 px-4 text-center text-xs text-slate-500 dark:text-slate-400'>
-          By continuing via a provider or as a guest, you agree to our{' '}
+          By continuing via an email, provider or as a guest, you agree to our{' '}
           <Link
             href='/terms-of-service'
             className='underline underline-offset-4 hover:text-green-500'

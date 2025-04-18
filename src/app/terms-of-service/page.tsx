@@ -3,8 +3,67 @@ import TermsOfService from '#/markdown/terms-of-service.mdx';
 import { cn } from '#/shared/utils/cn.util';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import * as m from 'motion/react-m';
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  authors: [
+    { name: 'Final Phase', url: 'https://finalphase.app' },
+    { name: 'Jarosław Kudzia', url: 'https://github.com/kudziajaroslaw98' },
+  ],
+  creator: 'Jarosław Kudzia',
+  title: 'Terms of Service - Final Phase',
+  description:
+    'Read the Terms of Service for using Final Phase. Understand your rights and responsibilities when using our AI flashcards and study application.',
+  keywords: [
+    'terms of service',
+    'Final Phase terms',
+    'user agreement',
+    'app terms',
+    'conditions of use',
+    'legal terms',
+    'study app terms',
+  ],
+  openGraph: {
+    title: 'Terms of Service - Final Phase',
+    description:
+      'Review the terms and conditions for using the Final Phase application.',
+    images: [
+      {
+        url: 'https://finalphase.app/og/og_image.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
+    url: 'https://finalphase.app/terms-of-service',
+    siteName: 'Final Phase',
+    locale: 'en-US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Terms of Service - Final Phase',
+    description:
+      'Review the terms and conditions for using the Final Phase application.',
+    images: [
+      {
+        url: 'https://finalphase.app/og/og_image.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  robots: {
+    index: false, // Often set to noindex, but indexable can be fine for informational purposes
+    follow: true,
+  },
+  applicationName: 'Final Phase',
+  alternates: {
+    canonical: 'https://finalphase.app/terms-of-service',
+  },
+  manifest: '/manifest.json',
+};
 
 export default function TermsOfServicePage() {
   const animatedPlayIcon = (
