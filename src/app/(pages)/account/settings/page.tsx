@@ -305,6 +305,13 @@ export default function SettingsPage() {
           >
             Terms of Service
           </Link>
+          <Link
+            href='/account-deletion
+'
+            className='hover:text-primary hover:underline'
+          >
+            How to delete my account?
+          </Link>
         </div>
       </div>
     </div>

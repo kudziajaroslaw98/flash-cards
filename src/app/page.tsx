@@ -878,6 +878,14 @@ export default async function Home() {
               >
                 Terms of Service
               </Link>
+              <span>|</span>{' '}
+              <Link
+                href='/account-deletion'
+                className='hover:text-green-500'
+                aria-label='Terms of Service'
+              >
+                How to delete my account?
+              </Link>
             </div>
             <span className='text-center text-sm text-slate-400'>
               © {new Date().getFullYear()} Final Phase. All rights reserved.
