@@ -1,8 +1,12 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "app.finalphase.twa",
-        "sha256_cert_fingerprints": ["F5:A8:6A:FF:80:1B:4B:4B:69:25:DC:DA:7F:22:21:64:6A:A8:27:44:00:A9:99:1E:D4:BF:E4:1A:6F:14:98:03"]
-      }
-    }]
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.finalphase.twa",
+      "sha256_cert_fingerprints": [
+        "D5:C4:3C:8D:E5:5B:94:4F:83:D9:66:9C:2B:C4:D4:2C:E1:CA:B7:52:99:F8:4C:E8:43:0F:75:A6:AE:72:BC:46"
+      ]
+    }
+  }
+]
