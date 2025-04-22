@@ -395,6 +395,7 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
 
   const checkFormValidity = async (
     newTouched?: Record<string, boolean>,
+    focusInvalid?: boolean,
   ): Promise<boolean> => {
     const checking: Promise<boolean> = new Promise((resolve) => {
       const inputs = Object.keys(props.scheme.inputs);
@@ -470,13 +471,15 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
         props.emitFormValid(Object.values(valids).every((item) => item));
       }
 
-      for (const [key, value] of Object.entries(valids)) {
-        if (!value) {
-          const firstInvalidElement = formRef.current?.querySelector(
-            `[name="${key}"]`,
-          ) as HTMLElement;
-          firstInvalidElement?.focus();
-          break;
+      if (focusInvalid) {
+        for (const [key, value] of Object.entries(valids)) {
+          if (!value) {
+            const firstInvalidElement = formRef.current?.querySelector(
+              `[name="${key}"]`,
+            ) as HTMLElement;
+            firstInvalidElement?.focus();
+            break;
+          }
         }
       }
 
@@ -494,7 +497,7 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
       touchedTmp = { ...touchedTmp, [inputName]: true };
     });
 
-    return await checkFormValidity(touchedTmp);
+    return await checkFormValidity(touchedTmp, true);
   };
 
   const getFormValidity = () => {

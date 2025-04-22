@@ -7,7 +7,7 @@ export default async function AccountsAdminPage() {
   }
 
   const getUser = await supabaseAdmin.auth.admin.getUserById(
-    '2e6b65f4-6973-4d0f-b4f1-8c6218930ba2',
+    '2f9e63f1-2ad3-4c76-8a0e-5e4ead173848',
   );
   const handleUpgradeUser = async () => {
     if (getUser.error) {
@@ -21,7 +21,7 @@ export default async function AccountsAdminPage() {
     }
 
     await supabaseAdmin.auth.admin.updateUserById(
-      '2e6b65f4-6973-4d0f-b4f1-8c6218930ba2',
+      '2f9e63f1-2ad3-4c76-8a0e-5e4ead173848',
       {
         user_metadata: {
           ...getUser.data.user.user_metadata,

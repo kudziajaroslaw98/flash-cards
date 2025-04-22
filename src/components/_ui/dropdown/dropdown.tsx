@@ -89,6 +89,7 @@ export default function Dropdown<T>({
   const [newItemValue, setNewItemValue] = useState('');
 
   const dropdownWrapperRef = useRef<HTMLDivElement>(null);
+  const popoverRef = useRef<{ handleTogglePopover: () => void } | null>(null);
   const dropdownLabelRef = useRef<HTMLDivElement>(null);
   const configRef = useRef<DictionaryValue<T>[] | null>(null);
   const valueRef = useRef<T | T[] | null | undefined>(null);
@@ -195,6 +196,7 @@ export default function Dropdown<T>({
       setVisible(false);
       setSelected([pickedItem]);
       setSearchValue('');
+      popoverRef.current?.handleTogglePopover();
 
       onChange(pickedItem.value as T & T[]);
     }
@@ -284,6 +286,7 @@ export default function Dropdown<T>({
 
       <div className='w-full'>
         <Popover
+          ref={popoverRef}
           trigger={
             <div
               ref={dropdownLabelRef}

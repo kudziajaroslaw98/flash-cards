@@ -438,10 +438,7 @@ export default function FlashcardReviseComponent() {
           </Accordion>
         </div>
 
-        <ReviseItem
-          clicked={clicked}
-          revisedCard={revisedCard}
-        />
+        <ReviseItem revisedCard={revisedCard} />
 
         <ReviseOptions
           clicked={clicked}

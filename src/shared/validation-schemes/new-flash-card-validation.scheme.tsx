@@ -35,7 +35,10 @@ export const newFlashcardScheme = (
         {
           type: 'validation',
           key: 'context',
-          constraint: z.string().min(1, 'Word or sentence is required'),
+          constraint: z
+            .string()
+            .min(1, 'Word or sentence is required')
+            .max(100, 'Maximum length exceeded'),
           whenKey: 'type',
           whenConstraint: z
             .string()
@@ -70,7 +73,10 @@ export const newFlashcardScheme = (
         {
           type: 'validation',
           key: 'definition',
-          constraint: z.string().min(1, 'Answer is required'),
+          constraint: z
+            .string()
+            .min(1, 'Answer is required')
+            .max(500, 'Maximum length exceeded'),
           whenKey: 'type',
           whenConstraint: z
             .string()

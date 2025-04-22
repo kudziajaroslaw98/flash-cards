@@ -142,7 +142,7 @@ export default function FlashcardComponent({
           <>
             <h5
               className={cn([
-                'z-20 flex h-full w-full flex-col items-center justify-center hyphens-auto text-center text-green-400',
+                'z-20 line-clamp-2 flex h-full w-full flex-col items-center justify-center hyphens-auto text-center text-green-400',
                 size === 'sm' && 'text-lg leading-[120%]',
                 size === 'horizontal-sm' && 'text-sm leading-[120%]',
                 size === 'md' && 'text-2xl',
@@ -158,7 +158,7 @@ export default function FlashcardComponent({
           <>
             <h5
               className={cn([
-                'z-20 flex h-full w-full flex-col items-center justify-center text-center',
+                'z-20 line-clamp-5 flex h-full w-full flex-col items-center justify-center text-center',
                 size === 'sm' && 'text-[0.6875rem] leading-[120%]',
                 size === 'horizontal-sm' && 'text-[0.6875rem] leading-[120%]',
                 size === 'md' && 'text-xs',
@@ -172,10 +172,10 @@ export default function FlashcardComponent({
 
         {flashcard.type === 'single' && (
           <div className='flex h-full w-full flex-col items-center justify-center gap-4'>
-            {flashcard.query && (
+            {flashcard.context && (
               <h5
                 className={cn([
-                  'z-20 flex h-auto w-full flex-col items-center hyphens-auto text-center font-fredoka font-semibold text-green-400',
+                  'z-20 line-clamp-2 flex h-auto w-full flex-col items-center hyphens-auto text-center font-fredoka font-semibold text-green-400',
                   size === 'sm' && 'text-lg leading-[120%]',
                   size === 'horizontal-sm' && 'text-lg leading-[100%]',
                   size === 'md' && 'text-2xl',
@@ -189,7 +189,7 @@ export default function FlashcardComponent({
             {flashcard.query && (
               <h5
                 className={cn([
-                  'z-20 flex h-auto w-full flex-col items-center justify-center text-center',
+                  'z-20 line-clamp-5 flex h-auto w-full flex-col items-center justify-center text-center',
                   size === 'sm' && 'text-[0.6875rem] leading-[120%]',
                   size === 'horizontal-sm' && 'text-[0.6875rem] leading-[120%]',
                   size === 'md' && 'text-xs',
@@ -208,7 +208,7 @@ export default function FlashcardComponent({
   const BackSide = () => (
     <div
       className={cn([
-        'scrollbar-hidden relative z-20 flex h-full w-full snap-y snap-mandatory scroll-pt-8 flex-col overflow-y-auto scroll-smooth hyphens-auto py-6 text-gray-300 text-gray-500 dark:text-slate-400',
+        'scrollbar-hidden relative z-20 flex h-full w-full snap-y snap-mandatory scroll-pt-8 flex-col overflow-y-auto scroll-smooth hyphens-auto py-6 text-gray-500 dark:text-slate-400',
         size === 'sm' && 'text-[.7rem]',
         size === 'horizontal-sm' && 'text-[.7rem]',
         size === 'md' && 'text-xs',

@@ -144,10 +144,7 @@ export function ReviseBody({
         </div>
       </div>
 
-      <ReviseItem
-        clicked={clicked}
-        revisedCard={revisedCard}
-      />
+      <ReviseItem revisedCard={revisedCard} />
 
       <ReviseOptions
         clicked={clicked}

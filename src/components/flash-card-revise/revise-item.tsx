@@ -5,18 +5,17 @@ import Card from '../_ui/card/card';
 import FlashcardComponent from '../flash-card/flash-card';
 
 type ReviewItem = {
-  clicked: boolean;
   revisedCard: Flashcard | undefined;
 };
 
-export function ReviseItem({ clicked, revisedCard }: ReviewItem) {
+export function ReviseItem({ revisedCard }: ReviewItem) {
   return (
     <div className='grid w-full'>
       <div className='flex w-full flex-col items-center justify-center'>
         <div
           className={cn([
             'flex w-full max-w-96  items-center justify-end gap-2 opacity-0 transition md:translate-x-20',
-            clicked && revisedCard?.type !== 'index' && 'opacity-100',
+            revisedCard?.type !== 'index' && 'opacity-100',
           ])}
         >
           <CornerLeftDown className='size-5 text-green-400' />
@@ -31,7 +30,6 @@ export function ReviseItem({ clicked, revisedCard }: ReviewItem) {
             <FlashcardComponent
               key={revisedCard.frontUuid}
               flashcard={revisedCard}
-              flipBlocked={!clicked}
               size='horizontal-sm'
               reviseView
             />
