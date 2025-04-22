@@ -122,15 +122,16 @@ export default function FlashcardSelectExample() {
 
   return (
     <div className='flex flex-col gap-4'>
-      <div className='flex flex-wrap justify-center gap-4'>
+      <div className='flex flex-col gap-4'>
         {flashcards.map((flashcard) => (
           <div key={flashcard.frontUuid}>
             <FlashcardComponent
               flashcard={flashcard}
-              size={'md'}
+              size={'horizontal-sm'}
               isSelected={isSelected(flashcard)}
               onSelect={() => toggleSelected(flashcard)}
               isInSelectionMode={isInSelectionMode}
+              className='mx-auto max-w-sm'
             />
           </div>
         ))}

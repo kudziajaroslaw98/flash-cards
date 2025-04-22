@@ -3,12 +3,20 @@ import FlashcardComponent from '#/components/flash-card/flash-card';
 import FlashcardSelectExample from '#/components/guide-examples/flash-card-select-example';
 import {
   ArrowRight,
+  BookA,
+  Clock,
   CopyCheck,
+  GraduationCap,
+  House,
+  Languages,
+  Layers,
+  MessagesSquare,
   Pencil,
   Plus,
   Settings,
   Sparkles,
   Trash,
+  RefreshCw
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -16,17 +24,15 @@ import Image from 'next/image';
 
 <h2 className='not-prose text-5xl font-extrabold text-green-400 pb-8'>
 
-Guide to Using the Flashcards App
+Guide to Using the Final Phase App
 
 </h2>
 
-**Welcome to the Flashcards App!**
+**Welcome to Final Phase!**
 
-This guide is dedicated to complete beginners both in learning applications and this Flashcards App, who want to enrich their learning with digital flashcards.
+This guide is designed for everyone, from complete beginners to those familiar with learning applications, who want to enhance their studies using digital flashcards and personalized learning plans.
 
-People familiar with modern applications should feel comfortable using it.
-
-You can read this guide to get the know application better. It will help you get started and explain how to effectively use the app to enhance your learning experience.
+Whether you're new to flashcard apps or looking to maximize your use of Final Phase, this guide will walk you through the key features and how to use them effectively.
 
 Below, we cover the main sections of the app and the methodology behind each feature.
 
@@ -35,71 +41,94 @@ Below, we cover the main sections of the app and the methodology behind each fea
 ## Table of Contents
 
 - [What are flashcards?](#what-are-flash-cards)
-- [Learn](#learn)
+- [Dashboard](#dashboard)
+- [Learn (Flashcards)](#learn)
   - Types Of Flashcards
   - Flashcards Management Options
   - How To Select Items
   - Best Practices
 - [Sets](#sets)
-  - Add a New Sets
+  - Add New Sets
   - Set Management Options
-  - Search and filter
+  - Search and Filter
   - Actions Within a Set
   - Best Practices
-- [Revise](#revise)
+- [Revise (Flashcards)](#revise-flashcards)
   - How To Revise
   - When You Revise It All
   - Best Practices
+- [Study Plans (Premium)](#study-plans)
+  - Creating a New Study Plan
+  - Viewing Your Plans
+  - Revising Your Study Plan
+  - Best Practices
+- [Reminders](#reminders)
+- [Settings](#settings)
 - [Methodology](#methodology)
 
 ---
 
-<a name='what-are-flash-cards' />
+<a name='what-are-flash-cards' ></a>
 
 ## What are flashcards?
 
-Before we cover this app functionalities it's important for you to understand
-**what flashcards are**.
+Before we dive into the app's functionalities, let's quickly cover **what flashcards are**.
 
-Flashcards are **small cards** with information written on them.
-On one side, there is a **question or word**, and on the other side, there is the **answer or explanation**.
+Flashcards are **digital cards** used for learning and memorization. Typically, one side displays a **question, term, or prompt**, and the other side shows the **answer or explanation**.
 
-You can use them to **learn and remember things**.
+They are excellent tools for:
 
-For example, you can use flashcards to **study new words**, math facts, or anything else you want to **learn**.
+- Learning new vocabulary
+- Memorizing facts (e.g., historical dates, scientific terms)
+- Understanding concepts
+- Practicing problem-solving
 
-Here are some simple things to remember when creating flashcards:
+**Tips for Creating Effective Flashcards:**
 
-- **Keep it short and clear**
+- **Keep it Concise:** Focus on one key piece of information per card. Avoid lengthy paragraphs.
+- **Use Clear Language:** Write in a way that is easy for you to understand quickly.
+- **One Idea Per Card:** Don't try to cram multiple questions or concepts onto a single card.
+- **Utilize Both Sides:** Question/Prompt on the front, Answer/Explanation on the back.
+- **Personalize:** Use your own words, examples, or mnemonics that resonate with you.
 
-  Write only the most important information. Don't put too much text on one card.
+Now, let's explore the Final Phase app features.
 
-- **Use simple language**
+---
 
-  Make it easy to understand, especially if you're still learning the topic.
+<a name='dashboard' />
 
-- **Focus on one idea per card**
+## Dashboard
 
-  Each card should have one question or concept. This helps you stay focused.
+The "Dashboard" provides a quick overview of your learning activity and progress.
 
-- **Use both sides wisely**
+<div className='flex w-full justify-center'>
+  <Image
+    src='/images/guide/dashboard.webp'
+    width={700}
+    height={240}
+    className='rounded-md'
+    alt='Dashboard page view'
+  />
+</div>
 
-  Write the question or term on one side and the answer or explanation on the other.
+Here you can find:
 
-- **Make them personal**
+- **Focus Ratio:** See the percentage of your study time that was actively focused versus total session time.
+- **Peak Focus Times:** Identify the times of day when you tend to be most focused.
+- **Flashcards Created:** A simple count of the total flashcards you've made.
+- **Daily Performance Heatmap:** Visualize your review consistency and retention over the past month.
+- **Weekly Focus Trends:** Track how your focus ratio changes throughout the week.
+- **Distraction Patterns:** See which hours of the day have the most recorded distractions during study sessions.
 
-  Write the cards in a way that makes sense to you. Use your own words or examples.
-
-Now let's talk about the app.
+Use the Dashboard to gain insights into your study habits and identify areas for improvement.
 
 ---
 
 <a name='learn' />
 
-## Learn
+## Learn (Flashcards)
 
-The "Learn" section is designed to help you study flashcards interactively by
-**presenting terms and testing your recall**.
+The "Learn" section is your primary space for creating, managing, and initially reviewing your digital flashcards.
 
 <div className='flex w-full justify-center'>
   <Image
@@ -107,229 +136,162 @@ The "Learn" section is designed to help you study flashcards interactively by
     width={480}
     height={240}
     className='rounded-md'
-    alt='learn page view'
+    alt='Learn page view'
   />
 </div>
 
 ### Types Of Flashcards:
 
-There are **3 types of flashcards** that are currently available:
+Final Phase currently supports **3 types of flashcards**:
 
 <div className='w-full flex justify-center flex-wrap gap-4 py-8 not-prose'>
+{/* Examples use defaultFlashcard structure for simplicity; actual data might vary slightly */}
 <FlashcardComponent
   flashcard={{
      type: 'index',
-    frontUuid: 'c5f20e37-c4c6-4a76-b987-4ab0adcf1ae5',
-    query: "What's the meaning of word below?",
-    context: 'Lazy',
-    definition: 'Unwilling to work or use energy.',
+    frontUuid: 'guide-example-index',
+    query: "",
+    context: 'Concise',
+    definition: '',
     order: 1,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
+    spacedRepetition: { interval: 0, easeFactor: 1.3, reviews: 0, dueDate: new Date(Date.now() + 1000 * 60).toISOString(), lastReviewAt: new Date().toISOString() },
+    sets: [], tags: [], synced: false,
   }}
-  size={'md'}
+  size={'horizontal-sm'}
   isSelected={false}
   isInSelectionMode={false}
+  className='mx-auto max-w-sm'
 />
-
 <FlashcardComponent
   flashcard={{
     type: 'question',
-    frontUuid: '757a6f43-2dc2-4d58-ba2d-5694defa0eab',
-    query: "What's the meaning of word below?",
-    context: 'Quick',
-    definition: 'Happening or done with great speed.',
-    order: 3,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
-  }}
-  size={'md'}
-  isSelected={false}
-  isInSelectionMode={false}
-/>
-
-<FlashcardComponent
-  flashcard={{
-     type: 'single',
-    frontUuid: 'b03e05d5-c42d-4808-a621-1ac2fc4abed6',
-    query: "What's the meaning of word below?",
-    context: 'Happy',
-    definition: 'Feeling or showing pleasure or contentment.',
-    order: 4,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
-  }}
-  size={'md'}
-  isSelected={false}
-  isInSelectionMode={false}
-/>
-</div>
-
-- **Index Flashcard**
-
-This flashcard is only having **one side**. It contain only highlighted word / sentence. You can use it as a quick add that you can edit later on.
-
-<div className='not-prose flex w-full flex-col items-center'>
-  <FlashcardComponent
-    flashcard={{
-      type: 'index',
-      frontUuid: 'c5f20e37-c4c6-4a76-b987-4ab0adcf1ae5',
-      query: "What's the meaning of word below?",
-      context: 'Lazy',
-      definition: 'Unwilling to work or use energy.',
-      order: 1,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      spacedRepetition: {
-        interval: 0,
-        easeFactor: 1.3,
-        reviews: 0,
-        dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-        lastReviewAt: new Date().toISOString(),
-      },
-      sets: [],
-    }}
-    size={'md'}
-    isSelected={false}
-    isInSelectionMode={false}
-  />
-</div>
-
-- **Question Flashcard**
-
-This flashcard is used to test your knowledge. On one side, there is a **question**, and on the other side, there is the **answer**. The question side helps you think and recall information, while the answer side lets you check if you got it right.
-
-<div className='flex w-full flex-col items-center not-prose gap-4'>
-
-<FlashcardComponent
-  flashcard={{
-    type: 'question',
-    frontUuid: '4d49e5e0-54e9-44de-b4b8-c654c95878fd',
-    query: "What's the meaning of word below?",
-    context: 'Bright',
-    definition: 'Giving off lots of light; intelligent or clever.',
+    frontUuid: 'guide-example-question',
+    query: "What is the capital of France?",
+    context: '',
+    definition: 'Paris',
     order: 2,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    spacedRepetition: {
-      interval: 0,
-      easeFactor: 1.3,
-      reviews: 0,
-      dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-      lastReviewAt: new Date().toISOString(),
-    },
-    sets: [],
+    spacedRepetition: { interval: 0, easeFactor: 1.3, reviews: 0, dueDate: new Date(Date.now() + 1000 * 60).toISOString(), lastReviewAt: new Date().toISOString() },
+    sets: [], tags: [], synced: false,
   }}
-  size={'md'}
+  size={'horizontal-sm'}
   isSelected={false}
   isInSelectionMode={false}
+  className='mx-auto max-w-sm'
 />
-
-<span className='text-sm'>
-Click on flashcard to flip it
-</span>
+<FlashcardComponent
+  flashcard={{
+     type: 'single',
+    frontUuid: 'guide-example-single',
+    query: "What is Photosynthesis?",
+    context: 'Biology',
+    definition: 'The process plants use to convert light energy into chemical energy.',
+    order: 3,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    spacedRepetition: { interval: 0, easeFactor: 1.3, reviews: 0, dueDate: new Date(Date.now() + 1000 * 60).toISOString(), lastReviewAt: new Date().toISOString() },
+    sets: [], tags: [], synced: false,
+  }}
+  size={'horizontal-sm'}
+  isSelected={false}
+  isInSelectionMode={false}
+  className='mx-auto max-w-sm'
+/>
 </div>
 
-- **Detailed Flashcard**
+- **Index Flashcard:**
+  A single-sided card displaying just a highlighted word or phrase (**Context** field). Useful for quickly capturing terms you want to define or study later. It has no back side for revision.
 
-This flashcard is designed to provide more **in-depth learning**. The front side usually asks a **question** or introduces a topic (e.g., a word, concept, or problem), while the back side gives a **detailed explanation**.
+  <div className='not-prose flex w-full flex-col items-center'>
+    <FlashcardComponent
+      flashcard={{
+        type: 'index',
+        frontUuid: 'guide-example-index-2',
+        query: "", context: 'Ephemeral', definition: '', order: 4,
+        createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+        spacedRepetition: { interval: 0, easeFactor: 1.3, reviews: 0, dueDate: new Date(Date.now() + 1000 * 60).toISOString(), lastReviewAt: new Date().toISOString() },
+        sets: [], tags: [], synced: false,
+      }}
+      size={'horizontal-sm'} isSelected={false} isInSelectionMode={false}
+      className='mx-auto max-w-sm'
+    />
+  </div>
 
-<div className='not-prose flex w-full flex-col items-center gap-4'>
+- **Question Flashcard:**
+  A traditional two-sided card. The front (**Query** field) asks a question, and the back (**Definition** field) provides the answer. Ideal for direct recall testing.
+
+  <div className='flex w-full flex-col items-center not-prose gap-4'>
   <FlashcardComponent
     flashcard={{
-      type: 'single',
-      frontUuid: 'b03e05d5-c42d-4808-a621-1ac2fc4abed6',
-      query: "What's the meaning of word below?",
-      context: 'Happy',
-      definition: 'Feeling or showing pleasure or contentment.',
-      order: 4,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      spacedRepetition: {
-        interval: 0,
-        easeFactor: 1.3,
-        reviews: 0,
-        dueDate: new Date(Date.now() + 1000 * 60).toISOString(),
-        lastReviewAt: new Date().toISOString(),
-      },
-      sets: [],
+      type: 'question',
+      frontUuid: 'guide-example-question-2',
+      query: "Who wrote 'Hamlet'?", context: '', definition: 'William Shakespeare', order: 5,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+      spacedRepetition: { interval: 0, easeFactor: 1.3, reviews: 0, dueDate: new Date(Date.now() + 1000 * 60).toISOString(), lastReviewAt: new Date().toISOString() },
+      sets: [], tags: [], synced: false,
     }}
-    size={'md'}
-    isSelected={false}
-    isInSelectionMode={false}
+    size={'horizontal-sm'} isSelected={false} isInSelectionMode={false}
+    className='mx-auto max-w-sm'
   />
-  <span className='text-sm'>Click on flashcard to flip it</span>
-</div>
+  <span className='text-sm'>Click on the flashcard to flip it and see the answer.</span>
+  </div>
+
+- **Detailed Flashcard:**
+  A two-sided card designed for more comprehensive learning. The front usually presents a term (**Context** field) and optionally a guiding question (**Query** field). The back (**Definition** field) provides a detailed explanation, examples, key points, synonyms, or related facts.
+
+  <div className='not-prose flex w-full flex-col items-center gap-4'>
+    <FlashcardComponent
+      flashcard={{
+        type: 'single',
+        frontUuid: 'guide-example-single-2',
+        query: "Explain the concept of...", context: 'Spaced Repetition',
+        definition: 'A learning technique involving increasing intervals of time between subsequent reviews of previously learned material.',
+        examples: 'Reviewing vocabulary daily, then every 3 days, then weekly.',
+        keyPoints: 'Strengthens long-term memory; Fights the forgetting curve.',
+        order: 6,
+        createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+        spacedRepetition: { interval: 0, easeFactor: 1.3, reviews: 0, dueDate: new Date(Date.now() + 1000 * 60).toISOString(), lastReviewAt: new Date().toISOString() },
+        sets: [], tags: [], synced: false,
+      }}
+      size={'horizontal-sm'} isSelected={false} isInSelectionMode={false}
+      className='mx-auto max-w-sm'
+    />
+    <span className='text-sm'>Click on the flashcard to flip it and see the details.</span>
+  </div>
 
 ### Flashcards Management Options:
 
-On the bottom there is **panel with controls** that can:
+A floating action panel at the bottom allows you to:
 
-- Add flashcards,
-
+- **Add** new flashcards:
   <div className='flex w-full justify-center'>
-    <Button
-      icon={<Plus className='h-4 w-4' />}
-      size={'icon-square'}
-      alt='Add new flashcards'
-    />
+    <Button icon={<Plus className='h-4 w-4' />} size={'icon-square'} alt='Add new flashcards' />
   </div>
 
-- Edit flashcards,
-
+- **Edit** selected flashcards:
   <div className='flex w-full justify-center'>
-    <Button
-      icon={<Pencil className='h-4 w-4' />}
-      size={'icon-square'}
-      variant={'secondary'}
-      alt='Edit flashcards'
-    />
+    <Button icon={<Pencil className='h-4 w-4' />} size={'icon-square'} variant={'secondary'} alt='Edit flashcards' />
   </div>
 
-- Delete flashcards
-
+- **Delete** selected flashcards:
   <div className='flex w-full justify-center'>
-    <Button
-      icon={<Trash className='h-4 w-4' />}
-      size={'icon-square'}
-      variant={'destructive'}
-      alt='Delete flashcards'
-    />
+    <Button icon={<Trash className='h-4 w-4' />} size={'icon-square'} variant={'destructive'} alt='Delete flashcards' />
   </div>
 
 <a name='select-example' />
 
 ### How To Select Items:
 
-**To edit and delete** flashcards you first need to **select** them.
+To **Edit** or **Delete** flashcards, you need to select them first:
 
-To do this just **click and hold** flashcard. **Only first** flashcard needs to be **clicked and hold**, next flashcards can be **selected just by clicking**.
+1.  **Click and Hold:** Press and hold the first flashcard you want to select.
+2.  **Click Others:** After the first long press, you can select/deselect other flashcards with a simple click.
+3.  The action buttons (Edit, Delete) will become active when at least one card is selected.
 
-You can try it now in below's example.
+Try it out below:
 
 <div className='not-prose'>
   <FlashcardSelectExample />
@@ -337,8 +299,9 @@ You can try it now in below's example.
 
 ### Best Practices:
 
-- Avoid distractions while using this mode to fully engage with the material.
-- Focus on understanding the terms rather than just memorizing.
+- Create flashcards as you learn new material.
+- Use the different types strategically (e.g., 'Index' for quick capture, 'Question' for facts, 'Single' for concepts).
+- Regularly review and refine your flashcards for clarity and accuracy.
 
 ---
 
@@ -346,70 +309,54 @@ You can try it now in below's example.
 
 ## Sets
 
+The "Sets" section is where you organize your flashcards into logical groups or decks based on topics, subjects, chapters, or any category that makes sense for your study needs.
+
 <div className='flex w-full justify-center'>
   <Image
     src='/images/guide/learn-9.webp'
     width={480}
     height={240}
     className='rounded-md'
-    alt='Sets page'
+    alt='Sets page view'
   />
 </div>
 
-The "Sets" section is where you **organize your flashcards** into collections based
-on topics, subjects, or categories.
+Sets are displayed in a grid, showing the **name**, **description**, and **number of cards** in each set.
 
-Sets are displayed in a **grid format**, with each set showing its **name**, a brief **description**, and the **number of cards** it contains.
+### Add New Sets:
 
-Think of these as **decks of cards** that help you **focus on specific areas** of study.
-
-### Add a New Sets:
-
-- To **Add New Set** click this **button**
-
+- Click the **Add** button to create a new set:
   <div className='flex w-full justify-center'>
-    <Button
-      icon={<Plus className='h-4 w-4' />}
-      size={'icon-square'}
-      alt='Add new sets'
-    />
+    <Button icon={<Plus className='h-4 w-4' />} size={'icon-square'} alt='Add new set' />
   </div>
-
-This allows you to **create a new set** by giving it a name, description, and adding cards to it.
+  You'll be prompted to provide a name, description, and optionally assign existing flashcards or create new ones for the set.
 
 ### Set Management Options:
 
-- **Edit Sets:** Modify the name, description, or contents of a set.
+Similar to flashcards, you can manage sets using the floating action buttons after selecting them (click and hold the first, then click others):
 
+- **Edit Sets:** Modify the name, description, or category of selected sets.
   <div className='flex w-full justify-center'>
-    <Button
-      icon={<Pencil className='h-4 w-4' />}
-      size={'icon-square'}
-      variant={'secondary'}
-      alt='Edit sets'
-    />
+    <Button icon={<Pencil className='h-4 w-4' />} size={'icon-square'} variant={'secondary'} alt='Edit sets' />
   </div>
 
-- **Delete Sets:** Remove a set you no longer need.
-
+- **Delete Sets:** Permanently remove selected sets (this does not delete the flashcards within them, only the set itself).
   <div className='flex w-full justify-center'>
-    <Button
-      variant={'destructive'}
-      icon={<Trash className='h-4 w-4' />}
-      size={'icon-square'}
-      alt='Delete sets'
-    />
+    <Button variant={'destructive'} icon={<Trash className='h-4 w-4' />} size={'icon-square'} alt='Delete sets' />
   </div>
 
-- **View Set Details:** Clicking on a set takes you to its details, where you can review and manage the flashcards within it.
+- **View Set Details:** Simply click on a set card (without holding) to navigate to its dedicated page where you can see and manage the flashcards it contains.
 
-To **edit and delete** sets you need to select them. [See how to select items](#select-example)
+### Search and Filter:
 
-### Search and filter:
-
-A **search bar** and filters are present to help you quickly **find specific sets**, show only **favorites sets** or categorize them based on their contents.
+Use the filters (accessible via the <Settings className='inline h-4 w-4'/> icon) to:
+- Search for sets by name.
+- Filter by category.
+- Show only your favorite sets.
 
 ### Actions Within a Set:
+
+When viewing the details of a specific set:
 
 <div className='flex w-full justify-center'>
   <Image
@@ -417,78 +364,41 @@ A **search bar** and filters are present to help you quickly **find specific set
     width={480}
     height={240}
     className='rounded-md'
-    alt='View from inside a set'
+    alt='View inside a set'
   />
 </div>
 
-Once you get **inside a set** by **clicking on set card**, you can:
+You have options to:
 
-- **Add new flashcards**.
+- **Add new flashcards** directly to this set:
+  <div className='flex w-full justify-center'><Button icon={<Plus className='h-4 w-4' />} size={'icon-square'} variant={'primary'} alt='Add new flashcards to set'/></div>
 
-  <div className='flex w-full justify-center gap-4'>
-    <Button
-      icon={<Plus className='h-4 w-4' />}
-      size={'icon-square'}
-      variant={'primary'}
-      alt='Add new flashcards'
-    />
-  </div>
+- **Edit the set's** details (name, description, category):
+  <div className='flex w-full justify-center'><Button icon={<Pencil className='h-4 w-4' />} size={'icon-square'} variant={'secondary'} alt='Edit current set'/></div>
 
-- **Edit set**.
+- **Assign existing flashcards** from your library to this set:
+  <div className='flex w-full justify-center'><Button icon={<CopyCheck className='size-4' />} size={'icon-square'} variant={'primary'} alt='Assign existing flashcards'/></div>
 
-  <div className='flex w-full justify-center gap-4'>
-    <Button
-      icon={<Pencil className='h-4 w-4' />}
-      size={'icon-square'}
-      variant={'secondary'}
-      alt='Edit set'
-    />
-  </div>
+- **Generate new flashcards** using AI based on the content of this set (**Premium Feature**):
+  <div className='flex w-full justify-center'><Button icon={<Sparkles className='size-4' />} size={'icon-square'} variant={'secondary-outline'} alt='Generate new flashcards with AI'/></div>
 
-- **Assign flashcards** to set that already existing
-
-  <div className='flex w-full justify-center gap-4'>
-    <Button
-      icon={<CopyCheck className='size-4' />}
-      size={'icon-square'}
-      variant={'primary'}
-      alt='Assign existing flashcards'
-    />
-  </div>
-
-- **Generate new flashcards** based of the ones that are already **assigned to set** (Paid feature).
-
-  <div className='flex w-full justify-center gap-4'>
-    <Button
-      icon={<Sparkles className='size-4' />}
-      size={'icon-square'}
-      variant={'secondary-outline'}
-      alt='Generate new flashcards'
-    />
-  </div>
-
-- To **delete set** while being inside you need to **click** this **context menu**
-
-  <div className='flex w-full justify-center gap-4'>
-    <Button
-      icon={<Settings className='h-4 w-4' />}
-      size={'icon-square'}
-      variant={'primary-outline'}
-      alt='Set context menu'
-    />
-  </div>
+- **Access more options** via the context menu (<Settings className='inline h-4 w-4' />), including deleting the set.
+  <div className='flex w-full justify-center'><Button icon={<Settings className='h-4 w-4' />} size={'icon-square'} variant={'primary-outline'} alt='Set context menu'/></div>
 
 ### Best Practices:
 
-- Organize your flashcards into distinct sets for better focus and clarity.
-- Use meaningful set names and descriptions to quickly identify their purpose.
-- Regularly review and update your sets to align with your learning goals.
+- Create sets for distinct topics (e.g., "Chapter 3 Biology," "Spanish Verbs," "Exam 1 Formulas").
+- Use clear names and descriptions.
+- Utilize categories for broader organization.
+- Regularly review set contents to ensure relevance.
 
 ---
 
-<a name='revise' />
+<a name='revise-flashcards' />
 
-## Revise
+## Revise (Flashcards)
+
+The "Revise" section is where you actively study your flashcards using the **Spaced Repetition System (SRS)** to maximize long-term memory retention.
 
 <div className='flex w-full justify-center'>
   <Image
@@ -496,111 +406,204 @@ Once you get **inside a set** by **clicking on set card**, you can:
     width={480}
     height={240}
     className='rounded-md'
-    alt='View from revise page'
+    alt='Revise page view'
   />
 </div>
 
-The "Revise" section **leverages spaced repetition** to help you retain
-knowledge effectively. This feature prioritizes cards based on how well you
-remember them.
+The app prioritizes cards based on your previous performance and the SRS algorithm.
 
 ### How To Revise:
 
-**Start Revising:**
+1.  **(Optional)** Select a specific **Set** to revise from the dropdown at the bottom, or revise **All Flashcards** by default.
+2.  The app presents a flashcard due for review.
+3.  **Recall:** Try to remember the answer or information.
+4.  **Reveal & Rate:**
+    *   For flashcards **Without** custom answers: Choose one of the four rating buttons based on how well you recalled the information:
+        *   **Again (1):** You didn't remember. The card will show up again soon (e.g., 10 minutes).
+        *   **Hard (2):** You struggled to remember. It will reappear relatively soon (e.g., 1 hour).
+        *   **Good (3):** You remembered it correctly with some effort. It will reappear based on the normal SRS interval (e.g., 1 day or more).
+        *   **Easy (4):** You remembered it instantly. It will reappear much later (e.g., several days or weeks).
+          <div className='flex w-full flex-wrap justify-center'><Image src='/images/guide/learn-3.webp' width={480} height={240} className='rounded-md' alt='Question/Index flashcard revise options'/></div>
+    *   For flashcards **With** custom answers: You will be presented with the correct answer and up to three incorrect "distractor" answers generated.
+        *   Click the answer you believe is correct.
+        *   Selecting the **Correct Answer** (highlighted green) automatically rates the card as **'Good'**.
+        *   Selecting an **Incorrect Answer** (highlighted red) automatically rates the card as **'Hard'**.
+        *   After selecting an answer, you can click the flashcard to flip it and review the full definition.
+          <div className='flex w-full flex-wrap justify-center'>
+            <Image src='/images/guide/learn-5.webp' width={480} height={240} className='rounded-md' alt='Detailed flashcard correct answer'/>
+            <Image src='/images/guide/learn-6.webp' width={480} height={240} className='rounded-md' alt='Detailed flashcard wrong answer'/>
+          </div>
+5.  **Reshuffle:** After rating, click the "Next Card" button (<RefreshCw className='inline h-4 w-4'/>) or press **Spacebar/Right Arrow** to get the next card due for review.
+    <div className='flex w-full justify-center py-4'><Button label='Next Card' icon={<RefreshCw className='h-4 w-4' />} iconPosition='right' alt='Next Card Button'/></div>
 
-1. **(optional)** Select a set (all flashcards by default) to revise.
-2. The app will present cards that needs to be revised.
-3. Choose one of the four options:
-
-   - **Again:** The card will reappear in 10 minutes.
-   - **Hard:** The card will reappear in 1 hour.
-   - **Good:** The card will reappear in 1 day.
-   - **Easy:** The card will reappear in 1 week.
-
-   or answers for **Detailed Flashcard** type.
-
-4. After picking the option you will be able to reshuffle to get new random card from the ones that need to be revised.
-5. There are differences that you can notice in how the revise behaves for different types of flashcards.
-
-- **Detailed Flashcard:** The card will have it's answer and 3 randomly picked
-  answers from cards with the same type.
-
-By default selecting **correct answer** (green background and border on picked answer) will space repetition the card with **'Good'** option. **Wrong answer** (red background and border on picked answer) will behave as **'Hard'** option.
-
-<div className='flex w-full flex-wrap justify-center'>
-  <Image
-    src='/images/guide/learn-5.webp'
-    width={480}
-    height={240}
-    className='rounded-md'
-    alt='Detailed flashcard good answer'
-  />
-  <Image
-    src='/images/guide/learn-6.webp'
-    width={480}
-    height={240}
-    className='rounded-md'
-    alt='Detailed flashcard wrong answer'
-  />
-</div>
-
-- **Question Flashcard** and **Index Flashcard:** The card will have options **'Again', 'Hard', 'Good', 'Easy'** to pick from.
-
-<div className='flex w-full flex-wrap justify-center'>
-  <Image
-    src='/images/guide/learn-3.webp'
-    width={480}
-    height={240}
-    className='rounded-md'
-    alt='Question flashcard options'
-  />
-
-<Image
-  src='/images/guide/learn-4.webp'
-  width={480}
-  height={240}
-  className='rounded-md'
-  alt='Index flashcard options'
-/>
-</div>
-
-- **Question Flashcard** and **Detailed Flashcard:** After picking and answer/option you can **flip** the card and check the answer on the back of the card by **clicking** on it.
-
-<div className='flex w-full flex-wrap justify-center'>
-  <Image
-    src='/images/guide/learn-7.webp'
-    width={480}
-    height={240}
-    className='rounded-md'
-    alt='Flipped card on revise page'
-  />
-</div>
-
-**When you revise all cards:**
+### When You Revise It All:
 
 <div className='not-prose flex w-full justify-center'>
   <Image
     src='/images/guide/learn-2.webp'
     width={480}
     height={240}
-    alt='prompt to continue after revising all cards'
+    alt='Prompt to continue after revising all due cards'
     className='rounded-md'
   />
 </div>
 
-### When You Revise It All:
+Once you have reviewed all cards currently due according to the SRS schedule, you'll see a message. You have the option to **"Continue with All Cards."**
 
-After revising all cards you will be asked to continue revising as it is optional.
-If you continue you will revise all cards from the pool.
-
-If you find yourself struggle with a word and picking **'Again'** or **'Hard'** option the **revise date will change** (lets say you picked 'Again' so the date of next revision will change for example from 4 days to 10 minutes) to speed up the process of revising it.
-
-Picking options **'Good'** or **'Easy' won't affect the revise date** to avoid stacking the space repetition multiplier used in the algorithm.
+- If you choose to continue, the app will randomly select cards from the entire chosen set (or all cards), regardless of their due date.
+- **Important:** When continuing in this optional mode:
+    - Rating cards as **'Again'** or **'Hard'** WILL reset their review schedule, making them appear sooner.
+    - Rating cards as **'Good'** or **'Easy'** WILL NOT change their originally scheduled due date. This prevents inflating the SRS intervals too quickly for cards that weren't actually due.
 
 ### Best Practices:
 
-- Be honest when rating your recall to optimize the spaced repetition algorithm.
-- Aim to review cards daily to build long-term retention.
+- **Be Honest:** Rate your recall accurately. The SRS works best with honest feedback.
+- **Consistency:** Aim for short, regular revision sessions (e.g., daily) rather than infrequent long ones.
+- **Focus:** Minimize distractions during revision to engage actively with the material.
+
+---
+
+<a name='study-plans' />
+
+## Study Plans (Premium)
+
+The "Study Plans" feature (**Premium**) leverages AI to create structured learning schedules tailored to your goals, knowledge level, and desired timeframe.
+
+<div className='flex w-full justify-center'>
+  <Image
+    src='/images/guide/study-plan-1.webp'
+    width={700}
+    height={240}
+    className='rounded-md'
+    alt='Study Plan Creation Step 1'
+  />
+</div>
+
+### Creating a New Study Plan:
+
+Navigate to **Study > Plans** and click the **Add** button (<Plus className='inline h-4 w-4' />), or go directly via **Study > New Plan**. This initiates a multi-step process:
+
+1.  **General Settings:**
+    *   Define your **Focus Tags** (topics you want to learn).
+    *   Select your current **Knowledge Level** for the topic (e.g., Beginner, Proficient).
+    *   (Optional) Choose AI-suggested focus areas based on your initial tags and level.
+    *   (Optional) Refine AI generation with **Advanced Options** like preferred learning style, card length, and mnemonic preferences.
+2.  **Plan Type & Duration:**
+    *   Choose **Coverage Focus** (Core Concepts, Broad Overview, Deep Dive).
+    *   Select the **Plan Duration** (e.g., 7 days, 14 days, 30 days).
+    *   (Optional) Add **Blacklist Tags** (topics to exclude).
+    *   (Optional) Provide an **Additional User Prompt** for the AI.
+3.  **Review Picked Flashcards:**
+    *   The app shows flashcards from your library matching the plan criteria.
+    *   You can **reject** any cards that don't fit your vision for this plan.
+4.  **Generate & Customize Flashcards (Optional):**
+    *   If you need more flashcards for the plan, the AI will **generate suggestions**.
+    *   Review the AI suggestions. **Accept** the ones you like (they'll be added to your library and the plan) or **reject** unwanted ones.
+5.  **Generate & Review Study Plan:**
+    *   The AI generates the daily study schedule based on all previous inputs and selected flashcards.
+    *   Review the generated plan, which outlines daily objectives, cards to review, new cards to learn, and estimated metrics.
+    *   **Accept** the plan to save it.
+
+### Viewing Your Plans:
+
+Access your saved study plans from the **Study > Plans** section. Click on a plan to view its details, including the daily breakdown and progress.
+
+<div className='flex w-full justify-center'>
+  <Image
+    src='/images/guide/study-plan-list.webp'
+    width={700}
+    height={240}
+    className='rounded-md'
+    alt='Study Plans List'
+  />
+</div>
+
+### Revising Your Study Plan:
+
+Navigate to **Study > Revise Plan**. This dedicated revision mode guides you through your active study plan day by day.
+
+- **Select Plan:** Choose the plan you want to revise from the dropdown.
+- **Daily Stages:** Each study day typically involves several stages:
+    1.  **Review Old Cards:** Revise cards from previous days that are due according to SRS.
+    2.  **(AI Summary - Optional):** Get an AI-generated summary of concepts from any cards you answered incorrectly during the review stage.
+    3.  **Learn New Cards:** Be introduced to the new flashcards scheduled for the current day.
+    4.  **(AI Summary - Optional):** Get an AI-generated summary for any new cards answered incorrectly.
+    5.  **Review All Incorrect:** A final review session focusing specifically on all cards marked incorrect during the current day's session.
+- **Progress:** The app tracks your progress through the plan and updates the schedule for the next day upon completion.
+
+<div className='flex w-full justify-center'>
+  <Image
+    src='/images/guide/study-plan-revise.webp'
+    width={700}
+    height={240}
+    className='rounded-md'
+    alt='Study Plan Revision View'
+  />
+</div>
+
+### Best Practices:
+
+- Clearly define your learning goals and topic scope using Focus Tags.
+- Be realistic about your current knowledge level and desired plan duration.
+- Actively review and curate the flashcards (both yours and AI-suggested) included in the plan.
+- Follow the daily revision schedule consistently for best results.
+
+---
+
+<a name='reminders' />
+
+## Reminders
+
+Set up notifications to remind yourself to study. Access this section via **Flashcards > Reminders**.
+
+<div className='flex w-full justify-center'>
+  <Image
+    src='/images/guide/reminders.webp'
+    width={700}
+    height={240}
+    className='rounded-md'
+    alt='Reminders Page'
+  />
+</div>
+
+- **Enable Notifications:** You'll need to grant browser/OS notification permissions when prompted to use this feature. If blocked, you'll need to enable them in your system settings.
+- **Create Reminders:** Click the **Add** button (<Plus className='inline h-4 w-4' />) to set up a new reminder. You can specify:
+    - **Title:** A name for your reminder.
+    - **Start Date & Time:** When the reminder should first occur.
+    - **Repeat:** How often it should repeat (None, Daily, Weekly, Monthly).
+    - **Enabled/Disabled:** Toggle the reminder on or off.
+- **Manage Reminders:** Select reminders (long press first, then click) to **Edit** (<Pencil className='inline h-4 w-4' />) or **Delete** (<Trash className='inline h-4 w-4' />) them using the floating action buttons.
+
+---
+
+<a name='settings' />
+
+## Settings
+
+Manage your account, preferences, and app data in the **Account > Settings** section.
+
+<div className='flex w-full justify-center'>
+  <Image
+    src='/images/guide/settings.webp'
+    width={700}
+    height={240}
+    className='rounded-md'
+    alt='Settings Page'
+  />
+</div>
+
+Key areas include:
+
+- **Profile:** View your avatar, name, and email associated with your account (if logged in).
+- **Premium:** Check your current subscription plan (Free or Premium) and status. Includes a link to the **Pricing** page to change your plan.
+- **Preferences:**
+    - **Theme:** Switch between Light and Dark mode.
+    - **Notifications:** Manage push notification permissions (links to browser/OS settings if already granted/denied).
+    - **Marketing Consent:** Opt-in or out of receiving promotional emails.
+- **Danger Zone:**
+    - **Clear Local Data:** Removes all app data stored *only* on your current device's browser (flashcards, sets, stats, etc.). Does not affect cloud-synced data if logged in. Use with caution.
+    - **Delete Account:** Permanently removes your user account and *all* associated data (local + cloud). **This action is irreversible.**
+- **Links:** Access the Privacy Policy, Terms of Service, and instructions on how to delete your account.
 
 ---
 
@@ -608,18 +611,16 @@ Picking options **'Good'** or **'Easy' won't affect the revise date** to avoid s
 
 ## Methodology
 
-The Flashcards app is built on **evidence-based learning** techniques to **maximize retention** and understanding:
+Final Phase is built upon effective learning principles:
 
-1. **Spaced Repetition:**
-   - Revisit information at increasing intervals to strengthen memory.
-2. **Active Recall:**
-   - Actively test your knowledge rather than passively rereading material.
-3. **Chunking:**
-   - Break down large volumes of information into manageable "chunks" (sets).
+1.  **Spaced Repetition System (SRS):** Our core revision mechanic. By reviewing information at scientifically optimized increasing intervals, you strengthen memory traces and combat the forgetting curve, leading to efficient long-term retention.
+2.  **Active Recall:** Instead of passively re-reading notes, the app forces you to actively retrieve information from memory (answering questions, recalling definitions). This mental effort significantly enhances learning and retention.
+3.  **Chunking:** Organizing flashcards into manageable Sets allows you to break down large subjects into smaller, focused chunks, making learning less overwhelming and more targeted.
+4.  **AI Assistance (Premium):** Leveraging AI helps overcome the initial hurdle of content creation (generating flashcards, plans) and provides personalized feedback (incorrect card summaries), allowing you to focus more on the learning process itself.
 
 ---
 
-By following this guide and consistently using the app, you can make **learning more efficient and enjoyable**. Happy studying!
+By consistently using Final Phase and its features, you can make your study sessions more productive, efficient, and ultimately more successful. Happy learning!
 
 <div className='flex w-full justify-center py-24'>
   <Link href='/flashcards/learn'>

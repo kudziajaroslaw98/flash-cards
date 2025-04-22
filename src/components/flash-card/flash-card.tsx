@@ -18,12 +18,14 @@ interface FlashcardProps {
   isInSelectionMode?: boolean;
   flipBlocked?: boolean;
   reviseView?: boolean;
+  className?: string;
 }
 
 export default function FlashcardComponent({
   isSelected,
   flashcard,
   onSelect,
+  className,
   isInSelectionMode,
   flipBlocked = false,
   size = 'md',
@@ -173,7 +175,7 @@ export default function FlashcardComponent({
             {flashcard.query && (
               <h5
                 className={cn([
-                  'font-fredoka z-20 flex h-auto w-full flex-col items-center hyphens-auto text-center font-semibold text-green-400',
+                  'z-20 flex h-auto w-full flex-col items-center hyphens-auto text-center font-fredoka font-semibold text-green-400',
                   size === 'sm' && 'text-lg leading-[120%]',
                   size === 'horizontal-sm' && 'text-lg leading-[100%]',
                   size === 'md' && 'text-2xl',
@@ -285,7 +287,7 @@ export default function FlashcardComponent({
       onTouchStart={(e) => onStart(e, flashcard)}
       onTouchEnd={onEnd}
       onTouchMove={onMove}
-      className={cn(['relative flex h-44 w-full'])}
+      className={cn(['relative flex h-44 w-full', className])}
     >
       <m.div
         variants={cardVariants}
