@@ -35,12 +35,14 @@ export function Reminders() {
           </span>
         </div>
 
-        {notificationPermission === 'granted' && (
-          <ReminderFilters setFiltered={setFiltered} />
-        )}
+        {notificationPermission === 'granted' ||
+          (process.env.NODE_ENV === 'development' && (
+            <ReminderFilters setFiltered={setFiltered} />
+          ))}
       </div>
 
-      {notificationPermission === 'granted' && pushSubscribed ? (
+      {notificationPermission === 'granted' ||
+      (process.env.NODE_ENV === 'development' && pushSubscribed) ? (
         <>
           <RemindersList
             selected={selected}
@@ -55,7 +57,8 @@ export function Reminders() {
         </>
       ) : (
         <div className='flex flex-col items-center justify-center py-10 text-center'>
-          {notificationPermission === 'default' ? (
+          {notificationPermission === 'default' ||
+          process.env.NODE_ENV === 'development' ? (
             <>
               <BellOff className='mb-8 size-12 text-green-500' />
               <span>You need to allow notifications to use this feature.</span>

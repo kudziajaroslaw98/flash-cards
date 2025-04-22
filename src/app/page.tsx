@@ -172,13 +172,13 @@ export default async function Home() {
       headline: 'Q1',
     },
     {
-      active: false,
+      active: true,
       body: (
         <ul className='flex flex-col gap-2'>
           {listItem(
             'Create more rewarding system for flashcards (e.g. streaks/points)',
           )}
-          {listItem('Generate sets from pdf/txt files')}
+          {listItem('Generate sets from pdf/txt files', true)}
           {listItem('Export / Import flashcards to / from CSV')}
           {listItem('Community section with shared decks')}
         </ul>
