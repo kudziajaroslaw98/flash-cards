@@ -287,6 +287,7 @@ export default function Dropdown<T>({
       <div className='w-full'>
         <Popover
           ref={popoverRef}
+          disabled={disabled}
           trigger={
             <div
               ref={dropdownLabelRef}
@@ -303,7 +304,7 @@ export default function Dropdown<T>({
                   : '',
                 error ? 'border-red-400 text-red-400 dark:border-red-400' : '',
                 disabled
-                  ? 'bg-gray-100 text-gray-200 dark:bg-slate-900 dark:text-slate-800'
+                  ? 'cursor-not-allowed bg-gray-100 text-gray-300 dark:bg-slate-900 dark:text-slate-700'
                   : '',
               ])}
               onClick={(e) => {

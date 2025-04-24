@@ -31,6 +31,7 @@ export function Popover({
   children,
   nested = false,
   popoverClassName,
+  disabled = false,
 }: PropsWithChildren<{
   ref?: Ref<{ handleTogglePopover: () => void }>;
   trigger: ReactNode;
@@ -38,6 +39,7 @@ export function Popover({
   nested?: boolean;
   popoverClassName?: string;
   minWidth?: number;
+  disabled?: boolean;
 }>) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const triggerRef = useRef<HTMLDivElement | null>(null);
@@ -238,6 +240,7 @@ export function Popover({
   }, [isOpen, updatePopoverPosition]);
 
   const handleTogglePopover = () => {
+    if (disabled) return;
     setIsOpen((prev) => !prev);
   };
 

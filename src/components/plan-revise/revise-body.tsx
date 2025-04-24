@@ -149,9 +149,10 @@ export function ReviseBody({
       <ReviseOptions
         clicked={clicked}
         clickedOption={clickedOption}
+        isSelected={isSelected}
         revisedCard={revisedCard}
-        spaceRepetitionClick={spaceRepetitionClick}
-        changeClicked={changeClicked}
+        selectSpacedRepetitionRating={spaceRepetitionClick}
+        selectAnswer={changeClicked}
       />
     </>
   );

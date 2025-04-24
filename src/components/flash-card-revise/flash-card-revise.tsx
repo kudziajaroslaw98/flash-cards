@@ -13,7 +13,7 @@ import type { Flashcard } from '#/types/flash-card.type';
 import type { FocusSession } from '#/types/focus-session.type';
 import type { ReviewLog } from '#/types/review-log.type';
 import type { ReviseOptionsType } from '#/types/revise-options.type';
-import { ArrowRight, Coffee, RefreshCw } from 'lucide-react';
+import { ArrowRight, Check, Coffee, RefreshCw } from 'lucide-react';
 import { Accordion } from '../_ui/accordion/accordion';
 import Dropdown from '../_ui/dropdown/dropdown';
 import LinkComponent from '../_ui/link/link';
@@ -61,6 +61,7 @@ export default function FlashcardReviseComponent() {
   >();
   const [clickedAnswer, setClickedAnswer] = useState<string | undefined>();
   const [clicked, setClicked] = useState(false);
+  const [isSelected, setIsSelected] = useState(false);
   const cardsReviewed = useRef(0);
   const cardsRecalled = useRef(0);
   const focusSession = useRef<FocusSession>({
@@ -101,16 +102,37 @@ export default function FlashcardReviseComponent() {
     numberOfItems: 1,
   });
 
-  const spaceRepetitionClick = (value: ReviseOptionsType) => {
-    if (!revisedCard) {
+  const selectSpacedRepetitionRating = (value: ReviseOptionsType) => {
+    // Only allow selection if nothing is selected or confirmed yet
+    if (clicked || !revisedCard) {
       return;
     }
-    window?.umami?.track('Space repetition clicked', { value });
+    window?.umami?.track('Space repetition selected', { value });
 
-    if (clicked) {
-      return;
+    setClickedOption(value); // Store the selected rating
+    setIsSelected(true); // Mark as selected, waiting for confirmation
+  };
+
+  const selectAnswer = (answer: string, key?: string) => {
+    // Only allow selection if nothing is selected or confirmed yet
+    if (clicked || !answer || !revisedCard) return;
+
+    if (key) {
+      window?.umami?.track('Answer selected', { key });
+    } else {
+      window?.umami?.track('Answer selected', { key: null });
     }
 
+    setClickedAnswer(answer); // Store the selected answer
+    setIsSelected(true); // Mark as selected, waiting for confirmation
+  };
+
+  const handleConfirm = () => {
+    if (!isSelected || !revisedCard || clicked) return;
+
+    window?.umami?.track('Answer confirmed');
+
+    const clonedStats = { ...metadata };
     const reviewLog: ReviewLog = {
       frontUuid: uuid(),
       timestamp: new Date().toISOString(),
@@ -122,67 +144,34 @@ export default function FlashcardReviseComponent() {
       synced: false,
     };
 
-    if (value === 'easy' || value === 'good') {
-      cardsRecalled.current += 1;
-      reviewLog.recalled = true;
-    }
+    let finalReviseOption: ReviseOptionsType | undefined = clickedOption;
 
-    db.reviewLogs.add(reviewLog);
-    cardsReviewed.current += 1;
-    setClickedOption(value);
-    setClicked(true);
-  };
+    if (answersAvailable) {
+      // Custom answers
+      const correct = revisedCard?.answer1 === clickedAnswer;
 
-  const changeClicked = (answer: string, key?: string) => {
-    if (!answer || !revisedCard || clicked) return;
-
-    if (key) {
-      window?.umami?.track('Answer clicked', { key });
+      reviewLog.recalled = correct;
+      clonedStats.correctAnswers += correct ? 1 : 0;
+      cardsRecalled.current += correct ? 1 : 0;
+      clonedStats.incorrectAnswers += correct ? 0 : 1;
+      finalReviseOption = correct ? 'easy' : 'again';
     } else {
-      window?.umami?.track('Answer clicked', { key: null });
+      // Spaced Repetition Options
+      cardsRecalled.current += finalReviseOption !== 'again' ? 1 : 0;
+      clonedStats.correctAnswers += finalReviseOption !== 'again' ? 1 : 0;
+      clonedStats.incorrectAnswers += finalReviseOption !== 'again' ? 0 : 1;
+      reviewLog.recalled = finalReviseOption !== 'again' ? true : false;
     }
-
-    const correct = revisedCard?.answer1 === answer;
-    const clonedStats = { ...metadata };
 
     cardsReviewed.current += 1;
     clonedStats.answers += 1;
-
-    const reviewLog: ReviewLog = {
-      frontUuid: uuid(),
-      timestamp: new Date().toISOString(),
-      sessionUuid: focusSession.current.frontUuid,
-      cardFrontUuid: revisedCard.frontUuid,
-      recalled: false,
-      timeSpent: Math.floor((Date.now() - cardTime.current.getTime()) / 1000),
-      tags: revisedCard.tags,
-      synced: false,
-    };
-
-    let reviseOption: ReviseOptionsType;
-    if (correct) {
-      reviewLog.recalled = true;
-    } else {
-      reviewLog.recalled = false;
-    }
-
-    if (revisedCard.type === 'single' && correct) {
-      clonedStats.correctAnswers += 1;
-      cardsRecalled.current += 1;
-      reviseOption = 'easy';
-    } else {
-      reviseOption = 'again';
-      clonedStats.incorrectAnswers += 1;
-    }
-
     clonedStats.accuracy = parseFloat(
       (clonedStats.correctAnswers / clonedStats.answers).toFixed(2),
     );
 
     db.reviewLogs.add(reviewLog);
     updateMetadata({ ...clonedStats });
-    setClickedAnswer(answer);
-    setClickedOption(reviseOption);
+    setClickedOption(finalReviseOption);
     setClicked(true);
   };
 
@@ -195,25 +184,22 @@ export default function FlashcardReviseComponent() {
     const lastCardUuid = revisedCard.frontUuid;
 
     try {
-      // Perform calculation first (this updates the card in the DB)
       await calculateRepetition(revisedCard, clickedOption);
 
-      // Reset UI state for the next card
       setClickedOption(undefined);
       setClickedAnswer(undefined);
       setClicked(false);
-      // revisedCard will be updated by the useEffect watching randomItems
+      setIsSelected(false);
 
-      // Reroll, removing the just-reviewed card from the session deck
       reroll(lastCardUuid);
     } catch (error) {
       console.error('Error during reshuffle:', error);
-      // Handle error appropriately, maybe show a notification
     }
   };
 
   const changeRevisedSet = (value: string) => {
-    window?.umami?.track('Change revised set', { value });
+    if (value !== revisedSet)
+      window?.umami?.track('Change revised set', { value });
     // Resetting state when set changes
     setClicked(false);
     setClickedOption(undefined);
@@ -234,12 +220,13 @@ export default function FlashcardReviseComponent() {
   const clickRevisedOption = (key: string) => {
     const index = parseInt(key) - 1;
     if (index < 0 || index > 3) return; // Invalid key
-    if (revisedCard?.type === 'index' || revisedCard?.type === 'question') {
+
+    if (answersAvailable) {
+      selectAnswer(answers[index], key);
+    } else {
       if (index < spaceRepetitionOptions.length) {
-        spaceRepetitionClick(spaceRepetitionOptions[index].value);
+        selectSpacedRepetitionRating(spaceRepetitionOptions[index].value);
       }
-    } else if (revisedCard?.type === 'single' && answersAvailable) {
-      changeClicked(answers[index], key);
     }
   };
 
@@ -442,10 +429,11 @@ export default function FlashcardReviseComponent() {
 
         <ReviseOptions
           clicked={clicked}
+          isSelected={isSelected}
           clickedOption={clickedOption}
           revisedCard={revisedCard}
-          spaceRepetitionClick={spaceRepetitionClick}
-          changeClicked={changeClicked}
+          selectSpacedRepetitionRating={selectSpacedRepetitionRating}
+          selectAnswer={selectAnswer}
           clickedAnswer={clickedAnswer}
           answers={answers}
           answersAvailable={answersAvailable}
@@ -455,25 +443,36 @@ export default function FlashcardReviseComponent() {
       <FloatingButtons>
         <div className='flex w-full flex-col items-center justify-center gap-2 py-2'>
           <Button
-            label={'Next Card'}
-            icon={<RefreshCw className='h-4 w-4' />}
+            label={clicked ? 'Next Card' : 'Confirm Answer'}
+            icon={
+              clicked ? (
+                <RefreshCw className='h-4 w-4' />
+              ) : (
+                <Check className='h-4 w-4' /> // Assuming you have a Check icon
+              )
+            }
             iconPosition={'right'}
-            onClick={() => handleReshuffle()}
+            onClick={() => (clicked ? handleReshuffle() : handleConfirm())}
             size={'xlg'}
             className='!w-full !max-w-xs'
-            disabled={!clicked || !revisedCard}
-            alt='Proceed to next flashcard'
+            disabled={!isSelected && !clicked}
+            alt={
+              clicked ? 'Proceed to next flashcard' : 'Confirm selected answer'
+            }
           />
 
-          <Dropdown
-            type='dropdown'
-            multiple={false}
-            config={[defaultSet, ...setsDictionary]}
-            onChange={changeRevisedSet}
-            value={revisedSet}
-            contextPosition='top'
-            labelClassName='max-w-xs bg-gray-50 dark:bg-slate-950'
-          />
+          {[defaultSet, ...setsDictionary].length > 1 && (
+            <Dropdown
+              type='dropdown'
+              multiple={false}
+              config={[defaultSet, ...setsDictionary]}
+              onChange={changeRevisedSet}
+              value={revisedSet}
+              contextPosition='top'
+              labelClassName='max-w-xs bg-gray-50 dark:bg-slate-950'
+              disabled={[defaultSet, ...setsDictionary].length === 1}
+            />
+          )}
         </div>
       </FloatingButtons>
     </div>
