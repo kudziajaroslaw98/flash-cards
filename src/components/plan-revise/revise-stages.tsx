@@ -1,6 +1,5 @@
-// import { experimental_useObject as useObject } from '@ai-sdk/react';
 import { useRevisePlanContext } from '#/providers/revise-plan-provider';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { Case } from '../_ui/switch-case/case';
 import { SwitchCase } from '../_ui/switch-case/switch-case';
 import { ReviseAllStage } from './revise-all-stage';
@@ -17,54 +16,86 @@ export function ReviseStages() {
     newFlashcards,
   } = useRevisePlanContext();
 
-  const [reviewCorrect, setReviewCorrect] = useState<string[]>([]);
-  const [reviewIncorrect, setReviewIncorrect] = useState<string[]>([]);
-  const [newCorrect, setNewCorrect] = useState<string[]>([]);
-  const [newIncorrect, setNewIncorrect] = useState<string[]>([]);
+  // Memoize the calculation of correct/incorrect counts for summaries
+  const { reviewCorrect, reviewIncorrect, newCorrect, newIncorrect } =
+    useMemo(() => {
+      if (!currentDay) {
+        return {
+          reviewCorrect: [],
+          reviewIncorrect: [],
+          newCorrect: [],
+          newIncorrect: [],
+        };
+      }
 
-  useEffect(() => {
-    if (!currentDay) {
-      return;
-    }
+      const reviewCorrectSet = new Set<string>();
+      const reviewIncorrectSet = new Set<string>();
+      const newCorrectSet = new Set<string>();
+      const newIncorrectSet = new Set<string>();
 
-    if (currentDay.correctCards.length > 0) {
-      const reviewCorrect: string[] = [];
-      const newCorrect: string[] = [];
+      const reviewCardUuids = new Set(
+        currentDay.cardsToReview.map((uuid) => uuid),
+      );
 
-      currentDay.correctCards.forEach((card) => {
-        if (currentDay.cardsToReview.some((c) => c === card)) {
-          reviewCorrect.push(card);
+      currentDay.correctCards.forEach((cardUuid) => {
+        if (reviewCardUuids.has(cardUuid)) {
+          reviewCorrectSet.add(cardUuid);
         } else {
-          newCorrect.push(card);
+          newCorrectSet.add(cardUuid);
         }
       });
 
-      setNewCorrect(newCorrect);
-      setReviewCorrect(reviewCorrect);
-    }
-  }, [currentDay, currentDay?.correctCards]);
-
-  useEffect(() => {
-    if (!currentDay) {
-      return;
-    }
-
-    if (currentDay.incorrectCards.length > 0) {
-      const reviewIncorrect: string[] = [];
-      const newIncorrect: string[] = [];
-
-      currentDay.incorrectCards.forEach((card) => {
-        if (currentDay.cardsToReview.some((c) => c === card)) {
-          reviewIncorrect.push(card);
+      currentDay.incorrectCards.forEach((cardUuid) => {
+        if (reviewCardUuids.has(cardUuid)) {
+          reviewIncorrectSet.add(cardUuid);
         } else {
-          newIncorrect.push(card);
+          newIncorrectSet.add(cardUuid);
         }
       });
 
-      setReviewIncorrect(reviewIncorrect);
-      setNewIncorrect(newIncorrect);
+      return {
+        reviewCorrect: Array.from(reviewCorrectSet),
+        reviewIncorrect: Array.from(reviewIncorrectSet),
+        newCorrect: Array.from(newCorrectSet),
+        newIncorrect: Array.from(newIncorrectSet),
+      };
+    }, [currentDay]); // Recalculate only when currentDay changes
+
+  const reviewRetention =
+    reviewFlashcards.length > 0
+      ? reviewCorrect.length / reviewFlashcards.length
+      : 0;
+  const newRetention =
+    newFlashcards.length > 0 ? newCorrect.length / newFlashcards.length : 0;
+
+  // Determine if summary stages should be shown
+  const showReviewSummary = reviewFlashcards.length > 0;
+  const showNewSummary = newFlashcards.length > 0;
+  const showAllIncorrect = reviewIncorrect.length + newIncorrect.length > 0;
+
+  // Determine the next stage dynamically
+  const getNextStage = (currentStage: number): number => {
+    switch (currentStage) {
+      case 1: // After Old Stage
+        return showReviewSummary
+          ? 2
+          : showNewSummary
+            ? 3
+            : showAllIncorrect
+              ? 5
+              : 6;
+      case 2: // After Review Summary
+        return showNewSummary ? 3 : showAllIncorrect ? 5 : 6;
+      case 3: // After New Stage
+        return showNewSummary ? 4 : showAllIncorrect ? 5 : 6;
+      case 4: // After New Summary
+        return showAllIncorrect ? 5 : 6;
+      case 5: // After All Incorrect
+        return 6; // End
+      default:
+        return 6; // Default to end
     }
-  }, [currentDay, currentDay?.incorrectCards]);
+  };
 
   return (
     <SwitchCase condition={stage}>
@@ -72,39 +103,46 @@ export function ReviseStages() {
         <ReviseOldStage />
       </Case>
 
-      <Case caseValue={2}>
-        <ReviseIncorrectSummary
-          cardsCount={reviewFlashcards.length}
-          correctCount={reviewCorrect.length}
-          incorrectCount={reviewIncorrect.length}
-          retention={reviewCorrect.length / reviewFlashcards.length}
-          flashcards={reviewFlashcards}
-          incorrectFlashcards={reviewIncorrect}
-          onContinue={() => setStage(3)}
-        />
-      </Case>
+      {showReviewSummary && (
+        <Case caseValue={2}>
+          <ReviseIncorrectSummary
+            cardsCount={reviewFlashcards.length}
+            correctCount={reviewCorrect.length}
+            incorrectCount={reviewIncorrect.length}
+            retention={reviewRetention}
+            flashcards={reviewFlashcards}
+            incorrectFlashcards={reviewIncorrect}
+            onContinue={() => setStage(getNextStage(2))}
+          />
+        </Case>
+      )}
 
-      <Case caseValue={3}>
-        <ReviseNewStage />
-      </Case>
+      {showNewSummary && (
+        <Case caseValue={3}>
+          <ReviseNewStage />
+        </Case>
+      )}
 
-      <Case caseValue={4}>
-        <ReviseIncorrectSummary
-          cardsCount={newFlashcards.length}
-          correctCount={newCorrect.length}
-          incorrectCount={newIncorrect.length}
-          retention={newCorrect.length / newFlashcards.length}
-          flashcards={newFlashcards}
-          incorrectFlashcards={newIncorrect}
-          onContinue={() => {
-            setStage(5);
-          }}
-        />
-      </Case>
+      {showNewSummary && (
+        <Case caseValue={4}>
+          <ReviseIncorrectSummary
+            cardsCount={newFlashcards.length}
+            correctCount={newCorrect.length}
+            incorrectCount={newIncorrect.length}
+            retention={newRetention}
+            flashcards={newFlashcards}
+            incorrectFlashcards={newIncorrect}
+            onContinue={() => setStage(getNextStage(4))}
+          />
+        </Case>
+      )}
 
-      <Case caseValue={5}>
-        <ReviseAllStage />
-      </Case>
+      {showAllIncorrect && (
+        <Case caseValue={5}>
+          <ReviseAllStage />
+        </Case>
+      )}
+      {/* Case 6 could be a final completion screen if needed */}
     </SwitchCase>
   );
 }

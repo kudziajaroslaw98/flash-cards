@@ -100,7 +100,11 @@ export default function NewStudyPlanPage() {
     return recommendedFlashcardsCount[coverageFocus ?? 'core'][duration ?? '3'];
   };
 
-  const { complete, completion } = useCompletion({
+  const {
+    complete,
+    completion,
+    stop: stopGenerating,
+  } = useCompletion({
     api: API_ROUTES.GENERATE_SUGGESTED_FLASHCARDS,
     body: {
       focusTags: [...state.step1.focusTags, ...state.step1.suggestedFocusAreas],
@@ -138,15 +142,22 @@ export default function NewStudyPlanPage() {
       return;
     }
 
-    setSuggestions(
-      objects.map(
-        (element) =>
-          ({
-            ...element,
-            type: 'single',
-          }) as AISuggestedFlashcardType,
-      ),
-    );
+    if (
+      objects.length >=
+      getRecommendedFlashcardCount(
+        state.step2.duration as PlanDuration,
+        state.step2.coverageFocus as CoverageFocus,
+      )?.[1]
+    )
+      setSuggestions(
+        objects.map(
+          (element) =>
+            ({
+              ...element,
+              type: 'single',
+            }) as AISuggestedFlashcardType,
+        ),
+      );
   }, [completion]);
 
   return (

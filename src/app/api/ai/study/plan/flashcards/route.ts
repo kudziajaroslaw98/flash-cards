@@ -264,11 +264,11 @@ export async function POST(req: NextRequest) {
 [
   {
     "id": "unique_string_ID_for_this_card",
-    "query": "The clear and concise question or prompt forming the front of the flashcard.",, // The front of the flashcard
-    "definition": "The detailed explanation elaborating on WHY the 'answer' is correct, providing context, or further defining the concept.", // The back of the flashcard
+    "query": "The clear and concise question or prompt forming the front of the flashcard.",
+    "definition": "The detailed explanation elaborating on WHY the 'answer' is correct, providing context, or further defining the concept.",
     "context": "The main subject or topic inferred from the Focus Tags (e.g., 'Computer Science', 'English Grammar').",
     "tags": ["list", "of", "relevant", "tags", "derived", "from", "FocusTags", "and", "specific", "card", "content"],
-    "answer1": "The correct, comprehensive answer.", // The back of the flashcard
+    "answer1": "The correct, comprehensive answer.",
     "answer2": "Incorrect plausible answer",
     "answer3": "Incorrect plausible answer",
     "answer4": "Incorrect plausible answer",

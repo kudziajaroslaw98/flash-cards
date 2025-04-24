@@ -1,12 +1,15 @@
 import { cn } from '#/shared/utils/cn.util';
 import type { Flashcard } from '#/types/flash-card.type';
+import { ReviseOptionsType } from '#/types/revise-options.type';
 
 type ReviseOptionsProps = {
   clicked: boolean;
   revisedCard: Flashcard | undefined;
   clickedOption: string | undefined;
-  spaceRepetitionClick: (value: 'again' | 'hard' | 'good' | 'easy') => void;
-  changeClicked: (answer: string, key?: string) => void;
+  selectSpacedRepetitionRating: (value: ReviseOptionsType) => void;
+  // Renamed from changeClicked for clarity
+  selectAnswer: (answer: string, key?: string) => void;
+  isSelected: boolean; // New prop: Is an answer/option selected (but not confirmed)?
   clickedAnswer?: string;
   answersAvailable?: boolean;
   answers?: string[];
@@ -17,8 +20,9 @@ export function ReviseOptions({
   revisedCard,
   clickedOption,
   clickedAnswer,
-  spaceRepetitionClick,
-  changeClicked,
+  isSelected,
+  selectSpacedRepetitionRating,
+  selectAnswer,
   answersAvailable = false,
   answers = [],
 }: ReviseOptionsProps) {
@@ -53,17 +57,30 @@ export function ReviseOptions({
             <div
               className={cn([
                 'flex w-full max-w-80 cursor-pointer items-center justify-center gap-4 rounded-md border border-gray-200 p-4 transition hover:bg-gray-100 dark:border-slate-800/40 dark:hover:bg-slate-800',
-                clickedOption === option.value &&
-                  'scale-110 border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
+                // Style for selected but not confirmed
+                isSelected &&
+                  !clicked &&
+                  clickedOption === option.value &&
+                  'ring-2 ring-blue-500 ring-offset-1 dark:ring-offset-slate-900',
+                // Style for confirmed (appears 'correct' visually)
+                clicked &&
+                  clickedOption === option.value &&
+                  'scale-105 border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
+                // Style for other options when one is confirmed (fade and blur)
                 clicked &&
                   clickedOption !== option.value &&
                   'scale-95 opacity-25 blur-[2px]',
+                // Style for other options when one is selected (fade slightly)
+                isSelected &&
+                  !clicked &&
+                  clickedOption !== option.value &&
+                  'opacity-60',
+                // Disabled pointer events if confirmed
+                clicked && 'pointer-events-none',
               ])}
-              key={`answer-${index}`}
+              key={`spaced-option-${index}`}
               onClick={() =>
-                spaceRepetitionClick(
-                  option.value as 'again' | 'hard' | 'good' | 'easy',
-                )
+                !clicked && selectSpacedRepetitionRating(option.value)
               }
             >
               <span
@@ -103,22 +120,35 @@ export function ReviseOptions({
             <div
               className={cn([
                 'flex w-[320px] cursor-pointer gap-4 rounded-md border border-gray-200 p-4 transition hover:bg-gray-100 dark:dark:border-slate-800/40 dark:hover:bg-slate-800',
-                clicked &&
-                  answer === revisedCard.answer1 &&
+                // Style for selected but not confirmed
+                isSelected &&
+                  !clicked &&
                   clickedAnswer === answer &&
-                  'scale-110 border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
+                  'ring-2 ring-blue-500 ring-offset-1 dark:ring-offset-slate-900',
+                // Style for confirmed correct answer
                 clicked &&
-                  answer !== revisedCard.answer1 &&
-                  clickedAnswer === answer &&
-                  'scale-110 border-red-400/50 bg-red-400/20 hover:!bg-red-100 dark:!border-red-400/40 dark:bg-red-400/20 dark:hover:!bg-red-400/20',
+                  clickedAnswer === answer && // This was the selected answer
+                  answer === revisedCard.answer1 && // And it was correct
+                  'scale-105 border-green-400/50 bg-green-100 hover:!bg-green-100 dark:!border-green-400/40 dark:bg-green-400/20 dark:hover:!bg-green-400/20',
+                // Style for confirmed incorrect answer
+                clicked &&
+                  clickedAnswer === answer && // This was the selected answer
+                  answer !== revisedCard.answer1 && // But it was incorrect
+                  'scale-105 border-red-400/50 bg-red-400/20 hover:!bg-red-100 dark:!border-red-400/40 dark:bg-red-400/20 dark:hover:!bg-red-400/20',
+                // Style for other options when one is confirmed (fade and blur)
                 clicked &&
                   clickedAnswer !== answer &&
                   'scale-95 opacity-25 blur-[2px]',
+                // Style for other options when one is selected (fade slightly)
+                isSelected &&
+                  !clicked &&
+                  clickedAnswer !== answer &&
+                  'opacity-60',
+                // Disabled pointer events if confirmed
+                clicked && 'pointer-events-none',
               ])}
               key={`answer-${index + 1}`}
-              onClick={() => {
-                changeClicked(answer);
-              }}
+              onClick={() => !clicked && selectAnswer(answer)}
             >
               <span className='flex size-8 min-h-8 min-w-8 items-center justify-center rounded-md bg-green-400 text-gray-100 dark:text-slate-900'>
                 {index + 1}

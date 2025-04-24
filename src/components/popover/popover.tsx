@@ -4,8 +4,10 @@ import * as m from 'motion/react-m';
 import {
   PropsWithChildren,
   ReactNode,
+  Ref,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useRef,
   useState,
 } from 'react';
@@ -23,23 +25,31 @@ interface WindowDimensions {
 }
 
 export function Popover({
+  ref,
   trigger,
   position,
   children,
   nested = false,
   popoverClassName,
+  disabled = false,
 }: PropsWithChildren<{
+  ref?: Ref<{ handleTogglePopover: () => void }>;
   trigger: ReactNode;
   position: 'top' | 'bottom' | 'bottom-right';
   nested?: boolean;
   popoverClassName?: string;
   minWidth?: number;
+  disabled?: boolean;
 }>) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const triggerRef = useRef<HTMLDivElement | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const popoverItemsEndRef = useRef<HTMLDivElement>(null);
   const popoverWrapperRef = useRef<HTMLDivElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    handleTogglePopover: handleTogglePopover,
+  }));
 
   useOutsideAlerter(popoverWrapperRef, () => {
     if (isOpen) {
@@ -230,6 +240,7 @@ export function Popover({
   }, [isOpen, updatePopoverPosition]);
 
   const handleTogglePopover = () => {
+    if (disabled) return;
     setIsOpen((prev) => !prev);
   };
 

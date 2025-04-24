@@ -1,82 +1,100 @@
 import { useRevisePlanContext } from '#/providers/revise-plan-provider';
 import type { Flashcard } from '#/types/flash-card.type';
-import { ArrowRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Button } from '../_ui/button/button';
-import { FloatingButtons } from '../floating-buttons/floating-buttons';
+import { useEffect, useMemo, useState } from 'react';
 import { ReviseBody } from './revise-body';
 
 export const ReviseOldStage = () => {
   const {
     setReviseStage: setStage,
-    completedFlashcards: completed,
+    completedFlashcards: completedInSession, // Renamed for clarity
     clicked,
     setClicked,
     currentDay,
-    currentSession,
-    reviewFlashcards,
+    reviewFlashcards, // Get only the review cards for this day
   } = useRevisePlanContext();
-  const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
-  const [revisedCard, setRevisedCard] = useState<Flashcard>();
 
-  const reroll = () => {
-    if (!clicked || !revisedCard) return;
+  // State specific to this stage
+  const [revisedCard, setRevisedCard] = useState<Flashcard | undefined>(
+    undefined,
+  );
+  const [completedCardsInStage, setCompletedCardsInStage] = useState<
+    Set<string>
+  >(new Set());
 
-    const leftCards = flashcards.filter((card) =>
-      completed?.every((c) => c.frontUuid !== card.frontUuid),
+  // Memoize the list of review flashcards for this stage
+  const flashcardsForStage = useMemo(
+    () => reviewFlashcards,
+    [reviewFlashcards],
+  );
+
+  // Determine initially completed cards for *this specific stage*
+  useEffect(() => {
+    if (!currentDay || !completedInSession) {
+      setCompletedCardsInStage(new Set());
+      return;
+    }
+    // Filter session's completed cards to only include those relevant to *this stage* (review cards)
+    const initialCompleted = new Set(
+      completedInSession
+        .map((fc) => fc.frontUuid) // Get UUIDs from the session completion list
+        .filter((uuid) =>
+          flashcardsForStage.some(
+            (reviewCard) => reviewCard.frontUuid === uuid,
+          ),
+        ),
+    );
+    setCompletedCardsInStage(initialCompleted);
+  }, [completedInSession, currentDay, flashcardsForStage]);
+
+  // Set the next card to revise when the current one is completed or state changes
+  useEffect(() => {
+    // Only find the next card if we are not in the 'clicked' (waiting for next) state
+    // and if there are cards defined for this stage
+    if (!clicked && flashcardsForStage.length > 0) {
+      const nextCard = flashcardsForStage.find(
+        (card) => !completedCardsInStage.has(card.frontUuid),
+      );
+      setRevisedCard(nextCard); // Will be undefined if no cards are left
+    }
+  }, [clicked, flashcardsForStage, completedCardsInStage]);
+
+  // Handler for moving to the next card or stage
+  const handleNextCard = () => {
+    if (!clicked || !revisedCard) return; // Cannot proceed if not confirmed or no card
+
+    // Add the just-revised card to this stage's completed set
+    const updatedCompletedCards = new Set(completedCardsInStage).add(
+      revisedCard.frontUuid,
+    );
+    setCompletedCardsInStage(updatedCompletedCards);
+
+    // Find the next card in *this stage's* list that hasn't been completed yet
+    const nextCard = flashcardsForStage.find(
+      (card) => !updatedCompletedCards.has(card.frontUuid),
     );
 
-    if (leftCards.length === 0) {
-      setStage((prev) => prev + 1);
+    if (!nextCard) {
+      // All cards for *this stage* are done
+      setStage((prev) => prev + 1); // Move to the next overall stage
+      setClicked(false); // Reset click state for the next stage
+    } else {
+      // Set the next card and reset the click state
+      setRevisedCard(nextCard);
+      setClicked(false);
     }
-
-    setRevisedCard(leftCards[0]);
-    setClicked(false);
   };
 
-  useEffect(() => {
-    if (revisedCard || flashcards.length === 0) {
-      return;
-    }
-    const leftCards = flashcards.filter((card) =>
-      completed?.every((c) => c.frontUuid !== card.frontUuid),
-    );
-    setRevisedCard(leftCards[0]);
-    setClicked(false);
-  }, [revisedCard, currentDay, completed, flashcards]);
-
-  useEffect(() => {
-    if (revisedCard || !currentSession || !currentDay) {
-      return;
-    }
-
-    setFlashcards(reviewFlashcards);
-  }, [reviewFlashcards]);
-
   return (
-    <>
-      <span>Review Cards</span>
-
-      <ReviseBody
-        clicked={clicked}
-        setClicked={setClicked}
-        revisedCard={revisedCard}
-      />
-
-      <FloatingButtons>
-        <div className='flex w-full flex-col items-center justify-center gap-2 py-2'>
-          <Button
-            label={'Next'}
-            icon={<ArrowRight className='h-4 w-4' />}
-            iconPosition={'right'}
-            onClick={reroll}
-            size={'xlg'}
-            className='!w-full !max-w-xs'
-            disabled={!clicked}
-            alt='Next'
-          />
-        </div>
-      </FloatingButtons>
-    </>
+    <div className='flex h-full w-full flex-col justify-stretch'>
+      <div className='flex h-full w-full flex-col items-center gap-8 pb-12'>
+        <span>Review Cards</span>
+        <ReviseBody
+          clicked={clicked}
+          setClicked={setClicked}
+          revisedCard={revisedCard}
+          handleReshuffle={handleNextCard}
+        />
+      </div>
+    </div>
   );
 };
