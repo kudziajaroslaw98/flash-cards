@@ -150,7 +150,10 @@ export default function SetHardlinkPage() {
       },
     ]);
 
-    if (options.additionalFile) {
+    if (
+      options.additionalFile !== null &&
+      options.additionalFile !== undefined
+    ) {
       const reader = new FileReader();
       reader.readAsDataURL(options.additionalFile);
       reader.onloadend = async () => {
@@ -185,6 +188,8 @@ export default function SetHardlinkPage() {
           setName: set?.name ?? '',
           setDescription: set?.description ?? '',
           options: options,
+          fileData: null,
+          mimeType: null,
         },
       });
     }

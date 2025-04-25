@@ -192,7 +192,8 @@ export const FlashcardGenerateDialog = ({
               )
               .refine((file) => file.size <= 5 * 1024 * 1024, {
                 message: 'File size should not exceed 5MB',
-              }),
+              })
+              .nullish(),
           },
         ],
       },
