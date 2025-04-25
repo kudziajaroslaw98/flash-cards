@@ -178,27 +178,23 @@ export const FlashcardGenerateDialog = ({
             type: 'validation',
             key: 'additionalFile',
             constraint: z
-              .null()
-              .nullish()
-              .or(
-                z
-                  .instanceof(File)
-                  .refine(
-                    (file) =>
-                      [
-                        'application/pdf',
-                        'image/jpeg',
-                        'image/png',
-                        'image/webp',
-                      ].includes(file.type),
-                    {
-                      message: 'Invalid document file type',
-                    },
-                  )
-                  .refine((file) => file.size <= 5 * 1024 * 1024, {
-                    message: 'File size should not exceed 5MB',
-                  }),
-              ),
+              .instanceof(File)
+              .refine(
+                (file) =>
+                  [
+                    'application/pdf',
+                    'image/jpeg',
+                    'image/png',
+                    'image/webp',
+                  ].includes(file.type),
+                {
+                  message: 'Invalid document file type',
+                },
+              )
+              .refine((file) => file.size <= 5 * 1024 * 1024, {
+                message: 'File size should not exceed 5MB',
+              })
+              .nullish(),
           },
         ],
       },
