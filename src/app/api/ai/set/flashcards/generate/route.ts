@@ -204,7 +204,7 @@ export async function POST(req: NextRequest) {
       }
 
       *   **Knowledge Level:** ${pickedKnowledgeLevel} (This is the PRIMARY determinant of difficulty for ALL cards)
-      *   **Focus Tags:** [${focusTagsSet.size > 0 ? focusTagsSet.values().toArray().join(', ') : 'None provided'}] (These define the specific topics/concepts to cover)
+      *   **Focus Tags:** [${focusTagsSet.size > 0 ? Array.from(focusTagsSet).join(', ') : 'None provided'}] (These define the specific topics/concepts to cover)
       *   **Subject Area & Topic:** (Infer the general Subject Area [e.g., Technical/STEM, Language Learning] and specific Topic Name from the Focus Tags. Use this context for applying style and knowledge level guidance.)
       *   **Excluded Topics (Blacklist):** ${options.blacklist && options.blacklist.length > 0 ? `[${options.blacklist.join(', ')}, ${flashcardsRecords.map((summary) => `${summary.query}`).join(', ')}]` : 'None specified'} (Strictly AVOID generating cards primarily about these concepts.)
       *   **Existing Cards (Avoid Duplication):**
