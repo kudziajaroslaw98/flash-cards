@@ -369,7 +369,7 @@ export default function FormComponent<T>({ ref, ...props }: FormProps<T>) {
 
   useEffect(() => {
     if (props?.debug?.values) {
-      console.log('form - values - ', formValues);
+      console.log('form - values - ', formValues, JSON.stringify(formValues));
     }
   }, [props.debug, formValues]);
 

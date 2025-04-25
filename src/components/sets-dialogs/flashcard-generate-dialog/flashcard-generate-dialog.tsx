@@ -194,7 +194,10 @@ export const FlashcardGenerateDialog = ({
               .refine((file) => file.size <= 5 * 1024 * 1024, {
                 message: 'File size should not exceed 5MB',
               })
-              .nullish(),
+              .nullish()
+              .or(
+                z.object({}).refine((value) => JSON.stringify(value) === '{}'),
+              ),
           },
         ],
       },
@@ -273,6 +276,7 @@ export const FlashcardGenerateDialog = ({
             className='w-full max-w-96'
             scheme={getFormScheme}
             initialValues={initialValue}
+            debug={{ values: true }}
           />
         </Modal.Body>
 
