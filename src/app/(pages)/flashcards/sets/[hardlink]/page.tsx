@@ -152,7 +152,8 @@ export default function SetHardlinkPage() {
 
     if (
       options.additionalFile !== null &&
-      options.additionalFile !== undefined
+      options.additionalFile !== undefined &&
+      JSON.stringify(options.additionalFile) !== '{}'
     ) {
       const reader = new FileReader();
       reader.readAsDataURL(options.additionalFile);
