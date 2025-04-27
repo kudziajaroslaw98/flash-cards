@@ -284,8 +284,9 @@ Ensure the JSON is valid.
 `;
 
   return streamText({
-    model: gemini('gemini-2.0-flash-thinking-exp-01-21'),
+    model: gemini('gemini-2.5-flash-preview-04-17'),
     prompt: prompt(flashcardsNeeded, []).replaceAll('\n', ' ').trim(),
+    abortSignal: req.signal,
     temperature: getTemperature(knowledgeLevel),
     maxSteps: 5,
     experimental_continueSteps: true,

@@ -156,7 +156,7 @@ export async function POST(req: NextRequest) {
   });
 
   const stream = streamObject({
-    model: gemini('gemini-2.0-flash-001'),
+    model: gemini('gemini-2.5-flash-preview-04-17'),
     prompt: prompt.replaceAll('\n', ' ').trim(),
     temperature: 0.7,
     system:

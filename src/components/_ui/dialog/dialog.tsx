@@ -22,7 +22,9 @@ export type DialogProps = {
   trigger: React.ReactNode;
   onDialogClose: () => void;
   onDialogSubmit?: () => void;
+  onDialogDelete?: () => void;
   isCloseButtonVisible?: boolean;
+  isDeleteButtonVisible?: boolean;
   closeOnBackdropClick?: boolean;
   submitRef?: React.RefObject<HTMLButtonElement | null>;
 } & PropsWithChildren;
@@ -33,7 +35,9 @@ export const Dialog = ({
   setOpen,
   onDialogClose,
   onDialogSubmit,
+  onDialogDelete,
   isCloseButtonVisible = true,
+  isDeleteButtonVisible = false,
   closeOnBackdropClick = false,
   ...props
 }: DialogProps) => {
@@ -82,7 +86,9 @@ export const Dialog = ({
         createPortal(
           <DialogProvider
             isCloseButtonVisible={isCloseButtonVisible}
+            isDeleteButtonVisible={isDeleteButtonVisible}
             onDialogClose={onDialogClose}
+            onDialogDelete={onDialogDelete}
           >
             <div className='fixed right-0 top-0 z-[100] h-screen w-screen bg-black/75 backdrop-blur-sm'>
               <div

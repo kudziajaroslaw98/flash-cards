@@ -148,16 +148,20 @@ export default function NewStudyPlanPage() {
         state.step2.duration as PlanDuration,
         state.step2.coverageFocus as CoverageFocus,
       )?.[1]
-    )
-      setSuggestions(
-        objects.map(
-          (element) =>
-            ({
-              ...element,
-              type: 'single',
-            }) as AISuggestedFlashcardType,
-        ),
-      );
+    ) {
+      stopGenerating();
+      setIsLoading(false);
+    }
+
+    setSuggestions(
+      objects.map(
+        (element) =>
+          ({
+            ...element,
+            type: 'single',
+          }) as AISuggestedFlashcardType,
+      ),
+    );
   }, [completion]);
 
   return (

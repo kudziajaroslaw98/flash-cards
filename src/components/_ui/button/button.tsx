@@ -37,13 +37,15 @@ const buttonVariants = cva(
         'secondary-text':
           'text-blue-500 hover:text-gray-50 bg-transparent border-transparent  hover:bg-blue-500 active:focus:bg-blue-600',
         muted:
-          'border-transparent text-gray-50 bg-gray-400 border-gray-500 hover:bg-gray-500 active:focus:bg-gray-600',
+          'text-gray-400 bg-gray-100 border-gray-100 hover:bg-gray-200 hover:text-gray-600 active:focus:bg-gray-200 dark:text-slate-700 dark:bg-slate-900 dark:border-slate-900 dark:hover:bg-slate-950 dark:hover:text-slate-500 dark:active:focus:bg-slate-950',
         'muted-outline':
-          'text-gray-500 hover:text-gray-50 bg-transparent border border-gray-500 hover:bg-gray-500 active:focus:bg-gray-600',
+          'text-gray-400 hover:text-gray-600 bg-transparent border border-gray-100 hover:bg-gray-200 active:focus:bg-gray-200 dark:text-slate-700 dark:bg-transparent dark:border-slate-900 dark:hover:bg-slate-950 dark:hover:text-slate-500 dark:active:focus:bg-slate-950',
         'muted-text':
-          'text-gray-500 hover:text-gray-50 bg-transparent border-transparent  hover:bg-gray-500 active:focus:bg-gray-600',
+          'text-gray-400 hover:text-gray-600 bg-transparent border-transparent hover:bg-gray-200 active:focus:bg-gray-200 dark:text-slate-700 dark:bg-transparent dark:border-transparent dark:hover:bg-slate-950 dark:hover:text-slate-500 dark:active:focus:bg-slate-950',
         'muted-transparent':
-          'border-transparent text-gray-500 bg-transparent border-transparent hover:bg-gray-500/5 active:focus:bg-gray-600/5',
+          'text-gray-400 bg-transparent border-transparent hover:bg-gray-200/5 active:focus:bg-gray-200/5 dark:text-slate-700 dark:bg-transparent dark:border-transparent dark:hover:bg-slate-950/5 dark:hover:text-slate-500 dark:active:focus:bg-slate-950/5',
+        ghost:
+          'bg-transparent border-transparent text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-900 focus:ring-gray-300 dark:focus:ring-slate-700',
       },
       size: {
         default: 'h-10 px-4 py-2 md:w-auto',

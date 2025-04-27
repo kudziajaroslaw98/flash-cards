@@ -161,7 +161,7 @@ You can use markdown in this fields: commonMisconceptions/contextualExample/keyT
   });
 
   return streamText({
-    model: gemini('gemini-2.0-flash-thinking-exp-01-21'),
+    model: gemini('gemini-2.5-flash-preview-04-17'),
     prompt: prompt,
     temperature: 0.7,
     experimental_continueSteps: true,

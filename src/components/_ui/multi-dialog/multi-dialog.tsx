@@ -22,6 +22,7 @@ export type MultiDialogProps = {
   open: boolean;
   trigger: React.ReactNode;
   isCloseButtonVisible?: boolean;
+  isDeleteButtonVisible?: boolean;
   closeOnBackdropClick?: boolean;
   currentIndex: number;
   maxIndex: number;
@@ -30,6 +31,7 @@ export type MultiDialogProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onDialogClose: () => void;
   onDialogSubmit?: () => void;
+  onDialogDelete?: () => void;
   handleLeftButtonClick?: () => void;
   handleRightButtonClick?: () => void;
 } & PropsWithChildren;
@@ -47,6 +49,7 @@ export const MultiDialog = ({
   submitRef,
   setOpen,
   onDialogClose,
+  onDialogDelete,
   onDialogSubmit,
   currentIndex = 0,
   maxIndex = 0,
@@ -54,6 +57,7 @@ export const MultiDialog = ({
   handleLeftButtonClick,
   handleRightButtonClick,
   isCloseButtonVisible = true,
+  isDeleteButtonVisible = false,
   closeOnBackdropClick = false,
   ...props
 }: MultiDialogProps) => {
@@ -177,7 +181,9 @@ export const MultiDialog = ({
         createPortal(
           <DialogProvider
             isCloseButtonVisible={isCloseButtonVisible}
+            isDeleteButtonVisible={isDeleteButtonVisible}
             onDialogClose={onDialogClose}
+            onDialogDelete={onDialogDelete}
           >
             <div className='fixed right-0 top-0 z-[100] h-screen w-screen bg-black/75 backdrop-blur-sm'>
               <div
@@ -191,26 +197,28 @@ export const MultiDialog = ({
                     mode='popLayout'
                     initial={false}
                   >
-                    <m.div
-                      key={currentIndex}
-                      transition={{ duration: 0.3, ease: 'easeInOut' }}
-                      initial={{
-                        opacity: 0,
-                        x: direction.current * -100,
-                      }}
-                      animate={{
-                        opacity: 1,
-                        x: 0,
-                      }}
-                      exit={{
-                        opacity: 0,
-                        x: direction.current * -100,
-                        zIndex: -1,
-                      }}
-                      className='w-full'
-                    >
-                      {props.children}
-                    </m.div>
+                    <div className='h-full w-full'>
+                      <m.div
+                        key={`dialog-${currentIndex}-${maxIndex}`}
+                        transition={{ duration: 0.15, ease: 'easeInOut' }}
+                        initial={{
+                          opacity: 0,
+                          x: direction.current * -100,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          x: 0,
+                        }}
+                        exit={{
+                          opacity: 0,
+                          x: direction.current * -100,
+                          zIndex: -1,
+                        }}
+                        className='h-full w-full'
+                      >
+                        {props.children}
+                      </m.div>
+                    </div>
                   </AnimatePresence>
 
                   <div className='flex w-full items-center gap-4 md:hidden'>

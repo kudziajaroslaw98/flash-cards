@@ -223,7 +223,7 @@ export function StudyPlanStep5({
             >
               <div className='flex w-full flex-col gap-4'>
                 <PlanSection title='Objectives'>
-                  <ul className='prose flex list-disc flex-col gap-1 pl-4 text-sm'>
+                  <ul className='prose flex list-disc flex-col gap-1 pl-4 text-sm dark:text-slate-300'>
                     {day.objectives.map((objective, index) => (
                       <li key={'objective-' + index}>{objective}</li>
                     ))}
@@ -231,7 +231,7 @@ export function StudyPlanStep5({
                 </PlanSection>
 
                 <PlanSection title='Metrics'>
-                  <ul className='prose flex list-disc flex-col gap-1 pl-4 text-sm'>
+                  <ul className='prose flex list-disc flex-col gap-1 pl-4 text-sm dark:text-slate-300'>
                     <li>Target Retention: {day.metrics.targetRetention}%</li>
 
                     <li>Max Study Time: {day.metrics.maxStudyTime} minutes</li>

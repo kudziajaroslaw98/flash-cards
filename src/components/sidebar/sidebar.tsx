@@ -12,6 +12,7 @@ import {
   ArrowUp,
   BookA,
   BookOpenText,
+  BrainCircuit,
   Clock,
   GraduationCap,
   House,

@@ -8,7 +8,7 @@ export default function useLongPress<T, K = unknown>(
     value: K[],
     e: MouseEvent | TouchEvent,
   ) => void = () => {},
-  longPressThreshold = 300,
+  longPressThreshold = 450,
 ): [
   (e: MouseEvent | TouchEvent, value: T) => void,
   (e: MouseEvent | TouchEvent, value?: K[]) => void,

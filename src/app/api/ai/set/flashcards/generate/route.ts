@@ -284,7 +284,7 @@ export async function POST(req: NextRequest) {
   });
 
   const result = streamText({
-    model: gemini('gemini-2.0-flash'),
+    model: gemini('gemini-2.5-flash-preview-04-17'),
     temperature: options.knowledgeLevel
       ? getTemperature(options.knowledgeLevel!)
       : 1,

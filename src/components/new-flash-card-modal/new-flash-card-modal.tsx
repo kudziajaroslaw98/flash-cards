@@ -128,6 +128,20 @@ export const NewFlashcardModal = ({
     clearInitialValues();
   };
 
+  const handleDialogDelete = () => {
+    window?.umami?.track('Flashcard dialog - delete button clicked');
+
+    if (flashcards.length > 1) {
+      setFlashcards((prev) =>
+        prev.filter((_, index) => index !== currentIndex),
+      );
+      setCurrentIndex((prev) => (prev > 0 ? prev - 1 : 0));
+    } else {
+      setFlashcards([getNewFlashcard()]);
+      setCurrentIndex(0);
+    }
+  };
+
   const handleDialogSubmit = async () => {
     window?.umami?.track('Flashcard dialog - submitted', { isInEditMode });
 
@@ -257,12 +271,14 @@ export const NewFlashcardModal = ({
         trigger={trigger}
         onDialogClose={handleDialogClose}
         onDialogSubmit={handleDialogSubmit}
+        onDialogDelete={handleDialogDelete}
         handleLeftButtonClick={handleLeftButtonClick}
         handleRightButtonClick={handleRightButtonClick}
         currentIndex={currentIndex}
         maxIndex={flashcards.length}
         isInEditMode={isInEditMode}
         submitRef={submitRef}
+        isDeleteButtonVisible={!isInEditMode && flashcards.length > 1}
       >
         <Modal className='w-full'>
           <Modal.Header variant={'form'}>
