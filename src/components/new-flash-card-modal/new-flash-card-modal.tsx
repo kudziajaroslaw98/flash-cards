@@ -1,20 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useAIStream } from '#/hooks/use-ai-stream.hook';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
 import { isPremiumUser } from '#/shared/guards/is-premium-user';
 import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
+import { extractObjectsFromString } from '#/shared/utils/extract-objects-from-string';
 import uuid from '#/shared/utils/uuid.util';
 import { newFlashcardScheme } from '#/shared/validation-schemes/new-flash-card-validation.scheme';
 import type { Flashcard } from '#/types/flash-card.type';
-import { useCompletion } from '@ai-sdk/react';
 import { Button } from '../_ui/button/button';
 import Modal from '../_ui/modal/modal';
 import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
 import FormComponent, { type FormMethods } from '../form-component/form';
-
-import { extractObjectsFromString } from '#/shared/utils/extract-objects-from-string';
 
 interface NewFlashcardModalProps {
   handleNewFlashcard: (
@@ -41,21 +40,12 @@ export const NewFlashcardModal = ({
   const { isLoggedIn, isPlanActive } = useSessionContext();
   const submitRef = useRef<HTMLButtonElement>(null);
   const formRef = useRef<FormMethods<Flashcard>>(null);
-  const {
-    completion,
-    complete,
-    isLoading: loadingGenerate,
-  } = useCompletion({
-    api: API_ROUTES.ANSWER_GENERATE,
-  });
 
-  const {
-    completion: generatedAnswers,
-    complete: generateAnswers,
-    isLoading: answersLoading,
-  } = useCompletion({
-    api: API_ROUTES.ANSWERS_GENERATE,
-  });
+  const { isStreaming, startStream } = useAIStream();
+  const [completion, setCompletion] = useState('');
+  const [generatedAnswers, setGeneratedAnswers] = useState('');
+  const [loadingGenerate, setLoadingGenerate] = useState(false);
+  const [answersLoading, setAnswersLoading] = useState(false);
 
   const getNewFlashcard: () => Omit<Flashcard, 'order'> = () =>
     flashcardsMerge(defaultFlashcard(), {
@@ -191,7 +181,7 @@ export const NewFlashcardModal = ({
   };
 
   const handleGenerate = useCallback(async () => {
-    if (!(await isPremiumUser())) {
+    if (!(await isPremiumUser()) || isStreaming) {
       return;
     }
 
@@ -199,14 +189,30 @@ export const NewFlashcardModal = ({
       (formValue.context !== undefined && formValue.context !== '') ||
       formValue.type === 'question'
     ) {
-      await complete(
-        `generate ${formValue.type === 'question' ? 'answer' : 'description'} to: '${formValue.type === 'question' ? formValue.query : formValue.context}'; Do not repeat words from the prompt as this will break the flashcard.`,
-      );
+      setLoadingGenerate(true);
+      setCompletion('');
+
+      try {
+        await startStream(
+          {
+            api: API_ROUTES.ANSWER_GENERATE,
+            header: 'Generating Answer',
+            onChunk: (chunk) => {
+              setCompletion(chunk.text);
+            },
+          },
+          {
+            prompt: `generate ${formValue.type === 'question' ? 'answer' : 'description'} to: '${formValue.type === 'question' ? formValue.query : formValue.context}'; Do not repeat words from the prompt as this will break the flashcard.`,
+          }
+        );
+      } finally {
+        setLoadingGenerate(false);
+      }
     }
-  }, [formValue, complete]);
+  }, [formValue, startStream, isStreaming]);
 
   const handleGenerateAnswers = useCallback(async () => {
-    if (!(await isPremiumUser())) {
+    if (!(await isPremiumUser()) || isStreaming) {
       return;
     }
 
@@ -219,15 +225,29 @@ export const NewFlashcardModal = ({
       formValue.context !== undefined &&
       formValue.context !== ''
     ) {
-      await generateAnswers('', {
-        body: {
-          context: formValue.context,
-          query: formValue.query,
-          definition: formValue.definition,
-        },
-      });
+      setAnswersLoading(true);
+      setGeneratedAnswers('');
+
+      try {
+        await startStream(
+          {
+            api: API_ROUTES.ANSWERS_GENERATE,
+            header: 'Generating Answers',
+            onChunk: (chunk) => {
+              setGeneratedAnswers(chunk.text);
+            },
+          },
+          {
+            context: formValue.context,
+            query: formValue.query,
+            definition: formValue.definition,
+          }
+        );
+      } finally {
+        setAnswersLoading(false);
+      }
     }
-  }, [formValue, generateAnswers]);
+  }, [formValue, startStream, isStreaming]);
 
   const getFormScheme = useMemo(
     () =>

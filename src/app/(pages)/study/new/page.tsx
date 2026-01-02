@@ -21,8 +21,8 @@ import type { KnowledgeLevel } from '#/types/knowledge-level.type';
 import type { LearningStyleAdaptation } from '#/types/learning-style.type';
 import type { MnemonicPreferences } from '#/types/mnemonic-preference.type';
 import type { PlanDuration } from '#/types/plan-durations.type';
-import { useCompletion } from '@ai-sdk/react';
-import { useEffect, useState } from 'react';
+import { useAIStream } from '#/hooks/use-ai-stream.hook';
+import { useCallback, useEffect, useState } from 'react';
 
 export interface PlanSetupState {
   step1: {
@@ -87,6 +87,9 @@ export default function NewStudyPlanPage() {
   const [suggestions, setSuggestions] = useState<AISuggestedFlashcardType[]>(
     [],
   );
+  const [completion, setCompletion] = useState('');
+
+  const { isStreaming, startStream, cancel } = useAIStream();
 
   useRedirectUnauthorized({
     redirectOnInactivePlan: true,
@@ -100,37 +103,42 @@ export default function NewStudyPlanPage() {
     return recommendedFlashcardsCount[coverageFocus ?? 'core'][duration ?? '3'];
   };
 
-  const {
-    complete,
-    completion,
-    stop: stopGenerating,
-  } = useCompletion({
-    api: API_ROUTES.GENERATE_SUGGESTED_FLASHCARDS,
-    body: {
-      focusTags: [...state.step1.focusTags, ...state.step1.suggestedFocusAreas],
-      knowledgeLevel: state.step1.knowledgeLevel,
-      coverageFocus: state.step2.coverageFocus,
-      duration: state.step2.duration,
-      flashcardsNeeded:
-        getRecommendedFlashcardCount(
-          state.step2.duration as PlanDuration,
-          state.step2.coverageFocus as CoverageFocus,
-        )?.[1] ?? 0,
-      learningStyle: state.step1.learningStyle,
-      cardLength: state.step1.cardLength,
-      mnemonicPreference: state.step1.mnemonicPreference,
-      userPrompt: state.step2.userPrompt,
-      blacklist: state.step2.blacklist,
-    },
-    onFinish: () => {
-      setIsLoading(false);
-    },
-  });
+  const generateSuggestions = useCallback(async () => {
+    if (isStreaming) return;
 
-  const generateSuggestions = () => {
     setIsLoading(true);
-    complete('prompt');
-  };
+    setCompletion('');
+
+    try {
+      await startStream(
+        {
+          api: API_ROUTES.GENERATE_SUGGESTED_FLASHCARDS,
+          header: 'Generating Flashcards',
+          onChunk: (chunk) => {
+            setCompletion(chunk.text);
+          },
+        },
+        {
+          focusTags: [...state.step1.focusTags, ...state.step1.suggestedFocusAreas],
+          knowledgeLevel: state.step1.knowledgeLevel,
+          coverageFocus: state.step2.coverageFocus,
+          duration: state.step2.duration,
+          flashcardsNeeded:
+            getRecommendedFlashcardCount(
+              state.step2.duration as PlanDuration,
+              state.step2.coverageFocus as CoverageFocus,
+            )?.[1] ?? 0,
+          learningStyle: state.step1.learningStyle,
+          cardLength: state.step1.cardLength,
+          mnemonicPreference: state.step1.mnemonicPreference,
+          userPrompt: state.step2.userPrompt,
+          blacklist: state.step2.blacklist,
+        }
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isStreaming, startStream, state]);
 
   useEffect(() => {
     Logger.info(completion);

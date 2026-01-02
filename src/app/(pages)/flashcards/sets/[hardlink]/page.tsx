@@ -24,7 +24,7 @@ import uuid from '#/shared/utils/uuid.util';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { Flashcard } from '#/types/flash-card.type';
 import { FlashcardGenerationOptions } from '#/types/flashcard-generation-options.type';
-import { useCompletion } from '@ai-sdk/react';
+import { useAIStream } from '#/hooks/use-ai-stream.hook';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   ArrowLeft,
@@ -67,14 +67,10 @@ export default function SetHardlinkPage() {
   );
   const [selected, setSelected] = useState<Flashcard[]>([]);
   const [generated, setGenerated] = useState<Flashcard[]>([]);
+  const [generatedFlashcards, setGeneratedFlashcards] = useState('');
+  const [isGeneratingFlashcards, setIsGeneratingFlashcards] = useState(false);
 
-  const {
-    complete: generateFlashcards,
-    completion: generatedFlashcards,
-    isLoading: isGeneratingFlashcards,
-  } = useCompletion({
-    api: API_ROUTES.SET_FLASHCARDS,
-  });
+  const { isStreaming, startStream } = useAIStream();
 
   const setFlashcards =
     useLiveQuery(
@@ -141,7 +137,7 @@ export default function SetHardlinkPage() {
     options: Partial<FlashcardGenerationOptions>,
   ) => {
     window?.umami?.track('Generate flashcards');
-    if (!isLoggedIn || !isPlanActive) return;
+    if (!isLoggedIn || !isPlanActive || isStreaming) return;
 
     updateSets([
       {
@@ -149,6 +145,26 @@ export default function SetHardlinkPage() {
         generationOptions: options,
       },
     ]);
+
+    setIsGeneratingFlashcards(true);
+    setGeneratedFlashcards('');
+
+    const doGenerate = async (body: Record<string, unknown>) => {
+      try {
+        await startStream(
+          {
+            api: API_ROUTES.SET_FLASHCARDS,
+            header: 'Generating Flashcards',
+            onChunk: (chunk) => {
+              setGeneratedFlashcards(chunk.text);
+            },
+          },
+          body
+        );
+      } finally {
+        setIsGeneratingFlashcards(false);
+      }
+    };
 
     if (
       options.additionalFile !== null &&
@@ -164,34 +180,31 @@ export default function SetHardlinkPage() {
 
         if (!fileData) {
           console.error('Failed to read file data.');
+          setIsGeneratingFlashcards(false);
           return;
         }
 
         const { additionalFile, ...withoutFile } = options;
 
-        generateFlashcards('', {
-          body: {
-            flashcards:
-              setFlashcards.map((flashcard) => flashcard.frontUuid) ?? [],
-            setName: set?.name ?? '',
-            setDescription: set?.description ?? '',
-            fileData: fileData,
-            mimeType: options.additionalFile?.type,
-            options: withoutFile,
-          },
-        });
-      };
-    } else {
-      generateFlashcards('', {
-        body: {
+        await doGenerate({
           flashcards:
             setFlashcards.map((flashcard) => flashcard.frontUuid) ?? [],
           setName: set?.name ?? '',
           setDescription: set?.description ?? '',
-          options: options,
-          fileData: null,
-          mimeType: null,
-        },
+          fileData: fileData,
+          mimeType: options.additionalFile?.type,
+          options: withoutFile,
+        });
+      };
+    } else {
+      await doGenerate({
+        flashcards:
+          setFlashcards.map((flashcard) => flashcard.frontUuid) ?? [],
+        setName: set?.name ?? '',
+        setDescription: set?.description ?? '',
+        options: options,
+        fileData: null,
+        mimeType: null,
       });
     }
   };

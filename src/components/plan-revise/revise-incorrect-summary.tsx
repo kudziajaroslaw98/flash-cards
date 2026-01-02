@@ -1,9 +1,9 @@
+import { useAIStream } from '#/hooks/use-ai-stream.hook';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 import { parseStreamingJSON } from '#/shared/utils/parse-streaming-json';
 import type { Flashcard } from '#/types/flash-card.type';
-import { useCompletion } from '@ai-sdk/react';
 import { ArrowRight, Dot, LoaderCircle } from 'lucide-react';
-import { memo, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
 import { Accordion } from '../_ui/accordion/accordion';
 import { Button } from '../_ui/button/button';
@@ -64,16 +64,40 @@ export const ReviseIncorrectSummary = ({
     IncorrectSummary[]
   >([]);
   const [hasGenerated, setHasGenerated] = useState(false);
+  const [summaries, setSummaries] = useState('');
+  const [generateSummaryLoading, setGenerateSummaryLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  const {
-    complete: generateSummary,
-    isLoading: generateSummaryLoading,
-    completion: summaries,
-    error,
-  } = useCompletion({
-    api: API_ROUTES.GENERATE_INCORRECT_REVIEW_SUMMARY,
-    onFinish: () => setHasGenerated(true), // Mark generation as attempted
-  });
+  const { isStreaming, startStream } = useAIStream();
+
+  const generateSummary = useCallback(
+    async (summariesPayload: unknown[]) => {
+      if (isStreaming) return;
+
+      setGenerateSummaryLoading(true);
+      setSummaries('');
+      setError(null);
+
+      try {
+        await startStream(
+          {
+            api: API_ROUTES.GENERATE_INCORRECT_REVIEW_SUMMARY,
+            header: 'Generating Explanations',
+            onChunk: (chunk) => {
+              setSummaries(chunk.text);
+            },
+          },
+          { summaries: summariesPayload }
+        );
+        setHasGenerated(true);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to generate'));
+      } finally {
+        setGenerateSummaryLoading(false);
+      }
+    },
+    [isStreaming, startStream]
+  );
 
   // Prepare summaries for API call only when needed and inputs are valid
   useEffect(() => {
@@ -95,7 +119,7 @@ export const ReviseIncorrectSummary = ({
         }));
 
       if (summariesPayload.length > 0) {
-        generateSummary('', { body: { summaries: summariesPayload } });
+        generateSummary(summariesPayload);
       } else {
         setHasGenerated(true); // Mark as generated even if no incorrect cards found
       }
