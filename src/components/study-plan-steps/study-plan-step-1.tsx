@@ -5,6 +5,7 @@ import { cardLengthDictionary } from '#/dictionaries/card-length.dictionary';
 import { knowledgeLevelDictionary } from '#/dictionaries/knowledge-level.dictionary';
 import { learningStyleDictionary } from '#/dictionaries/learning-style.dictionary';
 import { mnemonicPreferenceDictionary } from '#/dictionaries/mnemonic-preference.dictionary';
+import { useAIStream } from '#/hooks/use-ai-stream.hook';
 import { cardLengthSchema } from '#/schemas/card-length.schema';
 import { knowledgeLevelSchema } from '#/schemas/knowledge-level.schema';
 import { learningStyleAdaptationSchema } from '#/schemas/learning-style-adaptation.schema';
@@ -17,7 +18,6 @@ import { DictionaryValue } from '#/types/dictionary-value.type';
 import type { KnowledgeLevel } from '#/types/knowledge-level.type';
 import type { LearningStyleAdaptation } from '#/types/learning-style.type';
 import type { MnemonicPreferences } from '#/types/mnemonic-preference.type';
-import { useCompletion } from '@ai-sdk/react';
 import { ArrowRight } from 'lucide-react';
 import {
   useEffect,
@@ -40,6 +40,7 @@ export function StudyPlanStep1({
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<DictionaryValue<string>[]>([]);
+  const [completion, setCompletion] = useState('');
   const { goToNext } = useStepper();
   const formRef = useRef<
     FormMethods<{
@@ -52,12 +53,7 @@ export function StudyPlanStep1({
     }>
   >(null);
 
-  const { complete, completion } = useCompletion({
-    api: API_ROUTES.GENERATE_BRAINSTORM_TAG_IDEAS,
-    onFinish: () => {
-      setIsLoading(false);
-    },
-  });
+  const { isStreaming, startStream } = useAIStream();
 
   const handleOnClick = async () => {
     await formRef.current?.checkValidity();
@@ -71,7 +67,7 @@ export function StudyPlanStep1({
     setState((prev) => ({ ...prev, step1: value }) as PlanSetupState);
   };
 
-  const generateBrainstormIdeas = (value: Partial<PlanSetupState['step1']>) => {
+  const generateBrainstormIdeas = async (value: Partial<PlanSetupState['step1']>) => {
     if (!value.focusTags || value.focusTags.length === 0) {
       return;
     }
@@ -80,14 +76,27 @@ export function StudyPlanStep1({
       return;
     }
 
-    if (!isLoading && isDifferent(value.focusTags, suggestions)) {
+    if (!isLoading && !isStreaming && isDifferent(value.focusTags, suggestions)) {
       setIsLoading(true);
-      complete('prompt', {
-        body: {
-          focusTags: value.focusTags,
-          knowledgeLevel: value.knowledgeLevel,
-        },
-      });
+      setCompletion('');
+
+      try {
+        await startStream(
+          {
+            api: API_ROUTES.GENERATE_BRAINSTORM_TAG_IDEAS,
+            header: 'Brainstorming Tags',
+            onChunk: (chunk) => {
+              setCompletion(chunk.text);
+            },
+          },
+          {
+            focusTags: value.focusTags,
+            knowledgeLevel: value.knowledgeLevel,
+          }
+        );
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 

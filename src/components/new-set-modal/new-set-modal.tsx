@@ -1,12 +1,12 @@
 import { newSetFormScheme } from '#/shared/validation-schemes/new-set-validation.scheme';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useAIStream } from '#/hooks/use-ai-stream.hook';
 import { useSessionContext } from '#/providers/session-provider.component';
 import { API_ROUTES } from '#/shared/defaults/api-routes';
 import uuid from '#/shared/utils/uuid.util';
 import type { DictionaryValue } from '#/types//dictionary-value.type';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
-import { useCompletion } from '@ai-sdk/react';
 import { Button } from '../_ui/button/button';
 import Modal from '../_ui/modal/modal';
 import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';
@@ -43,9 +43,8 @@ export const NewSetModal = ({
       FormMethods<Pick<FlashcardSet, 'description' | 'name' | 'category'>>
     >(null);
 
-  const { completion, complete } = useCompletion({
-    api: API_ROUTES.SET_DESCRIPTION,
-  });
+  const { isStreaming, startStream } = useAIStream();
+  const [completion, setCompletion] = useState('');
 
   const submitRef = useRef<HTMLButtonElement>(null);
 
@@ -171,15 +170,30 @@ export const NewSetModal = ({
       formValue.name !== undefined &&
       formValue.name !== '' &&
       isLoggedIn &&
-      isPlanActive
+      isPlanActive &&
+      !isStreaming
     ) {
       setLoadingGenerate(true);
-      await complete(
-        `generate description to: '${formValue.name}' around 240 characters`,
-      );
-      setLoadingGenerate(false);
+      setCompletion('');
+
+      try {
+        await startStream(
+          {
+            api: API_ROUTES.SET_DESCRIPTION,
+            header: 'Generating Description',
+            onChunk: (chunk) => {
+              setCompletion(chunk.text);
+            },
+          },
+          {
+            prompt: `generate description to: '${formValue.name}' around 240 characters`,
+          }
+        );
+      } finally {
+        setLoadingGenerate(false);
+      }
     }
-  }, [formValue, complete, isLoggedIn, isPlanActive]);
+  }, [formValue, startStream, isLoggedIn, isPlanActive, isStreaming]);
 
   const handleAddNewCategory = useCallback((value: string) => {
     setCategories((prev) => [...prev, { value, label: value }]);

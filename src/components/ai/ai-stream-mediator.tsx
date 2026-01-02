@@ -1,9 +1,7 @@
 'use client';
 
 import useAppStore from '#/store/app-store';
-import { useChat } from '@ai-sdk/react';
-import { DefaultChatTransport } from 'ai';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/shallow';
 
 export function AIStreamMediator() {
@@ -25,50 +23,108 @@ export function AIStreamMediator() {
   );
 
   const currentStreamIdRef = useRef<string | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  const { sendMessage, setMessages, stop } = useChat({
-    id: `${streamTrigger?.id || 'unknown'}`,
-    transport: new DefaultChatTransport({
-      api: streamingAPI ?? '/api/chat',
-    }),
-    onData: (data) => {
-      streamTrigger?.onStreamChunk(data);
-    },
-    onError: (error) => {
-      console.error('Chat error:', error);
+  const stopStream = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+  }, []);
 
-      if (currentStreamIdRef.current) {
-        abortStream(error.message);
-        currentStreamIdRef.current = null;
-      }
-    },
-    onFinish: () => {
-      if (currentStreamIdRef.current) {
-        finishStream(currentStreamIdRef.current);
-        currentStreamIdRef.current = null;
-      }
-    },
-  });
+  useEffect(() => {
+    setStopStreamCallback(stopStream);
+  }, [stopStream, setStopStreamCallback]);
 
   useEffect(() => {
     if (
-      streamTrigger &&
-      streamingAPI !== null &&
-      streamTrigger.id !== null &&
-      streamTrigger.id !== currentStreamIdRef.current
+      !streamTrigger ||
+      streamingAPI === null ||
+      streamTrigger.id === null ||
+      streamTrigger.id === currentStreamIdRef.current
     ) {
-      currentStreamIdRef.current = streamTrigger.id;
-      setMessages([]);
-      sendMessage({
-        text: JSON.stringify(streamTrigger.body),
-      });
+      return;
     }
-  }, [streamTrigger, setMessages, sendMessage, streamingAPI]);
 
-  // Expose stop function to store whenever it changes
-  useEffect(() => {
-    setStopStreamCallback(() => stop);
-  }, [stop, setStopStreamCallback]);
+    currentStreamIdRef.current = streamTrigger.id;
+    const streamId = streamTrigger.id;
+
+    const executeStream = async () => {
+      abortControllerRef.current = new AbortController();
+
+      try {
+        const response = await fetch(streamingAPI, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(streamTrigger.body),
+          signal: abortControllerRef.current.signal,
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || `HTTP error: ${response.status}`);
+        }
+
+        if (!response.body) {
+          throw new Error('No response body');
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        let accumulatedText = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) {
+            break;
+          }
+
+          const chunk = decoder.decode(value, { stream: true });
+          accumulatedText += chunk;
+
+          // Send the accumulated text to the callback
+          streamTrigger.onStreamChunk({
+            type: 'text',
+            text: accumulatedText,
+            delta: chunk,
+          });
+        }
+
+        if (currentStreamIdRef.current === streamId) {
+          finishStream(streamId);
+          currentStreamIdRef.current = null;
+        }
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          // Stream was intentionally stopped
+          return;
+        }
+
+        console.error('Stream error:', error);
+
+        if (currentStreamIdRef.current === streamId) {
+          abortStream(
+            error instanceof Error ? error.message : 'Stream failed'
+          );
+          currentStreamIdRef.current = null;
+        }
+      } finally {
+        abortControllerRef.current = null;
+      }
+    };
+
+    executeStream();
+
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [streamTrigger, streamingAPI, abortStream, finishStream]);
 
   return null; // This component is headless
 }
