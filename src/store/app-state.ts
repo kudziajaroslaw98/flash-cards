@@ -3,10 +3,12 @@ import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { Flashcard, FlashcardType } from '#/types/flash-card.type';
 import type { Metadata } from '#/types/metadata.type';
 import type { Reminder } from '#/types/reminder.type';
+import type { StreamingToastState, ToastStep } from '#/types/streaming-toast.type';
 import type { StudyDay } from '#/types/study-day.type';
 import type { StudyPlan } from '#/types/study-plan.type';
 import type { StudySession } from '#/types/study-session.type';
 import type { User, UserAttributes } from '@supabase/supabase-js';
+import type { StreamTrigger } from './slices/ai-streaming-slice';
 
 // ============================================================================
 // Session Slice
@@ -136,6 +138,48 @@ export interface SyncSlice {
 }
 
 // ============================================================================
+// Streaming Toast Slice
+// ============================================================================
+
+export interface StreamingToastSlice {
+  // State
+  streamingToast: StreamingToastState;
+
+  // Actions
+  showStreamingToast: (header: string) => void;
+  setStreamSteps: (steps: ToastStep[]) => void;
+  updateStreamingToast: (update: Partial<StreamingToastState>) => void;
+  hideStreamingToast: () => void;
+  setStreamingToastError: (error: string) => void;
+  clearStreamingToast: () => void;
+}
+
+// ============================================================================
+// AI Streaming Slice
+// ============================================================================
+
+export interface AIStreamingSlice {
+  // State
+  isStreaming: boolean;
+  streamingError: string | null;
+  activeStreamId: string | null;
+  streamTrigger: StreamTrigger | null;
+  streamingAPI: string | null;
+  stopStreamCallback: (() => void) | null;
+
+  // Actions
+  triggerStream: (
+    api: string,
+    body: Record<string, unknown>,
+    onStreamChunk: (chunk: unknown) => void
+  ) => void;
+  finishStream: (streamId: string) => void;
+  abortStream: (reason: string) => void;
+  stopStream: () => void;
+  setStopStreamCallback: (callback: () => void) => void;
+}
+
+// ============================================================================
 // Combined App State
 // ============================================================================
 
@@ -147,4 +191,6 @@ export interface AppState
     RemindersSlice,
     StudyPlansSlice,
     RevisePlanSlice,
-    SyncSlice {}
+    SyncSlice,
+    StreamingToastSlice,
+    AIStreamingSlice {}

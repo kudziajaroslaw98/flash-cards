@@ -1,5 +1,7 @@
 'use client';
 
+import { AIStreamMediator } from '#/components/ai/ai-stream-mediator';
+import { StreamingToast } from '#/components/ai/streaming-toast';
 import { domMax, LazyMotion } from 'motion/react';
 import type { PropsWithChildren } from 'react';
 import AppProvider from './app-context';
@@ -16,7 +18,11 @@ export default function ClientSideProviders(props: PropsWithChildren) {
       <SessionProvider>
         <AppProvider>
           <ToastProvider>
-            <ThemeProvider>{props.children}</ThemeProvider>
+            <ThemeProvider>
+              {props.children}
+              <AIStreamMediator />
+              <StreamingToast />
+            </ThemeProvider>
           </ToastProvider>
         </AppProvider>
       </SessionProvider>
