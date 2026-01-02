@@ -312,7 +312,7 @@ export async function POST(req: NextRequest) {
               {
                 type: 'file',
                 data: Buffer.from(fileData, 'base64'),
-                mimeType: mimeType,
+                mediaType: mimeType,
               },
             ]
           : [
@@ -323,8 +323,6 @@ export async function POST(req: NextRequest) {
             ],
       },
     ],
-    maxSteps: 3,
-    experimental_continueSteps: true,
     onFinish(response) {
       Logger.info(
         `Generating flashcards session ${sessionId} finished successfully [RESPONSE DETAILS] ${JSON.stringify({ usage: response.usage })}`,
@@ -340,5 +338,5 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  return result.toDataStreamResponse();
+  return result.toTextStreamResponse();
 }

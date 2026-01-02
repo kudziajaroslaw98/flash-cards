@@ -287,8 +287,6 @@ Ensure the JSON is valid.
     model: gemini('gemini-2.0-flash-thinking-exp-01-21'),
     prompt: prompt(flashcardsNeeded, []).replaceAll('\n', ' ').trim(),
     temperature: getTemperature(knowledgeLevel),
-    maxSteps: 5,
-    experimental_continueSteps: true,
     stopSequences: ['[FINISH] All FC generated'],
     system: `You are an expert educational content designer specializing in creating high-quality, pedagogically sound flashcards based on detailed user specifications. Your primary responsibilities, guided by the main prompt, are:
 
@@ -316,5 +314,5 @@ Ensure the JSON is valid.
         JSON.stringify(error),
       );
     },
-  }).toDataStreamResponse();
+  }).toTextStreamResponse();
 }

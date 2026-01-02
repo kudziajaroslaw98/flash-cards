@@ -6,7 +6,7 @@ import { API_ROUTES } from '#/shared/defaults/api-routes';
 import uuid from '#/shared/utils/uuid.util';
 import type { DictionaryValue } from '#/types//dictionary-value.type';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
-import { useCompletion } from 'ai/react';
+import { useCompletion } from '@ai-sdk/react';
 import { Button } from '../_ui/button/button';
 import Modal from '../_ui/modal/modal';
 import { MultiDialog } from '../_ui/multi-dialog/multi-dialog';

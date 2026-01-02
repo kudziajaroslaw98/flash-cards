@@ -192,5 +192,5 @@ export async function POST(req: NextRequest) {
         JSON.stringify(error),
       );
     },
-  }).toDataStreamResponse();
+  }).toTextStreamResponse();
 }

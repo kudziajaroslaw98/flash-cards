@@ -238,7 +238,7 @@ export default async function Home() {
       viewport: { once: true },
       transition: {
         duration: 0.5,
-        ease: 'easeOut',
+        ease: 'easeOut' as const,
         staggerChildren: 0.4,
       },
     },

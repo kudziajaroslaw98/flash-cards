@@ -51,5 +51,5 @@ export async function POST(req: Request) {
     prompt: prompt,
   });
 
-  return result.toDataStreamResponse();
+  return result.toTextStreamResponse();
 }

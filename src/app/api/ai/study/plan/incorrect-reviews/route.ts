@@ -164,8 +164,6 @@ You can use markdown in this fields: commonMisconceptions/contextualExample/keyT
     model: gemini('gemini-2.0-flash-thinking-exp-01-21'),
     prompt: prompt,
     temperature: 0.7,
-    experimental_continueSteps: true,
-    maxSteps: 5,
     stopSequences: ['[FINISH] All summaries generated'],
     system:
       'You are a patient, expert tutor specializing in breaking down complex concepts into simple, memorable explanations. Your task is to help learners understand why their answer to a flashcard was incorrect, using analogies, mnemonics, and real-world examples. When youre ready to finish, include the phrase "[FINISH] All summaries generated" in your response.',
@@ -184,5 +182,5 @@ You can use markdown in this fields: commonMisconceptions/contextualExample/keyT
         routePath,
       );
     },
-  }).toDataStreamResponse();
+  }).toTextStreamResponse();
 }
