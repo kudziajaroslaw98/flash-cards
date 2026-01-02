@@ -1,21 +1,21 @@
 'use client';
+
 import { db } from '#/db/dexie.db';
+import useAppStore from '#/store/app-store';
 import type { Flashcard } from '#/types/flash-card.type';
 import type { StudyDay } from '#/types/study-day.type';
 import type { StudyPlan } from '#/types/study-plan.type';
 import type { StudySession } from '#/types/study-session.type';
-import { isAfter } from 'date-fns';
-import { endOfToday } from 'date-fns/endOfToday';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   createContext,
   useContext,
   useEffect,
-  useState,
   type Dispatch,
   type PropsWithChildren,
   type SetStateAction,
 } from 'react';
+import { useShallow } from 'zustand/shallow';
 
 export type RevisePlanContextType = {
   reviseStage: number;
@@ -56,32 +56,57 @@ export const RevisePlanContext = createContext<RevisePlanContextType>({
 });
 
 export default function RevisePlanProvider(props: Readonly<PropsWithChildren>) {
-  const [reviseStage, setReviseStage] = useState<number>(0);
-  const [pickedPlan, setPickedPlan] = useState<StudyPlan | null>(null);
-  const [currentDay, setCurrentDay] = useState<StudyDay | null>(null);
-  const [currentSession, setCurrentSession] = useState<StudySession | null>(
-    null,
+  // Get state and actions from Zustand store
+  const {
+    reviseStage,
+    pickedStudyPlan,
+    currentDay,
+    currentSession,
+    clicked,
+    setReviseStage,
+    setPickedStudyPlan,
+    setCurrentDay,
+    setCurrentSession,
+    setClicked,
+    updateReviseStage,
+  } = useAppStore(
+    useShallow((state) => ({
+      reviseStage: state.reviseStage,
+      pickedStudyPlan: state.pickedStudyPlan,
+      currentDay: state.currentDay,
+      currentSession: state.currentSession,
+      clicked: state.clicked,
+      setReviseStage: state.setReviseStage,
+      setPickedStudyPlan: state.setPickedStudyPlan,
+      setCurrentDay: state.setCurrentDay,
+      setCurrentSession: state.setCurrentSession,
+      setClicked: state.setClicked,
+      updateReviseStage: state.updateReviseStage,
+    }))
   );
-  const [clicked, setClicked] = useState(false);
 
+  // Keep Dexie live queries for reactive data
   const studySession = useLiveQuery(
     () =>
       db.studySessions
         .where('planId')
-        .equals(pickedPlan?.frontUuid ?? '')
+        .equals(pickedStudyPlan?.frontUuid ?? '')
         .first(),
-    [pickedPlan],
+    [pickedStudyPlan]
   );
+
   const studyDays =
     useLiveQuery(
       () =>
         db.studyDays
           .where('planId')
-          .equals(pickedPlan?.frontUuid ?? '')
+          .equals(pickedStudyPlan?.frontUuid ?? '')
           .toArray(),
-      [pickedPlan],
+      [pickedStudyPlan]
     ) ?? [];
+
   const studyPlans = useLiveQuery(() => db.studyPlans.toArray()) ?? [];
+
   const reviewFlashcards =
     useLiveQuery(() => {
       if (!currentDay) {
@@ -92,6 +117,7 @@ export default function RevisePlanProvider(props: Readonly<PropsWithChildren>) {
         .anyOf([...currentDay.cardsToReview])
         .toArray();
     }, [currentDay]) ?? [];
+
   const newFlashcards =
     useLiveQuery(() => {
       if (!currentDay) {
@@ -102,6 +128,7 @@ export default function RevisePlanProvider(props: Readonly<PropsWithChildren>) {
         .anyOf([...currentDay.newCards])
         .toArray();
     }, [currentDay]) ?? [];
+
   const completedFlashcards =
     useLiveQuery(() => {
       if (!currentSession) {
@@ -113,51 +140,88 @@ export default function RevisePlanProvider(props: Readonly<PropsWithChildren>) {
         .toArray();
     }, [currentSession]) ?? [];
 
+  // Sync study session with Zustand state
   useEffect(() => {
     if (studySession) {
       const currentDayNumber =
         studySession.currentDay === 0 ? 1 : studySession.currentDay;
-      const currentDay = studyDays?.find(
-        (day) => day.dayNumber === currentDayNumber,
-      );
+      const day = studyDays?.find((d) => d.dayNumber === currentDayNumber);
+
       if (currentDayNumber === 1 && studySession.stage === 0) {
         setReviseStage(3);
       } else {
         setReviseStage(studySession.stage);
       }
+
       setCurrentSession(studySession);
-      setCurrentDay(currentDay ?? null);
+      setCurrentDay(day ?? null);
     }
-  }, [studySession, studyDays]);
+  }, [studySession, studyDays, setReviseStage, setCurrentSession, setCurrentDay]);
 
+  // Handle revise stage changes
   useEffect(() => {
-    if (reviseStage === 6 && currentSession && currentDay) {
-      db.studySessions.update(currentSession.frontUuid, {
-        currentDay: currentSession.currentDay + 1,
-        nextRevisionDate: endOfToday().toUTCString(),
-        stage: 1,
-      });
-      setReviseStage(1);
-      return;
+    if (reviseStage !== 0) {
+      updateReviseStage(reviseStage);
     }
+  }, [reviseStage, updateReviseStage]);
 
-    if (
-      reviseStage !== 0 &&
-      currentSession &&
-      isAfter(new Date(), new Date(currentSession.nextRevisionDate))
-    ) {
-      db.studySessions.update(currentSession?.frontUuid, {
-        stage: reviseStage,
-      });
-      return;
+  // Create wrapper functions that match the expected Dispatch<SetStateAction<T>> signature
+  const handleSetPickedPlan: Dispatch<SetStateAction<StudyPlan | null>> = (
+    value
+  ) => {
+    if (typeof value === 'function') {
+      const newValue = value(pickedStudyPlan);
+      setPickedStudyPlan(newValue);
+    } else {
+      setPickedStudyPlan(value);
     }
-  }, [reviseStage]);
+  };
+
+  const handleSetReviseStage: Dispatch<SetStateAction<number>> = (value) => {
+    if (typeof value === 'function') {
+      const newValue = value(reviseStage);
+      setReviseStage(newValue);
+    } else {
+      setReviseStage(value);
+    }
+  };
+
+  const handleSetCurrentDay: Dispatch<SetStateAction<StudyDay | null>> = (
+    value
+  ) => {
+    if (typeof value === 'function') {
+      const newValue = value(currentDay);
+      setCurrentDay(newValue);
+    } else {
+      setCurrentDay(value);
+    }
+  };
+
+  const handleSetCurrentSession: Dispatch<
+    SetStateAction<StudySession | null>
+  > = (value) => {
+    if (typeof value === 'function') {
+      const newValue = value(currentSession);
+      setCurrentSession(newValue);
+    } else {
+      setCurrentSession(value);
+    }
+  };
+
+  const handleSetClicked: Dispatch<SetStateAction<boolean>> = (value) => {
+    if (typeof value === 'function') {
+      const newValue = value(clicked);
+      setClicked(newValue);
+    } else {
+      setClicked(value);
+    }
+  };
 
   return (
     <RevisePlanContext.Provider
       value={{
         reviseStage,
-        pickedPlan,
+        pickedPlan: pickedStudyPlan,
         currentDay,
         currentSession,
         studySession,
@@ -167,11 +231,11 @@ export default function RevisePlanProvider(props: Readonly<PropsWithChildren>) {
         newFlashcards,
         completedFlashcards,
         clicked,
-        setPickedPlan,
-        setCurrentDay,
-        setReviseStage,
-        setCurrentSession,
-        setClicked,
+        setPickedPlan: handleSetPickedPlan,
+        setCurrentDay: handleSetCurrentDay,
+        setReviseStage: handleSetReviseStage,
+        setCurrentSession: handleSetCurrentSession,
+        setClicked: handleSetClicked,
       }}
     >
       {props.children}
@@ -184,7 +248,7 @@ export const useRevisePlanContext = () => {
 
   if (!context) {
     throw new Error(
-      'useRevisePlanContext must be used within RevisePlanProvider',
+      'useRevisePlanContext must be used within RevisePlanProvider'
     );
   }
 

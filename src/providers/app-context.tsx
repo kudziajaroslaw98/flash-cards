@@ -1,31 +1,10 @@
+'use client';
+
 import { db } from '#/db/dexie.db';
 import useLocalStorage from '#/hooks/use-local-storage.hook';
-import { defaultFlashcard } from '#/shared/defaults/default-flashcard';
 import { defaultMetadata } from '#/shared/defaults/default-metadata';
-import { defaultReminder } from '#/shared/defaults/default-reminder';
-import { defaultSet } from '#/shared/defaults/default-set';
-import { flashcardsMerge } from '#/shared/helpers/flashcards-merge';
-import { metadataMerge } from '#/shared/helpers/metadata-merge';
-import { remindersMerge } from '#/shared/helpers/reminders-merge';
-import { setsMerge } from '#/shared/helpers/sets-merge';
-import { localToRemoteDailyStatsSync } from '#/shared/helpers/sync/local-to-remote/daily-stats-sync';
-import { localToRemoteFlashcardsSync } from '#/shared/helpers/sync/local-to-remote/flashcards-sync';
-import { localToRemoteFocusSessionsSync } from '#/shared/helpers/sync/local-to-remote/focus-sessions-sync';
-import { localToRemoteMetadataSync } from '#/shared/helpers/sync/local-to-remote/metadata-sync';
-import { localToRemoteRemindersSync } from '#/shared/helpers/sync/local-to-remote/reminders-sync';
-import { localToRemoteReviewLogsSync } from '#/shared/helpers/sync/local-to-remote/review-logs-sync';
-import { localToRemoteSetsSync } from '#/shared/helpers/sync/local-to-remote/sets-sync';
-import { remoteToLocalDailyStatsSync } from '#/shared/helpers/sync/remote-to-local/daily-stats-sync';
-import { remoteToLocalFlashcardsSync } from '#/shared/helpers/sync/remote-to-local/flashcards-sync';
-import { remoteToLocalFocusSessionsSync } from '#/shared/helpers/sync/remote-to-local/focus-sessions-sync';
-import { remoteToLocalMetadataSync } from '#/shared/helpers/sync/remote-to-local/metadata-sync';
-import { remoteToLocalRemindersSync } from '#/shared/helpers/sync/remote-to-local/reminders-sync';
-import { remoteToLocalReviewLogsSync } from '#/shared/helpers/sync/remote-to-local/review-logs-sync';
-import { remoteToLocalSetsSync } from '#/shared/helpers/sync/remote-to-local/sets-sync';
 import { generateHash } from '#/shared/utils/generate-hash';
-import omit from '#/shared/utils/omit.util';
-import { createClient } from '#/shared/utils/supabase/client';
-import uuid from '#/shared/utils/uuid.util';
+import useAppStore from '#/store/app-store';
 import type { DictionaryValue } from '#/types/dictionary-value.type';
 import type { FlashcardSet } from '#/types/flash-card-set.type';
 import type { Flashcard, FlashcardType } from '#/types/flash-card.type';
@@ -38,10 +17,9 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
-  useState,
   type PropsWithChildren,
 } from 'react';
+import { useShallow } from 'zustand/shallow';
 import { useSessionContext } from './session-provider.component';
 
 export type AppContextType = {
@@ -62,7 +40,7 @@ export type AppContextType = {
   assignFlashcardsToSet: (flashcardUuids: string[], setUuid: string) => void;
   unassignFlashcardsFromSet: (
     flashcardUuids: string[],
-    setUuid: string,
+    setUuid: string
   ) => void;
   addSets: (set: Partial<FlashcardSet>[]) => void;
   removeSets: (set: FlashcardSet[]) => void;
@@ -104,22 +82,60 @@ export const AppContext = createContext<AppContextType>({
 });
 
 export default function AppProvider(props: PropsWithChildren) {
-  /////////////////
-  // #region EXTERNAL HOOKS
-  /////////////////
+  const { isLoggedIn } = useSessionContext();
 
-  const { isLoggedIn, user } = useSessionContext();
-  const supabase = createClient();
+  // Get actions from Zustand store
+  const {
+    theme,
+    avatarSeed,
+    flashcardTypeDictionaries,
+    setTheme,
+    setAvatarSeed,
+    addFlashcards,
+    removeFlashcards,
+    updateFlashcards,
+    updateFlashcard,
+    assignFlashcardsToSet,
+    unassignFlashcardsFromSet,
+    addSets,
+    removeSets,
+    updateSet,
+    updateSets,
+    updateMetadata,
+    addReminders,
+    removeReminders,
+    updateReminders,
+    removeStudyPlans,
+    syncWithDB,
+    cleanupWebsockets,
+  } = useAppStore(
+    useShallow((state) => ({
+      theme: state.theme,
+      avatarSeed: state.avatarSeed,
+      flashcardTypeDictionaries: state.flashcardTypeDictionaries,
+      setTheme: state.setTheme,
+      setAvatarSeed: state.setAvatarSeed,
+      addFlashcards: state.addFlashcards,
+      removeFlashcards: state.removeFlashcards,
+      updateFlashcards: state.updateFlashcards,
+      updateFlashcard: state.updateFlashcard,
+      assignFlashcardsToSet: state.assignFlashcardsToSet,
+      unassignFlashcardsFromSet: state.unassignFlashcardsFromSet,
+      addSets: state.addSets,
+      removeSets: state.removeSets,
+      updateSet: state.updateSet,
+      updateSets: state.updateSets,
+      updateMetadata: state.updateMetadata,
+      addReminders: state.addReminders,
+      removeReminders: state.removeReminders,
+      updateReminders: state.updateReminders,
+      removeStudyPlans: state.removeStudyPlans,
+      syncWithDB: state.syncWithDB,
+      cleanupWebsockets: state.cleanupWebsockets,
+    }))
+  );
 
-  /////////////////
-  // #endregion EXTERNAL HOOKS
-  /////////////////
-
-  /////////////////
-  // #region STATE
-  /////////////////
-
-  const [avatarSeed, setAvatarSeed] = useState<string>('');
+  // Keep Dexie live queries for reactive data
   const flashcardsArray =
     useLiveQuery(() => db.flashcards.toCollection().sortBy('createdAt')) ?? [];
   const setsArray = useLiveQuery(() => db.sets.toArray()) ?? [];
@@ -130,12 +146,15 @@ export default function AppProvider(props: PropsWithChildren) {
     ({
       ...defaultMetadata,
     } as Metadata);
+
+  // Derived state
   const setsDictionary = useMemo(() => {
     return setsArray.map((set) => ({
       value: set.frontUuid,
       label: set.name,
     }));
   }, [setsArray]);
+
   const categories = useMemo(() => {
     const categoriesTmp = new Set<string>();
     setsArray.forEach((set) => {
@@ -145,7 +164,7 @@ export default function AppProvider(props: PropsWithChildren) {
     });
 
     const selectCategoriesAsDictionary: DictionaryValue<string>[] = Array.from(
-      categoriesTmp,
+      categoriesTmp
     ).map((item) => ({
       label: item,
       value: item,
@@ -153,622 +172,26 @@ export default function AppProvider(props: PropsWithChildren) {
 
     return selectCategoriesAsDictionary;
   }, [setsArray]);
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const websocketChannel =
-    useRef<ReturnType<typeof supabase.channel>>(undefined);
-  const flashcardTypeDictionaries: DictionaryValue<FlashcardType>[] = [
-    { value: 'index', label: 'Index Flashcard' },
-    { value: 'question', label: 'Question with answer' },
-    { value: 'single', label: 'Detailed Flashcard' },
-  ];
 
-  /////////////////
-  // #endregion STATE
-  /////////////////
-
-  /////////////////
-  // #region LOCAL STORAGE
-  /////////////////
+  // Local storage for theme - wrapper to match Dispatch<SetStateAction<T>> signature
+  const handleSetTheme = (value: React.SetStateAction<'dark' | 'light'>) => {
+    if (typeof value === 'function') {
+      const newValue = value(theme);
+      setTheme(newValue);
+    } else {
+      setTheme(value);
+    }
+  };
 
   useLocalStorage({
     key: 'theme',
     defaultValue: 'dark',
-    setValue: setTheme,
+    setValue: handleSetTheme,
   });
 
-  /////////////////
-  // #endregion LOCAL STORAGE
-  /////////////////
-
-  /////////////////
-  // #region FLASHCARDS MANAGEMENT
-  /////////////////
-
-  const addFlashcards = async (flashcards: Partial<Flashcard>[]) => {
-    const mappedFlashcards: Flashcard[] = flashcards.map((flashcard, index) => {
-      const flashcardUuid = flashcard.frontUuid ?? uuid();
-      return flashcardsMerge(defaultFlashcard(), {
-        ...flashcard,
-        frontUuid: flashcardUuid,
-        order: flashcardsArray.length + index,
-      });
-    });
-
-    db.flashcards.bulkAdd(mappedFlashcards);
-
-    const bulkFlashcards = await db.flashcards.bulkGet(
-      mappedFlashcards.map((item) => item.frontUuid),
-    );
-
-    await supabase.from('flashcards').insert(
-      bulkFlashcards.map((item) => ({
-        ...item,
-        user_uuid: user?.id,
-      })),
-    );
-
-    db.metadata.put(
-      {
-        ...metadata,
-        createdFlashCards: metadata.createdFlashCards + flashcards.length,
-        updatedAt: new Date().toUTCString(),
-      },
-      'current',
-    );
-  };
-
-  const removeFlashcards = async (flashcards: Flashcard[]) => {
-    const flashcardsToDelete: string[] = flashcards.map(
-      (item) => item.frontUuid,
-    );
-
-    db.flashcards.bulkDelete(flashcardsToDelete);
-    db.sets
-      .where('flashcards')
-      .anyOf(flashcardsToDelete)
-      .modify((set) => {
-        set.flashcards = set.flashcards.filter(
-          (uuid) => !flashcardsToDelete.includes(uuid),
-        );
-      });
-
-    // It wont work on listening to postgres msg's
-    // I need to broadcast messages to other subscribers here.
-    await supabase
-      .from('flashcards')
-      .delete()
-      .in('frontUuid', flashcardsToDelete);
-
-    await websocketChannel.current?.send({
-      type: 'broadcast',
-      event: 'flashcards_delete',
-      payload: { flashcards: flashcardsToDelete },
-    });
-  };
-
-  const updateFlashcards = async (flashcards: Partial<Flashcard>[]) => {
-    const mappedFlashcards: Flashcard[] = flashcards.map((flashcard) =>
-      flashcardsMerge(defaultFlashcard(), flashcard),
-    );
-
-    db.flashcards.bulkPut(mappedFlashcards);
-
-    await Promise.all(
-      mappedFlashcards.map((flashcard) =>
-        supabase
-          .from('flashcards')
-          .update(flashcard)
-          .eq('frontUuid', flashcard.frontUuid),
-      ),
-    );
-  };
-
-  const updateFlashcard = async (flashcard: Partial<Flashcard>) => {
-    const updatedFlashcard: Flashcard = flashcardsMerge(
-      defaultFlashcard(),
-      flashcard,
-    );
-
-    db.flashcards.put(updatedFlashcard);
-
-    await supabase
-      .from('flashcards')
-      .update(updatedFlashcard)
-      .eq('frontUuid', flashcard.frontUuid);
-  };
-
-  const assignFlashcardsToSet = async (
-    flashcardUuids: string[],
-    setUuid: string,
-  ) => {
-    const set = await db.sets.get(setUuid);
-
-    if (!set) {
-      console.warn('Set not found');
-      return;
-    }
-
-    const currentlyAssignedUuids = set.flashcards;
-    const newAssignmentUuids = new Set(flashcardUuids);
-    const flashcardsToUnassignUuids = currentlyAssignedUuids.filter(
-      (uuid) => !newAssignmentUuids.has(uuid),
-    );
-
-    await db.sets.update(setUuid, {
-      flashcards: flashcardUuids,
-    });
-
-    const allRelevantUuids = [...flashcardUuids, ...flashcardsToUnassignUuids];
-    const flashcardsToUpdate = await db.flashcards.bulkGet(allRelevantUuids);
-
-    const bulkUpdateData = flashcardsToUpdate
-      .map((flashcard) => {
-        if (!flashcard) return null;
-
-        const currentSets = new Set(flashcard.sets ?? []);
-
-        if (newAssignmentUuids.has(flashcard.frontUuid)) {
-          currentSets.add(setUuid);
-        } else if (flashcardsToUnassignUuids.includes(flashcard.frontUuid)) {
-          currentSets.delete(setUuid);
-        }
-
-        return {
-          ...flashcard,
-          sets: Array.from(currentSets),
-        };
-      })
-      .filter(Boolean) as Flashcard[];
-
-    if (bulkUpdateData.length > 0) {
-      await db.flashcards.bulkPut(bulkUpdateData);
-    }
-  };
-
-  const unassignFlashcardsFromSet = async (
-    flashcardUuids: string[],
-    setUuid: string,
-  ) => {
-    const set = await db.sets.get(setUuid);
-    const flashcards = await db.flashcards.bulkGet(flashcardUuids);
-
-    if (!set) {
-      console.warn('Set not found');
-      return;
-    }
-
-    await db.sets.update(setUuid, {
-      flashcards: set.flashcards.filter(
-        (flashcard) => !flashcardUuids.includes(flashcard),
-      ),
-    });
-
-    await db.flashcards.bulkPut(
-      flashcards.map((flashcard) => ({
-        ...flashcard,
-        sets: [...(flashcard?.sets ?? [])].filter((set) => set !== setUuid),
-      })) as Flashcard[],
-    );
-  };
-
-  /////////////////
-  // #endregion FLASHCARDS MANAGEMENT
-  /////////////////
-
-  /////////////////
-  // #region SETS MANAGEMENT
-  /////////////////
-
-  const addSets = async (sets: Partial<FlashcardSet>[]) => {
-    const mappedSets: FlashcardSet[] = sets.map((set) =>
-      setsMerge(defaultSet, set),
-    );
-
-    db.sets.bulkAdd(mappedSets);
-
-    await supabase
-      .from('sets')
-      .insert(mappedSets.map((item) => ({ ...item, user_uuid: user?.id })));
-  };
-
-  const removeSets = async (sets: FlashcardSet[]) => {
-    const setsToDelete: string[] = sets.map((item) => item.frontUuid);
-
-    db.sets.bulkDelete(setsToDelete);
-    db.flashcards
-      .where('sets')
-      .anyOf(setsToDelete)
-      .modify((flashcard) => {
-        flashcard.sets = flashcard.sets?.filter(
-          (uuid) => !setsToDelete.includes(uuid),
-        );
-      });
-
-    await supabase.from('sets').delete().in('frontUuid', setsToDelete);
-    await websocketChannel.current?.send({
-      type: 'broadcast',
-      event: 'sets_delete',
-      payload: { sets: setsToDelete },
-    });
-  };
-
-  const updateSets = async (sets: Partial<FlashcardSet>[]) => {
-    const mappedSets: FlashcardSet[] = sets.map((set) =>
-      setsMerge(defaultSet, set),
-    );
-
-    db.sets.bulkPut(mappedSets);
-
-    await Promise.all(
-      mappedSets.map((set) =>
-        supabase.from('sets').update(set).eq('frontUuid', set.frontUuid),
-      ),
-    );
-  };
-
-  const updateSet = async (set: Partial<FlashcardSet>) => {
-    const updatedSet = setsMerge(defaultSet, set);
-
-    db.sets.put(updatedSet);
-
-    await supabase.from('sets').update(set).eq('frontUuid', set.frontUuid);
-  };
-
-  /////////////////
-  // #endregion SETS MANAGEMENT
-  /////////////////
-
-  /////////////////
-  // #region STATS MANAGEMENT
-  /////////////////
-
-  const updateMetadata = async (update: Partial<Metadata>) => {
-    const updatedMetadata = metadataMerge(defaultMetadata, update);
-
-    await db.metadata.update('current', {
-      ...updatedMetadata,
-      updatedAt: new Date().toUTCString(),
-    });
-    await supabase.from('metadata').update(updatedMetadata);
-  };
-
-  /////////////////
-  // #endregion STATS MANAGEMENT
-  /////////////////
-
-  /////////////////
-  // #region REMINDERS MANAGEMENT
-  /////////////////
-
-  const addReminders = async (reminders: Partial<Reminder>[]) => {
-    const mappedReminders: Reminder[] = reminders.map((reminder) =>
-      remindersMerge(defaultReminder, reminder),
-    );
-
-    await db.reminders.bulkAdd(mappedReminders);
-
-    const bulkReminders = await db.reminders.bulkGet(
-      mappedReminders.map((item) => item.frontUuid),
-    );
-
-    const { error } = await supabase.from('reminders').insert(
-      bulkReminders.map((item) => ({
-        ...item,
-        user_uuid: user?.id,
-      })),
-    );
-  };
-
-  const removeReminders = async (reminders: Reminder[]) => {
-    const remindersToDelete: string[] = reminders.map((item) => item.frontUuid);
-
-    await db.reminders.bulkDelete(remindersToDelete);
-
-    await supabase
-      .from('reminders')
-      .delete()
-      .in('frontUuid', remindersToDelete);
-  };
-
-  const updateReminders = async (reminders: Partial<Reminder>[]) => {
-    const mappedReminders: Reminder[] = reminders.map((reminder) =>
-      remindersMerge(defaultReminder, reminder),
-    );
-
-    await db.reminders.bulkPut(mappedReminders);
-
-    await Promise.all(
-      mappedReminders.map((reminder) =>
-        supabase
-          .from('reminders')
-          .update(reminder)
-          .eq('frontUuid', reminder.frontUuid),
-      ),
-    );
-  };
-
-  /////////////////
-  // #endregion REMINDERS MANAGEMENT
-  /////////////////
-
-  /////////////////
-  // #region STUDY PLANS
-  /////////////////
-
-  const removeStudyPlans = async (plans: StudyPlan[]) => {
-    const plansToDelete: string[] = plans.map((item) => item.frontUuid);
-
-    // remove study sessions
-    const studySessions = await db.studySessions
-      .where('planId')
-      .anyOf(plansToDelete)
-      .toArray();
-    await db.studySessions.bulkDelete(
-      studySessions.map((item) => item.frontUuid),
-    );
-
-    // remove study days
-    const studyDays = await db.studyDays
-      .where('planId')
-      .anyOf(plansToDelete)
-      .toArray();
-    await db.studyDays.bulkDelete(studyDays.map((item) => item.frontUuid));
-
-    // remove study plans
-    await db.studyPlans.bulkDelete(plansToDelete);
-
-    // TODO: Add supabase delete
-  };
-
-  /////////////////
-  // #endregion STUDY PLANS
-  /////////////////
-
-  /////////////////
-  // #region SYNCHRONIZATION
-  /////////////////
-
-  const applyWebsockets = async () => {
-    if (!isLoggedIn || !user) return;
-    const user_channel = supabase.channel(`user-${user.id}`);
-    websocketChannel.current = user_channel;
-    // FLASHCARDS - UPDATE
-    websocketChannel.current
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'flashcards' },
-        async (payload) => {
-          if (payload.new) {
-            const updatedFlashcard = payload.new as Flashcard & {
-              user_uuid: string;
-              id: string;
-            };
-            await db.flashcards.put(
-              omit(updatedFlashcard, ['user_uuid', 'id']) as Flashcard,
-            );
-          }
-        },
-      )
-
-      // // FLASHCARDS - INSERT
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'flashcards' },
-        async (payload) => {
-          if (payload.new) {
-            const newFlashcard = payload.new as Flashcard & {
-              user_uuid: string;
-              id: string;
-            };
-            await db.flashcards.put(
-              omit(newFlashcard, ['user_uuid', 'id']) as Flashcard,
-            );
-          }
-        },
-      )
-      // FLASHCARDS - DELETE
-      .on('broadcast', { event: 'flashcards_delete' }, async ({ payload }) => {
-        if (
-          payload.flashcards &&
-          payload.flashcards.length >= 0 &&
-          Array.isArray(payload.flashcards)
-        ) {
-          await db.flashcards.bulkDelete(payload.flashcards);
-        }
-      })
-
-      // SETS - UPDATE
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'sets' },
-        async (payload) => {
-          if (payload.new) {
-            const updatedSet = payload.new as FlashcardSet & {
-              user_uuid: string;
-              id: string;
-            };
-            await db.sets.put(
-              omit(updatedSet, ['user_uuid', 'id']) as FlashcardSet,
-            );
-          }
-        },
-      )
-
-      // SETS - INSERT
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'sets' },
-        async (payload) => {
-          if (payload.new) {
-            const newSet = payload.new as FlashcardSet & {
-              user_uuid: string;
-              id: string;
-            };
-            await db.sets.put(
-              omit(newSet, ['user_uuid', 'id']) as FlashcardSet,
-            );
-          }
-        },
-      )
-
-      // SETS - DELETE
-      .on('broadcast', { event: 'sets_delete' }, async ({ payload }) => {
-        if (
-          payload?.sets &&
-          payload?.sets.length >= 0 &&
-          Array.isArray(payload?.sets)
-        ) {
-          await db.sets.bulkDelete(payload?.sets);
-        }
-      })
-      .subscribe();
-  };
-
-  const syncLocalToRemote = async () => {
-    if (!isLoggedIn || user === null) return;
-
-    const metadata = await db.metadata.get('current');
-    const newLastSyncAt = new Date().toUTCString();
-    let lastSyncAt: string;
-
-    if (
-      metadata === undefined ||
-      metadata.lastSyncAt === null ||
-      metadata.lastSyncAt === undefined ||
-      isNaN(new Date(metadata.lastSyncAt).getTime())
-    ) {
-      // First sync or invalid date: use epoch
-      lastSyncAt = new Date(0).toUTCString();
-    } else {
-      // Valid date: use ISO string
-      lastSyncAt = new Date(metadata.lastSyncAt).toUTCString();
-    }
-
-    const fiveMinsInMillis = 5 * 60 * 1000; // 5 minutes in milliseconds
-    if (
-      new Date().getTime() - new Date(lastSyncAt).getTime() <
-      fiveMinsInMillis
-    ) {
-      console.log(
-        'Sync [local ⇒ remote] skipped: Last sync was less than 5 minutes ago.',
-      );
-      return; // Skip sync
-    }
-
-    await Promise.allSettled([
-      // FLASHCARDS
-      localToRemoteFlashcardsSync(supabase, user),
-
-      // SETS
-      localToRemoteSetsSync(supabase, user),
-
-      // METADATA
-      localToRemoteMetadataSync(supabase, user, newLastSyncAt),
-
-      // FOCUS SESSIONS
-      localToRemoteFocusSessionsSync(supabase, user),
-
-      // DAILY STATS
-      localToRemoteDailyStatsSync(supabase, user),
-
-      // REMINDERS
-      localToRemoteRemindersSync(supabase, user),
-    ]);
-    // REVIEW LOGS
-    await localToRemoteReviewLogsSync(supabase, user);
-  };
-
-  const syncRemoteToLocal = async () => {
-    if (!isLoggedIn || user === null) return;
-
-    const metadata = await db.metadata.get('current');
-    const newLastSyncAt = new Date().toUTCString();
-    const emptyMetadata = metadata === undefined;
-    let lastSyncAt: string;
-
-    if (
-      metadata === undefined ||
-      metadata.lastSyncAt === null ||
-      metadata.lastSyncAt === undefined ||
-      isNaN(new Date(metadata.lastSyncAt).getTime())
-    ) {
-      // First sync or invalid date: use epoch
-      lastSyncAt = new Date(0).toUTCString();
-    } else {
-      // Valid date: use ISO string
-      lastSyncAt = new Date(metadata.lastSyncAt).toUTCString();
-    }
-
-    const fiveMinsInMillis = 5 * 60 * 1000; // 5 minutes in milliseconds
-    if (
-      new Date().getTime() - new Date(lastSyncAt).getTime() <
-      fiveMinsInMillis
-    ) {
-      console.log(
-        'Sync [remote ⇒ local] skipped: Last sync was less than 5 minutes ago.',
-      );
-      return; // Skip sync
-    }
-
-    await Promise.allSettled([
-      // FLASHCARDS
-      remoteToLocalFlashcardsSync(supabase, lastSyncAt),
-
-      // SETS
-      remoteToLocalSetsSync(supabase, lastSyncAt),
-
-      // METADATA
-      remoteToLocalMetadataSync(
-        supabase,
-        lastSyncAt,
-        emptyMetadata,
-        user,
-        metadata,
-      ),
-
-      // FOCUS SESSIONS
-      remoteToLocalFocusSessionsSync(supabase, lastSyncAt),
-
-      // DAILY STATS
-      remoteToLocalDailyStatsSync(supabase, lastSyncAt),
-
-      // REMINDERS
-      remoteToLocalRemindersSync(supabase, lastSyncAt),
-    ]);
-    // REVIEW LOGS
-    await remoteToLocalReviewLogsSync(supabase, lastSyncAt);
-    await db.metadata.update('current', {
-      lastSyncAt: new Date(newLastSyncAt),
-      synced: true,
-      updatedAt: new Date().toUTCString(),
-    });
-  };
-
-  const syncWithDB = async () => {
-    // LOCAL TO REMOTE
-    if (!isLoggedIn || user === null) return;
-
-    // SYNC LOCAL TO REMOTE
-    await syncLocalToRemote();
-
-    // REMOTE TO LOCAL
-    await syncRemoteToLocal();
-
-    // WEB SOCKETS
-    await applyWebsockets();
-  };
-
-  /////////////////
-  // #endregion SYNCHRONIZATION
-  /////////////////
-
-  /////////////////
-  // #region MIGRATION
-  /////////////////
-
+  // Migration from localStorage to Dexie
   const migrateLocalStorageToDexie = async () => {
     try {
-      // 1. Check if migration already ran
       if (localStorage.getItem('dexie_migrated')) return;
       localStorage.removeItem('flashcards');
       localStorage.removeItem('sets');
@@ -777,40 +200,28 @@ export default function AppProvider(props: PropsWithChildren) {
       localStorage.removeItem('migrations');
       localStorage.removeItem('backup_pre_dexie');
 
-      // 3. Use explicit Dexie transaction
       await db.transaction(
         'rw',
         db.flashcards,
         db.sets,
         db.metadata,
         async () => {
-          // Clear existing data first
           await Promise.all([
             db.flashcards.clear(),
             db.sets.clear(),
             db.metadata.clear(),
           ]);
-
-          // 5. Mark migration complete
           localStorage.setItem('dexie_migrated', 'true');
-        },
+        }
       );
     } catch (error) {
       console.error('Migration failed:', error);
-      // Rollback mechanism
       localStorage.removeItem('dexie_migrated');
       throw error;
     }
   };
 
-  /////////////////
-  // #endregion MIGRATION
-  /////////////////
-
-  /////////////////
-  // #region MUTATIONS
-  /////////////////
-
+  // Effects
   useEffect(() => {
     setAvatarSeed(generateHash());
     migrateLocalStorageToDexie();
@@ -821,26 +232,18 @@ export default function AppProvider(props: PropsWithChildren) {
     syncWithDB();
 
     return () => {
-      if (websocketChannel.current) {
-        websocketChannel.current.unsubscribe();
-        supabase.removeChannel(websocketChannel.current);
-      }
+      cleanupWebsockets();
     };
-  }, [isLoggedIn]);
+  }, [isLoggedIn, syncWithDB, cleanupWebsockets]);
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
       const umamiBlocked = window.localStorage.getItem('umami.disabled');
-
       if (!umamiBlocked) {
         window.localStorage.setItem('umami.disabled', '1');
       }
     }
   }, []);
-
-  /////////////////
-  // #endregion MUTATIONS
-  /////////////////
 
   return (
     <AppContext.Provider
@@ -855,12 +258,12 @@ export default function AppProvider(props: PropsWithChildren) {
         avatarSeed: avatarSeed,
         flashcardTypeDictionaries: flashcardTypeDictionaries,
         setTheme,
-        addFlashcards: addFlashcards,
-        removeFlashcards: removeFlashcards,
-        updateFlashcards: updateFlashcards,
-        updateFlashcard: updateFlashcard,
-        assignFlashcardsToSet: assignFlashcardsToSet,
-        unassignFlashcardsFromSet: unassignFlashcardsFromSet,
+        addFlashcards,
+        removeFlashcards,
+        updateFlashcards,
+        updateFlashcard,
+        assignFlashcardsToSet,
+        unassignFlashcardsFromSet,
         addSets,
         removeSets,
         updateSets,
