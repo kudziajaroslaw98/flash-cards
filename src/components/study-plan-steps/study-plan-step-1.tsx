@@ -17,7 +17,7 @@ import { DictionaryValue } from '#/types/dictionary-value.type';
 import type { KnowledgeLevel } from '#/types/knowledge-level.type';
 import type { LearningStyleAdaptation } from '#/types/learning-style.type';
 import type { MnemonicPreferences } from '#/types/mnemonic-preference.type';
-import { useCompletion } from 'ai/react';
+import { useCompletion } from '@ai-sdk/react';
 import { ArrowRight } from 'lucide-react';
 import {
   useEffect,

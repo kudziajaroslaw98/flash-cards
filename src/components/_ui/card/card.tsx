@@ -15,7 +15,6 @@ export default function Card({
   ...props
 }: PropsWithChildren<CardProps>) {
   return (
-    // @ts-expect-error motion error
     <m.div
       className={cn([
         `text-default group relative flex flex-col gap-4 rounded-md border border-gray-200 bg-gray-50 p-4 text-gray-600 transition-all dark:border-slate-800/40  dark:bg-slate-950 dark:text-slate-300`,

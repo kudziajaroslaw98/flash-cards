@@ -28,8 +28,8 @@ const withMDX = createMDX();
 //TODO: change n8n domain
 const cspHeader =
   process.env.NODE_ENV === 'development'
-    ? `default-src 'self'  http://localhost:3000 https://umami.finalphase.app https://supabase.finalphase.app wss://supabase.finalphase.app https://n8n-hc0sc0wskgo4cckgck8ks8ss.finalphase.app ws://localhost:54321 http://localhost:54321;
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:3000 https://umami.finalphase.app https://js.stripe.com blob:;
+    ? `default-src 'self' http://localhost:3000 https://supabase.finalphase.app wss://supabase.finalphase.app https://n8n-hc0sc0wskgo4cckgck8ks8ss.finalphase.app ws://localhost:54321 http://localhost:54321;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:3000 https://js.stripe.com blob:;
     style-src 'self' 'unsafe-inline';
     img-src 'self' avatars.githubusercontent.com lh3.googleusercontent.com blob: data: https://*.stripe.com;
     font-src 'self';
@@ -40,9 +40,9 @@ const cspHeader =
     frame-ancestors 'none';
     upgrade-insecure-requests;`
     : `
-    default-src 'self' https://umami.finalphase.app https://supabase.finalphase.app wss://supabase.finalphase.app https://n8n-hc0sc0wskgo4cckgck8ks8ss.finalphase.app;
-    script-src 'self' 'unsafe-inline' 'https://umami.finalphase.app https://js.stripe.com blob:;
-    style-src 'self' 'unsafe-inline' ;
+    default-src 'self' https://supabase.finalphase.app wss://supabase.finalphase.app https://n8n-hc0sc0wskgo4cckgck8ks8ss.finalphase.app;
+    script-src 'self' 'unsafe-inline' https://js.stripe.com blob:;
+    style-src 'self' 'unsafe-inline';
     img-src 'self' avatars.githubusercontent.com lh3.googleusercontent.com blob: data: https://*.stripe.com;
     font-src 'self';
     object-src 'none';
@@ -56,17 +56,9 @@ const cspHeader =
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  async rewrites() {
-    return [
-      {
-        source: `/analytics.js`,
-        destination: `${process.env.NEXT_PUBLIC_UMAMI_SRC}`,
-      },
-      {
-        source: `/api/send`,
-        destination: `${process.env.NEXT_PUBLIC_UMAMI_API}`,
-      },
-    ];
+  // Next.js 16: turbopack config moved from experimental to top-level
+  turbopack: {
+    // Turbopack-specific configuration (if needed)
   },
   async headers() {
     return [
@@ -82,6 +74,8 @@ const nextConfig = {
     ];
   },
   images: {
+    // Next.js 16 changed default minimumCacheTTL to 14400, restoring to 60
+    minimumCacheTTL: 60,
     remotePatterns: [
       {
         protocol: 'https',
